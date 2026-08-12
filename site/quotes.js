@@ -127,9 +127,10 @@
     const when = new Date(payload.fetched_at || Date.now());
     const clock = when.toLocaleTimeString("zh-TW", { hour12: false });
     const notSupported = payload.other_supported === false && otherSymbols.length;
+    const via = payload.provider ? `　·　美股經 ${payload.provider}` : "";
     report(notSupported
       ? `台股已更新 ${clock}　·　美股與新興市場維持建置快照（未設定報價金鑰）`
-      : `已更新 ${clock}　·　每 ${REFRESH_MS / 1000} 秒自動更新`);
+      : `已更新 ${clock}${via}　·　每 ${REFRESH_MS / 1000} 秒自動更新`);
   }
 
   refresh();

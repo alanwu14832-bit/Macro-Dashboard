@@ -82,12 +82,12 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
 | 區塊 | 部署後是否即時 | 條件 |
 |---|---|---|
 | 台股個股與 ETF | ✅ | 免金鑰，證交所 MIS |
-| 美股個股、類股 ETF、大盤 ETF、新興市場 ETF | ✅ | 需設定 `MARKETDATA_API_KEY` |
+| 美股個股、類股 ETF、大盤 ETF、新興市場 ETF | ✅ | 需設定 `FINNHUB_API_KEY` |
 | 原始指數（^GSPC、^TWII、^KS11…） | ❌ | 報價 API 免費層不開放，維持建置快照 |
 
 要啟用美股與新興市場的即時更新：到 https://finnhub.io 申請免費金鑰，
 在 Netlify 的 Site configuration → Environment variables 新增
-`MARKETDATA_API_KEY`。沒設定時那些欄位維持建置快照，頁面會明說，不會假裝有更新。
+`FINNHUB_API_KEY`（或 `MARKETDATA_API_KEY`，兩個名稱都接受）。沒設定時那些欄位維持建置快照，頁面會明說，不會假裝有更新。
 
 原始指數改用追蹤同標的的 ETF 代表（SPY／QQQ／DIA／IWM 等），那一組是會動的。
 

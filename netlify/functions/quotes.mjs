@@ -7,10 +7,10 @@
  *
  * 路由：
  *   /api/quotes?tw=2330,0050          台股 → 證交所 MIS，免金鑰
- *   /api/quotes?us=^GSPC,AAPL         其他市場 → 需要 MARKETDATA_API_KEY
+ *   /api/quotes?us=AAPL,SPY           其他市場 → 需要 FINNHUB_API_KEY
  *   兩個參數可同時給。
  *
- * 沒設定 MARKETDATA_API_KEY 時，us 部分會回 supported:false，前端就維持
+ * 沒設定金鑰時，us 部分會回 supported:false，前端就維持
  * 建置時烤進去的快照——不會顯示錯誤，也不會假裝有更新。
  */
 
@@ -109,37 +109,102 @@ async function fetchTaiwan(codes) {
   return data;
 }
 
-/**
- * 其他市場。Yahoo 會擋資料中心 IP 且無官方免費 API，所以走可設定的供應商。
- * 目前實作 Finnhub（免費層支援美股個股與 ETF；指數需付費層）。
- */
-async function fetchOther(symbols) {
-  const token = process.env.MARKETDATA_API_KEY;
-  if (!token) return { supported: false, data: [] };
-  if (!symbols.length) return { supported: true, data: [] };
+/* ---------------------------------------------------------- 其他市場 ------
+ * Yahoo 擋資料中心 IP 且無官方免費 API，所以走可設定的供應商。
+ * 兩家的 API 形狀完全不同，這裡都實作，第一次呼叫時自動判斷是哪一家，
+ * 之後記住——使用者不必額外設定 provider。
+ * 要強制指定的話設 MARKETDATA_PROVIDER=marketdata 或 finnhub。
+ * ------------------------------------------------------------------------ */
 
-  const results = await Promise.allSettled(symbols.map(async (symbol) => {
-    const url = `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${token}`;
-    const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const q = await response.json();
-    if (q.c === undefined || q.c === 0) throw new Error("no quote");
-    return {
-      symbol,
-      price: q.c,
-      change: q.d ?? null,
-      change_percent: q.dp ?? null,
-      open: q.o ?? null, high: q.h ?? null, low: q.l ?? null,
-      previous_close: q.pc ?? null,
-      quoted_at: q.t ? new Date(q.t * 1000).toISOString() : null,
-      market_status: "",
-      is_intraday: true,
-      source: "finnhub.io",
-    };
-  }));
+let resolvedProvider = process.env.MARKETDATA_PROVIDER || null;
+
+/** marketdata.app：指數與股票分屬不同路徑，^GSPC 這種要轉成 SPX。 */
+async function quoteMarketdata(symbol, token) {
+  const isIndex = symbol.startsWith("^");
+  const bare = isIndex ? symbol.slice(1).replace(/^GSPC$/, "SPX") : symbol;
+  const kind = isIndex ? "indices" : "stocks";
+  const url = `https://api.marketdata.app/v1/${kind}/quotes/${encodeURIComponent(bare)}/`;
+
+  const response = await fetch(url, {
+    headers: { Authorization: `Token ${token}` },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const q = await response.json();
+  if (q.s !== "ok" || !q.last?.length) throw new Error(`status ${q.s}`);
+
+  const last = q.last[0];
+  const change = q.change?.[0] ?? null;
+  return {
+    symbol,
+    price: last,
+    change,
+    change_percent: q.changepct?.[0] != null ? q.changepct[0] * 100 : null,
+    open: null,
+    high: q.high?.[0] ?? null,
+    low: q.low?.[0] ?? null,
+    previous_close: change != null ? Number((last - change).toFixed(4)) : null,
+    volume: q.volume?.[0] ?? null,
+    quoted_at: q.updated?.[0] ? new Date(q.updated[0] * 1000).toISOString() : null,
+    market_status: "",
+    is_intraday: true,
+    source: "marketdata.app",
+  };
+}
+
+/** Finnhub：免費層支援美股個股與 ETF，指數需付費層。 */
+async function quoteFinnhub(symbol, token) {
+  const url = `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${token}`;
+  const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const q = await response.json();
+  if (q.c === undefined || q.c === 0) throw new Error("no quote");
+  return {
+    symbol,
+    price: q.c,
+    change: q.d ?? null,
+    change_percent: q.dp ?? null,
+    open: q.o ?? null, high: q.h ?? null, low: q.l ?? null,
+    previous_close: q.pc ?? null,
+    quoted_at: q.t ? new Date(q.t * 1000).toISOString() : null,
+    market_status: "",
+    is_intraday: true,
+    source: "finnhub.io",
+  };
+}
+
+const PROVIDERS = { marketdata: quoteMarketdata, finnhub: quoteFinnhub };
+
+/** 用一個常見代號試出金鑰屬於哪一家。 */
+async function detectProvider(token) {
+  for (const [name, fn] of Object.entries(PROVIDERS)) {
+    try {
+      await fn("AAPL", token);
+      return name;
+    } catch { /* 換下一家 */ }
+  }
+  return null;
+}
+
+async function fetchOther(symbols) {
+  // FINNHUB_API_KEY 是比較好懂的名字；MARKETDATA_API_KEY 保留相容。
+  const token = process.env.FINNHUB_API_KEY || process.env.MARKETDATA_API_KEY;
+  if (!token) return { supported: false, data: [], provider: null };
+  if (!symbols.length) return { supported: true, data: [], provider: resolvedProvider };
+
+  if (!resolvedProvider) resolvedProvider = await detectProvider(token);
+  if (!resolvedProvider) {
+    return { supported: false, data: [], provider: null,
+             note: "金鑰無法對應到已知的供應商（marketdata.app / finnhub）" };
+  }
+
+  const quote = PROVIDERS[resolvedProvider];
+  const results = await Promise.allSettled(
+    symbols.map(symbol => quote(symbol, token)));
 
   return {
     supported: true,
+    provider: resolvedProvider,
     data: results.filter(r => r.status === "fulfilled").map(r => r.value),
   };
 }
@@ -169,6 +234,8 @@ export default async (request) => {
   if (otherResult.status === "fulfilled") {
     body.other = otherResult.value.data;
     body.other_supported = otherResult.value.supported;
+    body.provider = otherResult.value.provider || null;
+    if (otherResult.value.note) body.errors.push(otherResult.value.note);
   } else {
     body.other_supported = false;
     body.errors.push(`other: ${otherResult.reason?.message || otherResult.reason}`);
