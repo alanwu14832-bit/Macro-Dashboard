@@ -23,6 +23,7 @@ ICONS = {
     "debt": "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6",
     "growth": "M3 3v18h18M7 15l4-4 3 3 5-6",
     "global": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18",
+    "news": "M4 5h13v14H4zM17 9h3v8a2 2 0 0 1-3 2M7 9h7M7 13h7M7 17h4",
     "commodities": "M12 2l9 5v10l-9 5-9-5V7zM12 12l9-5M12 12v10M12 12L3 7",
     "equities": "M3 3v18h18M7 14l3-3 3 3 5-5M18 9h3v3",
     "market": "M4 20V10M10 20V4M16 20v-7M22 20V7",
@@ -31,7 +32,7 @@ ICONS = {
     "archive": "M3 7h18v13H3zM3 3h18v4H3zM9 12h6",
 }
 
-# (href, label, icon, group). Grouping is what makes 13 items scannable.
+# (href, label, icon, group). Grouping is what makes 14 items scannable.
 NAV = [
     ("/", "總覽", "overview", None),
 
@@ -41,6 +42,7 @@ NAV = [
     ("/debt/", "長端與債務", "debt", "美國總經"),
     ("/growth/", "成長與信用", "growth", "美國總經"),
 
+    ("/news/", "國際新聞", "news", "全球與市場"),
     ("/global/", "全球對照", "global", "全球與市場"),
     ("/commodities/", "大宗商品", "commodities", "全球與市場"),
     ("/equities/", "股市報價", "equities", "全球與市場"),
@@ -147,7 +149,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 {_sidebar(path)}
   <div class="shell">
     <header class="topbar">
-      <button type="button" class="icon-btn rail-open" id="rail-open"
+      <button type="button" class="icon-btn drawer-btn" id="rail-open"
               aria-label="開啟選單" aria-controls="rail" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -162,7 +164,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 {body}
       </div>
       <footer class="site">
-        <p>資料來源：FRED（BLS、BEA、DOL、Treasury、Federal Reserve、EIA、IMF 原始資料）、OECD SDMX、ECB Data Portal、行政院主計總處、LBMA、證交所、Finnhub。</p>
+        <p>資料來源：FRED（BLS、BEA、DOL、Treasury、Federal Reserve、EIA、IMF 原始資料）、OECD SDMX、ECB Data Portal、行政院主計總處、LBMA、證交所、Finnhub。新聞來源目錄取自 <a href="https://github.com/koala73/worldmonitor" target="_blank" rel="noopener noreferrer">WorldMonitor</a>（AGPL-3.0），新聞內容版權屬各原始媒體。</p>
         <p>所有量化判定由固定規則產生，同一份資料每次執行結果一致。指標定義與門檻見各區塊底部的名詞說明。</p>
         <p>本站為個人資料整理，不構成投資建議。{esc(updated)}</p>
       </footer>

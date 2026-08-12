@@ -18,8 +18,8 @@ from datetime import date, datetime
 
 from macro import archive, data, paths
 from macro.compute import (commodities, debt, equities, freshness, growth,
-                           inflation, labor, market, rates, scenario, signals,
-                           world)
+                           inflation, labor, market, news, rates, scenario,
+                           signals, world)
 from macro.render import layout
 from macro.render.pages import (archive as archive_page,
                                 commodities as commodities_page,
@@ -28,14 +28,15 @@ from macro.render.pages import (archive as archive_page,
                                 freshness as freshness_page,
                                 fed as fed_page, growth as growth_page,
                                 inflation as inflation_page, labor as labor_page,
-                                market as market_page, overview,
+                                market as market_page, news as news_page,
+                                overview,
                                 scenario as scenario_page, world as world_page)
 
 MODULES = [
     ("labor", labor), ("inflation", inflation), ("rates", rates),
     ("debt", debt), ("growth", growth), ("market", market), ("world", world),
     ("commodities", commodities), ("equities", equities),
-    ("freshness", freshness),
+    ("news", news), ("freshness", freshness),
 ]
 
 
@@ -54,6 +55,9 @@ def main() -> int:
     started = time.time()
     ttl = 0 if args.fresh else (float("inf") if args.offline else 6 * 3600)
     verbose = not args.quiet
+    # 新聞平常走自己的短 TTL，只有使用者明講要全抓或全離線時才跟著全站走。
+    if args.fresh or args.offline:
+        news.TTL_OVERRIDE = ttl
 
     print("== 1/5 載入資料 ==", flush=True)
     bundle = data.load(verbose=verbose, ttl=ttl)
@@ -117,6 +121,9 @@ def main() -> int:
         ("/global/", "全球對照", "全球對照",
          "主要經濟體的通膨、失業、利率與匯率，每格標明資料日期。",
          lambda: world_page.render(ctx)),
+        ("/news/", "國際新聞", "國際新聞",
+         "多家獨立媒體同時報導的事件，來源目錄取自 WorldMonitor。",
+         lambda: news_page.render(ctx)),
         ("/commodities/", "大宗商品", "大宗商品",
          "貴金屬、能源、工業金屬、農產，以及銅金比與金銀比這些總經讀數。",
          lambda: commodities_page.render(ctx)),

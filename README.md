@@ -1,7 +1,8 @@
 # 總經儀表板
 
 把勞動、通膨、聯準會與利率、長端與債務、成長與信用、全球對照、大宗商品、市場面
-八個面向，用固定規則收斂成一個**可追蹤、可回溯、可反駁**的判斷。
+八個面向，用固定規則收斂成一個**可追蹤、可回溯、可反駁**的判斷，
+再配一頁國際新聞，讓當天的事件跟這些數字對得起來。
 
 產出是純靜態網站（`site/`），可直接部署到 Netlify 或任何靜態主機。
 
@@ -99,6 +100,28 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
 Netlify Function 在雲端，碰不到；底層的 Yahoo 也會擋資料中心 IP。
 Fincept 的角色是**建置時**取得快照，那部分照舊。
 
+## 國際新聞（`/news/`）
+
+新聞來源目錄取自 [WorldMonitor](https://github.com/koala73/worldmonitor)——一個
+開源的全球情勢儀表板，維護著 287 個 RSS feed、16 個分類的來源清單。
+
+**接的是它的目錄，不是它的服務。** 它的 REST API 與 MCP server 都要 API key
+（`tools/list` 公開，`tools/call` 一律 401/403），但來源目錄就寫在原始碼裡
+（`src/config/feeds.ts`），公開可讀。所以這裡在建置時抓那個檔、解析出 feed 清單，
+再自己去抓各家 RSS。不需要金鑰、不需要 Node、不需要在本機跑它那套前端，
+而且它換掉死掉的來源時，我們下次建置就跟著換。
+
+**排序看「幾家報導」，不看「誰先報」。** 標題去停用詞後比對實詞重疊，共用 3 個
+以上且重疊率達 34% 視為同一件事。單一媒體的獨家會沉下去，這是刻意的：對總經
+判讀來說，一件事的重要性比較接近它被多少家編輯台同時認為重要。
+
+只取英文來源（目錄裡還有匈牙利文、克羅埃西亞文等在地媒體），時間窗 36 小時，
+每次約 64 個來源、耗時 45 秒左右。單一來源抓不到不影響其他來源，
+失敗清單列在頁面底部。
+
+授權：WorldMonitor 是 AGPL-3.0。這裡取用的是 feed 網址與分類名稱這類事實資料，
+沒有內含或改作它的原始碼；新聞內容版權屬各原始媒體，頁面只存標題與連結。
+
 ## 目錄
 
 ```
@@ -109,9 +132,9 @@ macro/
   catalogue.py              指標目錄：series id → 中文名／單位／頻率
   data.py                   載入目錄，記錄缺漏
   archive.py                每日判斷快照與期間比對
-  sources/                  fred / sdmx / taiwan / lbma / quotes
+  sources/                  fred / sdmx / taiwan / lbma / quotes / worldmonitor
   compute/                  labor inflation rates debt growth world market
-                            commodities equities freshness signals scenario
+                            commodities equities news freshness signals scenario
   render/
     html.py                 元件庫（跳脫、格式化、卡片、表格）
     layout.py               頁面外殼、導覽、深淺色

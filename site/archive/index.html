@@ -6,47 +6,62 @@
 <title>存檔｜總經儀表板</title>
 <meta name="description" content="每天的判斷與關鍵讀數，可回看任一天的結論。">
 <meta name="color-scheme" content="light dark">
-<link rel="stylesheet" href="/style.css?v=1786561957">
+<link rel="stylesheet" href="/style.css?v=1786564871">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>📊</text></svg>">
 <script>
-(function(){try{var t=localStorage.getItem('theme');
-if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+(function(){var d=document.documentElement;try{
+var t=localStorage.getItem('theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);
+if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
+}catch(e){}})();
 </script>
 </head>
 <body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">總經儀表板<small>最後更新 2026-08-13 03:38</small></div>
-    <nav class="nav"><a href="/">總覽</a><a href="/labor/">勞動市場</a><a href="/inflation/">通膨</a><a href="/fed/">聯準會與利率</a><a href="/debt/">長端與債務</a><a href="/growth/">成長與信用</a><a href="/global/">全球對照</a><a href="/commodities/">大宗商品</a><a href="/equities/">股市報價</a><a href="/market/">市場面</a><a href="/scenario/">情境與部位</a><a href="/freshness/">資料新鮮度</a><a href="/archive/" aria-current="page">存檔</a></nav>
-    <button type="button" class="icon-btn" id="theme-toggle" aria-label="切換深淺色">主題</button>
-  </div>
-</header>
-<main class="wrap">
-<div class="page-head"><h1>存檔</h1><p class="lede">每天的判斷與關鍵讀數，可回看任一天的結論。</p></div>
+<a class="skip" href="#content">跳到主要內容</a>
+<div class="app">
+
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <a class="rail-brand" href="/">
+        <span class="rail-mark" aria-hidden="true"></span>
+        <span class="nav-label">總經儀表板</span>
+      </a>
+      <button type="button" class="rail-toggle" id="rail-toggle"
+              aria-expanded="true" aria-controls="rail" aria-label="收合側邊選單">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="nav" aria-label="主選單"><a class="nav-item" href="/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 11h7v10h-7zM3 14h7v7H3z"/></svg><span class="nav-label">總覽</span><span class="nav-tip">總覽</span></a><div class="nav-group"><span>美國總經</span></div><a class="nav-item" href="/labor/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87"/></svg><span class="nav-label">勞動市場</span><span class="nav-tip">勞動市場</span></a><a class="nav-item" href="/inflation/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M21 7h-6M21 7v6"/></svg><span class="nav-label">通膨</span><span class="nav-tip">通膨</span></a><a class="nav-item" href="/fed/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V10M9 21V10M15 21V10M19 21V10M2 10h20L12 3z"/></svg><span class="nav-label">聯準會與利率</span><span class="nav-tip">聯準會與利率</span></a><a class="nav-item" href="/debt/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span class="nav-label">長端與債務</span><span class="nav-tip">長端與債務</span></a><a class="nav-item" href="/growth/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></svg><span class="nav-label">成長與信用</span><span class="nav-tip">成長與信用</span></a><div class="nav-group"><span>全球與市場</span></div><a class="nav-item" href="/news/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13v14H4zM17 9h3v8a2 2 0 0 1-3 2M7 9h7M7 13h7M7 17h4"/></svg><span class="nav-label">國際新聞</span><span class="nav-tip">國際新聞</span></a><a class="nav-item" href="/global/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18"/></svg><span class="nav-label">全球對照</span><span class="nav-tip">全球對照</span></a><a class="nav-item" href="/commodities/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7zM12 12l9-5M12 12v10M12 12L3 7"/></svg><span class="nav-label">大宗商品</span><span class="nav-tip">大宗商品</span></a><a class="nav-item" href="/equities/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18M7 14l3-3 3 3 5-5M18 9h3v3"/></svg><span class="nav-label">股市報價</span><span class="nav-tip">股市報價</span></a><a class="nav-item" href="/market/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/></svg><span class="nav-label">市場面</span><span class="nav-tip">市場面</span></a><div class="nav-group"><span>判讀與紀錄</span></div><a class="nav-item" href="/scenario/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg><span class="nav-label">情境與部位</span><span class="nav-tip">情境與部位</span></a><a class="nav-item" href="/freshness/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2"/></svg><span class="nav-label">資料新鮮度</span><span class="nav-tip">資料新鮮度</span></a><a class="nav-item" href="/archive/" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v13H3zM3 3h18v4H3zM9 12h6"/></svg><span class="nav-label">存檔</span><span class="nav-tip">存檔</span></a></nav>
+  </aside>
+  <div class="rail-scrim" id="rail-scrim" hidden></div>
+  <div class="shell">
+    <header class="topbar">
+      <button type="button" class="icon-btn drawer-btn" id="rail-open"
+              aria-label="開啟選單" aria-controls="rail" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="topbar-title">存檔</div>
+      <div class="topbar-meta">最後更新 2026-08-13 04:03</div>
+      <button type="button" class="icon-btn" id="theme-toggle" aria-label="切換深淺色">主題</button>
+    </header>
+    <main class="content" id="content">
+      <div class="wrap">
+<header class="page-head"><h1>存檔</h1><p class="lede">每天的判斷與關鍵讀數，可回看任一天的結論。</p></header>
 <section id="current"><div class="section-head"><h2>目前判斷</h2></div><div class="card"><div class="card-title">停滯性通膨（通膨優先）</div><p class="dim">就業弱　·　通膨高　·　<span class="tag hawkish">利升息</span>　·　訊號 12 條（偏降息）</p><p class="muted">產生於 2026-08-13T02:51:36</p></div></section><section id="history"><div class="section-head"><h2>判斷歷史</h2><p class="note">共 2 筆存檔</p></div><div class="table-wrap"><table><thead><tr><th>日期</th><th>情境</th><th>九宮格位置</th><th>政策重心</th><th>傾向</th><th>訊號</th></tr></thead><tbody><tr><td class="">2026-08-13</td><td class="num">停滯性通膨</td><td class="num">弱 × 高</td><td class="num">通膨優先</td><td class="num"><span class="tag hawkish">利升息</span></td><td class="num">12 條（偏降息）</td></tr><tr><td class="">2026-08-12</td><td class="num">停滯性通膨</td><td class="num">弱 × 高</td><td class="num">通膨優先</td><td class="num"><span class="tag hawkish">利升息</span></td><td class="num">12 條（偏降息）</td></tr></tbody></table></div><details class="acc terms"><summary>這一段的名詞與意義<span class="term-count">2 個</span></summary><div class="acc-body"><div class="term"><div class="term-name">九宮格</div><div class="term-row"><span class="term-tag">是什麼</span><span class="term-text">就業（強/中/弱）× 通膨（低/中/高）的九種組合。</span></div><div class="term-row"><span class="term-tag">為什麼重要</span><span class="term-text">聯準會有兩個使命，這兩個軸就是它面對的完整狀態空間。</span></div><div class="term-row"><span class="term-tag">怎麼讀</span><span class="term-text">同一格在不同政策重心下會導出不同結論，所以格子位置只是判斷的一半。</span></div></div><div class="term"><div class="term-name">政策重心</div><div class="term-row"><span class="term-tag">是什麼</span><span class="term-text">聯準會目前把哪一個使命排在前面：通膨優先、就業優先、或兩邊並重。</span></div><div class="term-row"><span class="term-tag">為什麼重要</span><span class="term-text">在停滯性通膨（就業弱 × 通膨高）這一格，兩個使命指向相反的政策。判斷重心比判斷數據本身更重要。</span></div><div class="term-row"><span class="term-tag">怎麼讀</span><span class="term-text">本站用核心 PCE 距目標的距離與長期通膨預期是否錨定來判定。預期一旦鬆動，必定是通膨優先。</span></div></div></div></details></section><section id="daily"><div class="section-head"><h2>每日訊號明細</h2><p class="note">最近 30 筆</p></div><details class="acc"><summary>2026-08-13　停滯性通膨　（12 條訊號）</summary><div class="acc-body"><div class="signal-list"><div class="signal"><div class="sev high">■</div><div><div class="headline">核心 PCE 顯著高於目標</div><div class="evidence">核心 PCE 3.3%，距 2% 目標 +1.3 個百分點</div></div><div class="side"><span class="tag hawkish">利升息</span></div></div><div class="signal"><div class="sev high">■</div><div><div class="headline">三月均非農低於損益兩平，撐不住現有失業率</div><div class="evidence">三月均 +2.0 萬人，損益兩平約 8.3 萬人</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev high">■</div><div><div class="headline">失業率下降來自勞動力萎縮，不是就業改善</div><div class="evidence">人口月增 +14.1 萬、勞動力月增 -10.7 萬；黃金年齡就業率 12 個月 -0.3 個百分點</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">核心 CPI 近三月年化明顯低於年增率</div><div class="evidence">近三月年化 2.3%，年增 2.8%，低 0.5 個百分點</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">主動離職率降到低檔，勞工議價力下降</div><div class="evidence">主動離職率 2.0%</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">10年實質利率處於限制性水準</div><div class="evidence">10年實質利率 2.43%</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">股債同向，債券失去對沖股票的功能</div><div class="evidence">標普報酬與10年殖利率變動相關 -0.30（近一年）</div></div><div class="side"><span class="tag neutral">中性</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">核心服務除住房卡在目標之上</div><div class="evidence">年增 3.5%，已連 62 個月高於 2.5%</div></div><div class="side"><span class="tag hawkish">利升息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">初值近一年呈系統性下修，實質動能弱於初值</div><div class="evidence">近 10 個月有 70% 遭下修，平均修正 -4.5 萬人</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">期限溢酬偏高，長端在要求額外補償</div><div class="evidence">期限溢酬（近似）+0.95 個百分點</div></div><div class="side"><span class="tag hawkish">利升息</span></div></div><div class="signal"><div class="sev low">●</div><div><div class="headline">信用利差處在十年低檔，市場幾乎沒有反映風險</div><div class="evidence">高收益利差 2.70%，十年百分位 9%</div></div><div class="side"><span class="tag neutral">中性</span></div></div><div class="signal"><div class="sev low">●</div><div><div class="headline">剔除極端值後通膨明顯較低，漲勢集中</div><div class="evidence">核心 2.8%，剔除極端值均值 1.7%</div></div><div class="side"><span class="tag dovish">利降息</span></div></div></div></div></details><details class="acc"><summary>2026-08-12　停滯性通膨　（12 條訊號）</summary><div class="acc-body"><div class="signal-list"><div class="signal"><div class="sev high">■</div><div><div class="headline">核心 PCE 顯著高於目標</div><div class="evidence">核心 PCE 3.3%，距 2% 目標 +1.3 個百分點</div></div><div class="side"><span class="tag hawkish">利升息</span></div></div><div class="signal"><div class="sev high">■</div><div><div class="headline">三月均非農低於損益兩平，撐不住現有失業率</div><div class="evidence">三月均 +2.0 萬人，損益兩平約 8.3 萬人</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev high">■</div><div><div class="headline">失業率下降來自勞動力萎縮，不是就業改善</div><div class="evidence">人口月增 +14.1 萬、勞動力月增 -10.7 萬；黃金年齡就業率 12 個月 -0.3 個百分點</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">核心 CPI 近三月年化明顯低於年增率</div><div class="evidence">近三月年化 2.3%，年增 2.8%，低 0.5 個百分點</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">主動離職率降到低檔，勞工議價力下降</div><div class="evidence">主動離職率 2.0%</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">10年實質利率處於限制性水準</div><div class="evidence">10年實質利率 2.43%</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">股債同向，債券失去對沖股票的功能</div><div class="evidence">標普報酬與10年殖利率變動相關 -0.30（近一年）</div></div><div class="side"><span class="tag neutral">中性</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">核心服務除住房卡在目標之上</div><div class="evidence">年增 3.5%，已連 62 個月高於 2.5%</div></div><div class="side"><span class="tag hawkish">利升息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">初值近一年呈系統性下修，實質動能弱於初值</div><div class="evidence">近 10 個月有 70% 遭下修，平均修正 -4.5 萬人</div></div><div class="side"><span class="tag dovish">利降息</span></div></div><div class="signal"><div class="sev medium">▲</div><div><div class="headline">期限溢酬偏高，長端在要求額外補償</div><div class="evidence">期限溢酬（近似）+0.95 個百分點</div></div><div class="side"><span class="tag hawkish">利升息</span></div></div><div class="signal"><div class="sev low">●</div><div><div class="headline">信用利差處在十年低檔，市場幾乎沒有反映風險</div><div class="evidence">高收益利差 2.70%，十年百分位 9%</div></div><div class="side"><span class="tag neutral">中性</span></div></div><div class="signal"><div class="sev low">●</div><div><div class="headline">剔除極端值後通膨明顯較低，漲勢集中</div><div class="evidence">核心 2.8%，剔除極端值均值 1.7%</div></div><div class="side"><span class="tag dovish">利降息</span></div></div></div></div></details><details class="acc terms"><summary>這一段的名詞與意義<span class="term-count">1 個</span></summary><div class="acc-body"><div class="term"><div class="term-name">訊號規則引擎</div><div class="term-row"><span class="term-tag">是什麼</span><span class="term-text">一組固定的判定規則，每條規則檢查特定條件，成立就產生一條訊號。</span></div><div class="term-row"><span class="term-tag">為什麼重要</span><span class="term-text">把判斷寫成規則的好處是：同一份資料每次執行結果一致，可以跟上期比對，而且門檻攤在陽光下可以被反駁。</span></div><div class="term-row"><span class="term-tag">怎麼讀</span><span class="term-text">訊號有方向（利升息／利降息）與嚴重度（嚴重／留意／參考）。數量多不代表結論強，要看加權後的傾向。</span></div></div></div></details></section><div class="callout">存檔存的是「判斷」而不是原始資料：訊號清單、九宮格位置與關鍵讀數。原始資料本來就在 data/cache 裡，不需要重複存。</div>
-</main>
-<footer class="site">
-  <div class="wrap">
-    <p>資料來源：FRED（BLS、BEA、DOL、Treasury、Federal Reserve、EIA、IMF 原始資料）、OECD SDMX、ECB Data Portal、行政院主計總處、LBMA。</p>
-    <p>所有量化判定由固定規則產生，同一份資料每次執行結果一致。指標定義與門檻見各頁「判讀說明」。</p>
-    <p>本站為個人資料整理，不構成投資建議。最後更新 2026-08-13 03:38</p>
+      </div>
+      <footer class="site">
+        <p>資料來源：FRED（BLS、BEA、DOL、Treasury、Federal Reserve、EIA、IMF 原始資料）、OECD SDMX、ECB Data Portal、行政院主計總處、LBMA、證交所、Finnhub。新聞來源目錄取自 <a href="https://github.com/koala73/worldmonitor" target="_blank" rel="noopener noreferrer">WorldMonitor</a>（AGPL-3.0），新聞內容版權屬各原始媒體。</p>
+        <p>所有量化判定由固定規則產生，同一份資料每次執行結果一致。指標定義與門檻見各區塊底部的名詞說明。</p>
+        <p>本站為個人資料整理，不構成投資建議。最後更新 2026-08-13 04:03</p>
+      </footer>
+    </main>
   </div>
-</footer>
-<script src="/chart.js?v=1786561957" defer></script>
-<script src="/quotes.js?v=1786561957" defer></script>
-<script>
-(function(){var b=document.getElementById('theme-toggle');if(!b)return;
-var root=document.documentElement;
-function label(){var t=root.getAttribute('data-theme');
-b.textContent=t==='dark'?'淺色':t==='light'?'深色':'主題';}
-label();
-b.addEventListener('click',function(){
-var cur=root.getAttribute('data-theme');
-var mql=window.matchMedia('(prefers-color-scheme: dark)');
-var next=cur?(cur==='dark'?'light':'dark'):(mql.matches?'light':'dark');
-root.setAttribute('data-theme',next);
-try{localStorage.setItem('theme',next);}catch(e){}
-label();document.dispatchEvent(new Event('themechange'));});})();
-</script>
+</div>
+<script src="/sidebar.js?v=1786564871" defer></script>
+<script src="/chart.js?v=1786564871" defer></script>
+<script src="/quotes.js?v=1786564871" defer></script>
 </body>
 </html>

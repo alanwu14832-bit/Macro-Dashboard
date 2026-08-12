@@ -181,6 +181,29 @@
 
     draw();
     card._redraw = draw;
+
+    // 進場動畫：已經在視窗內的直接播，其餘等捲到才播。
+    // 不完全依賴 IntersectionObserver——某些環境（背景分頁、部分嵌入式
+    // 瀏覽器）它不會觸發，那時圖表仍要正常顯示，只是不播動畫。
+    queueAnimation(card);
+
+    // 響應式：容器寬度跨過斷點時重繪，讓刻度數量跟著改
+    if ("ResizeObserver" in window) {
+      let bucket = widthBucket(wrap.clientWidth);
+      const ro = new ResizeObserver(() => {
+        if (document.documentElement.classList.contains("rail-animating")) return;
+        const next = widthBucket(wrap.clientWidth);
+        if (next === bucket) return;
+        bucket = next;
+        draw();
+      });
+      ro.observe(wrap);
+    }
+  }
+
+  /** 只在跨過這幾個級距時重繪，避免每一像素都重畫。 */
+  function widthBucket(width) {
+    return width < 380 ? 0 : width < 560 ? 1 : width < 820 ? 2 : 3;
   }
 
   // ------------------------------------------------------ time-series form --
@@ -236,8 +259,11 @@
                    "stroke-dasharray": "0" }, svg);
     }
 
-    // x ticks — first, last and evenly spaced interior
-    const nTicks = Math.min(6, dates.length);
+    // x ticks — first, last and evenly spaced interior.
+    // 窄容器放不下六個日期標籤，硬塞會互相重疊。
+    const rendered = svg.parentElement?.clientWidth || 720;
+    const maxTicks = rendered < 380 ? 2 : rendered < 560 ? 3 : rendered < 820 ? 4 : 6;
+    const nTicks = Math.min(maxTicks, dates.length);
     const seen = new Set();
     for (let i = 0; i < nTicks; i++) {
       const idx = Math.round((i / (nTicks - 1 || 1)) * (dates.length - 1));
@@ -275,7 +301,8 @@
           const path = up
             ? `M${x} ${top + h} L${x} ${top + r} Q${x} ${top} ${x + r} ${top} L${x + barW - r} ${top} Q${x + barW} ${top} ${x + barW} ${top + r} L${x + barW} ${top + h} Z`
             : `M${x} ${top} L${x} ${top + h - r} Q${x} ${top + h} ${x + r} ${top + h} L${x + barW - r} ${top + h} Q${x + barW} ${top + h} ${x + barW} ${top + h - r} L${x + barW} ${top} Z`;
-          el("path", { d: path, fill, "shape-rendering": "crispEdges" }, svg);
+          el("path", { d: path, fill, "shape-rendering": "crispEdges",
+                       "data-bar": up ? "up" : "down" }, svg);
         }
       } else {
         const line = pts.map(([d, v], i) => `${i ? "L" : "M"}${X(d).toFixed(2)} ${Y(v).toFixed(2)}`).join(" ");
@@ -283,23 +310,25 @@
           const base = Y(Math.max(lo, Math.min(hi, 0)));
           el("path", {
             d: `${line} L${X(pts[pts.length - 1][0]).toFixed(2)} ${base} L${X(pts[0][0]).toFixed(2)} ${base} Z`,
-            fill: color, "fill-opacity": 0.1,
+            fill: color, "fill-opacity": 0.1, "data-fade": "",
           }, svg);
         }
         el("path", {
           d: line, fill: "none", stroke: color, "stroke-width": 2,
           "stroke-linejoin": "round", "stroke-linecap": "round",
           "stroke-dasharray": s.dashed ? "5 4" : null,
+          "data-line": s.dashed ? null : "",
         }, svg);
 
         // end marker with a 2px surface ring, plus a direct end-label
         const [ld, lv] = pts[pts.length - 1];
         el("circle", {
           cx: X(ld), cy: Y(lv), r: 4, fill: color,
-          stroke: cssVar("--surface"), "stroke-width": 2,
+          stroke: cssVar("--surface"), "stroke-width": 2, "data-fade": "",
         }, svg);
         if (spec.endLabels !== false) {
-          el("text", { class: "end-label", x: X(ld) + 9, y: Y(lv) + 4 }, svg)
+          el("text", { class: "end-label", x: X(ld) + 9, y: Y(lv) + 4,
+                       "data-fade": "" }, svg)
             .textContent = fmtVal(lv, spec);
         }
       }
@@ -414,9 +443,11 @@
         el("line", { x1: xa, x2: xb, y1: cy, y2: cy, stroke: cssVar("--axis"), "stroke-width": 2,
                      "stroke-linecap": "round" }, svg);
         el("circle", { cx: xa, cy, r: 4.5, fill: seriesColor(spec.series[0].color, 0),
-                       stroke: cssVar("--surface"), "stroke-width": 2 }, svg);
+                       stroke: cssVar("--surface"), "stroke-width": 2,
+                       "data-fade": "" }, svg);
         el("circle", { cx: xb, cy, r: 4.5, fill: seriesColor(spec.series[1].color, 1),
-                       stroke: cssVar("--surface"), "stroke-width": 2 }, svg);
+                       stroke: cssVar("--surface"), "stroke-width": 2,
+                       "data-fade": "" }, svg);
       } else {
         const zero = X(Math.max(lo, Math.min(hi, 0)));
         const x = X(r.value);
@@ -429,14 +460,15 @@
         const path = r.value >= 0
           ? `M${left} ${cy - barH / 2} L${left + w - rr} ${cy - barH / 2} Q${left + w} ${cy - barH / 2} ${left + w} ${cy - barH / 2 + rr} L${left + w} ${cy + barH / 2 - rr} Q${left + w} ${cy + barH / 2} ${left + w - rr} ${cy + barH / 2} L${left} ${cy + barH / 2} Z`
           : `M${left + w} ${cy - barH / 2} L${left + rr} ${cy - barH / 2} Q${left} ${cy - barH / 2} ${left} ${cy - barH / 2 + rr} L${left} ${cy + barH / 2 - rr} Q${left} ${cy + barH / 2} ${left + rr} ${cy + barH / 2} L${left + w} ${cy + barH / 2} Z`;
-        el("path", { d: path, fill }, svg);
+        el("path", { d: path, fill,
+                     "data-bar": r.value >= 0 ? "left" : "right" }, svg);
         // Positive bars label past their right end; negative bars label just
         // right of the baseline. Labelling a negative bar past its LEFT end
         // walks into the category-name gutter and collides with it — and a
         // label must never be clipped or overlapped to make it fit.
         el("text", { class: "end-label",
                      x: (r.value >= 0 ? x : zero) + 7, y: cy + 4,
-                     "text-anchor": "start" }, svg)
+                     "text-anchor": "start", "data-fade": "" }, svg)
           .textContent = fmtVal(r.value, spec);
       }
 
@@ -479,6 +511,117 @@
     node.appendChild(svg);
   }
 
+  // ------------------------------------------------------- entrance animation
+  const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  /**
+   * 進場動畫。原則是「動的是墨水，不是資料」——
+   * 線圖用描邊長度把線畫出來、長條從基線長出來，任何時刻看到的位置
+   * 都是最終位置，不會出現值被誇大或縮小的中間狀態。
+   */
+  function animateIn(svg, spec) {
+    if (REDUCED.matches) return;
+    const bars = [...svg.querySelectorAll("[data-bar]")];
+    const lines = [...svg.querySelectorAll("[data-line]")];
+    const fades = [...svg.querySelectorAll("[data-fade]")];
+
+    lines.forEach((path, index) => {
+      let length;
+      try { length = path.getTotalLength(); } catch { return; }
+      if (!length || !Number.isFinite(length)) return;
+      path.style.strokeDasharray = `${length}`;
+      path.style.strokeDashoffset = `${length}`;
+      path.style.transition = `stroke-dashoffset 820ms cubic-bezier(.4,0,.2,1) ${index * 110}ms`;
+      requestAnimationFrame(() => { path.style.strokeDashoffset = "0"; });
+      // 動畫結束後把 dash 屬性拿掉，否則虛線樣式的序列會被蓋掉
+      setTimeout(() => {
+        path.style.strokeDasharray = "";
+        path.style.transition = "";
+      }, 900 + index * 110);
+    });
+
+    bars.forEach((bar, index) => {
+      bar.style.transformBox = "fill-box";
+      bar.style.transformOrigin = bar.dataset.bar === "up" ? "50% 100%"
+        : bar.dataset.bar === "down" ? "50% 0%"
+        : bar.dataset.bar === "left" ? "0% 50%" : "100% 50%";
+      const axis = (bar.dataset.bar === "up" || bar.dataset.bar === "down")
+        ? "scaleY" : "scaleX";
+      bar.style.transform = `${axis}(0)`;
+      bar.style.transition =
+        `transform 560ms cubic-bezier(.34,1.2,.64,1) ${Math.min(index * 26, 420)}ms`;
+      requestAnimationFrame(() => { bar.style.transform = ""; });
+    });
+
+    const settle = lines.length ? 700 : 240;
+    fades.forEach((node) => {
+      node.style.opacity = "0";
+      node.style.transition = `opacity 320ms ease ${settle}ms`;
+      requestAnimationFrame(() => { node.style.opacity = ""; });
+    });
+  }
+
+  /** 一張圖只播一次。 */
+  const seen = new WeakSet();
+
+  function playOnce(card) {
+    if (seen.has(card)) return;
+    seen.add(card);
+    const svg = card.querySelector("svg");
+    if (svg) animateIn(svg, null);
+  }
+
+  function inViewport(node) {
+    const rect = node.getBoundingClientRect();
+    return rect.top < window.innerHeight && rect.bottom > 0;
+  }
+
+  /* 待播清單。IntersectionObserver 是效率較好的路徑，但實測有些環境
+     （背景分頁、部分嵌入式瀏覽器）它一次都不觸發，圖表就永遠不會播。
+     所以再掛一條 rAF 節流的捲動備援；playOnce 本身冪等，兩條路徑
+     同時命中也只會播一次。清單清空後兩個監聽都會拆掉。 */
+  const pending = new Set();
+  let draining = false;
+
+  function drain() {
+    draining = false;
+    for (const card of [...pending]) {
+      if (!inViewport(card)) continue;
+      pending.delete(card);
+      watcher?.unobserve(card);
+      playOnce(card);
+    }
+    if (!pending.size) {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    }
+  }
+
+  function onScroll() {
+    if (draining) return;
+    draining = true;
+    requestAnimationFrame(drain);
+  }
+
+  function queueAnimation(card) {
+    if (REDUCED.matches) return;
+    if (inViewport(card)) { playOnce(card); return; }
+    pending.add(card);
+    watcher?.observe(card);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+  }
+  const watcher = ("IntersectionObserver" in window)
+    ? new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          watcher.unobserve(entry.target);
+          pending.delete(entry.target);
+          playOnce(entry.target);
+        }
+      }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 })
+    : null;
+
   // ------------------------------------------------------------------ init --
   function init() {
     document.querySelectorAll("[data-chart]").forEach(renderChart);
@@ -496,5 +639,6 @@
   };
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaint);
   document.addEventListener("themechange", repaint);
+  document.addEventListener("layoutchange", repaint);
   window.addEventListener("scroll", hideTip, { passive: true });
 })();
