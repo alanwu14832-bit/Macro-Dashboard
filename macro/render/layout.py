@@ -15,6 +15,7 @@ NAV = [
     ("/growth/", "成長與信用"),
     ("/global/", "全球對照"),
     ("/commodities/", "大宗商品"),
+    ("/equities/", "股市報價"),
     ("/market/", "市場面"),
     ("/scenario/", "情境與部位"),
     ("/freshness/", "資料新鮮度"),

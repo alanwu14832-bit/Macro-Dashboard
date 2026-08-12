@@ -17,12 +17,14 @@ import traceback
 from datetime import date, datetime
 
 from macro import archive, data, paths
-from macro.compute import (commodities, debt, freshness, growth, inflation, labor,
-                           market, rates, scenario, signals, world)
+from macro.compute import (commodities, debt, equities, freshness, growth,
+                           inflation, labor, market, rates, scenario, signals,
+                           world)
 from macro.render import layout
 from macro.render.pages import (archive as archive_page,
                                 commodities as commodities_page,
                                 debt as debt_page,
+                                equities as equities_page,
                                 freshness as freshness_page,
                                 fed as fed_page, growth as growth_page,
                                 inflation as inflation_page, labor as labor_page,
@@ -32,7 +34,8 @@ from macro.render.pages import (archive as archive_page,
 MODULES = [
     ("labor", labor), ("inflation", inflation), ("rates", rates),
     ("debt", debt), ("growth", growth), ("market", market), ("world", world),
-    ("commodities", commodities), ("freshness", freshness),
+    ("commodities", commodities), ("equities", equities),
+    ("freshness", freshness),
 ]
 
 
@@ -117,6 +120,9 @@ def main() -> int:
         ("/commodities/", "大宗商品", "大宗商品",
          "貴金屬、能源、工業金屬、農產，以及銅金比與金銀比這些總經讀數。",
          lambda: commodities_page.render(ctx)),
+        ("/equities/", "股市報價", "股市報價",
+         "美股、台股與其他新興市場的指數與個股報價，建置時取得的快照。",
+         lambda: equities_page.render(ctx)),
         ("/market/", "市場面", "市場面",
          "股債相關性、波動率定位與實質利率張力——總經判斷被定價了多少。",
          lambda: market_page.render(ctx, found)),

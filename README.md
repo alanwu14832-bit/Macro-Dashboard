@@ -53,6 +53,8 @@ python3 -m http.server 8787 --directory site
 | ECB Data Portal | 歐元區失業率、核心 HICP | 免金鑰 |
 | 行政院主計總處 | 台灣 CPI | 免金鑰；走 curl（見下） |
 | LBMA | 黃金、白銀官方定盤價 | 免金鑰 |
+| 證交所 mis.twse.com.tw | 台股個股與 ETF 報價 | 免金鑰 |
+| Fincept Terminal | 美股、台股與新興市場指數報價 | 需本機安裝，見下 |
 
 FRED 金鑰讀取順序：環境變數 `FRED_API_KEY` → `~/.config/fincept/keys.json`。
 金鑰不會進版控，快取寫入前也會 redact 掉 URL 中的金鑰參數。
@@ -60,6 +62,22 @@ FRED 金鑰讀取順序：環境變數 `FRED_API_KEY` → `~/.config/fincept/key
 主計總處的伺服器沒有送出中介憑證，OpenSSL 補不齊憑證鏈（macOS 會透過憑證的
 AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` 讓這些主機
 改走 curl —— **TLS 驗證仍然完整開啟**，由系統信任庫執行，沒有關掉任何檢查。
+
+## 股市報價
+
+`/equities/` 有三個區塊：美股、台股、其他新興市場。分工照來源特性：
+
+- **指數與美股／新興市場個股** → Fincept Terminal 的 `yfinance_data.py`，
+  以子行程呼叫。預設路徑 `~/Desktop/fincept-mcp`，可用環境變數 `FINCEPT_ROOT`
+  覆寫。Fincept 不在時這一頁會顯示提示訊息，其餘 12 頁不受影響。
+- **台股個股與 ETF** → 直接打證交所 `mis.twse.com.tw`，用 stdlib 實作
+  （fincept 的 twse_source 需要 requests，與本專案的零依賴原則衝突）。
+  含漲跌停價，並依「報價日期 vs 今天」判斷盤中／收盤／盤前。
+
+**報價是建置當下的快照，不是串流。** twse.com.tw 與 Yahoo 都沒有送
+`Access-Control-Allow-Origin`，靜態網頁無法自行抓取。頁面上每一區都標明
+報價時間與當時的市場狀態。要做到頁面自動更新，需要 Netlify Functions
+之類的伺服器端代理。
 
 ## 目錄
 
@@ -71,9 +89,9 @@ macro/
   catalogue.py              指標目錄：series id → 中文名／單位／頻率
   data.py                   載入目錄，記錄缺漏
   archive.py                每日判斷快照與期間比對
-  sources/                  fred / sdmx / taiwan / lbma
+  sources/                  fred / sdmx / taiwan / lbma / quotes
   compute/                  labor inflation rates debt growth world market
-                            commodities freshness signals scenario
+                            commodities equities freshness signals scenario
   render/
     html.py                 元件庫（跳脫、格式化、卡片、表格）
     layout.py               頁面外殼、導覽、深淺色
