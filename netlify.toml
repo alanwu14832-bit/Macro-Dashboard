@@ -1,0 +1,33 @@
+# Netlify 只負責 serve 已經建好的 site/，不在雲端重跑 build。
+#
+# 這樣做的兩個理由：
+#   1. FRED 金鑰不需要放到 Netlify 的環境變數裡
+#   2. data/archive/ 的判斷歷史只有本機一份，不會和 CI 的另一份分岔
+#
+# 更新流程：本機排程跑 build.py → git commit → git push → Netlify 自動上線。
+
+[build]
+  publish = "site"
+  command = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# 內容每天重建一次，HTML 不要長期快取，靜態資源靠檔名的 ?v= 版本號破快取。
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/style.css"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/chart.js"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

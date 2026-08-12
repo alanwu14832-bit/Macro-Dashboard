@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>情境與部位｜總經儀表板</title>
+<meta name="description" content="九宮格定位、三種政策重心、轉換門檻與部位對照。">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="/style.css?v=1786539513">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>📊</text></svg>">
+<script>
+(function(){try{var t=localStorage.getItem('theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">總經儀表板<small>最後更新 2026-08-12 21:21</small></div>
+    <nav class="nav"><a href="/">總覽</a><a href="/labor/">勞動市場</a><a href="/inflation/">通膨</a><a href="/fed/">聯準會與利率</a><a href="/debt/">長端與債務</a><a href="/growth/">成長與信用</a><a href="/global/">全球對照</a><a href="/commodities/">大宗商品</a><a href="/market/">市場面</a><a href="/scenario/" aria-current="page">情境與部位</a><a href="/archive/">存檔</a></nav>
+    <button type="button" class="icon-btn" id="theme-toggle" aria-label="切換深淺色">主題</button>
+  </div>
+</header>
+<main class="wrap">
+<div class="page-head"><h1>情境與部位</h1><p class="lede">九宮格定位、三種政策重心、轉換門檻與部位對照。</p></div>
+<div class="verdict" style="--regime-color:var(--hawkish)"><div class="eyebrow">目前定位</div><div class="hero-figure">停滯性通膨</div><div class="chips"><span class="chip">就業弱</span><span class="chip">通膨高</span><span class="chip">重心：通膨優先</span><span class="chip hawkish"><span class="dot"></span>利升息</span></div><p class="summary">通膨回到目標前，就業轉弱不會單獨換來降息</p></div><section id="positioning"><div class="section-head"><h2>九宮格定位</h2><p class="note">格內文字是該情境在「通膨優先」重心下的政策傾向</p></div><div class="ninegrid" style="--regime-color:var(--hawkish);--regime-wash:var(--hawkish-wash)"><div class="corner"></div><div class="colhead">通膨低</div><div class="colhead">通膨中</div><div class="colhead">通膨高</div><div class="rowhead">就業強</div><div class="cell"><div class="name">金髮女孩</div><div class="lean">中性</div></div><div class="cell"><div class="name">穩健擴張</div><div class="lean">利升息</div></div><div class="cell"><div class="name">過熱</div><div class="lean">利升息</div></div><div class="rowhead">就業中</div><div class="cell"><div class="name">溫和放緩</div><div class="lean">中性</div></div><div class="cell"><div class="name">平衡</div><div class="lean">中性</div></div><div class="cell"><div class="name">通膨未解</div><div class="lean">利升息</div></div><div class="rowhead">就業弱</div><div class="cell"><div class="name">需求不足</div><div class="lean">利降息</div></div><div class="cell"><div class="name">軟著陸邊緣</div><div class="lean">中性</div></div><div class="cell active" style="--regime-color:var(--hawkish);--regime-wash:var(--hawkish-wash)"><div class="name">停滯性通膨</div><div class="lean">利升息</div></div></div></section><section id="why"><div class="section-head"><h2>這個判斷怎麼來的</h2></div><div class="card"><div class="card-title">就業：弱</div><ul style="color:var(--ink-2);margin:0 0 10px"><li>三月均非農為損益兩平的 0.24 倍</li><li>失業率距一年低點 +0.0 個百分點</li><li>黃金年齡就業率 12 個月變動 -0.3 個百分點</li></ul><div class="table-wrap"><table><thead><tr><th>分項</th><th>權重</th><th>分數 (−1 弱 ~ +1 強)</th><th>加權</th></tr></thead><tbody><tr><td class="">三月均非農 vs 損益兩平</td><td class="num">45%</td><td class="num">-1.00</td><td class="num">-0.45</td></tr><tr><td class="">失業率距一年低點</td><td class="num">25%</td><td class="num">+1.00</td><td class="num">+0.25</td></tr><tr><td class="">黃金年齡就業率 12 個月變動</td><td class="num">30%</td><td class="num">-0.75</td><td class="num">-0.22</td></tr></tbody></table></div><p class="muted" style="font-size:.83rem">加權總分 -0.42；≤ -0.33 為弱、≥ 0.33 為強。用加權分數而非投票，是因為投票制會讓「失業率在低點」抵銷掉「聘僱遠低於損益兩平」——而失業率下降有可能只是勞動力在萎縮。</p></div><div class="card"><div class="card-title">通膨：高</div><ul style="color:var(--ink-2);margin:0"><li>核心 PCE 3.3%</li><li>近三月年化 2.9%</li></ul><p class="muted" style="font-size:.83rem">門檻：核心 PCE ≤ 2.3% 為低、≥ 2.8% 為高。</p></div><div class="card"><div class="card-title">重心：通膨優先</div><ul style="color:var(--ink-2);margin:0"><li>核心 PCE 距目標 +1.3 個百分點</li><li>5y5y 通膨預期 2.31%</li></ul><p class="muted" style="font-size:.83rem">規則：長期通膨預期超過 2.55% 時必為通膨優先；否則核心 PCE 距目標超過 0.8 個百分點為通膨優先，小於 0.2 個百分點為就業優先，其餘為兩邊並重。</p></div></section><section id="regimes"><div class="section-head"><h2>同一格，三種重心下會變成什麼</h2></div><div class="table-wrap"><table><thead><tr><th>政策重心</th><th>政策傾向</th><th>說明</th></tr></thead><tbody><tr><td class="">通膨優先（目前）</td><td class="num"><span class="tag hawkish">利升息</span></td><td class="num">通膨回到目標前，就業轉弱不會單獨換來降息</td></tr><tr><td class="">就業優先</td><td class="num"><span class="tag dovish">利降息</span></td><td class="num">勞動市場惡化是決定性因素，通膨略高可以容忍</td></tr><tr><td class="">兩邊並重</td><td class="num"><span class="tag neutral">中性</span></td><td class="num">哪一邊先出現極端值，哪一邊就主導</td></tr></tbody></table></div><div class="callout">聯準會的兩個使命在停滯性通膨情境下互相衝突。同樣的數據，把哪一個使命排在前面，會導出相反的結論——所以判斷重心比判斷數據本身更重要。</div></section><section id="transitions"><div class="section-head"><h2>情境轉換門檻</h2><p class="note">這些就是接下來每次數據發布時該盯的數字</p></div><div class="table-wrap"><table><thead><tr><th>要換到哪一格</th><th>需要什麼</th><th>還差</th></tr></thead><tbody><tr><td class="">通膨由「高」轉「中」</td><td class="num">核心 PCE 需降至 2.8% 以下</td><td class="num"><span class="num">0.49 個百分點</span></td></tr><tr><td class="">通膨由「高」轉「低」</td><td class="num">核心 PCE 需降至 2.3% 以下</td><td class="num"><span class="num">0.99 個百分點</span></td></tr><tr><td class="">就業由「弱」轉「中」</td><td class="num">三月均非農需到 5.9 萬人（其他兩項不變的前提下）</td><td class="num"><span class="num">3.88 萬人</span></td></tr></tbody></table></div></section><section id="portfolio"><div class="section-head"><h2>部位對照</h2></div><div class="table-wrap"><table><thead><tr><th>部位類別</th><th>方向</th><th>原因</th></tr></thead><tbody><tr><td class="">殖利率曲線</td><td class="num"><strong>熊平</strong></td><td class="num">短端被政策推高，長端被壓抑</td></tr><tr><td class="">債券存續期間</td><td class="num"><strong>縮短</strong></td><td class="num">降息時點延後，長天期承受更多重定價風險</td></tr><tr><td class="">抗通膨債券 TIPS</td><td class="num"><strong>相對走強</strong></td><td class="num">通膨補償上升時少數受惠的固定收益資產</td></tr><tr><td class="">公司債利差</td><td class="num"><strong>走闊</strong></td><td class="num">融資成本上升壓縮企業獲利</td></tr><tr><td class="">美元</td><td class="num"><strong>偏強</strong></td><td class="num">利差擴大吸引資金流入</td></tr><tr><td class="">股票存續期間</td><td class="num"><strong>偏短</strong></td><td class="num">高估值成長股對貼現率最敏感</td></tr></tbody></table></div><div class="callout">以上對應「停滯性通膨／通膨優先」情境下政策傾向利升息的組合。情境一變，整張表就會改寫。</div><p class="muted" style="font-size:.82rem">這是情境到部位方向的機械對照，不是投資建議，也未考慮任何個人的風險承受度、稅務與既有部位。</p></section><section id="cross-check"><div class="section-head"><h2>跟其他證據對得起來嗎</h2></div><div class="card"><dl class="kv"><dt>規則引擎合計</dt><dd>偏降息</dd><dt>市場定價隱含</dt><dd>市場定價未來一至二年升息</dd><dt>長端供給壓力</dt><dd>高</dd><dt>衰退風險刻度</dt><dd>中性</dd></dl><div class="callout">九宮格是對「聯準會會怎麼想」的判斷；市場定價是對「市場已經信了多少」的判斷。兩者背離時，才有交易價值。</div></div></section><section id="glossary"><div class="section-head"><h2>判讀說明</h2></div><details class="acc"><summary>方法與門檻</summary><div class="acc-body"><dl class="kv" style="grid-template-columns:auto 1fr"><dt>九宮格</dt><dd style='text-align:left'>就業（強/中/弱）× 通膨（低/中/高）的九種組合。每格在不同政策重心下有不同的政策傾向。</dd><dt>政策重心</dt><dd style='text-align:left'>聯準會把哪一個使命排在前面。由核心 PCE 距目標的距離與長期通膨預期是否錨定決定。</dd><dt>損益兩平就業增速</dt><dd style='text-align:left'>維持失業率不變所需的月增就業＝人口月增 × 勞參率 × (1−失業率)。</dd><dt>為什麼要三種重心</dt><dd style='text-align:left'>同樣一格在不同重心下結論相反。明列三種，讀者可以自己判斷聯準會站在哪一邊。</dd><dt>所有門檻</dt><dd style='text-align:left'>全部寫死在 macro/compute/scenario.py 的 EMPLOYMENT_BANDS、INFLATION_BANDS、REGIME_RULES。改門檻等於改判斷，不會藏在別處。</dd></dl></div></details></section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <p>資料來源：FRED（BLS、BEA、DOL、Treasury、Federal Reserve、EIA、IMF 原始資料）、OECD SDMX、ECB Data Portal、行政院主計總處、LBMA。</p>
+    <p>所有量化判定由固定規則產生，同一份資料每次執行結果一致。指標定義與門檻見各頁「判讀說明」。</p>
+    <p>本站為個人資料整理，不構成投資建議。最後更新 2026-08-12 21:21</p>
+  </div>
+</footer>
+<script src="/chart.js?v=1786539513" defer></script>
+<script>
+(function(){var b=document.getElementById('theme-toggle');if(!b)return;
+var root=document.documentElement;
+function label(){var t=root.getAttribute('data-theme');
+b.textContent=t==='dark'?'淺色':t==='light'?'深色':'主題';}
+label();
+b.addEventListener('click',function(){
+var cur=root.getAttribute('data-theme');
+var mql=window.matchMedia('(prefers-color-scheme: dark)');
+var next=cur?(cur==='dark'?'light':'dark'):(mql.matches?'light':'dark');
+root.setAttribute('data-theme',next);
+try{localStorage.setItem('theme',next);}catch(e){}
+label();document.dispatchEvent(new Event('themechange'));});})();
+</script>
+</body>
+</html>
