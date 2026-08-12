@@ -173,9 +173,16 @@ async function quoteFinnhub(symbol, token) {
   };
 }
 
-const PROVIDERS = { marketdata: quoteMarketdata, finnhub: quoteFinnhub };
+const PROVIDERS = { finnhub: quoteFinnhub, marketdata: quoteMarketdata };
 
-/** 用一個常見代號試出金鑰屬於哪一家。 */
+/**
+ * 用一個常見代號試出金鑰屬於哪一家。
+ *
+ * 順序很重要：marketdata.app 對「未認證」請求也會回資料，所以它一定會
+ * 「通過」測試，先試它就永遠選中它，使用者真正的金鑰反而沒被用到——
+ * 而未認證額度只夠一兩次請求，結果是幾乎每檔都失敗。
+ * Finnhub 的無效金鑰會明確回 401，是可靠的否定訊號，所以先試它。
+ */
 async function detectProvider(token) {
   for (const [name, fn] of Object.entries(PROVIDERS)) {
     try {
@@ -186,26 +193,48 @@ async function detectProvider(token) {
   return null;
 }
 
-async function fetchOther(symbols) {
-  // FINNHUB_API_KEY 是比較好懂的名字；MARKETDATA_API_KEY 保留相容。
-  const token = process.env.FINNHUB_API_KEY || process.env.MARKETDATA_API_KEY;
-  if (!token) return { supported: false, data: [], provider: null };
-  if (!symbols.length) return { supported: true, data: [], provider: resolvedProvider };
+function readToken() {
+  if (process.env.FINNHUB_API_KEY) {
+    // 變數名稱本身就說明了供應商，不需要（也不該）再猜。
+    return { token: process.env.FINNHUB_API_KEY, provider: "finnhub", from: "FINNHUB_API_KEY" };
+  }
+  if (process.env.MARKETDATA_API_KEY) {
+    return { token: process.env.MARKETDATA_API_KEY, provider: null, from: "MARKETDATA_API_KEY" };
+  }
+  return { token: null, provider: null, from: null };
+}
 
-  if (!resolvedProvider) resolvedProvider = await detectProvider(token);
-  if (!resolvedProvider) {
-    return { supported: false, data: [], provider: null,
-             note: "金鑰無法對應到已知的供應商（marketdata.app / finnhub）" };
+async function fetchOther(symbols) {
+  const { token, provider: declared, from } = readToken();
+  if (!token) return { supported: false, data: [], provider: null, key_source: null };
+  if (!symbols.length) {
+    return { supported: true, data: [], provider: declared || resolvedProvider, key_source: from };
   }
 
-  const quote = PROVIDERS[resolvedProvider];
+  let provider = declared || resolvedProvider;
+  if (!provider) {
+    provider = await detectProvider(token);
+    resolvedProvider = provider;
+  }
+  if (!provider) {
+    return { supported: false, data: [], provider: null, key_source: from,
+             note: "金鑰無法對應到已知的供應商（finnhub / marketdata.app）" };
+  }
+
+  const quote = PROVIDERS[provider];
   const results = await Promise.allSettled(
     symbols.map(symbol => quote(symbol, token)));
 
+  const failures = results.filter(r => r.status === "rejected");
   return {
     supported: true,
-    provider: resolvedProvider,
+    provider,
+    key_source: from,
     data: results.filter(r => r.status === "fulfilled").map(r => r.value),
+    // 部分失敗要說出來，否則使用者只會看到「有些格子沒更新」卻不知道為什麼
+    note: failures.length
+      ? `${failures.length}/${symbols.length} 檔取不到：${failures[0].reason?.message || failures[0].reason}`
+      : undefined,
   };
 }
 
@@ -235,6 +264,7 @@ export default async (request) => {
     body.other = otherResult.value.data;
     body.other_supported = otherResult.value.supported;
     body.provider = otherResult.value.provider || null;
+    body.key_source = otherResult.value.key_source || null;
     if (otherResult.value.note) body.errors.push(otherResult.value.note);
   } else {
     body.other_supported = false;
