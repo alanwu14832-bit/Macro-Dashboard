@@ -78,7 +78,9 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
 ### 即時更新（Netlify Function 代理）
 
 `netlify/functions/quotes.mjs` 在伺服器端代抓報價再加上 CORS 標頭送回瀏覽器，
-`macro/render/static/quotes.js` 每 20 秒就地換掉頁面上的數字。
+`macro/render/static/quotes.js` 每 45 秒就地換掉頁面上的數字。
+間隔是 45 秒而不是更短，是因為頁面上有四十幾個非台股代號，而 Finnhub
+免費層是每分鐘 60 次呼叫；代理端另有逐檔 45 秒快取，所有訪客共用。
 
 | 區塊 | 部署後是否即時 | 條件 |
 |---|---|---|
@@ -88,7 +90,8 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
 
 要啟用美股與新興市場的即時更新：到 https://finnhub.io 申請免費金鑰，
 在 Netlify 的 Site configuration → Environment variables 新增
-`FINNHUB_API_KEY`（或 `MARKETDATA_API_KEY`，兩個名稱都接受）。沒設定時那些欄位維持建置快照，頁面會明說，不會假裝有更新。
+`FINNHUB_API_KEY`（`MARKETDATA_API_KEY` 為相容用的舊名）。
+沒設定時那些欄位維持建置快照，狀態列會明說，不會假裝有更新。
 
 原始指數改用追蹤同標的的 ETF 代表（SPY／QQQ／DIA／IWM 等），那一組是會動的。
 

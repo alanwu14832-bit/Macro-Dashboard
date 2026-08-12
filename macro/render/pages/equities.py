@@ -91,11 +91,14 @@ def render(ctx: dict) -> str:
         f'<span class="quote-status" id="quote-status">建置快照 {esc(fetched)}</span>'
         f'</div>'
         + callout(
-            f'頁面載入後會透過 <code>/api/quotes</code> 代理向證交所要最新報價，'
-            f'台股每 20 秒更新一次；沒有代理的環境（例如本機預覽）就維持'
-            f'建置當下的快照。<br>'
-            f'美股與新興市場需要在 Netlify 設定 <code>MARKETDATA_API_KEY</code> '
-            f'才會即時更新——Yahoo 會擋資料中心 IP，沒有可靠的免費替代。'
+            f'頁面載入後會透過 <code>/api/quotes</code> 代理更新報價，每 45 秒一次：'
+            f'台股取自證交所，美股與新興市場的個股與 ETF 取自 Finnhub。'
+            f'上方狀態列會顯示實際的更新時間與來源。<br>'
+            f'<strong>原始指數（^GSPC、^TWII、^KS11 等）維持建置快照</strong>——'
+            f'報價 API 的免費層不含指數，所以本站另列一組追蹤同標的的大盤 ETF，'
+            f'那一組才是會跳動的。<br>'
+            f'沒有代理的環境（例如本機以 http.server 預覽）會安靜降級成建置快照，'
+            f'狀態列的燈號會轉灰並註明。'
             f'　<a href="/freshness/">看更新時程 →</a>'))
 
     # ================================================================ 美股 ==
@@ -123,7 +126,7 @@ def render(ctx: dict) -> str:
             + callout("原始指數（^GSPC 等）在報價 API 的免費層不開放，這幾檔 ETF "
                       "追蹤相同標的且開放存取——所以<strong>它們是會即時更新的那一組</strong>，"
                       "上面的指數欄位則維持建置快照。"),
-            note="設定報價金鑰後這一組會每 20 秒更新"))
+            note="每 45 秒更新"))
 
     if us["stocks"]:
         body.append(section(

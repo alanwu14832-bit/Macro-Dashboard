@@ -107,7 +107,7 @@
       failures++;
       // 沒有 functions 的環境（本機預覽、其他靜態主機）第一次就會失敗。
       // 快速重試一次確認不是暫時性的，再確定停用——不要讓「live」燈號在
-      // 根本不會更新的頁面上繼續跳 20 秒。
+      // 根本不會更新的頁面上繼續跳。
       if (failures === 1) {
         clearInterval(timer);
         setTimeout(refresh, 2000);
@@ -132,7 +132,7 @@
     const notSupported = payload.other_supported === false && otherSymbols.length;
     const via = payload.provider ? `　·　美股經 ${payload.provider}` : "";
     report(notSupported
-      ? `台股已更新 ${clock}　·　美股與新興市場維持建置快照（未設定報價金鑰）`
+      ? `台股已更新 ${clock}　·　美股與新興市場維持建置快照（代理未設定 Finnhub 金鑰）`
       : `已更新 ${clock}${via}　·　每 ${REFRESH_MS / 1000} 秒自動更新`);
     if (payload.errors?.length) {
       status.title = payload.errors.join("；");   // 詳情放 tooltip，不佔版面
