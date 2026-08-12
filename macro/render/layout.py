@@ -17,6 +17,7 @@ NAV = [
     ("/commodities/", "大宗商品"),
     ("/market/", "市場面"),
     ("/scenario/", "情境與部位"),
+    ("/freshness/", "資料新鮮度"),
     ("/archive/", "存檔"),
 ]
 

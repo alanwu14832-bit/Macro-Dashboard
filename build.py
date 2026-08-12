@@ -17,12 +17,13 @@ import traceback
 from datetime import date, datetime
 
 from macro import archive, data, paths
-from macro.compute import (commodities, debt, growth, inflation, labor, market,
-                           rates, scenario, signals, world)
+from macro.compute import (commodities, debt, freshness, growth, inflation, labor,
+                           market, rates, scenario, signals, world)
 from macro.render import layout
 from macro.render.pages import (archive as archive_page,
                                 commodities as commodities_page,
                                 debt as debt_page,
+                                freshness as freshness_page,
                                 fed as fed_page, growth as growth_page,
                                 inflation as inflation_page, labor as labor_page,
                                 market as market_page, overview,
@@ -31,7 +32,7 @@ from macro.render.pages import (archive as archive_page,
 MODULES = [
     ("labor", labor), ("inflation", inflation), ("rates", rates),
     ("debt", debt), ("growth", growth), ("market", market), ("world", world),
-    ("commodities", commodities),
+    ("commodities", commodities), ("freshness", freshness),
 ]
 
 
@@ -122,6 +123,9 @@ def main() -> int:
         ("/scenario/", "情境與部位", "情境與部位",
          "九宮格定位、三種政策重心、轉換門檻與部位對照。",
          lambda: scenario_page.render(ctx, scenario_data, summary)),
+        ("/freshness/", "資料新鮮度", "資料新鮮度",
+         "每個指標多新、下次什麼時候更新，以及為什麼總經資料沒有即時可言。",
+         lambda: freshness_page.render(ctx)),
         ("/archive/", "存檔", "存檔",
          "每天的判斷與關鍵讀數，可回看任一天的結論。",
          lambda: archive_page.render(snapshots)),

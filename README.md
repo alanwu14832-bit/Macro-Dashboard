@@ -73,7 +73,7 @@ macro/
   archive.py                每日判斷快照與期間比對
   sources/                  fred / sdmx / taiwan / lbma
   compute/                  labor inflation rates debt growth world market
-                            commodities signals scenario
+                            commodities freshness signals scenario
   render/
     html.py                 元件庫（跳脫、格式化、卡片、表格）
     layout.py               頁面外殼、導覽、深淺色
@@ -85,15 +85,29 @@ data/archive/               每日判斷快照（刪掉就失去歷史）
 site/                       產出，部署這個目錄
 ```
 
-## 每天自動更新
+## 自動更新
 
 ```bash
 cd /path/to/macro-dashboard && python3 build.py
 ```
 
-把上面這行掛到排程（cron 或 scheduled-tasks）即可。每次執行會寫入一筆
-`data/archive/YYYY-MM-DD.json`，隔天起 `/archive/` 頁與總覽的「跟上期比，
-什麼變了」就會有內容。
+掛到排程即可。目前的設定是 **每天 08:45 與 21:45（台北時間）**：
+
+| 時間（台北） | 對應 | 抓得到什麼 |
+|---|---|---|
+| 08:45 | 美國前一交易日收盤後 | 公債殖利率、匯率、股價、信用利差 |
+| 21:45 | 美國 8:30am ET 數據發布後約 75 分鐘 | 非農、CPI、PCE、零售、初領失業金 |
+
+**為什麼沒有「即時」。** 這個儀表板的資料本身不是即時的：非農與 CPI 月頻、
+GDP 季頻、JOLTS 還延遲一個月，而 FRED 的日頻序列也是收盤後隔天才發布。
+再高的重建頻率也改變不了這件事。
+
+所以本站的做法不是提高重整頻率，而是把新鮮度攤開：`/freshness/` 頁列出每個
+指標的最新資料日期、FRED 上次更新時間、**下次發布日與倒數天數**（取自 FRED
+官方發布行事曆），總覽頁也會用一列 chip 標出七天內即將發布的項目。
+
+每次執行會寫入一筆 `data/archive/YYYY-MM-DD.json`（同一天重跑會覆蓋），
+隔天起 `/archive/` 頁與總覽的「跟上期比，什麼變了」就會有內容。
 
 ## 免責
 

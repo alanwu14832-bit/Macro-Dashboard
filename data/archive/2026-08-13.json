@@ -1,0 +1,136 @@
+{
+ "date": "2026-08-13",
+ "generated_at": "2026-08-13T02:51:36",
+ "signals": [
+  {
+   "key": "core_pce_above_target",
+   "headline": "核心 PCE 顯著高於目標",
+   "direction": "hawkish",
+   "severity": "high",
+   "evidence": "核心 PCE 3.3%，距 2% 目標 +1.3 個百分點",
+   "module": "物價"
+  },
+  {
+   "key": "payrolls_below_breakeven",
+   "headline": "三月均非農低於損益兩平，撐不住現有失業率",
+   "direction": "dovish",
+   "severity": "high",
+   "evidence": "三月均 +2.0 萬人，損益兩平約 8.3 萬人",
+   "module": "就業"
+  },
+  {
+   "key": "unemployment_falling_for_wrong_reason",
+   "headline": "失業率下降來自勞動力萎縮，不是就業改善",
+   "direction": "dovish",
+   "severity": "high",
+   "evidence": "人口月增 +14.1 萬、勞動力月增 -10.7 萬；黃金年齡就業率 12 個月 -0.3 個百分點",
+   "module": "就業"
+  },
+  {
+   "key": "momentum_cooling",
+   "headline": "核心 CPI 近三月年化明顯低於年增率",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "近三月年化 2.3%，年增 2.8%，低 0.5 個百分點",
+   "module": "物價"
+  },
+  {
+   "key": "quits_collapsed",
+   "headline": "主動離職率降到低檔，勞工議價力下降",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "主動離職率 2.0%",
+   "module": "就業"
+  },
+  {
+   "key": "real_rate_restrictive",
+   "headline": "10年實質利率處於限制性水準",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "10年實質利率 2.43%",
+   "module": "利率"
+  },
+  {
+   "key": "stock_bond_correlation_positive",
+   "headline": "股債同向，債券失去對沖股票的功能",
+   "direction": "neutral",
+   "severity": "medium",
+   "evidence": "標普報酬與10年殖利率變動相關 -0.30（近一年）",
+   "module": "市場"
+  },
+  {
+   "key": "supercore_sticky",
+   "headline": "核心服務除住房卡在目標之上",
+   "direction": "hawkish",
+   "severity": "medium",
+   "evidence": "年增 3.5%，已連 62 個月高於 2.5%",
+   "module": "物價"
+  },
+  {
+   "key": "systematic_downward_revisions",
+   "headline": "初值近一年呈系統性下修，實質動能弱於初值",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "近 10 個月有 70% 遭下修，平均修正 -4.5 萬人",
+   "module": "就業"
+  },
+  {
+   "key": "term_premium_elevated",
+   "headline": "期限溢酬偏高，長端在要求額外補償",
+   "direction": "hawkish",
+   "severity": "medium",
+   "evidence": "期限溢酬（近似）+0.95 個百分點",
+   "module": "利率"
+  },
+  {
+   "key": "credit_complacent",
+   "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
+   "direction": "neutral",
+   "severity": "low",
+   "evidence": "高收益利差 2.70%，十年百分位 9%",
+   "module": "利率"
+  },
+  {
+   "key": "inflation_narrow",
+   "headline": "剔除極端值後通膨明顯較低，漲勢集中",
+   "direction": "dovish",
+   "severity": "low",
+   "evidence": "核心 2.8%，剔除極端值均值 1.7%",
+   "module": "物價"
+  }
+ ],
+ "summary": {
+  "total": 12,
+  "hawkish": 3,
+  "dovish": 7,
+  "neutral": 2,
+  "score": -8,
+  "tilt": "偏降息"
+ },
+ "scenario": {
+  "name": "停滯性通膨",
+  "employment": "弱",
+  "inflation": "高",
+  "regime": "通膨優先",
+  "lean": "hawkish"
+ },
+ "readings": {
+  "payrolls_latest": -23.0,
+  "payrolls_3m": 20.0,
+  "breakeven": 83.26981016666666,
+  "unemployment": 4.1,
+  "core_cpi": 2.80581107579545,
+  "core_pce": 3.286526430967074,
+  "supercore": 3.4701779812646327,
+  "ten_year": 4.72,
+  "real_ten_year": 2.43,
+  "curve_10_2": 0.46999999999999975,
+  "recession_gauge": 42.361300990134694,
+  "composite_labor": -7.669245534102035
+ },
+ "as_of": {
+  "labor": "2026-07-01",
+  "inflation": "2026-06-01",
+  "rates": "2026-08-10"
+ }
+}

@@ -61,6 +61,12 @@ def narrative(ctx: dict, scenario: dict, summary: dict) -> str:
     return "".join(f"<p>{b}</p>" for b in bits)
 
 
+def _when(days: int | None) -> str:
+    if days is None:
+        return "時程未定"
+    return {0: "今天", 1: "明天"}.get(days, f"{days} 天後")
+
+
 def key_line(scenario: dict) -> str:
     transitions = scenario.get("transitions") or []
     if not transitions:
@@ -196,6 +202,23 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
         note=f"共 {summary['total']} 條：{summary['dovish']} 條利降息、"
              f"{summary['hawkish']} 條利升息、{summary['neutral']} 條中性。依嚴重度排序。",
         terms=["signal_engine", "hawkish_dovish"]))
+
+    # ---- 資料新鮮度 ----
+    fresh = ctx.get("freshness") or {}
+    imminent = fresh.get("imminent") or []
+    if imminent:
+        chips = "".join(
+            f'<span class="chip">{esc(r["name"])}'
+            f'<strong style="margin-left:4px">{esc(_when(r["days_away"]))}</strong>'
+            f'</span>'
+            for r in imminent[:6])
+        body.append(section(
+            "fresh", "接下來幾天會有新數字",
+            f'<div class="chips">{chips}</div>'
+            f'<p class="muted" style="margin-top:10px">'
+            f'發布後本站的下一次建置就會帶進來，訊號與九宮格判定也可能跟著改變。'
+            f'　<a href="/freshness/">看完整發布時程與資料新鮮度 →</a></p>',
+            note="資料來源：FRED 官方發布行事曆"))
 
     # ---- 接下來看什麼 ----
     transitions = scenario.get("transitions") or []
