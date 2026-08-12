@@ -18,9 +18,19 @@ def _clock(moment: datetime | None) -> str:
     return f"{local.month}/{local.day} {local.hour:02d}:{local.minute:02d}"
 
 
+def _safe_link(url: str) -> str:
+    """只放行 http(s)。
+
+    標題與連結都是第三方 RSS 給的，`esc` 擋得住屬性跳脫，但擋不住
+    `javascript:` 這種 scheme——那要在這裡擋。
+    """
+    return url if url.lower().startswith(("http://", "https://")) else ""
+
+
 def _row(*, badge: str, badge_class: str, headline: str, link: str,
          note: str, side: str, extra: str = "") -> str:
     title = esc(headline)
+    link = _safe_link(link.strip())
     if link:
         title = (f'<a href="{esc(link)}" target="_blank" rel="noopener noreferrer">'
                  f'{title}</a>')
