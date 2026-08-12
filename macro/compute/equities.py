@@ -20,6 +20,13 @@ US_STOCKS = [
     ("AMZN", "亞馬遜"), ("META", "Meta"), ("TSLA", "特斯拉"), ("AVGO", "博通"),
     ("JPM", "摩根大通"), ("XOM", "埃克森美孚"),
 ]
+# 大盤 ETF。原始指數（^GSPC 等）在多數報價 API 的免費層不開放，這些 ETF
+# 追蹤同樣的標的且開放，所以它們是「能即時更新」的那一組。
+US_PROXIES = [
+    ("SPY", "SPDR 標普 500"), ("QQQ", "Invesco 那斯達克 100"),
+    ("DIA", "SPDR 道瓊"), ("IWM", "iShares 羅素 2000"),
+    ("VXX", "波動率期貨 ETN"),
+]
 US_SECTORS = [
     ("XLK", "科技"), ("XLF", "金融"), ("XLE", "能源"), ("XLV", "醫療"),
     ("XLI", "工業"), ("XLY", "非必需消費"), ("XLP", "必需消費"), ("XLU", "公用事業"),
@@ -106,6 +113,7 @@ def compute(bundle=None) -> dict:
 
     us_indices = _fetch(US_INDICES, "美股")
     us_stocks = _fetch(US_STOCKS, "美股")
+    us_proxies = _fetch(US_PROXIES, "美股")
     us_sectors = _fetch(US_SECTORS, "美股")
 
     tw_index = _fetch(TW_INDICES, "台股")          # 加權指數走 yfinance
@@ -119,7 +127,8 @@ def compute(bundle=None) -> dict:
         "available": True,
         "fetched_at": datetime.now(),
         "us": {
-            "indices": us_indices, "stocks": us_stocks, "sectors": us_sectors,
+            "indices": us_indices, "proxies": us_proxies,
+            "stocks": us_stocks, "sectors": us_sectors,
             "breadth": _breadth(us_stocks),
             "sector_breadth": _breadth(us_sectors),
             "status": _market_note(us_indices),

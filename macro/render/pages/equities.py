@@ -10,20 +10,35 @@ def _stamp(rows: list[dict]) -> str:
     return when.strftime("%Y-%m-%d %H:%M") if when else "—"
 
 
+def _live(symbol: str, field: str, market: str, digits: int, inner: str) -> str:
+    """把一個數字包成可被 quotes.js 就地更新的欄位。
+
+    沒有報價代理時這些屬性只是死的標記，頁面照樣顯示建置時的快照。
+    """
+    return (f'<span data-quote="{esc(symbol)}" data-field="{esc(field)}" '
+            f'data-market="{esc(market)}" data-digits="{digits}">{inner}</span>')
+
+
 def _quote_table(rows: list[dict], *, with_limits: bool = False,
-                 price_digits: int = 2) -> str:
+                 price_digits: int = 2, market: str = "other") -> str:
     headers = ["名稱", "代號", "價格", "漲跌", "漲跌幅", "開盤", "最高", "最低", "昨收"]
     if with_limits:
         headers += ["漲停", "跌停"]
     body = []
     for r in rows:
+        symbol = str(r["symbol"])
         row = [
-            esc(r["name"]), esc(r["symbol"]),
-            f'<strong>{fmt(r["price"], price_digits)}</strong>',
-            delta_span(r["change"], price_digits),
-            delta_span(r["change_percent"], 2, suffix="%"),
-            fmt(r["open"], price_digits), fmt(r["high"], price_digits),
-            fmt(r["low"], price_digits), fmt(r["previous_close"], price_digits),
+            esc(r["name"]), esc(symbol),
+            "<strong>" + _live(symbol, "price", market, price_digits,
+                               fmt(r["price"], price_digits)) + "</strong>",
+            _live(symbol, "change", market, price_digits,
+                  delta_span(r["change"], price_digits)),
+            _live(symbol, "change_percent", market, 2,
+                  delta_span(r["change_percent"], 2, suffix="%")),
+            fmt(r["open"], price_digits),
+            _live(symbol, "high", market, price_digits, fmt(r["high"], price_digits)),
+            _live(symbol, "low", market, price_digits, fmt(r["low"], price_digits)),
+            fmt(r["previous_close"], price_digits),
         ]
         if with_limits:
             row += [fmt(r["limit_up"], price_digits), fmt(r["limit_down"], price_digits)]
@@ -70,12 +85,18 @@ def render(ctx: dict) -> str:
 
     fetched = d["fetched_at"].strftime("%Y-%m-%d %H:%M")
 
-    body.append(callout(
-        f'以下報價於 <strong>{esc(fetched)}</strong> 建置時取得。'
-        f'本站是靜態網站，而 twse.com.tw 與 Yahoo 都沒有開放跨來源存取（CORS），'
-        f'網頁無法自行更新報價——所以這是<strong>快照而不是串流</strong>。'
-        f'每一區都標明了當時的市場狀態，盤中與收盤價不會混為一談。'
-        f'　<a href="/freshness/">看更新時程 →</a>', key=True))
+    body.append(
+        f'<div class="live-bar" data-quotes-live>'
+        f'<span class="live-dot"></span>'
+        f'<span class="quote-status" id="quote-status">建置快照 {esc(fetched)}</span>'
+        f'</div>'
+        + callout(
+            f'頁面載入後會透過 <code>/api/quotes</code> 代理向證交所要最新報價，'
+            f'台股每 20 秒更新一次；沒有代理的環境（例如本機預覽）就維持'
+            f'建置當下的快照。<br>'
+            f'美股與新興市場需要在 Netlify 設定 <code>MARKETDATA_API_KEY</code> '
+            f'才會即時更新——Yahoo 會擋資料中心 IP，沒有可靠的免費替代。'
+            f'　<a href="/freshness/">看更新時程 →</a>'))
 
     # ================================================================ 美股 ==
     us = d["us"]
@@ -94,6 +115,15 @@ def render(ctx: dict) -> str:
             + f'<div class="grid grid-3">{"".join(tiles)}</div>',
             note=f'報價時間 {_stamp(us["indices"])}',
             terms=["drawdown", "vix"]))
+
+    if us.get("proxies"):
+        body.append(section(
+            "us-etf", "大盤 ETF",
+            _quote_table(us["proxies"])
+            + callout("原始指數（^GSPC 等）在報價 API 的免費層不開放，這幾檔 ETF "
+                      "追蹤相同標的且開放存取——所以<strong>它們是會即時更新的那一組</strong>，"
+                      "上面的指數欄位則維持建置快照。"),
+            note="設定報價金鑰後這一組會每 20 秒更新"))
 
     if us["stocks"]:
         body.append(section(
@@ -123,11 +153,16 @@ def render(ctx: dict) -> str:
                       f'{fmt(r["change_percent"], 2, suffix="%", signed=True)}',
                 asof=f'昨收 {fmt(r["previous_close"], 2)}'))
         for r in tw["stocks"][:3]:
+            symbol = str(r["symbol"])
             tiles.append(stat(
-                r["name"], fmt(r["price"], 2),
-                delta=f'{fmt(r["change"], 2, signed=True)}　'
-                      f'{fmt(r["change_percent"], 2, suffix="%", signed=True)}',
-                asof=f'{esc(r["symbol"])}　昨收 {fmt(r["previous_close"], 2)}'))
+                r["name"],
+                _live(symbol, "price", "tw", 2, fmt(r["price"], 2)),
+                delta=_live(symbol, "change", "tw", 2,
+                            fmt(r["change"], 2, signed=True))
+                      + "　"
+                      + _live(symbol, "change_percent", "tw", 2,
+                              fmt(r["change_percent"], 2, suffix="%", signed=True)),
+                asof=f'{esc(symbol)}　昨收 {fmt(r["previous_close"], 2)}'))
         body.append(section(
             "tw", "台灣股市",
             _status_note(tw["status"], "證交所 mis.twse.com.tw（指數為 Fincept）")
@@ -137,7 +172,7 @@ def render(ctx: dict) -> str:
     if tw["stocks"]:
         body.append(section(
             "tw-stocks", "台股權值股",
-            _quote_table(tw["stocks"], with_limits=True)
+            _quote_table(tw["stocks"], with_limits=True, market="tw")
             + _breadth_line(tw["breadth"], "十檔權值股")
             + _movers_chart(tw["stocks"], "台股權值股漲跌幅"),
             note="含漲跌停價；資料為證交所官方報價"))
@@ -145,7 +180,7 @@ def render(ctx: dict) -> str:
     if tw["etfs"]:
         body.append(section(
             "tw-etfs", "台股主要 ETF",
-            _quote_table(tw["etfs"], with_limits=True),
+            _quote_table(tw["etfs"], with_limits=True, market="tw"),
             note="市值型與高股息型各兩檔"))
 
     # ========================================================== 新興市場 ==

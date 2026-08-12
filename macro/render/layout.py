@@ -113,6 +113,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
   </div>
 </footer>
 <script src="/chart.js?v={version}" defer></script>
+<script src="/quotes.js?v={version}" defer></script>
 <script>{THEME_TOGGLE}</script>
 </body>
 </html>

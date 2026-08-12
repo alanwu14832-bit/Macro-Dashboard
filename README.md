@@ -74,10 +74,30 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
   （fincept 的 twse_source 需要 requests，與本專案的零依賴原則衝突）。
   含漲跌停價，並依「報價日期 vs 今天」判斷盤中／收盤／盤前。
 
-**報價是建置當下的快照，不是串流。** twse.com.tw 與 Yahoo 都沒有送
-`Access-Control-Allow-Origin`，靜態網頁無法自行抓取。頁面上每一區都標明
-報價時間與當時的市場狀態。要做到頁面自動更新，需要 Netlify Functions
-之類的伺服器端代理。
+### 即時更新（Netlify Function 代理）
+
+`netlify/functions/quotes.mjs` 在伺服器端代抓報價再加上 CORS 標頭送回瀏覽器，
+`macro/render/static/quotes.js` 每 20 秒就地換掉頁面上的數字。
+
+| 區塊 | 部署後是否即時 | 條件 |
+|---|---|---|
+| 台股個股與 ETF | ✅ | 免金鑰，證交所 MIS |
+| 美股個股、類股 ETF、大盤 ETF、新興市場 ETF | ✅ | 需設定 `MARKETDATA_API_KEY` |
+| 原始指數（^GSPC、^TWII、^KS11…） | ❌ | 報價 API 免費層不開放，維持建置快照 |
+
+要啟用美股與新興市場的即時更新：到 https://finnhub.io 申請免費金鑰，
+在 Netlify 的 Site configuration → Environment variables 新增
+`MARKETDATA_API_KEY`。沒設定時那些欄位維持建置快照，頁面會明說，不會假裝有更新。
+
+原始指數改用追蹤同標的的 ETF 代表（SPY／QQQ／DIA／IWM 等），那一組是會動的。
+
+**沒有代理的環境會安靜降級。** 本機用 `python3 -m http.server` 預覽時
+`/api/quotes` 不存在，腳本重試一次後就停用，燈號轉灰並標示「顯示的是建置
+當下的快照」——不會讓 live 燈號在根本不更新的頁面上繼續跳。
+
+不能用 Fincept Terminal 當這個代理的資料源：它是跑在本機的 Python 程式，
+Netlify Function 在雲端，碰不到；底層的 Yahoo 也會擋資料中心 IP。
+Fincept 的角色是**建置時**取得快照，那部分照舊。
 
 ## 目錄
 
