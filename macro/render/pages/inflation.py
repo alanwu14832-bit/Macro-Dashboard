@@ -1,11 +1,10 @@
 """通膨頁。"""
 from __future__ import annotations
 
-from ..common import (checks_block, glossary, hbar_chart, legend_note,
+from ..common import (checks_block, hbar_chart, legend_note,
                       line_chart, signals_block)
 from ..html import (accordion, callout, delta_span, esc, fmt, kv, pct, section,
                     stat, table, zh_date)
-
 
 def render(ctx: dict, signals: list[dict]) -> str:
     d = ctx["inflation"]
@@ -15,7 +14,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
     body = []
 
     body.append(section("signals", "本期關鍵訊號",
-                        signals_block(signals, module="物價") + legend_note()))
+                        signals_block(signals, module="物價") + legend_note(),
+                        terms=["signal_engine", "hawkish_dovish"]))
 
     tiles = [
         stat("核心 PCE", pct(headline["core_pce"], 1),
@@ -36,7 +36,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
              asof=f'連 {supercore["months_above"]} 個月高於 2.5%'),
     ]
     body.append(section("numbers", "關鍵數字",
-                        f'<div class="grid grid-4">{"".join(tiles)}</div>'))
+                        f'<div class="grid grid-4">{"".join(tiles)}</div>',
+                        terms=["core_pce", "core_cpi", "cpi", "supercore"]))
 
     # ---- 動能 ----
     rows = [
@@ -58,7 +59,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
         table(["指標", "年增率", "近六月年化", "近三月年化", "動能差"], rows)
         + callout("近月年化低於年增率＝通膨在降溫，而且這個訊號會先於年增率出現。"
                   "反過來則是再加速的早期證據。"),
-        note="近三月年化把最近三個月的漲幅換算成全年速度"))
+        note="近三月年化把最近三個月的漲幅換算成全年速度",
+        terms=["yoy_vs_annualised"]))
 
     body.append(section("trend", "走勢", f'<div class="grid grid-2">' + "".join([
         line_chart("核心通膨與目標",
@@ -70,7 +72,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
                    [(supercore["series"], "核心服務除住房", "series-1")],
                    years=15, default_years=5, suffix="%", digits=1, target=2.5,
                    sub="從服務 CPI 剔除住房後重建，最貼近薪資壓力"),
-    ]) + "</div>"))
+    ]) + "</div>",
+                        terms=["core_pce", "supercore"]))
 
     # ---- 分項貢獻 ----
     contributions = d["contributions"]
@@ -90,7 +93,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
             "contributions", "分項貢獻分解",
             chart_html + accordion("展開分項數字",
                                    table(["分項", "權重", "年增", "近三月年化", "貢獻"],
-                                         rows, foot=esc(foot)))))
+                                         rows, foot=esc(foot))),
+        terms=["contribution"]))
 
     # ---- 廣度 ----
     breadth = d["breadth"]
@@ -106,7 +110,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
                       f'核心 CPI {pct(breadth["core"], 1)}，'
                       f'三個剔除極端值指標的均值 {pct(breadth["average"], 1)}。'
                       f'集中式的漲價比全面性漲價更容易自行消退。', key=True),
-            note="中位數與截尾平均剔除當月漲跌最極端的項目"))
+            note="中位數與截尾平均剔除當月漲跌最極端的項目",
+        terms=["trimmed_median", "sticky_cpi"]))
 
     # ---- 住房落後 ----
     shelter = d["shelter"]
@@ -123,7 +128,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
         ]) + callout(
             "CPI 住房項落後市場租金約 9 至 12 個月。近三月年化低於年增率時，"
             "代表住房還會繼續把整體讀數往下拉；兩者收斂後這股下拉力道就消失了。")
-            + "</div>", note="表面讀數與實際通膨的落差來源"))
+            + "</div>", note="表面讀數與實際通膨的落差來源",
+                        terms=["shelter_lag", "oer"]))
 
     # ---- 能源 ----
     energy = d["energy"]
@@ -143,7 +149,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
             f'油價領先汽油幾個月？實測相關係數'
             + (f'（最強：落後 {best["lag"]} 個月，r={fmt(best["corr"], 2)}）' if best else ""),
             table(["落後期數", "相關係數"], lag_rows)) if lag_rows else "")
-            + "</div>", note="傳導係數由實測相關係數決定，不是套固定值"))
+            + "</div>", note="傳導係數由實測相關係數決定，不是套固定值",
+                        terms=["energy_passthrough"]))
 
     # ---- 薪資傳導 ----
     wages = d["wages"]
@@ -161,7 +168,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
                             ]) + callout(
                                 "薪資減生產力＝單位勞動成本，那才是服務業通膨的底線。"
                                 "薪資漲得比生產力快多少，大致就是企業必須轉嫁的幅度。")
-                            + "</div>"))
+                            + "</div>",
+                        terms=["eci", "productivity_ulc"]))
 
     # ---- 預期 ----
     expectations = d["expectations"]
@@ -181,17 +189,10 @@ def render(ctx: dict, signals: list[dict]) -> str:
                                      [(expectations["t5y5y_series"], "5y5y 通膨預期", "series-1")],
                                      years=20, default_years=10, suffix="%", digits=2,
                                      target=2.0,
-                                     sub="預期一旦脫錨，壓通膨的成本會大幅上升")))
+                                     sub="預期一旦脫錨，壓通膨的成本會大幅上升"),
+                        terms=["inflation_expectations", "five_y_five_y", "breakeven_inflation"]))
 
-    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"])))
-
-    body.append(section("glossary", "判讀說明", accordion("名詞與門檻", glossary([
-        ("核心 PCE", "剔除食物與能源的個人消費支出物價指數。聯準會的 2% 目標是以這個指標計算。"),
-        ("核心服務除住房", "服務 CPI 剔除住房後的部分，本站以 BLS 相對權重加權相減後重建。最貼近薪資壓力。"),
-        ("近三月年化", "把最近三個月的累計漲幅換算成全年速度，比年增率更早反映轉折。"),
-        ("中位數 CPI / 截尾平均 CPI", "剔除當月漲跌最極端的項目後的通膨率，用來判斷漲勢是集中還是全面。"),
-        ("住房落後", "CPI 住房項採樣方式使其落後市場租金約 9 至 12 個月。"),
-        ("通膨補償", "同天期名目公債與抗通膨公債的殖利率差，代表市場定價的平均通膨預期。"),
-    ]))))
+    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"]),
+                        terms=["check_lights"]))
 
     return "".join(body)

@@ -1,11 +1,10 @@
 """聯準會與利率頁：政策立場、完整殖利率曲線、長端拆解、信用。"""
 from __future__ import annotations
 
-from ..common import (checks_block, curve_chart, glossary, hbar_chart,
+from ..common import (checks_block, curve_chart, hbar_chart,
                       legend_note, line_chart, signals_block)
 from ..html import (accordion, callout, delta_span, esc, fmt, kv, pct, section,
                     stat, table, zh_date)
-
 
 def render(ctx: dict, signals: list[dict]) -> str:
     d = ctx["rates"]
@@ -15,7 +14,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
     body = []
 
     body.append(section("signals", "本期關鍵訊號",
-                        signals_block(signals, module="利率") + legend_note()))
+                        signals_block(signals, module="利率") + legend_note(),
+                        terms=["signal_engine", "hawkish_dovish"]))
 
     tiles = [
         stat("政策利率上緣", pct(stance["policy"], 2),
@@ -31,7 +31,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
              delta=esc(stance["market_implies"])),
     ]
     body.append(section("numbers", "政策立場",
-                        f'<div class="grid grid-4">{"".join(tiles)}</div>'))
+                        f'<div class="grid grid-4">{"".join(tiles)}</div>',
+                        terms=["fed_funds", "real_policy_rate"]))
 
     # ---- 曲線 ----
     curve_rows = d["curve"]["rows"]
@@ -54,14 +55,16 @@ def render(ctx: dict, signals: list[dict]) -> str:
                 ("水準近三月變動", fmt(shape.get("level_change_3m"), 2, suffix=" pp", signed=True)),
             ]) + "</div>"
             + accordion("展開 11 個期限的完整數字",
-                        table(["期限", "現在", "三個月前", "近一月", "近三月", "近一年"], rows))))
+                        table(["期限", "現在", "三個月前", "近一月", "近三月", "近一年"], rows)),
+        terms=["yield_curve"]))
 
     body.append(section("slope", "曲線斜率走勢", line_chart(
         "10年減2年 與 10年減3個月",
         [(shape.get("slope_series"), "10Y − 2Y", "series-1"),
          (shape.get("slope_3m_series"), "10Y − 3M", "series-2")],
         years=20, default_years=10, suffix="%", digits=2, target=0,
-        sub="兩條都跌破零線時，衰退訊號最強")))
+        sub="兩條都跌破零線時，衰退訊號最強"),
+                        terms=["curve_inversion"]))
 
     # ---- 長端拆解 ----
     body.append(section("decomposition", "長端利率拆解", f'<div class="card">' + kv([
@@ -78,14 +81,16 @@ def render(ctx: dict, signals: list[dict]) -> str:
         "那是成長預期或供給問題。兩者對股債的意義完全不同。")
         + '<p class="muted" style="font-size:.82rem">'
           '期限溢酬為近似值：10 年實質利率減去「政策利率減通膨補償」的短期實質利率，'
-          '不等同 ACM 或 Kim-Wright 模型的估計。</p></div>'))
+          '不等同 ACM 或 Kim-Wright 模型的估計。</p></div>',
+                        terms=["real_rate", "breakeven_inflation", "term_premium"]))
 
     body.append(section("real", "實質利率與通膨補償", line_chart(
         "10 年實質利率 vs 通膨補償",
         [(decomposition["real_series"], "10 年實質利率", "series-1"),
          (decomposition["breakeven_series"], "10 年通膨補償", "series-2")],
         years=20, default_years=10, suffix="%", digits=2,
-        sub="兩者相加約等於名目殖利率")))
+        sub="兩者相加約等於名目殖利率"),
+                        terms=["real_rate", "breakeven_inflation"]))
 
     # ---- 信用 ----
     credit = d["credit"]
@@ -105,13 +110,15 @@ def render(ctx: dict, signals: list[dict]) -> str:
                        sign_color=None,
                        sub="百分位低＝利差在十年低檔＝市場沒有反映壓力")
             + table(["級距", "利差", "近一月", "近三月", "十年百分位", "z 分數"], rows)
-            + callout(f'判定：<strong>{esc(credit["verdict"])}</strong>', key=True)))
+            + callout(f'判定：<strong>{esc(credit["verdict"])}</strong>', key=True),
+        terms=["credit_spread", "percentile_rank", "zscore"]))
 
     body.append(section("credit-trend", "高收益與投資級利差走勢", line_chart(
         "信用利差", [(credit.get("hy_series"), "高收益", "series-2"),
                     (credit.get("ig_series"), "投資級", "series-1")],
         years=20, default_years=10, suffix="%", digits=2,
-        sub="利差擴大通常領先違約率與失業率")))
+        sub="利差擴大通常領先違約率與失業率"),
+                        terms=["credit_spread"]))
 
     # ---- 金融情勢與資產負債表 ----
     conditions = d["conditions"]
@@ -127,17 +134,10 @@ def render(ctx: dict, signals: list[dict]) -> str:
              delta="政策傳導到家戶的實際成本"),
     ]
     body.append(section("conditions", "金融情勢",
-                        f'<div class="grid grid-4">{"".join(tiles)}</div>'))
+                        f'<div class="grid grid-4">{"".join(tiles)}</div>',
+                        terms=["nfci", "balance_sheet"]))
 
-    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"])))
-
-    body.append(section("glossary", "判讀說明", accordion("名詞與門檻", glossary([
-        ("實質利率", "名目殖利率減通膨補償，即抗通膨公債（TIPS）的殖利率。真正的緊縮程度看這個。"),
-        ("通膨補償", "名目公債與 TIPS 的殖利率差，代表市場定價的平均通膨預期。"),
-        ("期限溢酬", "投資人為承擔長天期風險要求的額外補償。本站為近似值，非 ACM 模型估計。"),
-        ("曲線倒掛", "短天期殖利率高於長天期。10 年減 3 個月是歷史上最可靠的衰退領先指標之一。"),
-        ("信用利差", "公司債與同天期公債的殖利率差。十年百分位低代表市場對風險定價不足。"),
-        ("金融情勢指數", "芝加哥聯準綜合貨幣、債務與股權市場的指標。正值＝緊、負值＝鬆。"),
-    ]))))
+    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"]),
+                        terms=["check_lights"]))
 
     return "".join(body)

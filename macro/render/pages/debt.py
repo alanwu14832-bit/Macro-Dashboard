@@ -1,11 +1,10 @@
 """長端與債務頁。"""
 from __future__ import annotations
 
-from ..common import (checks_block, glossary, legend_note, line_chart,
+from ..common import (checks_block, legend_note, line_chart,
                       signals_block)
 from ..html import (accordion, callout, esc, fmt, kv, pct, section, stat,
                     table, zh_date)
-
 
 def render(ctx: dict, signals: list[dict]) -> str:
     d = ctx["debt"]
@@ -16,7 +15,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
     body = []
 
     body.append(section("signals", "本期關鍵訊號",
-                        signals_block(signals, module="債務") + legend_note()))
+                        signals_block(signals, module="債務") + legend_note(),
+                        terms=["signal_engine", "hawkish_dovish"]))
 
     tiles = [
         stat("聯邦債務佔 GDP", fmt(dynamics["debt_gdp"], 0, suffix="%"),
@@ -32,7 +32,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
              asof=f'佔 GDP {fmt(fiscal["interest_gdp"], 1, suffix="%")}'),
     ]
     body.append(section("numbers", "關鍵數字",
-                        f'<div class="grid grid-4">{"".join(tiles)}</div>'))
+                        f'<div class="grid grid-4">{"".join(tiles)}</div>',
+                        terms=["debt_to_gdp", "r_minus_g", "interest_burden"]))
 
     # ---- 長端為什麼在這裡 ----
     reasons = "".join(f"<li>{esc(r)}</li>" for r in supply["reasons"])
@@ -47,7 +48,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
         + callout(
             "長端利率不只由聯準會決定。降息可以壓低短端，但長端還要看發債量、"
             "買盤結構與財政可持續性——這也是降息後長端反而上行的常見原因。")
-        + "</div>"))
+        + "</div>",
+        terms=["term_premium"]))
 
     # ---- 債務動態 ----
     body.append(section("dynamics", "債務動態：r − g 框架", f'<div class="card">' + kv([
@@ -59,7 +61,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
     ]) + callout(f'判定：<strong>{esc(dynamics["verdict"])}</strong>。'
                  f'r 大於 g 時，就算基本收支平衡，債務佔 GDP 仍會上升——'
                  f'這意味著長端供給只會增加，不會減少。', key=True)
-        + "</div>", note="決定債務是否可持續的基本恆等式"))
+        + "</div>", note="決定債務是否可持續的基本恆等式",
+                        terms=["r_minus_g", "primary_balance"]))
 
     body.append(section("debt-trend", "債務與利息負擔走勢",
                         f'<div class="grid grid-2">' + "".join([
@@ -71,7 +74,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
                                        [(fiscal["interest_series"], "利息支出（十億美元）", "series-2")],
                                        years=40, default_years=10, digits=0, freq="q",
                                        sub="舊債以更高利率換新債，這條線會持續上行"),
-                        ]) + "</div>"))
+                        ]) + "</div>",
+                        terms=["debt_to_gdp", "interest_burden"]))
 
     # ---- 買盤 ----
     body.append(section("holders", "誰在吃這些債", f'<div class="card">' + kv([
@@ -84,15 +88,10 @@ def render(ctx: dict, signals: list[dict]) -> str:
     ]) + callout(
         "外國央行與主權基金是長端最穩定的買盤。這個佔比下降時，"
         "同樣的發債量必須由對價格更敏感的本國買盤吸收，長端就需要更高的殖利率。")
-        + "</div>"))
+        + "</div>",
+                        terms=["foreign_holdings"]))
 
-    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"])))
-
-    body.append(section("glossary", "判讀說明", accordion("名詞與門檻", glossary([
-        ("r − g", "實質利率減實質經濟成長率。大於零時債務佔 GDP 會自動累積，即使基本收支平衡。"),
-        ("基本盈餘", "不含利息支出的財政收支。穩定債務比所需的基本盈餘 ≈ (r−g)/(1+g) × 債務比。"),
-        ("期限溢酬", "投資人為承擔長天期風險要求的補償。供給增加時通常上升。"),
-        ("利息佔 GDP", "聯邦利息支出佔經濟規模的比例。超過 2.5% 時開始明顯排擠其他支出。"),
-    ]))))
+    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"]),
+                        terms=["check_lights"]))
 
     return "".join(body)

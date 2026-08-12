@@ -1,11 +1,10 @@
 """成長與信用頁。"""
 from __future__ import annotations
 
-from ..common import (checks_block, glossary, hbar_chart, legend_note,
+from ..common import (checks_block, hbar_chart, legend_note,
                       line_chart, signals_block)
 from ..html import (accordion, callout, delta_span, esc, fmt, kv, pct, section,
                     stat, table, zh_date)
-
 
 def render(ctx: dict, signals: list[dict]) -> str:
     d = ctx["growth"]
@@ -16,7 +15,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
     body = []
 
     body.append(section("signals", "本期關鍵訊號",
-                        signals_block(signals, module="成長") + legend_note()))
+                        signals_block(signals, module="成長") + legend_note(),
+                        terms=["signal_engine", "hawkish_dovish"]))
 
     tiles = [
         stat("實質 GDP 年化季增", pct(activity["gdp_qoq"], 1),
@@ -30,7 +30,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
              delta=f'儲蓄率 {pct(activity["savings"], 1)}'),
     ]
     body.append(section("numbers", "活動面",
-                        f'<div class="grid grid-4">{"".join(tiles)}</div>'))
+                        f'<div class="grid grid-4">{"".join(tiles)}</div>',
+                        terms=["real_gdp", "retail_sales", "consumer_sentiment"]))
 
     # ---- 衰退刻度 ----
     if gauge.get("value") is not None:
@@ -49,7 +50,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
                 "多個領先指標同時偏向風險端時，單一指標的雜訊會被抵消。")
             + (f'<p class="muted">Sahm 法則即時值：{fmt(gauge["sahm"], 2)}</p>'
                if gauge.get("sahm") is not None else "")
-            + "</div>"))
+            + "</div>",
+        terms=["recession_gauge", "sahm_rule", "zscore"]))
 
     body.append(section("activity-trend", "活動面走勢",
                         f'<div class="grid grid-2">' + "".join([
@@ -70,7 +72,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
                                        [(activity["savings_series"], "儲蓄率", "series-3")],
                                        years=20, default_years=10, suffix="%", digits=1,
                                        sub="緩衝薄時，消費對衝擊更敏感"),
-                        ]) + "</div>"))
+                        ]) + "</div>",
+                        terms=["retail_sales", "consumer_sentiment"]))
 
     # ---- 住宅 ----
     tiles = [
@@ -91,7 +94,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
                                      [(housing["starts_series"], "新屋開工", "series-1"),
                                       (housing["permits_series"], "建築許可", "series-2")],
                                      years=25, default_years=10, digits=0, suffix=" 千戶",
-                                     sub="住宅對利率最敏感，通常最早反應")))
+                                     sub="住宅對利率最敏感，通常最早反應"),
+                        terms=["housing_starts"]))
 
     # ---- 信用循環 ----
     if credit.get("rows"):
@@ -109,21 +113,17 @@ def render(ctx: dict, signals: list[dict]) -> str:
             ]) + table(["違約率", "目前", "近一年變動", "十年百分位"], rows)
             + callout("銀行收緊放款標準領先就業惡化約二至四個季度。"
                       "違約率則是落後指標，用來確認循環已經轉向。")
-            + "</div>", note=f'{zh_date(credit["as_of"], freq="q")} 資料'))
+            + "</div>", note=f'{zh_date(credit["as_of"], freq="q")} 資料',
+        terms=["sloos", "delinquency"]))
 
         body.append(section("credit-trend", "放款標準走勢", line_chart(
             "銀行淨收緊工商放款標準的比例",
             [(credit["standards_series"], "淨收緊比例", "series-2")],
             years=30, default_years=10, suffix="%", digits=0, target=0, freq="q",
-            sub="正值＝收緊的銀行多於放寬的銀行")))
+            sub="正值＝收緊的銀行多於放寬的銀行"),
+                        terms=["sloos"]))
 
-    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"])))
-
-    body.append(section("glossary", "判讀說明", accordion("名詞與門檻", glossary([
-        ("Sahm 法則", "三月均失業率高出前一年低點 0.5 個百分點時，歷史上多半已進入衰退。"),
-        ("放款標準調查", "聯準會每季調查銀行是否收緊放款標準（SLOOS）。正值代表收緊的銀行較多。"),
-        ("衰退風險刻度", "本站自訂：五個領先指標各取十年 z 分數、依方向調號後平均並壓縮到 0–100。是相對定位，不是機率。"),
-        ("核心資本財訂單", "剔除國防與飛機的資本財新訂單，是企業投資意願的領先指標。"),
-    ]))))
+    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"]),
+                        terms=["check_lights"]))
 
     return "".join(body)

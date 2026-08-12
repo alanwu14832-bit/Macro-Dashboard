@@ -48,7 +48,8 @@ def render(ctx: dict) -> str:
     body.append(section(
         "countries", "主要經濟體對照",
         table(["", "CPI 年增", "失業率", "政策利率", "10 年公債", "實質殖利率"], table_rows)
-        + note, note="實質殖利率＝10 年公債殖利率 − CPI 年增率"))
+        + note, note="實質殖利率＝10 年公債殖利率 − CPI 年增率",
+        terms=["global_real_yield", "hicp"]))
 
     # ---- 資料來源說明（誠實交代缺口）----
     gaps = d.get("gaps") or []
@@ -76,7 +77,8 @@ def render(ctx: dict) -> str:
               "sub": f'{zh_date(r["cpi_date"])} 資料'} for r in
              sorted(fresh, key=lambda x: x["cpi"], reverse=True)],
             suffix="%", digits=1, label_width=80, sign_color=None,
-            sub="只列出仍在更新的來源")))
+            sub="只列出仍在更新的來源"),
+                        terms=["hicp", "policy_divergence"]))
 
     # ---- 美元 ----
     tiles = [
@@ -98,7 +100,8 @@ def render(ctx: dict) -> str:
                         + line_chart("美元指數（廣義）",
                                      [(dollar["broad_series"], "美元指數", "series-1")],
                                      years=20, default_years=5, digits=1, freq="d",
-                                     sub="美元走強會透過進口價格壓低美國通膨，同時緊縮全球美元流動性")))
+                                     sub="美元走強會透過進口價格壓低美國通膨，同時緊縮全球美元流動性"),
+                        terms=["dollar_index"]))
 
     # ---- 匯率 ----
     fx = d["fx"]
@@ -118,7 +121,8 @@ def render(ctx: dict) -> str:
                          suffix="%", digits=1, label_width=120,
                          sign_color=("series-1", "series-8"),
                          sub="正值＝美元升值。顏色只標正負，與升降息方向無關"),
-            note=f'{zh_date(fx["as_of"], freq="d")} 資料'))
+            note=f'{zh_date(fx["as_of"], freq="d")} 資料',
+        terms=["dollar_index", "policy_divergence"]))
 
     body.append(section("glossary", "判讀說明", accordion("資料來源與名詞", glossary([
         ("各國 CPI", "取自 OECD SDMX（OECD.SDD.TPS,DSD_PRICES）。美國取自 FRED，歐元區取自 FRED 的 Eurostat HICP。"),

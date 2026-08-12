@@ -186,14 +186,16 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
         f'</div>')
 
     # ---- 模組入口 ----
-    body.append(section("modules", "各模組現況", module_cards(ctx, signals)))
+    body.append(section("modules", "各模組現況", module_cards(ctx, signals),
+                        terms=["nine_grid"]))
 
     # ---- 關鍵訊號 ----
     body.append(section(
         "signals", "本期關鍵訊號",
         signals_block(signals) + legend_note(),
         note=f"共 {summary['total']} 條：{summary['dovish']} 條利降息、"
-             f"{summary['hawkish']} 條利升息、{summary['neutral']} 條中性。依嚴重度排序。"))
+             f"{summary['hawkish']} 條利升息、{summary['neutral']} 條中性。依嚴重度排序。",
+        terms=["signal_engine", "hawkish_dovish"]))
 
     # ---- 接下來看什麼 ----
     transitions = scenario.get("transitions") or []
@@ -203,7 +205,8 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
                   if t.get("gap") is not None else '<span class="muted">—</span>')]
                 for t in transitions]
         body.append(section("watch", "接下來要盯什麼",
-                            table(["情境轉換", "需要什麼", "還差"], rows)))
+                            table(["情境轉換", "需要什麼", "還差"], rows),
+                        terms=["transition_threshold"]))
 
     # ---- 變化 ----
     body.append(section("changed", "跟上期比，什麼變了",

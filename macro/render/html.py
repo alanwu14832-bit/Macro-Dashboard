@@ -216,11 +216,48 @@ def card(title: str, body: str, *, sub: str = "") -> str:
     return f'<div class="card">{head}{body}</div>'
 
 
-def section(anchor: str, title: str, body: str, *, note: str = "") -> str:
+FIELD_LABELS = [
+    ("what", "是什麼"),
+    ("how", "怎麼算"),
+    ("why", "為什麼重要"),
+    ("read", "怎麼讀"),
+]
+
+
+def terms_block(keys: list[str], *, title: str = "這一段的名詞與意義") -> str:
+    """區塊底部的名詞解釋。
+
+    收合起來，讓已經懂的人不會被擋路；展開後每個詞都給「是什麼／怎麼算／
+    為什麼重要／怎麼讀」，因為只給定義的名詞表沒有教育意義——讀者真正卡住的
+    地方是「知道它的定義，但不知道看到這個數字該想什麼」。
+    """
+    from .. import glossary
+
+    entries = [glossary.get(k) for k in keys]
+    entries = [e for e in entries if e]
+    if not entries:
+        return ""
+
+    items = []
+    for entry in entries:
+        rows = "".join(
+            f'<div class="term-row"><span class="term-tag">{esc(label)}</span>'
+            f'<span class="term-text">{entry[field]}</span></div>'
+            for field, label in FIELD_LABELS if entry.get(field))
+        items.append(f'<div class="term"><div class="term-name">{esc(entry["term"])}</div>'
+                     f'{rows}</div>')
+
+    return (f'<details class="acc terms"><summary>{esc(title)}'
+            f'<span class="term-count">{len(entries)} 個</span></summary>'
+            f'<div class="acc-body">{"".join(items)}</div></details>')
+
+
+def section(anchor: str, title: str, body: str, *, note: str = "",
+            terms: list[str] | None = None) -> str:
     note_html = f'<p class="note">{esc(note)}</p>' if note else ""
     return (f'<section id="{esc(anchor)}">'
             f'<div class="section-head"><h2>{esc(title)}</h2>{note_html}</div>'
-            f'{body}</section>')
+            f'{body}{terms_block(terms) if terms else ""}</section>')
 
 
 def table(headers: list[str], rows: list[list[str]], *, foot: str = "",

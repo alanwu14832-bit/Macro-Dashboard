@@ -1,7 +1,6 @@
 """情境與部位頁：九宮格、政策重心、轉換門檻、部位對照。"""
 from __future__ import annotations
 
-from ..common import glossary
 from ..html import (accordion, callout, direction_class, direction_label, esc,
                     fmt, kv, section, table, tag)
 
@@ -9,7 +8,6 @@ LEAN_COLOR = {"hawkish": "var(--hawkish)", "dovish": "var(--dovish)",
               "neutral": "var(--neutral)"}
 LEAN_WASH = {"hawkish": "var(--hawkish-wash)", "dovish": "var(--dovish-wash)",
              "neutral": "var(--neutral-wash)"}
-
 
 def nine_grid(scenario: dict) -> str:
     lean = scenario["lean"]
@@ -31,7 +29,6 @@ def nine_grid(scenario: dict) -> str:
     return (f'<div class="ninegrid" style="--regime-color:{LEAN_COLOR[lean]};'
             f'--regime-wash:{LEAN_WASH[lean]}">{"".join(cells)}</div>')
 
-
 def render(ctx: dict, scenario: dict, summary: dict) -> str:
     lean = scenario["lean"]
     body = []
@@ -52,7 +49,8 @@ def render(ctx: dict, scenario: dict, summary: dict) -> str:
     # ---- 九宮格 ----
     body.append(section(
         "positioning", "九宮格定位", nine_grid(scenario),
-        note=f'格內文字是該情境在「{scenario["regime_label"]}」重心下的政策傾向'))
+        note=f'格內文字是該情境在「{scenario["regime_label"]}」重心下的政策傾向',
+        terms=["nine_grid", "policy_regime"]))
 
     # ---- 判定依據 ----
     detail = scenario.get("employment_detail") or {}
@@ -91,7 +89,8 @@ def render(ctx: dict, scenario: dict, summary: dict) -> str:
         f'{scenario["bands"]["regime"]["expectations_threshold"]}% 時必為通膨優先；'
         f'否則核心 PCE 距目標超過 {scenario["bands"]["regime"]["inflation_first_gap"]} '
         f'個百分點為通膨優先，小於 0.2 個百分點為就業優先，其餘為兩邊並重。</p></div>',
-    ])))
+    ]),
+                        terms=["breakeven_payrolls", "prime_epop", "core_pce", "five_y_five_y"]))
 
     # ---- 三種重心 ----
     rows = [[esc(a["label"]) + ("（目前）" if a["active"] else ""),
@@ -102,7 +101,8 @@ def render(ctx: dict, scenario: dict, summary: dict) -> str:
         table(["政策重心", "政策傾向", "說明"], rows)
         + callout("聯準會的兩個使命在停滯性通膨情境下互相衝突。"
                   "同樣的數據，把哪一個使命排在前面，會導出相反的結論——"
-                  "所以判斷重心比判斷數據本身更重要。")))
+                  "所以判斷重心比判斷數據本身更重要。"),
+        terms=["policy_regime"]))
 
     # ---- 轉換門檻 ----
     transitions = scenario.get("transitions") or []
@@ -113,7 +113,8 @@ def render(ctx: dict, scenario: dict, summary: dict) -> str:
                 for t in transitions]
         body.append(section("transitions", "情境轉換門檻",
                             table(["要換到哪一格", "需要什麼", "還差"], rows),
-                            note="這些就是接下來每次數據發布時該盯的數字"))
+                            note="這些就是接下來每次數據發布時該盯的數字",
+                        terms=["transition_threshold"]))
 
     # ---- 部位對照 ----
     rows = [[esc(name), f'<strong>{esc(direction)}</strong>', esc(reason)]
@@ -126,7 +127,8 @@ def render(ctx: dict, scenario: dict, summary: dict) -> str:
                   f'情境一變，整張表就會改寫。')
         + '<p class="muted" style="font-size:.82rem">'
           '這是情境到部位方向的機械對照，不是投資建議，也未考慮任何個人的'
-          '風險承受度、稅務與既有部位。</p>'))
+          '風險承受度、稅務與既有部位。</p>',
+        terms=["bull_bear_steepener", "duration", "tips"]))
 
     # ---- 交叉檢查 ----
     body.append(section("cross-check", "跟其他證據對得起來嗎", f'<div class="card">' + kv([
@@ -135,14 +137,7 @@ def render(ctx: dict, scenario: dict, summary: dict) -> str:
         ("長端供給壓力", esc(scenario.get("supply_pressure", "—"))),
         ("衰退風險刻度", esc(scenario.get("recession_gauge", "—"))),
     ]) + callout("九宮格是對「聯準會會怎麼想」的判斷；市場定價是對「市場已經信了多少」的判斷。"
-                 "兩者背離時，才有交易價值。") + "</div>"))
-
-    body.append(section("glossary", "判讀說明", accordion("方法與門檻", glossary([
-        ("九宮格", "就業（強/中/弱）× 通膨（低/中/高）的九種組合。每格在不同政策重心下有不同的政策傾向。"),
-        ("政策重心", "聯準會把哪一個使命排在前面。由核心 PCE 距目標的距離與長期通膨預期是否錨定決定。"),
-        ("損益兩平就業增速", "維持失業率不變所需的月增就業＝人口月增 × 勞參率 × (1−失業率)。"),
-        ("為什麼要三種重心", "同樣一格在不同重心下結論相反。明列三種，讀者可以自己判斷聯準會站在哪一邊。"),
-        ("所有門檻", "全部寫死在 macro/compute/scenario.py 的 EMPLOYMENT_BANDS、INFLATION_BANDS、REGIME_RULES。改門檻等於改判斷，不會藏在別處。"),
-    ]))))
+                 "兩者背離時，才有交易價值。") + "</div>",
+                        terms=["signal_engine"]))
 
     return "".join(body)

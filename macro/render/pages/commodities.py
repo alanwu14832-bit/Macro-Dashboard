@@ -1,10 +1,9 @@
 """大宗商品頁。"""
 from __future__ import annotations
 
-from ..common import checks_block, glossary, hbar_chart, line_chart
+from ..common import checks_block, hbar_chart, line_chart
 from ..html import (accordion, callout, delta_span, esc, fmt, kv, pct, section,
                     stat, table, zh_date)
-
 
 def _copper_gold_note(corr) -> str:
     """描述實測到的關係，而不是背誦教科書上的關係。
@@ -23,7 +22,6 @@ def _copper_gold_note(corr) -> str:
                 f"通膨與供給推動，而非成長預期——所以殖利率此時不宜當成成長的代理變數。")
     return (f"近十年兩者的相關係數僅 {corr:+.2f}，關係不明顯，"
             f"這段期間殖利率的驅動因素不只成長預期。")
-
 
 def render(ctx: dict) -> str:
     d = ctx["commodities"]
@@ -55,7 +53,8 @@ def render(ctx: dict) -> str:
 
     body.append(section("precious", "貴金屬與比值",
                         f'<div class="grid grid-4">{"".join(tiles)}</div>',
-                        note="金銀價為 LBMA 官方定盤價"))
+                        note="金銀價為 LBMA 官方定盤價",
+                        terms=["gold_silver_ratio"]))
 
     if precious.get("rows"):
         rows = [[esc(r["name"]), fmt(r["value"], 2, prefix="$"),
@@ -93,7 +92,8 @@ def render(ctx: dict) -> str:
             ]) + callout(
                 f'判定：<strong>{esc(cg.get("verdict", ""))}</strong>。'
                 + _copper_gold_note(cg.get("corr_with_10y")), key=True)
-            + "</div>"))
+            + "</div>",
+        terms=["copper_gold_ratio"]))
 
     # ---- 黃金與實質利率 ----
     if gr.get("corr_yoy_5y") is not None:
@@ -107,7 +107,8 @@ def render(ctx: dict) -> str:
             ]) + callout(
                 f'{esc(gr.get("verdict", ""))}。持有黃金不孳息，機會成本就是實質利率，'
                 f'所以兩者長期反向。這個關係鬆脫時，多半代表央行買盤或地緣避險'
-                f'蓋過了利率因素。') + "</div>"))
+                f'蓋過了利率因素。') + "</div>",
+        terms=["gold_real_rates", "real_rate"]))
 
     # ---- 分類明細 ----
     for group in d.get("groups", []):
@@ -120,6 +121,12 @@ def render(ctx: dict) -> str:
                 for r in group["rows"]]
         anchor = {"能源": "energy", "工業金屬": "metals",
                   "農產": "agri", "指數": "indices"}.get(group["title"], "group")
+        group_terms = {
+            "能源": ["energy_passthrough", "commodity_index"],
+            "工業金屬": ["copper_gold_ratio", "commodity_index"],
+            "農產": ["commodity_index"],
+            "指數": ["commodity_index", "percentile_rank"],
+        }.get(group["title"], [])
         chart_html = hbar_chart(
             f'{group["title"]}：近一年漲跌',
             [{"name": r["name"], "value": r["chg_1y"]}
@@ -129,16 +136,9 @@ def render(ctx: dict) -> str:
         body.append(section(
             anchor, group["title"],
             table(["項目", "價格", "單位", "近一月", "近三月", "近一年", "十年百分位"], rows)
-            + chart_html))
+            + chart_html, terms=group_terms))
 
-    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"])))
-
-    body.append(section("glossary", "判讀說明", accordion("名詞與來源", glossary([
-        ("金銀比", "黃金價格 ÷ 白銀價格。白銀有工業用途，比值拉高代表市場在買純避險而非景氣。"),
-        ("銅金比", "銅價 ÷ 黃金價格。與 10 年公債殖利率長期同向，是市場定價的成長預期。"),
-        ("黃金與實質利率", "持有黃金不孳息，機會成本就是實質利率，兩者長期反向。"),
-        ("資料來源", "金銀為 LBMA 官方定盤價；原油與天然氣為 EIA（經 FRED）；金屬、農產與各項指數為 IMF Primary Commodity Prices（經 FRED）。"),
-        ("為什麼放進總經儀表板", "商品是通膨的上游、也是全球需求的即時讀數。能源直接進 CPI，工業金屬領先製造業，農產傳導到食品項。"),
-    ]))))
+    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"]),
+                        terms=["check_lights"]))
 
     return "".join(body)

@@ -51,7 +51,8 @@ def render(snapshots: list[dict]) -> str:
     body.append(section(
         "history", "判斷歷史",
         table(["日期", "情境", "九宮格位置", "政策重心", "傾向", "訊號"], rows),
-        note=f"共 {len(snapshots)} 筆存檔"))
+        note=f"共 {len(snapshots)} 筆存檔",
+        terms=["nine_grid", "policy_regime"]))
 
     # ---- 讀數走勢 ----
     if len(snapshots) >= 3:
@@ -67,7 +68,8 @@ def render(snapshots: list[dict]) -> str:
                        years=None, default_years=0, suffix="%", digits=2, freq="d"),
         ]
         body.append(section("readings", "關鍵讀數走勢",
-                            f'<div class="grid grid-2">{"".join(c for c in charts if c)}</div>'))
+                            f'<div class="grid grid-2">{"".join(c for c in charts if c)}</div>',
+                        terms=["core_pce", "real_rate"]))
 
     # ---- 每日訊號 ----
     items = []
@@ -85,7 +87,8 @@ def render(snapshots: list[dict]) -> str:
             f'<div class="signal-list">{signal_rows}</div>' if signal_rows
             else '<p class="muted">無訊號。</p>'))
     body.append(section("daily", "每日訊號明細", "".join(items),
-                        note="最近 30 筆"))
+                        note="最近 30 筆",
+                        terms=["signal_engine"]))
 
     body.append(callout(
         "存檔存的是「判斷」而不是原始資料：訊號清單、九宮格位置與關鍵讀數。"

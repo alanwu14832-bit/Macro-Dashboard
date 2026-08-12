@@ -1,11 +1,10 @@
 """勞動市場頁。"""
 from __future__ import annotations
 
-from ..common import (bar_chart, checks_block, glossary, hbar_chart, legend_note,
+from ..common import (bar_chart, checks_block, hbar_chart, legend_note,
                       line_chart, signals_block)
 from ..html import (accordion, callout, delta_span, esc, fmt, kv, pct, section,
                     stat, table, thousands_to_wan, zh_date)
-
 
 def render(ctx: dict, signals: list[dict]) -> str:
     d = ctx["labor"]
@@ -15,7 +14,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
     body = []
 
     body.append(section("signals", "本期關鍵訊號",
-                        signals_block(signals, module="就業") + legend_note()))
+                        signals_block(signals, module="就業") + legend_note(),
+                        terms=["signal_engine", "hawkish_dovish"]))
 
     # ---- 關鍵數字 ----
     tiles = [
@@ -35,7 +35,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
              asof=f'{zh_date(d["claims"]["as_of"], freq="d")} 週'),
     ]
     body.append(section("numbers", "關鍵數字",
-                        f'<div class="grid grid-4">{"".join(tiles)}</div>'))
+                        f'<div class="grid grid-4">{"".join(tiles)}</div>',
+                        terms=["payrolls", "unemployment_rate", "u6", "initial_claims", "continued_claims"]))
 
     # ---- 損益兩平 ----
     be_body = kv([
@@ -75,7 +76,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
         f'算法：民間非機構人口月增 × 勞參率 × (1 − 失業率)。'
         f'刻意用人口而非勞動力推導——參與率下滑時勞動力可能萎縮，'
         f'用勞動力會算出負的損益兩平，那是量錯了東西。</p></div>',
-        note="維持失業率不變所需的月增就業"))
+        note="維持失業率不變所需的月增就業",
+        terms=["breakeven_payrolls", "civilian_population", "participation_rate"]))
 
     # ---- 走勢圖 ----
     # 每張圖只放同一單位的序列 — 不同單位就分開畫，不共用一條 Y 軸。
@@ -107,7 +109,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
                    sub="與初領量級差近 10 倍，分開畫才看得出各自的轉折"),
     ]
     body.append(section("charts", "走勢",
-                        f'<div class="grid grid-2">{"".join(c for c in charts if c)}</div>'))
+                        f'<div class="grid grid-2">{"".join(c for c in charts if c)}</div>',
+                        terms=["prime_epop", "initial_claims", "continued_claims"]))
 
     # ---- 修正追蹤 ----
     revisions = d["revisions"]
@@ -123,7 +126,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
                 f'初值取該月次月 15 日的 FRED vintage。')
         body.append(section("revisions", "初值 vs 現值：修正追蹤",
                             table(["月份", "初值", "目前值", "累計修正"], rows) if rows else "",
-                            note="系統性下修代表當月公布的數字應該打折看待"))
+                            note="系統性下修代表當月公布的數字應該打折看待",
+                        terms=["revisions"]))
         body.append(f'<p class="muted" style="font-size:.83rem;margin-top:-24px">{esc(foot)}</p>')
 
     # ---- 失業率拆解 ----
@@ -139,7 +143,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
             table(["期間", "失業率變動", "失業人數效果", "勞動力效果"], rows)
             + callout("失業人數效果為正＝真的有人失業；勞動力效果為負＝有人退出勞動力"
                       "把失業率壓下去。後者不是好消息。"),
-            note="Δu ≈ (ΔU − u·ΔL) / L"))
+            note="Δu ≈ (ΔU − u·ΔL) / L",
+        terms=["unemployment_rate", "participation_rate"]))
 
     # ---- 行業別 ----
     sectors = d["sectors"]
@@ -160,7 +165,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
             "sectors", "行業別貢獻分解",
             chart_html + accordion("展開 17 個行業的完整數字",
                                    table(["行業", "本月", "三月均", "十二月均", "年增"], rows)),
-            note=f'三月擴散指數 {fmt(sectors["diffusion_3m"], 0)}%'))
+            note=f'三月擴散指數 {fmt(sectors["diffusion_3m"], 0)}%',
+        terms=["diffusion"]))
 
     # ---- JOLTS ----
     jolts = d["jolts"]
@@ -175,7 +181,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
              delta=f'招聘 {fmt((jolts["hires"] or 0) / 100, 1, suffix=" 萬人")}'),
     ]
     body.append(section("jolts", "JOLTS 職缺與人力流動",
-                        f'<div class="grid grid-4">{"".join(tiles)}</div>'))
+                        f'<div class="grid grid-4">{"".join(tiles)}</div>',
+                        terms=["jolts", "vu_ratio", "quits_rate", "layoff_rate"]))
 
     # ---- 強弱指數 ----
     composite = d["composite"]
@@ -190,19 +197,11 @@ def render(ctx: dict, signals: list[dict]) -> str:
             f'<span style="font-size:.4em;color:var(--ink-muted)"> / ±100</span></div>'
             f'<p class="dim">正值＝強於十年常態，負值＝弱於常態。'
             f'各分項取 10 年 z 分數後以 tanh 壓縮，避免單一極端值主導。</p>'
-            + table(["分項", "權重", "分數", "加權貢獻"], rows) + "</div>"))
+            + table(["分項", "權重", "分數", "加權貢獻"], rows) + "</div>",
+        terms=["composite_labor", "zscore"]))
 
     # ---- 檢核 ----
-    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"])))
-
-    # ---- 名詞 ----
-    body.append(section("glossary", "判讀說明", accordion("名詞與門檻", glossary([
-        ("損益兩平就業增速", "維持失業率不變所需的月增就業。算法：民間非機構人口月增 × 勞參率 × (1−失業率)。"),
-        ("擴散指數", "增加就業的行業佔全部行業的比例。低於 50% 代表多數行業在縮減。"),
-        ("Sahm 法則", "三月均失業率高出前一年低點 0.5 個百分點時，歷史上多半已進入衰退。"),
-        ("職缺對失業人數比", "JOLTS 職缺數 ÷ 失業人數。低於 1 代表求職者多於職缺。"),
-        ("黃金年齡就業率", "25–54 歲的就業人口比。排除人口老化與升學影響，是最乾淨的勞動市場強弱讀數。"),
-        ("初值 vs 現值", "非農就業每月會被修正兩次。初值取該月次月 15 日的 FRED vintage。"),
-    ])), note="門檻寫死在程式碼中，同一份資料每次判定一致"))
+    body.append(section("checks", "關鍵指標檢核", checks_block(d["checks"]),
+                        terms=["check_lights", "sahm_rule"]))
 
     return "".join(body)

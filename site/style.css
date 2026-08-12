@@ -376,6 +376,30 @@ details.acc[open] > summary::before { transform: rotate(90deg); }
 details.acc > summary:hover { color: var(--ink); }
 details.acc .acc-body { padding: 2px 14px 14px; }
 
+/* --------------------------------------------------- 名詞解釋（每區塊底） -- */
+details.acc.terms { margin-top: 14px; background: transparent; border-style: dashed; }
+details.acc.terms > summary { color: var(--ink-muted); font-weight: 500; font-size: 0.85rem; }
+details.acc.terms > summary:hover { color: var(--ink-2); }
+.term-count {
+  margin-left: auto; font-size: 0.75rem; color: var(--ink-muted);
+  border: 1px solid var(--border); border-radius: 999px; padding: 0 8px;
+}
+.term { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.term:last-child { border-bottom: 0; padding-bottom: 2px; }
+.term:first-child { padding-top: 4px; }
+.term-name { font-weight: 650; font-size: 0.92rem; margin-bottom: 6px; }
+.term-row { display: grid; grid-template-columns: 68px 1fr; gap: 10px; margin-bottom: 4px; }
+.term-tag {
+  font-size: 0.73rem; color: var(--ink-muted); text-align: right;
+  padding-top: 2px; white-space: nowrap;
+}
+.term-text { font-size: 0.87rem; color: var(--ink-2); line-height: 1.65; }
+.term-text strong { color: var(--ink); font-weight: 620; }
+@media (max-width: 560px) {
+  .term-row { grid-template-columns: 1fr; gap: 1px; }
+  .term-tag { text-align: left; font-weight: 600; }
+}
+
 /* -------------------------------------------------------------- module ---- */
 .module-link {
   display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: inherit;
