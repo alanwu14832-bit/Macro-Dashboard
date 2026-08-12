@@ -204,6 +204,35 @@ function readToken() {
   return { token: null, provider: null, from: null };
 }
 
+/* 供應商的每檔報價都要一次呼叫，而 Finnhub 免費層是 60 次/分。頁面上有
+ * 四十幾個非台股代號，若每個訪客每次刷新都直接打上游，一個人就會超額。
+ * 這裡用逐檔快取：同一個代號在 TTL 內只打一次上游，所有訪客共用。       */
+const QUOTE_TTL_MS = 45_000;
+const quoteCache = new Map();
+
+/** Finnhub 免費層不含指數，^ 開頭的一定失敗，別浪費額度去打。 */
+function servableBy(provider, symbol) {
+  return provider === "finnhub" ? !symbol.startsWith("^") : true;
+}
+
+async function cachedQuote(provider, symbol, token) {
+  const key = `${provider}:${symbol}`;
+  const hit = quoteCache.get(key);
+  if (hit && Date.now() - hit.at < QUOTE_TTL_MS) {
+    if (hit.error) throw hit.error;
+    return hit.value;
+  }
+  try {
+    const value = await PROVIDERS[provider](symbol, token);
+    quoteCache.set(key, { at: Date.now(), value });
+    return value;
+  } catch (error) {
+    // 失敗也要快取，否則每次刷新都會重打一輪注定失敗的請求
+    quoteCache.set(key, { at: Date.now(), error });
+    throw error;
+  }
+}
+
 async function fetchOther(symbols) {
   const { token, provider: declared, from } = readToken();
   if (!token) return { supported: false, data: [], provider: null, key_source: null };
@@ -221,20 +250,25 @@ async function fetchOther(symbols) {
              note: "金鑰無法對應到已知的供應商（finnhub / marketdata.app）" };
   }
 
-  const quote = PROVIDERS[provider];
+  const servable = symbols.filter(s => servableBy(provider, s));
+  const skipped = symbols.length - servable.length;
   const results = await Promise.allSettled(
-    symbols.map(symbol => quote(symbol, token)));
+    servable.map(symbol => cachedQuote(provider, symbol, token)));
 
   const failures = results.filter(r => r.status === "rejected");
+  const notes = [];
+  if (skipped) notes.push(`${skipped} 檔指數不在此供應商的免費層，維持建置快照`);
+  if (failures.length) {
+    notes.push(`${failures.length}/${servable.length} 檔取不到：`
+               + (failures[0].reason?.message || failures[0].reason));
+  }
+
   return {
     supported: true,
     provider,
     key_source: from,
     data: results.filter(r => r.status === "fulfilled").map(r => r.value),
-    // 部分失敗要說出來，否則使用者只會看到「有些格子沒更新」卻不知道為什麼
-    note: failures.length
-      ? `${failures.length}/${symbols.length} 檔取不到：${failures[0].reason?.message || failures[0].reason}`
-      : undefined,
+    note: notes.length ? notes.join("；") : undefined,
   };
 }
 

@@ -14,7 +14,10 @@
   const root = document.querySelector("[data-quotes-live]");
   if (!root) return;
 
-  const REFRESH_MS = 20_000;
+  // 45 秒而不是 20：頁面上有四十幾個非台股代號，而報價 API 的免費層是
+  // 每分鐘 60 次呼叫。代理端有逐檔快取，這裡再放慢一點，一起把單一訪客
+  // 的上游用量壓在額度內。
+  const REFRESH_MS = 45_000;
   const status = document.getElementById("quote-status");
   const cells = [...document.querySelectorAll("[data-quote]")];
   if (!cells.length) return;
@@ -131,6 +134,9 @@
     report(notSupported
       ? `台股已更新 ${clock}　·　美股與新興市場維持建置快照（未設定報價金鑰）`
       : `已更新 ${clock}${via}　·　每 ${REFRESH_MS / 1000} 秒自動更新`);
+    if (payload.errors?.length) {
+      status.title = payload.errors.join("；");   // 詳情放 tooltip，不佔版面
+    }
   }
 
   refresh();
