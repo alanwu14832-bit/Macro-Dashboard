@@ -29,6 +29,7 @@ ICONS = {
     "commodities": "M12 2l9 5v10l-9 5-9-5V7zM12 12l9-5M12 12v10M12 12L3 7",
     "equities": "M3 3v18h18M7 14l3-3 3 3 5-5M18 9h3v3",
     "twstock": "M4 20v-6M9 20V9M14 20v-8M19 20V5M4 9l5-4 5 3 5-4",
+    "guide": "M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5zM8 7h8M8 11h8",
     "market": "M4 20V10M10 20V4M16 20v-7M22 20V7",
     "scenario": "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
     "freshness": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2",
@@ -56,6 +57,7 @@ NAV = [
     ("/explore/", "自選比較", "explore", "判讀與紀錄"),
     ("/scenario/", "情境與部位", "scenario", "判讀與紀錄"),
     ("/freshness/", "資料新鮮度", "freshness", "判讀與紀錄"),
+    ("/guide/", "使用講義", "guide", "判讀與紀錄"),
     ("/archive/", "存檔", "archive", "判讀與紀錄"),
 ]
 
@@ -218,6 +220,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
              stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
       <div class="topbar-title">{esc(title)}</div>
+      <a class="topbar-guide" href="/guide/">使用講義</a>
       <div class="topbar-meta">{esc(updated)}</div>
       <button type="button" class="icon-btn" id="theme-toggle" aria-label="切換深淺色">主題</button>
     </header>

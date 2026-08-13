@@ -22,6 +22,7 @@ from macro.compute import (commodities, debt, equities, freshness, growth,
                            signals, world)
 from macro.render import api, layout
 from macro.render.pages import (archive as archive_page,
+                                guide as guide_page,
                                 commodities as commodities_page,
                                 debt as debt_page,
                                 equities as equities_page,
@@ -160,6 +161,9 @@ def main() -> int:
         ("/freshness/", "資料新鮮度", "資料新鮮度",
          "每個指標多新、下次什麼時候更新，以及為什麼總經資料沒有即時可言。",
          lambda: freshness_page.render(ctx)),
+        ("/guide/", "使用講義", "使用講義",
+         "這個網站怎麼用、每個指標在說什麼、升與降各意味著什麼。",
+         lambda: guide_page.render(ctx)),
         ("/archive/", "存檔", "存檔",
          "每天的判斷與關鍵讀數，可回看任一天的結論。",
          lambda: archive_page.render(snapshots)),

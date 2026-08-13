@@ -930,3 +930,42 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
   padding-top: 9px;
 }
 @media (max-width: 560px) { .sig-grid { grid-template-columns: 1fr; } }
+
+/* ================================================== 使用講義頁 == */
+.gd-ind {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 22px; margin: 16px 0;
+}
+.gd-name { font-weight: 700; font-size: 1rem; margin-bottom: 2px; }
+.gd-en { font-weight: 400; color: var(--ink-muted); font-size: 0.78rem; margin-left: 8px; }
+.gd-where { font-size: 0.76rem; color: var(--ink-muted); margin-bottom: 10px; }
+.gd-ind p { font-size: 0.92rem; margin: 0 0 10px; line-height: 1.75; }
+.gd-imply {
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 14px;
+  margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-strong);
+  font-size: 0.88rem; line-height: 1.65;
+}
+.gd-dir { font-weight: 700; white-space: nowrap; }
+.gd-dir.u { color: var(--hawkish); }
+.gd-dir.d { color: var(--dovish); }
+.gd-dir.n { color: var(--ink-muted); }
+.gd-chain {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  background: var(--surface-sunken); border-radius: var(--radius-sm);
+  padding: 14px 16px; margin: 14px 0 20px; font-size: 0.87rem;
+}
+.gd-node {
+  background: var(--surface); border: 1px solid var(--border-strong);
+  border-radius: 7px; padding: 4px 11px; font-weight: 600;
+}
+.gd-arr { color: var(--ink-muted); }
+.gd-h { font-size: 0.95rem; margin: 22px 0 8px; }
+@media (max-width: 560px) { .gd-imply { grid-template-columns: 1fr; gap: 2px 0; } }
+
+/* 頂欄講義入口 */
+.topbar-guide {
+  font-size: 0.8rem; color: var(--ink-muted); text-decoration: none;
+  white-space: nowrap; margin-right: 14px;
+  padding: 3px 10px; border: 1px solid var(--border); border-radius: 999px;
+}
+.topbar-guide:hover { color: var(--ink); background: var(--surface-sunken); }
