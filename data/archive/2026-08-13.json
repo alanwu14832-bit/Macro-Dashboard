@@ -1,6 +1,6 @@
 {
  "date": "2026-08-13",
- "generated_at": "2026-08-13T02:51:36",
+ "generated_at": "2026-08-13T08:45:50",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -8,6 +8,14 @@
    "direction": "hawkish",
    "severity": "high",
    "evidence": "核心 PCE 3.3%，距 2% 目標 +1.3 個百分點",
+   "module": "物價"
+  },
+  {
+   "key": "momentum_cooling",
+   "headline": "核心 CPI 近三月年化明顯低於年增率",
+   "direction": "dovish",
+   "severity": "high",
+   "evidence": "近三月年化 1.6%，年增 2.8%，低 1.1 個百分點",
    "module": "物價"
   },
   {
@@ -27,14 +35,6 @@
    "module": "就業"
   },
   {
-   "key": "momentum_cooling",
-   "headline": "核心 CPI 近三月年化明顯低於年增率",
-   "direction": "dovish",
-   "severity": "medium",
-   "evidence": "近三月年化 2.3%，年增 2.8%，低 0.5 個百分點",
-   "module": "物價"
-  },
-  {
    "key": "quits_collapsed",
    "headline": "主動離職率降到低檔，勞工議價力下降",
    "direction": "dovish",
@@ -51,6 +51,14 @@
    "module": "利率"
   },
   {
+   "key": "shelter_still_dragging",
+   "headline": "住房落後項仍在推升表面讀數，實際通膨比表面低",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "住房年增 3.4%、近三月年化 2.3%，收斂後對整體 CPI 約 -0.38 個百分點",
+   "module": "物價"
+  },
+  {
    "key": "stock_bond_correlation_positive",
    "headline": "股債同向，債券失去對沖股票的功能",
    "direction": "neutral",
@@ -63,7 +71,7 @@
    "headline": "核心服務除住房卡在目標之上",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "年增 3.5%，已連 62 個月高於 2.5%",
+   "evidence": "年增 3.4%，已連 63 個月高於 2.5%",
    "module": "物價"
   },
   {
@@ -87,16 +95,8 @@
    "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
    "direction": "neutral",
    "severity": "low",
-   "evidence": "高收益利差 2.70%，十年百分位 9%",
+   "evidence": "高收益利差 2.72%，十年百分位 12%",
    "module": "利率"
-  },
-  {
-   "key": "inflation_narrow",
-   "headline": "剔除極端值後通膨明顯較低，漲勢集中",
-   "direction": "dovish",
-   "severity": "low",
-   "evidence": "核心 2.8%，剔除極端值均值 1.7%",
-   "module": "物價"
   }
  ],
  "summary": {
@@ -104,7 +104,7 @@
   "hawkish": 3,
   "dovish": 7,
   "neutral": 2,
-  "score": -8,
+  "score": -10,
   "tilt": "偏降息"
  },
  "scenario": {
@@ -119,9 +119,9 @@
   "payrolls_3m": 20.0,
   "breakeven": 83.26981016666666,
   "unemployment": 4.1,
-  "core_cpi": 2.80581107579545,
+  "core_cpi": 2.786747157096725,
   "core_pce": 3.286526430967074,
-  "supercore": 3.4701779812646327,
+  "supercore": 3.4060580229904325,
   "ten_year": 4.72,
   "real_ten_year": 2.43,
   "curve_10_2": 0.46999999999999975,
@@ -130,7 +130,7 @@
  },
  "as_of": {
   "labor": "2026-07-01",
-  "inflation": "2026-06-01",
+  "inflation": "2026-07-01",
   "rates": "2026-08-10"
  }
 }
