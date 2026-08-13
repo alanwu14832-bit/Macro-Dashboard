@@ -226,11 +226,20 @@
     const xi = new Map(dates.map((d, i) => [d, i]));
     const X = (d) => m.l + (dates.length === 1 ? iw / 2 : (xi.get(d) / (dates.length - 1)) * iw);
 
+    // 量價合圖：標了 axis:"right" 的序列（通常是成交量）走自己的刻度，
+    // 而且壓在下方三成，不跟價格線爭畫面。左軸只由左軸序列決定範圍，
+    // 否則成交量的量級會把價格線壓成一條平線。
+    const isRight = (si) => spec.series[si]?.axis === "right";
+    const hasRight = spec.series.some((s) => s.axis === "right");
+
     let lo = Infinity, hi = -Infinity;
-    data.forEach((d) => d.forEach(([, v]) => {
-      if (v === null) return;
-      if (v < lo) lo = v; if (v > hi) hi = v;
-    }));
+    data.forEach((d, si) => {
+      if (isRight(si)) return;
+      d.forEach(([, v]) => {
+        if (v === null) return;
+        if (v < lo) lo = v; if (v > hi) hi = v;
+      });
+    });
     if (!Number.isFinite(lo)) return svg;
     if (spec.zeroBased && lo > 0) lo = 0;
     if (spec.includeZero && lo > 0) lo = 0;
@@ -239,6 +248,19 @@
     const pad = (hi - lo) * 0.08;
     lo -= pad; hi += pad;
     const Y = (v) => m.t + ih - ((v - lo) / (hi - lo)) * ih;
+
+    // 右軸：0 起算，最大值放大到只佔畫面下方 RIGHT_SHARE 的高度
+    const RIGHT_SHARE = 0.32;
+    let rhi = 0;
+    if (hasRight) {
+      data.forEach((d, si) => {
+        if (!isRight(si)) return;
+        d.forEach(([, v]) => { if (v !== null && v > rhi) rhi = v; });
+      });
+      if (rhi <= 0) rhi = 1;
+    }
+    const rightTop = rhi / RIGHT_SHARE;
+    const YR = (v) => m.t + ih - (v / rightTop) * ih;
 
     // grid + y ticks
     for (const t of niceTicks(lo + pad, hi - pad, spec.yTicks || 4)) {
@@ -277,19 +299,39 @@
     }
     el("line", { class: "axis-line", x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih }, svg);
 
-    // marks
-    const isBar = spec.type === "bar";
-    const barW = isBar ? Math.max(1, Math.min(24, (iw / dates.length) * 0.68)) : 0;
+    // 右軸刻度（只標最大值一格，避免跟左軸的格線打架）
+    if (hasRight) {
+      for (const t of niceTicks(0, rhi, 2)) {
+        if (t <= 0) continue;
+        el("text", { class: "tick", x: m.l + iw + 6, y: YR(t) + 3.5,
+                     "text-anchor": "start", opacity: 0.75 }, svg)
+          .textContent = fmtVal(t, { digits: 0, suffix: spec.rightSuffix || "" });
+      }
+    }
 
-    spec.series.forEach((s, si) => {
+    // marks — bar 可以是整張圖的型別，也可以是單一序列的 kind
+    const isBar = spec.type === "bar";
+    const anyBar = isBar || spec.series.some((s) => s.kind === "bar");
+    const barW = anyBar ? Math.max(1, Math.min(24, (iw / dates.length) * 0.68)) : 0;
+
+    // 柱子先畫，折線壓在上面
+    const order = spec.series
+      .map((s, si) => si)
+      .sort((a, b) => (spec.series[b].kind === "bar" ? 0 : 1)
+                    - (spec.series[a].kind === "bar" ? 0 : 1));
+
+    order.forEach((si) => {
+      const s = spec.series[si];
       const color = seriesColor(s.color, si);
       const pts = data[si].filter((p) => p[1] !== null);
       if (!pts.length) return;
+      const useRight = isRight(si);
+      const Yv = useRight ? YR : Y;
 
-      if (isBar) {
-        const zero = Y(Math.max(lo, Math.min(hi, 0)));
+      if (isBar || s.kind === "bar") {
+        const zero = useRight ? (m.t + ih) : Y(Math.max(lo, Math.min(hi, 0)));
         for (const [d, v] of pts) {
-          const y = Y(v), x = X(d) - barW / 2;
+          const y = Yv(v), x = X(d) - barW / 2;
           const h = Math.abs(y - zero);
           const up = v >= 0;
           const fill = s.signColor
@@ -305,9 +347,9 @@
                        "data-bar": up ? "up" : "down" }, svg);
         }
       } else {
-        const line = pts.map(([d, v], i) => `${i ? "L" : "M"}${X(d).toFixed(2)} ${Y(v).toFixed(2)}`).join(" ");
+        const line = pts.map(([d, v], i) => `${i ? "L" : "M"}${X(d).toFixed(2)} ${Yv(v).toFixed(2)}`).join(" ");
         if (spec.type === "area") {
-          const base = Y(Math.max(lo, Math.min(hi, 0)));
+          const base = Yv(Math.max(lo, Math.min(hi, 0)));
           el("path", {
             d: `${line} L${X(pts[pts.length - 1][0]).toFixed(2)} ${base} L${X(pts[0][0]).toFixed(2)} ${base} Z`,
             fill: color, "fill-opacity": 0.1, "data-fade": "",
@@ -323,23 +365,24 @@
         // end marker with a 2px surface ring, plus a direct end-label
         const [ld, lv] = pts[pts.length - 1];
         el("circle", {
-          cx: X(ld), cy: Y(lv), r: 4, fill: color,
+          cx: X(ld), cy: Yv(lv), r: 4, fill: color,
           stroke: cssVar("--surface"), "stroke-width": 2, "data-fade": "",
         }, svg);
         if (spec.endLabels !== false) {
-          el("text", { class: "end-label", x: X(ld) + 9, y: Y(lv) + 4,
+          el("text", { class: "end-label", x: X(ld) + 9, y: Yv(lv) + 4,
                        "data-fade": "" }, svg)
             .textContent = fmtVal(lv, spec);
         }
       }
     });
 
-    attachCrosshair(svg, spec, data, dates, X, m, ih, iw, isBar, barW, Y);
+    attachCrosshair(svg, spec, data, dates, X, m, ih, iw, isBar, barW,
+                    (v, si) => (isRight(si) ? YR(v) : Y(v)));
     return svg;
   }
 
   /** Crosshair finds the X; one tooltip lists every series at that X. */
-  function attachCrosshair(svg, spec, data, dates, X, m, ih, iw, isBar, barW, Y) {
+  function attachCrosshair(svg, spec, data, dates, X, m, ih, iw, isBar, barW, Yof) {
     const cross = el("line", { class: "crosshair", y1: m.t, y2: m.t + ih, x1: -99, x2: -99,
                                opacity: 0 }, svg);
     const dots = dates.length ? spec.series.map((s, si) =>
@@ -384,10 +427,15 @@
         const v = lookup[si].get(d);
         const dot = dots[si];
         if (v === undefined || v === null) { if (dot) dot.setAttribute("opacity", 0); return; }
-        if (dot && !isBar) {
-          dot.setAttribute("cx", px); dot.setAttribute("cy", Y(v)); dot.setAttribute("opacity", 1);
+        // 柱狀序列不放圓點，折線序列才放
+        if (dot && !isBar && s.kind !== "bar") {
+          dot.setAttribute("cx", px); dot.setAttribute("cy", Yof(v, si));
+          dot.setAttribute("opacity", 1);
         }
-        rows.push({ name: s.name, color: seriesColor(s.color, si), value: fmtVal(v, spec) });
+        rows.push({ name: s.name, color: seriesColor(s.color, si),
+                    value: s.axis === "right"
+                      ? fmtVal(v, { digits: 0, suffix: spec.rightSuffix || "" })
+                      : fmtVal(v, spec) });
       });
       if (rows.length) {
         showTip(svg, cx, rect.top + (evt.clientY ? 0 : 0) + rect.height * 0.35, fmtDate(d, spec.freq), rows);

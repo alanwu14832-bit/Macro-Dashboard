@@ -42,7 +42,10 @@ def line_chart(title: str, series_specs: list[tuple[Series, str, str | None]], *
                band: list | None = None, height: int = 260,
                include_zero: bool = False, freq: str = "m",
                with_table: bool = True,
-               sign_colors: tuple[str, str] | None = None) -> str:
+               sign_colors: tuple[str, str] | None = None,
+               series_kinds: list[str | None] | None = None,
+               series_axes: list[str | None] | None = None,
+               right_suffix: str = "") -> str:
     """Build a chart card from Series objects.
 
     `series_specs` is [(series, display name, colour token or None)].
@@ -57,6 +60,12 @@ def line_chart(title: str, series_specs: list[tuple[Series, str, str | None]], *
         entry = {"name": name, "color": color, "data": pts}
         if sign_colors:
             entry["signColor"] = list(sign_colors)
+        # 量價合圖：kind="bar" 的序列畫成柱，axis="right" 的走自己的刻度
+        index = len(data)
+        if series_kinds and index < len(series_kinds) and series_kinds[index]:
+            entry["kind"] = series_kinds[index]
+        if series_axes and index < len(series_axes) and series_axes[index]:
+            entry["axis"] = series_axes[index]
         data.append(entry)
         legend.append((name, s))
 
@@ -70,6 +79,8 @@ def line_chart(title: str, series_specs: list[tuple[Series, str, str | None]], *
     }
     if digits is not None:
         spec["digits"] = digits
+    if right_suffix:
+        spec["rightSuffix"] = right_suffix
     if target is not None:
         spec["target"] = target
     if band:

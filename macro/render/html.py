@@ -158,6 +158,24 @@ def check_row(check: dict) -> str:
 RANGES = [("1Y", 1), ("3Y", 3), ("5Y", 5), ("10Y", 10), ("全期", 0)]
 
 
+def _span_years(spec: dict) -> float | None:
+    """spec 裡所有序列涵蓋的年數。抓不到日期就回 None（不做過濾）。"""
+    firsts, lasts = [], []
+    for s in spec.get("series") or []:
+        pts = s.get("data") or []
+        if pts:
+            firsts.append(pts[0][0])
+            lasts.append(pts[-1][0])
+    if not firsts:
+        return None
+    try:
+        start = date.fromisoformat(str(min(firsts))[:10])
+        end = date.fromisoformat(str(max(lasts))[:10])
+    except ValueError:
+        return None
+    return (end - start).days / 365.25
+
+
 def chart(spec: dict, *, title: str = "", sub: str = "", ranges: bool = True,
           table_rows: list | None = None, table_head: list | None = None) -> str:
     """A chart card. `spec` is consumed by chart.js; `table_rows` is the
@@ -169,11 +187,22 @@ def chart(spec: dict, *, title: str = "", sub: str = "", ranges: bool = True,
     tools = ""
     if ranges:
         default = spec.get("defaultYears", 0)
-        buttons = "".join(
-            f'<button type="button" data-years="{years}" '
-            f'aria-pressed="{"true" if years == default else "false"}">{esc(name)}</button>'
-            for name, years in RANGES)
-        tools += f'<div class="range-group" role="group" aria-label="時間區間">{buttons}</div>'
+        # 只列資料真的涵蓋得到的區間。序列只有半年時把 1Y/3Y/10Y 全列出來，
+        # 按了畫面完全不變——那不是「沒反應的按鈕」，是騙人的按鈕。
+        span = _span_years(spec)
+        usable = [(n, y) for n, y in RANGES if y == 0 or (span is None or y < span)]
+        if len(usable) <= 1:
+            tools = ""                      # 只剩「全期」就不必給選擇
+        else:
+            if default and all(y != default for _, y in usable):
+                default = 0                 # 預設值被濾掉了 → 退回全期
+                spec["defaultYears"] = 0
+            buttons = "".join(
+                f'<button type="button" data-years="{years}" '
+                f'aria-pressed="{"true" if years == default else "false"}">{esc(name)}</button>'
+                for name, years in usable)
+            tools += (f'<div class="range-group" role="group" '
+                      f'aria-label="時間區間">{buttons}</div>')
     if table_rows:
         tools += ('<button type="button" class="icon-btn" data-toggle-table '
                   'aria-expanded="false">表格</button>')

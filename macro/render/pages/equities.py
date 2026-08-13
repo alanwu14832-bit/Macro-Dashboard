@@ -335,17 +335,17 @@ def render_tw(ctx: dict) -> str:
     if trend.get("index"):
         body.append(section(
             "tw-trend", "大盤走勢與成交量",
-            line_chart("加權指數（收盤）",
-                       [(trend["index"], "加權指數", "series-1")],
-                       years=None, default_years=1, freq="d", digits=0,
-                       with_table=False)
-            + line_chart("每日成交金額",
-                         [(trend["turnover"], "成交金額", "series-4")],
-                         years=None, default_years=1, freq="d", digits=0,
-                         suffix=" 億", chart_type="bar", height=180,
-                         include_zero=True, with_table=False)
+            line_chart("加權指數與成交金額",
+                       [(trend["index"], "加權指數", "series-1"),
+                        (trend["turnover"], "成交金額", "series-4")],
+                       years=None, default_years=0, freq="d", digits=0,
+                       height=320, with_table=False,
+                       series_kinds=[None, "bar"],
+                       series_axes=[None, "right"],
+                       right_suffix=" 億")
             + callout("量是價的體檢：指數創高而量能萎縮，漲勢的參與度在下降；"
-                      "下跌爆量則常是恐慌或換手。兩張圖同一時間軸，上下對照看。"),
+                      "下跌爆量則常是恐慌或換手。成交量走右軸、壓在下方三成，"
+                      "跟指數共用同一條時間軸——同一根位置上下對齊著看。"),
             note="近六個月日資料，證交所每日市場成交資訊"))
 
     if tw["stocks"]:
