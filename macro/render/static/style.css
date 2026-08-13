@@ -399,6 +399,20 @@ section { margin: 34px 0; scroll-margin-top: calc(var(--topbar-h) + 18px); }
 .tag.dovish  { background: var(--dovish-wash); }
 .tag .glyph { font-size: 0.9em; }
 
+/* 剛公布的數據：FRED 兩天內更新過就掛「新」。用 good 綠而非方向色——
+   新不新是狀態，不是鷹鴿。 */
+.new-badge {
+  display: inline-block; margin-left: 6px; padding: 0 5px;
+  border-radius: 4px; font-size: 0.68rem; font-weight: 700; line-height: 1.7;
+  color: #fff; background: var(--good); vertical-align: 1px;
+  letter-spacing: 0.05em; cursor: help;
+}
+.fresh-line {
+  margin-top: 12px; padding: 8px 12px; border-radius: var(--radius-sm);
+  background: rgba(12, 163, 12, 0.08); font-size: 0.88rem; color: var(--ink-2);
+}
+.fresh-line .new-badge { margin-left: 0; margin-right: 8px; cursor: default; }
+
 /* ------------------------------------------------------------- signals ---- */
 .signal-list { display: flex; flex-direction: column; gap: 0; }
 .signal {

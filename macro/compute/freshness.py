@@ -22,6 +22,7 @@ TRACKED = [
     ("ICSA", "初領失業金", "勞動市場", 180),
     ("JTSJOL", "JOLTS 職缺", "勞動市場", 192),
     ("CPIAUCSL", "CPI", "通膨", 10),
+    ("PPIFIS", "PPI", "通膨", 46),
     ("PCEPILFE", "核心 PCE", "通膨", 54),
     ("GDPC1", "實質 GDP", "成長", 53),
     ("RSAFS", "零售銷售", "成長", 9),
@@ -112,9 +113,17 @@ def compute(bundle: Bundle) -> dict:
     rows.sort(key=lambda r: (r["days_away"] is None, r["days_away"]))
     imminent = [r for r in rows if r["days_away"] is not None and r["days_away"] <= 7]
 
+    # 剛公布的數據：FRED 在今天或昨天更新過的序列。使用者打開網站時
+    # 不會記得每個發布日，這個集合讓渲染層能在對應讀數旁掛「新」徽章。
+    fresh = {r["id"]: {"name": r["name"],
+                       "date": r["updated"].date().isoformat()}
+             for r in rows
+             if r["updated_days"] is not None and r["updated_days"] <= 1}
+
     return {
         "rows": rows,
         "imminent": imminent,
+        "fresh": fresh,
         "external": EXTERNAL,
         "generated": datetime.now(),
         "next_up": rows[0] if rows else None,

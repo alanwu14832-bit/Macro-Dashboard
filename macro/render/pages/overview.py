@@ -120,6 +120,22 @@ def glance_board(ctx: dict, scenario: dict) -> str:
     return f'<div class="glance">{"".join(cols)}</div>'
 
 
+def fresh_line(ctx: dict) -> str:
+    """剛公布的數據一覽：FRED 在今天或昨天更新過的指標。
+
+    使用者不會背發布行事曆——昨天公布了 PPI，今天打開網站就該一眼看到
+    「PPI 是新數據」，而不是自己去對日期。
+    """
+    fresh = (ctx.get("freshness") or {}).get("fresh") or {}
+    if not fresh:
+        return ""
+    items = "、".join(
+        f'{esc(info["name"])}（{esc(info["date"][5:].replace("-", "/"))}）'
+        for info in fresh.values())
+    return (f'<div class="fresh-line"><span class="new-badge">新</span>'
+            f'剛公布：{items}——下方對應讀數也標有「新」。</div>')
+
+
 def direction_line(scenario: dict, summary: dict, stance: dict) -> str:
     """方向一句話：訊號傾向 → 規則上的閘門 → 市場定價，三段收斂。"""
     bits = [f"訊號 {summary['dovish']} 條偏降息、{summary['hawkish']} 條偏升息"]
@@ -301,6 +317,7 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
         f'{esc(direction_label(lean))}</span>'
         f'<span class="chip">訊號{esc(summary["tilt"])}</span>'
         f'</div>'
+        + fresh_line(ctx)
         + glance_board(ctx, scenario)
         + f'<div class="callout key">'
           f'{direction_line(scenario, summary, (ctx["rates"] or {}).get("stance") or {})}</div>'

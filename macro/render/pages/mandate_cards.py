@@ -11,27 +11,29 @@
 from __future__ import annotations
 
 from .overview_blocks import _inflation_read, _payroll_read
-from ..html import (accordion, callout, esc, fmt, pct, section,
+from ..html import (accordion, callout, esc, fmt, new_badge, pct, section,
                     table, zh_date)
 
 
-def _cell(label, sub, value, foot, *, key=False) -> str:
+def _cell(label, sub, value, foot, *, key=False, badge="") -> str:
     """四格讀數的一格。key=True 會加左側綠邊，標示判定採用的口徑。"""
     return (f'<div class="mc-cell{" mc-key" if key else ""}">'
-            f'<div class="mc-label">{esc(label)}'
+            f'<div class="mc-label">{esc(label)}{badge}'
             + (f'<span class="mc-sub">｜{esc(sub)}</span>' if sub else "")
             + f'</div><div class="mc-value">{value}</div>'
             f'<div class="mc-foot">{esc(foot)}</div></div>')
 
 
-def _chain(steps: list[tuple[str, str, str, str]]) -> str:
-    """傳導鏈：三張卡以箭頭相連。每張是 (標題, 副標, 讀數, 說明)。"""
+def _chain(steps: list[tuple]) -> str:
+    """傳導鏈：三張卡以箭頭相連。每張是 (標題, 副標, 讀數, 說明[, 徽章])。"""
     cards = []
-    for i, (title, sub, reading, note) in enumerate(steps):
+    for i, step in enumerate(steps):
+        title, sub, reading, note = step[:4]
+        badge = step[4] if len(step) > 4 else ""
         if i:
             cards.append('<div class="mc-arrow" aria-hidden="true">→</div>')
         cards.append(
-            f'<div class="mc-step"><div class="mc-step-head">{esc(title)}'
+            f'<div class="mc-step"><div class="mc-step-head">{esc(title)}{badge}'
             f'<span class="mc-sub">｜{esc(sub)}</span></div>'
             f'<div class="mc-step-read">{esc(reading)}</div>'
             f'<div class="mc-step-note">{esc(note)}</div></div>')
@@ -76,28 +78,33 @@ def employment(ctx: dict, scenario: dict) -> str:
 
     headline = _employment_headline(latest, avg3, breakeven, unrate,
                                     unemployment.get("prior"))
+    fresh = (ctx.get("freshness") or {}).get("fresh") or {}
 
     cells = "".join([
         _cell("非農就業", "月增", _wan(latest),
-              f'上期 {_wan(prev)}' if prev is not None else "—"),
+              f'上期 {_wan(prev)}' if prev is not None else "—",
+              badge=new_badge(fresh, "PAYEMS")),
         _cell("三月均", "降噪後的趨勢", _wan(avg3),
               f'十二月均 {_wan(payrolls.get("avg12"))}'),
         _cell("損益兩平", "撐住失業率所需", _wan(breakeven, signed=False),
               _gap_note(avg3, breakeven)),
         _cell("失業率", "九宮格水準", pct(unrate, 1),
-              f'判定 {esc(scenario.get("employment_label", ""))}', key=True),
+              f'判定 {esc(scenario.get("employment_label", ""))}', key=True,
+              badge=new_badge(fresh, "UNRATE")),
     ])
 
     chain = _chain([
         ("職缺", "需求端",
          f'{fmt(jolts.get("openings"), 0)} 千個'
          + (f'　V/U {fmt(jolts.get("vu_ratio"), 2)}' if jolts.get("vu_ratio") else ""),
-         "企業想僱多少人；最早鬆動的一環"),
+         "企業想僱多少人；最早鬆動的一環",
+         new_badge(fresh, "JTSJOL")),
         ("流量", "僱用與離職",
          f'招聘 {fmt(jolts.get("hires"), 1)}%　主動離職 {fmt(jolts.get("quits"), 1)}%'
          + (f'　初領 {fmt(claims.get("initial_4w", 0) / 10000, 1)} 萬'
             if claims.get("initial_4w") else ""),
-         "主動離職率跌代表勞工不敢換工作，是信心的溫度計"),
+         "主動離職率跌代表勞工不敢換工作，是信心的溫度計",
+         new_badge(fresh, "ICSA")),
         ("失業率", "結果",
          f'{fmt(unrate, 1)}%　自然率附近',
          "落後指標；等它動的時候，前兩環早就轉向了"),
@@ -164,14 +171,19 @@ def inflation(ctx: dict, scenario: dict) -> str:
     if ppi_trend:
         headline += f'，PPI 壓力{ppi_trend}'
 
+    fresh = (ctx.get("freshness") or {}).get("fresh") or {}
     cells = "".join([
-        _cell("總體 CPI", "民眾體感", pct(head.get("cpi"), 1), "含食物與能源"),
+        _cell("總體 CPI", "民眾體感", pct(head.get("cpi"), 1), "含食物與能源",
+              badge=new_badge(fresh, "CPIAUCSL")),
         _cell("核心 CPI", "消費端趨勢", pct(head.get("core_cpi"), 1),
-              f'3M 年化 {fmt(mom.get("core_cpi_3m"), 1, suffix="%")}'),
+              f'3M 年化 {fmt(mom.get("core_cpi_3m"), 1, suffix="%")}',
+              badge=new_badge(fresh, "CPIAUCSL")),
         _cell("總體 PCE", "Fed 2% 目標", pct(head.get("pce"), 1),
-              f'3M 年化 {fmt(mom.get("pce_3m"), 1, suffix="%")}'),
+              f'3M 年化 {fmt(mom.get("pce_3m"), 1, suffix="%")}',
+              badge=new_badge(fresh, "PCEPILFE")),
         _cell("核心 PCE", "九宮格水準", pct(core_pce, 1),
-              f'動能 {trend}', key=True),
+              f'動能 {trend}', key=True,
+              badge=new_badge(fresh, "PCEPILFE")),
     ])
 
     chain = _chain([
@@ -179,17 +191,20 @@ def inflation(ctx: dict, scenario: dict) -> str:
          f'總體 {fmt(ppi.get("headline"), 1, suffix="%")}'
          f' · 核心 {fmt(ppi.get("core"), 1, suffix="%")}'
          f' · 3M {fmt(ppi.get("core_3m"), 1, suffix="%")}',
-         "只判斷成本壓力，不直接移動九宮格"),
+         "只判斷成本壓力，不直接移動九宮格",
+         new_badge(fresh, "PPIFIS")),
         ("CPI", "消費者價格",
          f'總體 {fmt(head.get("cpi"), 1, suffix="%")}'
          f' · 核心 {fmt(head.get("core_cpi"), 1, suffix="%")}'
          f' · 3M {fmt(mom.get("core_cpi_3m"), 1, suffix="%")}',
-         "最早確認消費端轉折與分項來源"),
+         "最早確認消費端轉折與分項來源",
+         new_badge(fresh, "CPIAUCSL")),
         ("PCE", "政策口徑",
          f'總體 {fmt(head.get("pce"), 1, suffix="%")}'
          f' · 核心 {fmt(core_pce, 1, suffix="%")}'
          f' · 3M {fmt(core_pce_3m, 1, suffix="%")}',
-         "核心年增決定格位；三個月年化只決定方向"),
+         "核心年增決定格位；三個月年化只決定方向",
+         new_badge(fresh, "PCEPILFE")),
     ])
 
     dates = []

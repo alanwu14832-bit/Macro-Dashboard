@@ -97,6 +97,19 @@ def tag(direction: str, text: str | None = None) -> str:
             f'{esc(text or direction_label(direction))}</span>')
 
 
+def new_badge(fresh: dict | None, *ids: str) -> str:
+    """「新」徽章：任一序列在近兩天內被 FRED 更新過就掛上。
+
+    fresh 來自 ctx["freshness"]["fresh"]（{series_id: {name, date}}）。
+    同一發布的序列一起更新，所以檢查代表序列即可（例如 PPIFIS 代表整份 PPI）。
+    """
+    hit = next((fresh[i] for i in ids if fresh and i in fresh), None)
+    if not hit:
+        return ""
+    return (f'<span class="new-badge" title="FRED 於 {esc(hit["date"])} '
+            f'更新了這項數據">新</span>')
+
+
 def stat(label: str, value: str, *, delta: str = "", asof: str = "",
          direction: str | None = None, spark: list | None = None,
          spark_color: str = "series-1") -> str:

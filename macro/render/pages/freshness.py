@@ -1,7 +1,7 @@
 """資料新鮮度頁：每個指標多新、下次什麼時候更新。"""
 from __future__ import annotations
 
-from ..html import callout, esc, fmt, section, table, zh_date
+from ..html import callout, esc, fmt, new_badge, section, table, zh_date
 
 
 def _countdown(days: int | None) -> str:
@@ -47,8 +47,9 @@ def render(ctx: dict) -> str:
             note=f'共 {len(imminent)} 項'))
 
     # ---- 完整表 ----
+    fresh = d.get("fresh") or {}
     rows = [[
-        esc(r["name"]),
+        esc(r["name"]) + new_badge(fresh, r["id"]),
         esc(r["module"]),
         zh_date(r["data_date"], freq=r["frequency"]),
         _age(r["data_age"], r["frequency"]),
