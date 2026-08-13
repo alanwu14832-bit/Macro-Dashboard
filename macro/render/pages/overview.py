@@ -63,6 +63,74 @@ def narrative(ctx: dict, scenario: dict, summary: dict) -> str:
     return "".join(f"<p>{b}</p>" for b in bits)
 
 
+def glance_board(ctx: dict, scenario: dict) -> str:
+    """三欄一眼板：就業、通膨、聯準會，各給判定 + 三個關鍵數字。
+
+    取代原本的散文段落——散文讀者要自己在句子裡找數字，
+    這裡直接把「狀況、關鍵讀數、動能方向」排成可掃視的格子。
+    """
+    labor = ctx["labor"]
+    inflation = ctx["inflation"]
+    stance = (ctx["rates"] or {}).get("stance") or {}
+
+    avg3 = labor["payrolls"]["avg3"]
+    breakeven = labor["breakeven"].get("value")
+    unrate = labor["unemployment"]["rate"]
+    jobs_gap = (avg3 - breakeven) if (avg3 is not None and breakeven) else None
+
+    core_pce = inflation["headline"]["core_pce"]
+    ann3 = inflation["momentum"].get("core_pce_3m")
+    core_cpi = inflation["headline"]["core_cpi"]
+    inf_trend = ("動能 ↘ 放緩中" if ann3 < core_pce else "動能 ↗ 仍在加速") \
+        if (ann3 is not None and core_pce is not None) else ""
+
+    def col(title, judge_dir, judge_text, trend, rows):
+        row_html = "".join(
+            f'<div class="gl-row"><span>{esc(k)}</span>'
+            f'<span class="gl-v">{v}</span></div>' for k, v in rows if v)
+        trend_html = f'<div class="gl-trend">{esc(trend)}</div>' if trend else ""
+        return (f'<div class="gl-col"><div class="gl-head">{esc(title)}'
+                f'{tag(judge_dir, judge_text)}</div>{row_html}{trend_html}</div>')
+
+    jobs_trend = ""
+    if jobs_gap is not None:
+        jobs_trend = ("增速低於損益兩平 → 失業率有上行壓力" if jobs_gap < 0
+                      else "增速高於損益兩平 → 失業率可維持")
+
+    cols = [
+        col("就業", "dovish", scenario["employment_label"], jobs_trend, [
+            ("三月均非農", thousands_to_wan(avg3)),
+            ("損益兩平需", thousands_to_wan(breakeven, signed=False)),
+            ("失業率", fmt(unrate, 1, suffix="%")),
+        ]),
+        col("通膨", "hawkish", scenario["inflation_label"], inf_trend, [
+            ("核心 PCE 年增", pct(core_pce, 1)),
+            ("近三月年化", pct(ann3, 1)),
+            ("核心 CPI 年增", pct(core_cpi, 1)),
+        ]),
+        col("聯準會", scenario["lean"], scenario["regime_label"], "", [
+            ("政策利率上緣", pct(stance.get("policy"), 2)),
+            ("實質政策利率", pct(stance.get("real_policy"), 2)),
+            ("市場定價", esc((stance.get("market_implies") or "—")
+                             .replace("市場定價", ""))),
+        ]),
+    ]
+    return f'<div class="glance">{"".join(cols)}</div>'
+
+
+def direction_line(scenario: dict, summary: dict, stance: dict) -> str:
+    """方向一句話：訊號傾向 → 規則上的閘門 → 市場定價，三段收斂。"""
+    bits = [f"訊號 {summary['dovish']} 條偏降息、{summary['hawkish']} 條偏升息"]
+    first = next((t for t in (scenario.get("transitions") or [])
+                  if t.get("gap") is not None), None)
+    if first:
+        bits.append(f"但規則上要等{esc(first['name'])}政策重心才會換——"
+                    f"還差 {fmt(abs(first['gap']), 2)} {esc(first['unit'])}")
+    if stance.get("market_implies"):
+        bits.append(esc(stance["market_implies"]))
+    return "<strong>方向：</strong>" + "；".join(bits) + "。"
+
+
 def _when(days: int | None) -> str:
     if days is None:
         return "時程未定"
@@ -190,47 +258,13 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
         f'{esc(direction_label(lean))}</span>'
         f'<span class="chip">訊號{esc(summary["tilt"])}</span>'
         f'</div>'
-        f'<div class="summary">{narrative(ctx, scenario, summary)}</div>'
-        + (f'<div class="callout key">{key_line(scenario)}</div>' if key_line(scenario) else "")
+        + glance_board(ctx, scenario)
+        + f'<div class="callout key">'
+          f'{direction_line(scenario, summary, (ctx["rates"] or {}).get("stance") or {})}</div>'
+        + accordion("完整敘述", narrative(ctx, scenario, summary))
         + f'<p style="margin:12px 0 0"><a href="/scenario/">'
           f'這個判斷怎麼來的、對應什麼部位　→</a></p>'
         f'</div>')
-
-    # ---- 模組入口 ----
-    body.append(section("modules", "各模組現況", module_cards(ctx, signals),
-                        terms=["nine_grid"]))
-
-    # ---- 關鍵訊號 ----
-    body.append(section(
-        "signals", "本期關鍵訊號",
-        signals_block(signals) + legend_note(),
-        note=f"共 {summary['total']} 條：{summary['dovish']} 條利降息、"
-             f"{summary['hawkish']} 條利升息、{summary['neutral']} 條中性。依嚴重度排序。",
-        terms=["signal_engine", "hawkish_dovish"]))
-
-    # ---- 資料新鮮度 ----
-    fresh = ctx.get("freshness") or {}
-    imminent = fresh.get("imminent") or []
-    fomc = next_meeting()
-    if imminent or fomc:
-        chips = "".join(
-            f'<span class="chip">{esc(r["name"])}'
-            f'<strong style="margin-left:4px">{esc(_when(r["days_away"]))}</strong>'
-            f'</span>'
-            for r in imminent[:6])
-        if fomc:
-            # FOMC 不是資料發布，是事件——排最前面、標色以示區別
-            chips = (f'<span class="chip hawkish"><span class="dot"></span>'
-                     f'FOMC 利率決策 {fomc["date"].month}/{fomc["date"].day}'
-                     f'<strong style="margin-left:4px">還有 {fomc["days"]} 天</strong>'
-                     f'</span>') + chips
-        body.append(section(
-            "fresh", "接下來幾天會有新數字",
-            f'<div class="chips">{chips}</div>'
-            f'<p class="muted" style="margin-top:10px">'
-            f'發布後本站的下一次建置就會帶進來，訊號與九宮格判定也可能跟著改變。'
-            f'　<a href="/freshness/">看完整發布時程與資料新鮮度 →</a></p>',
-            note="資料來源：FRED 官方發布行事曆"))
 
     # ---- 今日財經要聞 ----
     news = ctx.get("news") or {}
@@ -272,6 +306,42 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
                 f' <a href="/news/">國際新聞</a>。</p>',
                 note=f'近 {news.get("stats", {}).get("window_hours", 36)} 小時、'
                      f'財金相關、多家同報優先'))
+
+    # ---- 模組入口 ----
+    body.append(section("modules", "各模組現況", module_cards(ctx, signals),
+                        terms=["nine_grid"]))
+
+    # ---- 關鍵訊號 ----
+    body.append(section(
+        "signals", "本期關鍵訊號",
+        signals_block(signals) + legend_note(),
+        note=f"共 {summary['total']} 條：{summary['dovish']} 條利降息、"
+             f"{summary['hawkish']} 條利升息、{summary['neutral']} 條中性。依嚴重度排序。",
+        terms=["signal_engine", "hawkish_dovish"]))
+
+    # ---- 資料新鮮度 ----
+    fresh = ctx.get("freshness") or {}
+    imminent = fresh.get("imminent") or []
+    fomc = next_meeting()
+    if imminent or fomc:
+        chips = "".join(
+            f'<span class="chip">{esc(r["name"])}'
+            f'<strong style="margin-left:4px">{esc(_when(r["days_away"]))}</strong>'
+            f'</span>'
+            for r in imminent[:6])
+        if fomc:
+            # FOMC 不是資料發布，是事件——排最前面、標色以示區別
+            chips = (f'<span class="chip hawkish"><span class="dot"></span>'
+                     f'FOMC 利率決策 {fomc["date"].month}/{fomc["date"].day}'
+                     f'<strong style="margin-left:4px">還有 {fomc["days"]} 天</strong>'
+                     f'</span>') + chips
+        body.append(section(
+            "fresh", "接下來幾天會有新數字",
+            f'<div class="chips">{chips}</div>'
+            f'<p class="muted" style="margin-top:10px">'
+            f'發布後本站的下一次建置就會帶進來，訊號與九宮格判定也可能跟著改變。'
+            f'　<a href="/freshness/">看完整發布時程與資料新鮮度 →</a></p>',
+            note="資料來源：FRED 官方發布行事曆"))
 
     # ---- 接下來看什麼 ----
     transitions = scenario.get("transitions") or []
