@@ -1,12 +1,16 @@
 # Vercel 只需要 site/（靜態產出）與 api/（serverless function）。
 # 建置在 GitHub Actions 跑完才 commit 回來，雲端不會執行 build.py，
 # 所以 Python 那一整包不必上傳。
+#
+# 每條規則都用開頭的 / 綁在專案根目錄。這裡的比對規則跟 .gitignore 一樣：
+# 沒有開頭斜線的 `data/` 會對到任何一層的 data 目錄，連 site/data/ 都會被
+# 掃掉——而那是 /explore/ 的指標目錄，掃掉就整頁壞掉。
 
-build.py
-macro/
-data/
-.github/
-README.md
+/build.py
+/macro/
+/data/archive/
+/.github/
+/README.md
 __pycache__/
 *.py[cod]
 .venv/
