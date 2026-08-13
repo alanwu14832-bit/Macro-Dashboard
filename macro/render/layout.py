@@ -64,8 +64,8 @@ SITE_NAME = "總經儀表板"
 # Supabase（帳號與自選清單同步）。anon key 是「設計上就公開」的前端金鑰，
 # 資料隔離靠資料庫的 Row Level Security，不靠把 key 藏起來。
 # 兩個值都留空時，登入介面整個不出現，自選清單維持純 localStorage。
-SUPABASE_URL = ""
-SUPABASE_ANON_KEY = ""
+SUPABASE_URL = "https://nwbfjoroqnhpymdtdbwu.supabase.co"
+SUPABASE_ANON_KEY = "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"
 
 # Theme and rail state are applied before first paint so neither flashes.
 BOOT = """
