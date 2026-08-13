@@ -118,6 +118,31 @@ def _heatmap(groups: list[dict]) -> str:
     return f'<div class="heatmap">{"".join(blocks)}</div>'
 
 
+def _watchlist(market: str) -> str:
+    """自選清單容器。列是空的——quotes.js 讀 localStorage 後動態生成，
+    生成的儲存格帶 data-quote 屬性，跟其他表格共用同一套即時更新。
+
+    沒有帳號系統是刻意的：清單存瀏覽器本機，不上傳、不跨裝置，
+    網站本身維持純靜態。
+    """
+    name_col = "<th>名稱</th>" if market == "tw" else ""
+    hint = ("輸入證交所代號（2330、00878、8299…含上櫃）"
+            if market == "tw" else
+            "輸入美股代號（AAPL、SPY、QQQ…）；^ 開頭的指數不支援，請用對應 ETF")
+    return (
+        f'<div data-watchlist="{market}">'
+        f'<form class="wl-form" data-wl-form>'
+        f'<input class="wl-input" maxlength="10" autocomplete="off" '
+        f'placeholder="{esc(hint)}" aria-label="新增自選代號">'
+        f'<button type="submit" class="wl-add">加入</button>'
+        f'<span class="wl-msg" aria-live="polite"></span></form>'
+        f'<div class="table-wrap"><table><thead><tr>'
+        f'<th>代號</th>{name_col}<th>成交</th><th>漲跌</th><th>漲跌幅</th>'
+        f'<th>昨收</th><th></th></tr></thead><tbody></tbody></table></div>'
+        f'<p class="wl-empty muted">還沒有自選。加入的清單只存在這個瀏覽器'
+        f'（localStorage），換裝置或清瀏覽資料就會不見。</p></div>')
+
+
 def _status_note(status: str, source: str) -> str:
     return (f'<p class="muted" style="font-size:.83rem;margin:-4px 0 12px">'
             f'狀態：{esc(status)}　·　來源：{esc(source)}</p>')
@@ -181,6 +206,10 @@ def render_us(ctx: dict) -> str:
             + earnings_html,
             note=f'報價時間 {_stamp(us["indices"])}',
             terms=["drawdown", "vix"]))
+
+    body.append(section(
+        "us-watchlist", "自選清單", _watchlist("us"),
+        note="即時更新跟其他表格同節奏（45 秒）；清單只存在瀏覽器本機"))
 
     if us.get("proxies"):
         body.append(section(
@@ -296,6 +325,10 @@ def render_tw(ctx: dict) -> str:
             _status_note(tw["status"], "證交所 mis.twse.com.tw（指數與個股同源）")
             + f'<div class="grid grid-4">{"".join(tiles)}</div>',
             note=f'報價時間 {_stamp(tw["stocks"] or tw["index"])}'))
+
+    body.append(section(
+        "tw-watchlist", "自選清單", _watchlist("tw"),
+        note="含上櫃，跟其他台股表格同節奏（5 秒）即時更新；清單只存在瀏覽器本機"))
 
     trend = tw.get("trend") or {}
     if trend.get("index"):

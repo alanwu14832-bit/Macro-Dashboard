@@ -21,13 +21,18 @@
   const TW_REFRESH_MS = 5_000;
   const OTHER_REFRESH_MS = 45_000;
   const status = document.getElementById("quote-status");
-  const cells = [...document.querySelectorAll("[data-quote]")];
-  if (!cells.length) return;
 
-  const twSymbols = [...new Set(cells.filter(c => c.dataset.market === "tw")
-                                     .map(c => c.dataset.quote))];
-  const otherSymbols = [...new Set(cells.filter(c => c.dataset.market !== "tw")
-                                        .map(c => c.dataset.quote))];
+  // 自選清單的列是動態生成的，所以 cells 與符號清單要能重收集
+  let cells = [], twSymbols = [], otherSymbols = [];
+  function recollect() {
+    cells = [...document.querySelectorAll("[data-quote]")];
+    twSymbols = [...new Set(cells.filter(c => c.dataset.market === "tw")
+                                 .map(c => c.dataset.quote))];
+    otherSymbols = [...new Set(cells.filter(c => c.dataset.market !== "tw")
+                                    .map(c => c.dataset.quote))];
+  }
+  recollect();
+  if (!cells.length && !document.querySelector("[data-watchlist]")) return;
 
   let failures = 0;
   let disabled = false;
@@ -213,6 +218,93 @@
       status.title = payload.errors.join("；");   // 詳情放 tooltip，不佔版面
     }
   }
+
+  /* ------------------------------------------------------- 自選清單 ------
+   * 清單存 localStorage（wl-tw / wl-us），列動態生成、儲存格帶
+   * data-quote 屬性，跟其他表格共用同一套輪詢與更新。
+   * 沒有帳號系統是刻意的：不上傳、不跨裝置，網站維持純靜態。
+   * ---------------------------------------------------------------------- */
+  const WL_RULES = {
+    tw: { max: 20, pattern: /^\d{4,6}[A-Z]?$/,
+          bad: "台股代號是 4–6 位數字（可帶一個字母），例如 2330、00878" },
+    us: { max: 20, pattern: /^[A-Z][A-Z0-9.\-]{0,9}$/,
+          bad: "美股代號是字母開頭，例如 AAPL、BRK.B；^ 開頭的指數不支援" },
+  };
+
+  function kick(kind) {
+    if (disabled) return;
+    pace[kind].wait = CADENCE[kind].base;
+    pace[kind].idle = 0;
+    refresh(kind);
+  }
+
+  function wlRow(market, symbol) {
+    const dq = (field) =>
+      `data-quote="${symbol}" data-field="${field}" ` +
+      `data-market="${market}" data-digits="2"`;
+    const name = market === "tw"
+      ? `<td class="wl-name" data-wl-name="${symbol}">…</td>` : "";
+    return `<tr><td>${symbol}</td>${name}` +
+      `<td class="num" ${dq("price")}>—</td>` +
+      `<td class="num" ${dq("change")}>—</td>` +
+      `<td class="num" ${dq("change_percent")}>—</td>` +
+      `<td class="num" ${dq("previous_close")}>—</td>` +
+      `<td><button type="button" class="wl-remove" ` +
+      `data-wl-remove="${symbol}" aria-label="移除 ${symbol}">✕</button></td></tr>`;
+  }
+
+  for (const box of document.querySelectorAll("[data-watchlist]")) {
+    const market = box.dataset.watchlist;            // "tw" | "us"
+    const kind = market === "tw" ? "tw" : "other";
+    const rules = WL_RULES[market];
+    const storageKey = "wl-" + market;
+    const tbody = box.querySelector("tbody");
+    const emptyNote = box.querySelector(".wl-empty");
+    const message = box.querySelector(".wl-msg");
+    const input = box.querySelector(".wl-input");
+
+    const load = () => {
+      try { return JSON.parse(localStorage.getItem(storageKey)) || []; }
+      catch { return []; }
+    };
+    const save = (list) => {
+      try { localStorage.setItem(storageKey, JSON.stringify(list)); } catch {}
+    };
+
+    function renderList() {
+      const list = load();
+      emptyNote.hidden = list.length > 0;
+      tbody.innerHTML = list.map((s) => wlRow(market, s)).join("");
+      for (const btn of tbody.querySelectorAll("[data-wl-remove]")) {
+        btn.addEventListener("click", () => {
+          save(load().filter((s) => s !== btn.dataset.wlRemove));
+          renderList();
+          recollect();
+        });
+      }
+    }
+
+    box.querySelector("[data-wl-form]").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const symbol = input.value.trim().toUpperCase().split(".TW")[0];
+      message.textContent = "";
+      if (!symbol) return;
+      if (!rules.pattern.test(symbol)) { message.textContent = rules.bad; return; }
+      const list = load();
+      if (list.includes(symbol)) { message.textContent = "已在清單裡"; return; }
+      if (list.length >= rules.max) {
+        message.textContent = `最多 ${rules.max} 檔`; return;
+      }
+      save([...list, symbol]);
+      input.value = "";
+      renderList();
+      recollect();
+      kick(kind);                       // 立刻抓一輪，不等下一個節拍
+    });
+
+    renderList();
+  }
+  recollect();
 
   if (twSymbols.length) refresh("tw");
   if (otherSymbols.length) refresh("other");
