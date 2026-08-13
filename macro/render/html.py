@@ -139,6 +139,29 @@ def signal_row(signal: dict) -> str:
     )
 
 
+def signal_card(signal: dict) -> str:
+    """One rule-engine finding as a tile.
+
+    格子的三層是固定的：頂列標模組與方向（顏色 + 文字，不只靠色相）、
+    中間是結論、底部是那條規則實際引用的數字。嚴重度靠左側色條而不是
+    另一個字級，這樣一排格子掃過去高度一致、輕重仍分得出來。
+    """
+    sev = signal.get("severity", "low")
+    direction = signal.get("direction", "neutral")
+    return (
+        f'<div class="sig-card sev-{esc(sev)}">'
+        f'<div class="sig-top">'
+        f'<span class="sig-mod">{esc(signal.get("module", ""))}</span>'
+        f'{tag(direction)}</div>'
+        f'<div class="sig-head">{esc(signal["headline"])}</div>'
+        f'<div class="sig-why">{esc(signal.get("why", ""))}</div>'
+        + (f'<div class="sig-evi">{esc(signal["evidence"])}</div>'
+           if signal.get("evidence") else "")
+        + f'<div class="sig-sev" title="{esc(SEV_TEXT.get(sev, ""))}">'
+          f'{SEV_GLYPH.get(sev, "●")} {esc(SEV_TEXT.get(sev, ""))}</div>'
+        f'</div>')
+
+
 CHECK_GLYPH = {"alert": "▲", "watch": "◆", "normal": "●"}
 CHECK_TEXT = {"alert": "警戒", "watch": "留意", "normal": "正常"}
 

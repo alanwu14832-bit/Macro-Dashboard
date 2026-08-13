@@ -888,3 +888,45 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
   .mc-chain { grid-template-columns: 1fr; }
   .mc-arrow { transform: rotate(90deg); justify-self: center; }
 }
+
+/* ================================================== 關鍵訊號：方格排版 == */
+.sig-grid {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+.sig-card {
+  position: relative; display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 13px 15px 11px 17px;
+  overflow: hidden;
+}
+/* 嚴重度靠左側色條——一排格子高度一致，輕重仍分得出來 */
+.sig-card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+}
+.sig-card.sev-high::before   { background: var(--critical); }
+.sig-card.sev-medium::before { background: var(--warning); }
+.sig-card.sev-low::before    { background: var(--border-strong); }
+
+.sig-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: 7px;
+}
+.sig-mod {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em;
+  color: var(--ink-muted);
+}
+.sig-head {
+  font-size: 0.92rem; font-weight: 650; line-height: 1.45; margin-bottom: 6px;
+}
+.sig-why { font-size: 0.8rem; color: var(--ink-2); line-height: 1.55; }
+.sig-evi {
+  font-size: 0.78rem; color: var(--ink-muted); line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  margin-top: 7px; padding-top: 7px; border-top: 1px dashed var(--border);
+}
+.sig-sev {
+  font-size: 0.72rem; color: var(--ink-muted); margin-top: auto;
+  padding-top: 9px;
+}
+@media (max-width: 560px) { .sig-grid { grid-template-columns: 1fr; } }

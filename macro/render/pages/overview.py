@@ -305,7 +305,7 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
         + f'<div class="callout key">'
           f'{direction_line(scenario, summary, (ctx["rates"] or {}).get("stance") or {})}</div>'
         + accordion(f"本期關鍵訊號（{summary['total']} 條）",
-                    signals_block(signals) + legend_note())
+                    signals_block(signals, grid=True) + legend_note())
         + accordion("完整敘述", narrative(ctx, scenario, summary))
         + f'<p style="margin:12px 0 0"><a href="/scenario/">'
           f'這個判斷怎麼來的、對應什麼部位　→</a></p>'
