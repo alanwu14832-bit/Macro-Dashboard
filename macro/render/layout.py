@@ -9,7 +9,9 @@ Below 960px the rail leaves the grid and becomes an off-canvas drawer: a
 """
 from __future__ import annotations
 
+import html as html_module
 import os
+import re
 
 from .. import paths
 from .html import esc
@@ -73,7 +75,19 @@ def _icon(name: str) -> str:
             f'stroke-linejoin="round" aria-hidden="true"><path d="{path}"/></svg>')
 
 
-def _sidebar(path: str) -> str:
+CARET = ('<span class="nav-caret" aria-hidden="true">'
+         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+         'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+         '<path d="M9 6l6 6-6 6"/></svg></span>')
+
+
+def _sidebar(path: str, sections: dict[str, list[tuple[str, str]]] | None = None) -> str:
+    """側欄。每個大標下列出該頁的區塊小標（<details> 展開，目前頁預設開）。
+
+    小標清單由 build.py 從各頁渲染完的 HTML 抽出來（兩段式建置），
+    所以永遠跟頁面實際有的區塊一致，不需要另外維護一份目錄。
+    """
+    sections = sections or {}
     items, seen = [], None
     for href, label, icon, group in NAV:
         if group != seen:
@@ -81,10 +95,22 @@ def _sidebar(path: str) -> str:
             if group:
                 items.append(f'<div class="nav-group"><span>{esc(group)}</span></div>')
         current = ' aria-current="page"' if href == path else ""
-        items.append(
+        link = (
             f'<a class="nav-item" href="{esc(href)}"{current}>'
             f'{_icon(icon)}<span class="nav-label">{esc(label)}</span>'
             f'<span class="nav-tip">{esc(label)}</span></a>')
+        subs = sections.get(href) or []
+        if subs:
+            sub_links = "".join(
+                f'<a href="{esc(href)}#{esc(anchor)}">{esc(title)}</a>'
+                for anchor, title in subs)
+            open_attr = " open" if href == path else ""
+            items.append(
+                f'<details class="nav-details"{open_attr}>'
+                f'<summary>{link}{CARET}</summary>'
+                f'<div class="nav-sub">{sub_links}</div></details>')
+        else:
+            items.append(link)
 
     return f"""
   <aside class="rail" id="rail">
@@ -120,9 +146,19 @@ def asset_version() -> str:
     return str(int(stamp))
 
 
+SECTION_RE = re.compile(
+    r'<section id="([^"]+)"><div class="section-head"><h2>([^<]+)</h2>')
+
+
+def extract_sections(body: str) -> list[tuple[str, str]]:
+    """從渲染完的頁面 HTML 抽出 (錨點, 標題) 清單，給側欄小標用。"""
+    return [(anchor, html_module.unescape(title))
+            for anchor, title in SECTION_RE.findall(body)]
+
+
 def page(*, title: str, path: str, body: str, lede: str = "",
          heading: str = "", updated: str = "", description: str = "",
-         toc: list[tuple[str, str]] | None = None) -> str:
+         sections: dict[str, list[tuple[str, str]]] | None = None) -> str:
     version = asset_version()
 
     head_block = ""
@@ -148,7 +184,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 <body>
 <a class="skip" href="#content">跳到主要內容</a>
 <div class="app">
-{_sidebar(path)}
+{_sidebar(path, sections)}
   <div class="shell">
     <header class="topbar">
       <button type="button" class="icon-btn drawer-btn" id="rail-open"

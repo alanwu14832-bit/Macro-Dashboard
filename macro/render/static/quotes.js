@@ -54,9 +54,26 @@
     return true;
   }
 
+  // 熱力圖磁磚底色。跟 Python 端 heat_style() 同一套公式：
+  // ±3% 封頂，之內線性調透明度，綠漲紅跌。改一邊就要一起改另一邊。
+  function heatColor(pct) {
+    if (pct === null || pct === undefined) return "rgba(137,135,129,0.10)";
+    const clamped = Math.max(-3, Math.min(3, pct));
+    const alpha = 0.06 + (Math.abs(clamped) / 3) * 0.42;
+    const rgb = clamped > 0 ? "12,132,58"
+              : clamped < 0 ? "199,55,55" : "137,135,129";
+    return `rgba(${rgb},${alpha.toFixed(3)})`;
+  }
+
   function apply(quotes) {
     const bySymbol = new Map(quotes.map(q => [String(q.symbol), q]));
     let changed = 0;
+
+    for (const tile of document.querySelectorAll("[data-heat]")) {
+      const quote = bySymbol.get(tile.dataset.heat);
+      if (!quote || quote.change_percent === undefined) continue;
+      tile.style.background = heatColor(quote.change_percent);
+    }
 
     for (const cell of cells) {
       const quote = bySymbol.get(cell.dataset.quote);

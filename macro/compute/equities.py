@@ -39,11 +39,53 @@ TW_INDICES = [("^TWII", "台股加權指數")]
 TW_TICKERS = [
     ("2330", "台積電"), ("2317", "鴻海"), ("2454", "聯發科"), ("2308", "台達電"),
     ("2382", "廣達"), ("2412", "中華電"), ("2881", "富邦金"), ("2882", "國泰金"),
-    ("1301", "台塑"), ("2603", "長榮"),
 ]
 TW_ETFS = [
     ("0050", "元大台灣50"), ("0056", "元大高股息"), ("00878", "國泰永續高股息"),
-    ("006208", "富邦台50"),
+    ("006208", "富邦台50"), ("009816", "凱基台灣TOP50"),
+]
+
+# ---- 台股族群熱力圖 -------------------------------------------------------
+# 每個族群挑市值與成交量具代表性的個股，上市優先、必要時含上櫃
+# （MIS 對兩個 board 都能報價）。熱力圖看的是「族群內一致還是分歧」，
+# 不是選股清單，所以每組 4–6 檔就夠說話。
+TW_GROUPS = [
+    ("金融", [("2881", "富邦金"), ("2882", "國泰金"), ("2884", "玉山金"),
+              ("2885", "元大金"), ("2891", "中信金"), ("2886", "兆豐金")]),
+    ("電子代工與 AI 伺服器", [("2317", "鴻海"), ("2382", "廣達"), ("3231", "緯創"),
+                              ("2356", "英業達"), ("2376", "技嘉"), ("2357", "華碩")]),
+    ("航運", [("2603", "長榮"), ("2609", "陽明"), ("2615", "萬海"),
+              ("2610", "華航"), ("2618", "長榮航")]),
+    ("重電與電力設備", [("1519", "華城"), ("1513", "中興電"), ("1503", "士電"),
+                        ("2308", "台達電")]),
+    ("塑化", [("1301", "台塑"), ("1303", "南亞"), ("1326", "台化"),
+              ("6505", "台塑化")]),
+    ("鋼鐵", [("2002", "中鋼"), ("2027", "大成鋼"), ("9958", "世紀鋼")]),
+    ("光電與鏡頭", [("3008", "大立光"), ("3406", "玉晶光"), ("2409", "友達"),
+                    ("3481", "群創")]),
+    ("通信網路", [("2412", "中華電"), ("3045", "台灣大"), ("4904", "遠傳"),
+                  ("2345", "智邦")]),
+]
+
+# ---- 半導體產業鏈熱力圖 ---------------------------------------------------
+# 依製程順序排：設計 → 製造 → 記憶體 → 封測 → 設備 → 材料 → 載板 → 通路。
+# 同一天各環節的分歧（例如設計漲、封測跌）比大盤漲跌本身更有資訊量。
+TW_SEMI_CHAIN = [
+    ("IC 設計", [("2454", "聯發科"), ("3034", "聯詠"), ("2379", "瑞昱"),
+                 ("3443", "創意"), ("3529", "力旺"), ("5269", "祥碩")]),
+    ("晶圓代工", [("2330", "台積電"), ("2303", "聯電"), ("5347", "世界先進"),
+                  ("6770", "力積電")]),
+    ("記憶體", [("2408", "南亞科"), ("2344", "華邦電"), ("3006", "晶豪科"),
+                ("8299", "群聯"), ("2451", "創見")]),
+    ("封測", [("3711", "日月光投控"), ("6239", "力成"), ("2449", "京元電子"),
+              ("6147", "頎邦"), ("3374", "精材")]),
+    ("設備", [("3680", "家登"), ("3131", "弘塑"), ("3583", "辛耘"),
+              ("2360", "致茂"), ("6196", "帆宣")]),
+    ("材料與矽晶圓", [("6488", "環球晶"), ("3532", "台勝科"), ("1560", "中砂"),
+                      ("5434", "崇越")]),
+    ("IC 載板與 PCB", [("3037", "欣興"), ("8046", "南電"), ("2368", "金像電"),
+                       ("2383", "台光電"), ("3044", "健鼎"), ("4958", "臻鼎-KY")]),
+    ("IC 通路", [("3702", "大聯大"), ("3036", "文曄")]),
 ]
 
 # ---- 其他新興市場 --------------------------------------------------------
@@ -80,6 +122,14 @@ def _fetch_taiwan(pairs: list[tuple[str, str]], region: str,
     order = {symbol: i for i, (symbol, _) in enumerate(pairs)}
     out.sort(key=lambda r: order.get(str(r["symbol"]), 999))
     return out
+
+
+def _group_rows(defs: list[tuple[str, list]], rows: list[dict]) -> list[dict]:
+    """把攤平抓回來的報價分回各族群，保持定義裡的順序。"""
+    by_symbol = {str(r["symbol"]): r for r in rows}
+    return [{"name": name,
+             "rows": [by_symbol[s] for s, _ in pairs if s in by_symbol]}
+            for name, pairs in defs]
 
 
 def _breadth(rows: list[dict]) -> dict:
@@ -207,13 +257,21 @@ def compute(bundle=None) -> dict:
     tw_stocks = _fetch_taiwan(TW_TICKERS, "台股")
     tw_etfs = _fetch_taiwan(TW_ETFS, "台股")
 
+    # 熱力圖的代號跨族群會重複（台積電同時在權值股與晶圓代工），
+    # 抓一次攤平的清單，再分回各族群。
+    heat_pairs = list({symbol: (symbol, name)
+                       for _, pairs in TW_GROUPS + TW_SEMI_CHAIN
+                       for symbol, name in pairs}.values())
+    tw_heat = _fetch_taiwan(heat_pairs, "台股")
+
     em_indices = _fetch(EM_INDICES, "新興市場")
     em_etfs = _fetch(EM_ETFS, "新興市場")
 
     # 先把這次成功的存起來，再用存檔補這次沒取到的——順序不能反，
     # 否則會拿這次剛補進去的舊值去覆蓋存檔。
     _save_snapshot([us_indices, us_proxies, us_stocks, us_sectors,
-                    tw_index, tw_stocks, tw_etfs, em_indices, em_etfs])
+                    tw_index, tw_stocks, tw_etfs, tw_heat,
+                    em_indices, em_etfs])
 
     us_indices = _fill_gaps(us_indices, US_INDICES, "美股", snapshot)
     us_proxies = _fill_gaps(us_proxies, US_PROXIES, "美股", snapshot)
@@ -222,6 +280,7 @@ def compute(bundle=None) -> dict:
     tw_index = _fill_gaps(tw_index, TW_INDICES, "台股", snapshot)
     tw_stocks = _fill_gaps(tw_stocks, TW_TICKERS, "台股", snapshot)
     tw_etfs = _fill_gaps(tw_etfs, TW_ETFS, "台股", snapshot)
+    tw_heat = _fill_gaps(tw_heat, heat_pairs, "台股", snapshot)
     em_indices = _fill_gaps(em_indices, EM_INDICES, "新興市場", snapshot)
     em_etfs = _fill_gaps(em_etfs, EM_ETFS, "新興市場", snapshot)
 
@@ -243,6 +302,8 @@ def compute(bundle=None) -> dict:
         },
         "tw": {
             "index": tw_index, "stocks": tw_stocks, "etfs": tw_etfs,
+            "groups": _group_rows(TW_GROUPS, tw_heat),
+            "semi": _group_rows(TW_SEMI_CHAIN, tw_heat),
             "breadth": _breadth(tw_stocks),
             "status": _market_note(tw_stocks or tw_index),
         },

@@ -665,3 +665,64 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
 .ex-item.is-on { border-color: var(--series-1); box-shadow: inset 0 0 0 1px var(--series-1); }
 .ex-item .ex-name { font-size: 0.87rem; font-weight: 550; }
 .ex-item .ex-meta { font-size: 0.74rem; color: var(--ink-muted); }
+
+/* ================================================================ 熱力圖 == */
+.heatmap { display: flex; flex-direction: column; gap: 16px; }
+.heat-label {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--ink-2);
+}
+.heat-avg { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--ink-muted); }
+.heat-tiles {
+  display: grid; gap: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+}
+.heat-tile {
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 8px 10px; display: flex; flex-direction: column; gap: 1px;
+  transition: background 400ms;
+}
+.ht-name {
+  font-size: 0.82rem; font-weight: 600; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ht-code { font-size: 0.72rem; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.ht-chg { font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+
+/* ========================================================= 側欄子選單 == */
+/* 每個大標是一個 <details>：summary 裡是原本的 nav-item（點了就換頁）
+   加一個小箭頭（點了展開小標）。目前頁面預設展開。 */
+.nav-details > summary {
+  list-style: none; display: flex; align-items: center;
+}
+.nav-details > summary::-webkit-details-marker { display: none; }
+.nav-details > summary > .nav-item { flex: 1; min-width: 0; }
+.nav-caret {
+  flex: none; width: 22px; height: 22px; display: flex;
+  align-items: center; justify-content: center; border-radius: 6px;
+  color: var(--ink-muted); cursor: pointer;
+  transition: transform 160ms var(--ease), background 130ms, color 130ms;
+}
+.nav-caret:hover { background: var(--surface-sunken); color: var(--ink); }
+.nav-caret svg { width: 13px; height: 13px; }
+.nav-details[open] > summary .nav-caret { transform: rotate(90deg); }
+.nav-sub {
+  display: flex; flex-direction: column; gap: 1px;
+  margin: 1px 0 4px; padding-left: 33px;
+}
+.nav-sub a {
+  font-size: 0.8rem; color: var(--ink-muted); text-decoration: none;
+  padding: 4px 8px; border-radius: 6px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  transition: background 130ms, color 130ms;
+}
+.nav-sub a:hover { background: var(--surface-sunken); color: var(--ink); }
+/* 收合成純圖示時，小標與箭頭都藏起來 */
+:root.rail-collapsed .nav-sub,
+:root.rail-collapsed .nav-caret { display: none; }
+:root.rail-collapsed .nav-details > summary { justify-content: center; }
+@media (max-width: 960px) {
+  :root.rail-collapsed .nav-sub { display: flex; }
+  :root.rail-collapsed .nav-caret { display: flex; }
+  :root.rail-collapsed .nav-details > summary { justify-content: flex-start; }
+}

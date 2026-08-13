@@ -153,17 +153,27 @@ def main() -> int:
          lambda: archive_page.render(snapshots)),
     ]
 
-    written = []
+    # 兩段式：先渲染出全部頁面的內文、抽出各頁的區塊清單，
+    # 再包外殼——側欄的小標才能列出「所有」頁的區塊，而不是只有當前頁。
+    bodies: dict[str, str] = {}
     for path, title, heading, lede, render_fn in pages:
         try:
-            body = render_fn()
+            bodies[path] = render_fn()
         except Exception:
             print(f"   ✗ {path}", flush=True)
             traceback.print_exc()
             failures.append(path)
+
+    section_map = {path: layout.extract_sections(body)
+                   for path, body in bodies.items()}
+
+    written = []
+    for path, title, heading, lede, render_fn in pages:
+        if path not in bodies:
             continue
-        html = layout.page(title=title, path=path, body=body, heading=heading,
-                           lede=lede, updated=updated, description=lede)
+        html = layout.page(title=title, path=path, body=bodies[path],
+                           heading=heading, lede=lede, updated=updated,
+                           description=lede, sections=section_map)
         target = layout.write_page(path, html)
         written.append(target)
         if verbose:

@@ -137,13 +137,21 @@ def _mis_fetch(channels: str, ttl: float) -> dict[str, dict]:
 
 
 def taiwan_quotes(tickers: list[str], *, ttl: float = 900) -> list[dict]:
-    """證交所官方報價。上市與上櫃兩個 channel 都送，MIS 只回存在的那個。"""
+    """證交所官方報價。上市與上櫃兩個 channel 都送，MIS 只回存在的那個。
+
+    每檔要兩個 channel（tse + otc），代號一多單一請求就會超過 MIS
+    能接受的長度，所以 40 檔一批分開送。
+    """
     codes = [str(t).strip().upper().split(".")[0] for t in tickers if str(t).strip()]
+    codes = list(dict.fromkeys(codes))            # 去重、保序
     if not codes:
         return []
-    channels = "|".join(f"{market}_{code}.tw"
-                        for code in codes for market in ("tse", "otc"))
-    found = _mis_fetch(channels, ttl)
+    found: dict[str, dict] = {}
+    for i in range(0, len(codes), 40):
+        chunk = codes[i:i + 40]
+        channels = "|".join(f"{market}_{code}.tw"
+                            for code in chunk for market in ("tse", "otc"))
+        found.update(_mis_fetch(channels, ttl))
     return [_shape_taiwan(found[code]) for code in codes if code in found]
 
 

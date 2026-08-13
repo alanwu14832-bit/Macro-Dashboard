@@ -99,17 +99,8 @@ function shapeTaiwan(row) {
   };
 }
 
-async function fetchTaiwan(codes, indexSymbols) {
-  if (!codes.length && !indexSymbols.length) return [];
-  const key = "tw:" + codes.join(",") + "|" + indexSymbols.join(",");
-  const hit = twCache.get(key);
-  if (hit && Date.now() - hit.at < UPSTREAM_TTL_MS) return hit.data;
-
-  const channels = codes.flatMap((c) => [`tse_${c}.tw`, `otc_${c}.tw`])
-    .concat(indexSymbols.map((s) => TW_INDEX[s].channel))
-    .join("|");
+async function misFetch(channels) {
   const url = `${TWSE_MIS}?ex_ch=${encodeURIComponent(channels)}&json=1&delay=0`;
-
   const response = await fetch(url, {
     headers: { "User-Agent": UA, Referer: "https://mis.twse.com.tw/stock/index.jsp" },
     signal: AbortSignal.timeout(12_000),
@@ -118,9 +109,26 @@ async function fetchTaiwan(codes, indexSymbols) {
   const payload = await response.json();
   // 證交所限流時回的是 HTTP 200 加非 0000 的 rtcode，只看狀態碼會誤判成功
   if (payload.rtcode !== "0000") throw new Error(`TWSE rtcode ${payload.rtcode}`);
+  return (payload.msgArray || []).filter((r) => r.c);
+}
 
+async function fetchTaiwan(codes, indexSymbols) {
+  if (!codes.length && !indexSymbols.length) return [];
+  const key = "tw:" + codes.join(",") + "|" + indexSymbols.join(",");
+  const hit = twCache.get(key);
+  if (hit && Date.now() - hit.at < UPSTREAM_TTL_MS) return hit.data;
+
+  // 每檔要 tse + otc 兩個 channel，熱力圖讓代號破百，單一請求會超過
+  // MIS 能接受的長度——40 檔一批並行送。
+  const allChannels = codes.flatMap((c) => [`tse_${c}.tw`, `otc_${c}.tw`])
+    .concat(indexSymbols.map((s) => TW_INDEX[s].channel));
+  const batches = [];
+  for (let i = 0; i < allChannels.length; i += 80) {
+    batches.push(misFetch(allChannels.slice(i, i + 80).join("|")));
+  }
   const found = new Map(
-    (payload.msgArray || []).filter((r) => r.c).map((r) => [r.c, r]));
+    (await Promise.all(batches)).flat().map((r) => [r.c, r]));
+
   const data = codes.filter((c) => found.has(c)).map((c) => shapeTaiwan(found.get(c)));
   for (const symbol of indexSymbols) {
     const row = found.get(TW_INDEX[symbol].code);
@@ -197,8 +205,9 @@ async function fetchOther(symbols) {
   };
 }
 
+// 上限 200：熱力圖讓台股頁的代號到了一百出頭，60 會把後半截掉
 const splitParam = (raw) =>
-  String(raw || "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 60);
+  String(raw || "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 200);
 
 module.exports = async (req, res) => {
   setCors(res);
