@@ -76,9 +76,13 @@ def _shape_taiwan(row: dict) -> dict:
     price = _tw_num(row.get("z"))                 # 最近成交價
     prev = _tw_num(row.get("y"))                  # 昨收
     if price is None:
-        # 收盤後或無成交時 z 是 '-'，退而用最佳買價／賣價
+        # 無成交時 z 是 '-'，退而用最佳買價／賣價
         price = (_tw_num((row.get("b") or "").split("_")[0])
                  or _tw_num((row.get("a") or "").split("_")[0]))
+    if price is None:
+        # 盤前連掛單都還沒有，這時該顯示昨收而不是空白——市場狀態欄位
+        # 已經標明「盤前」，不會有人把它讀成成交價。
+        price = prev
 
     change = round(price - prev, 4) if (price is not None and prev) else None
     pct = round(change / prev * 100, 4) if (change is not None and prev) else None
@@ -115,11 +119,22 @@ def taiwan_quotes(tickers: list[str], *, ttl: float = 900) -> list[dict]:
     channels = "|".join(f"{market}_{code}.tw"
                         for code in codes for market in ("tse", "otc"))
     url = build_url(MIS_URL, {"ex_ch": channels, "json": "1", "delay": "0"})
-    try:
-        payload = get_json(url, ttl=ttl, namespace="twse", timeout=30, retries=2)
-    except Exception:
-        return []
-    if payload.get("rtcode") != "0000":
+
+    # 證交所限流時回的是 HTTP 200 加上非 0000 的 rtcode。HTTP 層只看狀態碼，
+    # 會把這種「成功的錯誤」寫進快取，接下來整個 TTL 都拿不到報價。
+    # 所以這裡驗過內容才算數，內容不對就繞過快取重抓一次——成功的回應會
+    # 順帶把壞的快取覆蓋掉。
+    for attempt, cache_ttl in enumerate((ttl, 0)):
+        try:
+            payload = get_json(url, ttl=cache_ttl, namespace="twse",
+                               timeout=30, retries=2)
+        except Exception:
+            return []
+        if payload.get("rtcode") == "0000":
+            break
+        if attempt == 1:
+            return []
+    else:
         return []
 
     found = {row.get("c"): row for row in payload.get("msgArray") or [] if row.get("c")}
@@ -127,29 +142,71 @@ def taiwan_quotes(tickers: list[str], *, ttl: float = 900) -> list[dict]:
 
 
 # -------------------------------------------------------------- 其他市場 ---
+# 兩條路徑：本機有 Fincept 就用它（涵蓋指數）；沒有就走 Finnhub（stdlib，
+# 但免費層不含指數）。雲端建置（GitHub Actions）走的是後者。
+
+FINNHUB_QUOTE = "https://finnhub.io/api/v1/quote"
+
+
+def finnhub_key() -> str:
+    return (os.environ.get("FINNHUB_API_KEY")
+            or os.environ.get("MARKETDATA_API_KEY") or "").strip()
+
+
+def finnhub_quotes(symbols: list[str], *, ttl: float = 900) -> list[dict]:
+    """Finnhub 逐檔報價。免費層不含指數，^ 開頭的直接略過不浪費額度。"""
+    token = finnhub_key()
+    if not token or not symbols:
+        return []
+    out = []
+    for symbol in symbols:
+        if symbol.startswith("^"):
+            continue
+        url = build_url(FINNHUB_QUOTE, {"symbol": symbol, "token": token})
+        try:
+            q = get_json(url, ttl=ttl, namespace="finnhub", timeout=25, retries=2)
+        except Exception:
+            continue
+        price = q.get("c")
+        if not price:
+            continue
+        out.append({
+            "symbol": symbol, "price": price,
+            "change": q.get("d"), "change_percent": q.get("dp"),
+            "open": q.get("o"), "high": q.get("h"), "low": q.get("l"),
+            "previous_close": q.get("pc"),
+            "timestamp": q.get("t"),
+            "source": "finnhub.io",
+        })
+    return out
+
 
 def index_quotes(symbols: list[str], *, timeout: int = 90) -> list[dict]:
-    """Fincept Terminal 的 yfinance_data.py batch_quotes。"""
-    if not available() or not symbols:
+    """優先用 Fincept Terminal；本機沒有它時退回 Finnhub。"""
+    if not symbols:
         return []
+    if not available():
+        return finnhub_quotes(symbols)
     script = os.path.join(FINCEPT_SCRIPTS, "yfinance_data.py")
     if not os.path.exists(script):
-        return []
+        return finnhub_quotes(symbols)
     try:
         result = subprocess.run(
             [FINCEPT_PYTHON, script, "batch_quotes", *symbols],
             capture_output=True, timeout=timeout, cwd=FINCEPT_SCRIPTS)
     except Exception:
-        return []
+        return finnhub_quotes(symbols)
     if result.returncode != 0:
-        return []
+        return finnhub_quotes(symbols)
     try:
         payload = json.loads(result.stdout.decode("utf-8", "replace"))
     except Exception:
-        return []
+        return finnhub_quotes(symbols)
     if isinstance(payload, dict):
         payload = payload.get("data") or []
-    return [row for row in payload if isinstance(row, dict) and row.get("price") is not None]
+    rows = [row for row in payload
+            if isinstance(row, dict) and row.get("price") is not None]
+    return rows or finnhub_quotes(symbols)
 
 
 # ---------------------------------------------------------------- 正規化 ---

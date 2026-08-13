@@ -1,0 +1,71 @@
+name: 建置儀表板
+
+# 排程用 UTC。台北 08:45 = UTC 00:45；台北 21:45 = UTC 13:45。
+# 這兩個時點分別對應「美國前一交易日收盤後」與「美國 8:30am ET 數據發布後」。
+#
+# 刻意不掛 push 觸發：這個 workflow 自己會 commit 回 repo，掛 push 會無限迴圈。
+on:
+  schedule:
+    - cron: "45 0 * * *"
+    - cron: "45 13 * * *"
+  workflow_dispatch:          # 也可以在 Actions 頁面手動按
+
+concurrency:
+  group: build
+  cancel-in-progress: false   # 兩次建置不要互相取消，寧可排隊
+
+permissions:
+  contents: write             # 需要把產出 commit 回來
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # 沒有 pip install：這個專案是純 stdlib
+
+      # 快取 FRED 等來源的回應。沒有它每次都要冷抓 196 檔，
+      # 既慢又會逼近 FRED 的速率限制。
+      - name: 還原資料快取
+        uses: actions/cache@v4
+        with:
+          path: data/cache
+          key: macro-cache-${{ github.run_id }}
+          restore-keys: |
+            macro-cache-
+
+      - name: 建置
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: python3 build.py
+
+      - name: 檢查產出是否合理
+        run: |
+          # 建置腳本會吞掉單一模組的錯誤以免整份報告掛掉，所以這裡另外
+          # 把關：頁數不對或首頁太小，就讓這次執行失敗，不要 commit 出去。
+          pages=$(find site -name index.html | wc -l)
+          size=$(wc -c < site/index.html)
+          echo "頁數 $pages，首頁 $size bytes"
+          test "$pages" -ge 14 || { echo "頁數不足，中止"; exit 1; }
+          test "$size" -ge 8000 || { echo "首頁過小，中止"; exit 1; }
+
+      - name: 提交產出
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site data/archive data/quotes_snapshot.json
+          if git diff --cached --quiet; then
+            echo "沒有變更，跳過 commit"
+          else
+            git commit -m "自動建置 $(date -u '+%Y-%m-%d %H:%M UTC')"
+            # 期間若有人手動 push，先 rebase 再送，不要硬推
+            git pull --rebase --autostash origin main
+            git push
+          fi

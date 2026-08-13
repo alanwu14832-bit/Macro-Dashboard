@@ -6,6 +6,8 @@
 """
 from __future__ import annotations
 
+import json
+import os
 from datetime import datetime
 
 from ..sources import quotes
@@ -107,9 +109,90 @@ def _market_note(rows: list[dict]) -> str:
     return "最近收盤價"
 
 
+def _snapshot_path() -> str:
+    from .. import paths
+    return os.path.join(paths.DATA_DIR, "quotes_snapshot.json")
+
+
+def _load_snapshot() -> dict:
+    try:
+        with open(_snapshot_path(), encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception:
+        return {}
+
+
+def _save_snapshot(groups: list[list[dict]]) -> None:
+    """記住每檔最後一次成功的報價。
+
+    來源會暫時掛掉（Finnhub 額度、證交所維護、CI 上沒有 Fincept），
+    那時留白會讓整個區塊消失。留下上次的值並標明它的原始時間，
+    比假裝沒有這個市場要誠實，也比拿舊值假裝是現況要誠實。
+    """
+    snapshot = _load_snapshot()
+    for rows in groups:
+        for row in rows:
+            if row.get("price") is None:
+                continue
+            snapshot[str(row["symbol"])] = {
+                "name": row.get("name"), "price": row.get("price"),
+                "change": row.get("change"), "change_percent": row.get("change_percent"),
+                "open": row.get("open"), "high": row.get("high"), "low": row.get("low"),
+                "previous_close": row.get("previous_close"),
+                "limit_up": row.get("limit_up"), "limit_down": row.get("limit_down"),
+                "market_status": row.get("market_status"),
+                "quoted_at": row["quoted_at"].isoformat() if row.get("quoted_at") else None,
+                "saved_at": datetime.now().isoformat(timespec="seconds"),
+                "source": row.get("source"),
+            }
+    try:
+        with open(_snapshot_path(), "w", encoding="utf-8") as fh:
+            json.dump(snapshot, fh, ensure_ascii=False, indent=1, sort_keys=True)
+    except Exception:
+        pass
+
+
+def _fill_gaps(rows: list[dict], pairs: list[tuple[str, str]],
+               region: str, snapshot: dict) -> list[dict]:
+    """這次沒取到的代號，用存檔補上並標為 stale。"""
+    # 有列但沒價格，跟完全沒抓到一樣是洞
+    rows = [r for r in rows if r.get("price") is not None]
+    have = {str(r["symbol"]) for r in rows}
+    for symbol, name in pairs:
+        if symbol in have:
+            continue
+        saved = snapshot.get(symbol)
+        if not saved or saved.get("price") is None:
+            continue
+        when = None
+        if saved.get("quoted_at"):
+            try:
+                when = datetime.fromisoformat(saved["quoted_at"])
+            except Exception:
+                when = None
+        rows.append({
+            "symbol": symbol, "name": name or saved.get("name") or symbol,
+            "region": region,
+            "price": saved.get("price"), "change": saved.get("change"),
+            "change_percent": saved.get("change_percent"),
+            "open": saved.get("open"), "high": saved.get("high"),
+            "low": saved.get("low"), "previous_close": saved.get("previous_close"),
+            "limit_up": saved.get("limit_up"), "limit_down": saved.get("limit_down"),
+            "volume": None, "trade_time": None,
+            "quoted_at": when,
+            "market_status": saved.get("market_status") or "",
+            "is_intraday": False,
+            "source": saved.get("source") or "存檔",
+            "stale": True,
+            "saved_at": saved.get("saved_at"),
+        })
+    order = {symbol: i for i, (symbol, _) in enumerate(pairs)}
+    rows.sort(key=lambda r: order.get(str(r["symbol"]), 999))
+    return rows
+
+
 def compute(bundle=None) -> dict:
-    if not quotes.available():
-        return {"available": False, "groups": [], "fetched_at": datetime.now()}
+    snapshot = _load_snapshot()
 
     us_indices = _fetch(US_INDICES, "美股")
     us_stocks = _fetch(US_STOCKS, "美股")
@@ -123,8 +206,29 @@ def compute(bundle=None) -> dict:
     em_indices = _fetch(EM_INDICES, "新興市場")
     em_etfs = _fetch(EM_ETFS, "新興市場")
 
+    # 先把這次成功的存起來，再用存檔補這次沒取到的——順序不能反，
+    # 否則會拿這次剛補進去的舊值去覆蓋存檔。
+    _save_snapshot([us_indices, us_proxies, us_stocks, us_sectors,
+                    tw_index, tw_stocks, tw_etfs, em_indices, em_etfs])
+
+    us_indices = _fill_gaps(us_indices, US_INDICES, "美股", snapshot)
+    us_proxies = _fill_gaps(us_proxies, US_PROXIES, "美股", snapshot)
+    us_stocks = _fill_gaps(us_stocks, US_STOCKS, "美股", snapshot)
+    us_sectors = _fill_gaps(us_sectors, US_SECTORS, "美股", snapshot)
+    tw_index = _fill_gaps(tw_index, TW_INDICES, "台股", snapshot)
+    tw_stocks = _fill_gaps(tw_stocks, TW_TICKERS, "台股", snapshot)
+    tw_etfs = _fill_gaps(tw_etfs, TW_ETFS, "台股", snapshot)
+    em_indices = _fill_gaps(em_indices, EM_INDICES, "新興市場", snapshot)
+    em_etfs = _fill_gaps(em_etfs, EM_ETFS, "新興市場", snapshot)
+
+    everything = (us_indices + us_proxies + us_stocks + us_sectors
+                  + tw_index + tw_stocks + tw_etfs + em_indices + em_etfs)
+
     return {
-        "available": True,
+        "available": bool(everything),
+        "stale_count": sum(1 for r in everything if r.get("stale")),
+        "source_note": ("Fincept Terminal" if quotes.available()
+                        else "Finnhub" if quotes.finnhub_key() else "存檔"),
         "fetched_at": datetime.now(),
         "us": {
             "indices": us_indices, "proxies": us_proxies,
