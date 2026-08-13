@@ -6,7 +6,7 @@
     python3 build.py --offline    # 只用快取，不連網（快取無限期有效）
     python3 build.py --no-archive # 不寫入當天存檔
 
-產出在 site/，是純靜態檔案，可直接部署到 Netlify 或用任何靜態伺服器開。
+產出在 site/，是純靜態檔案，可直接部署到 Vercel 或用任何靜態伺服器開。
 """
 from __future__ import annotations
 

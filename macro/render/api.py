@@ -5,10 +5,10 @@
 
 只輸出中繼資料，不輸出序列本身：
 
-  /api/catalogue.json   全部序列的中繼資料（約 40 KB，給選單用）
-  /api/state.json       目前的判斷與輸入值（機器可讀）
+  /data/catalogue.json  全部序列的中繼資料（約 40 KB，給選單用）
+  /data/state.json      目前的判斷與輸入值（機器可讀）
 
-序列資料改由 netlify/functions/series.mjs 即時向 FRED 取。原本試過把
+序列資料改由 api/series.js 這支 serverless function 即時向 FRED 取。原本試過把
 196 檔序列烤成靜態 JSON，共 9.1 MB——問題不在絕對大小，而在每天兩次
 建置會讓四十幾檔日資料重寫，一年下來 repo 會膨脹到 GB 等級。而且烤成
 靜態檔本質上還是快照，跟「動態」的目的相違。
@@ -21,8 +21,8 @@ import os
 from .. import catalogue, paths
 from ..data import Bundle
 
-API_DIR = os.path.join(paths.SITE_DIR, "api")
-SERIES_DIR = os.path.join(API_DIR, "series")
+# 靜態 JSON 放 /data/，/api/ 留給 serverless function，兩者不共用命名空間
+DATA_OUT = os.path.join(paths.SITE_DIR, "data")
 
 # 序列所屬的分組，決定前端選單的分類
 GROUP_LABELS = {
@@ -80,7 +80,7 @@ def write_series(bundle: Bundle) -> dict:
             "prev": _round(series.at(-2)) if series.at(-2) is not None else None,
         })
 
-    total_bytes += _write(os.path.join(API_DIR, "catalogue.json"), {
+    total_bytes += _write(os.path.join(DATA_OUT, "catalogue.json"), {
         "count": len(entries),
         "groups": [{"key": k, "label": v} for k, v in GROUP_LABELS.items()],
         "series": entries,
@@ -98,7 +98,7 @@ def write_readings(ctx: dict, signals: list[dict], summary: dict,
     inflation = ctx.get("inflation") or {}
     rates = ctx.get("rates") or {}
 
-    return _write(os.path.join(API_DIR, "state.json"), {
+    return _write(os.path.join(DATA_OUT, "state.json"), {
         "scenario": {
             "name": scenario_data.get("name"),
             "employment": scenario_data.get("employment_label"),

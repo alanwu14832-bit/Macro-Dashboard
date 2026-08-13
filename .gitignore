@@ -6,7 +6,8 @@ data/cache/
 # 刪掉或不提交就會永久失去歷史。
 
 # 注意：site/ 也刻意「不」忽略。
-# Netlify 直接部署這個目錄，不在雲端重跑 build，所以 FRED 金鑰不需要外流。
+# 建置由 GitHub Actions 跑完 commit 回來，Vercel 只 serve 這個目錄、不重跑 build。
+# 產出進版控，Vercel 那邊才不需要 FRED 金鑰，也才不會有第二份判斷歷史。
 
 __pycache__/
 *.py[cod]

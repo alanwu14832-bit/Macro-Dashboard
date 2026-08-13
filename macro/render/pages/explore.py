@@ -53,7 +53,7 @@ def render(ctx: dict) -> str:
 
     body.append(section("about", "這一頁怎麼運作", callout(
         "序列資料不是烤在頁面裡的，而是選到時才向 <code>/api/series</code> 取——"
-        "那是一個代理 FRED 的 Function，所以你看到的永遠是 FRED 上的最新版本，"
+        "那是一個代理 FRED 的 serverless function，所以你看到的永遠是 FRED 上的最新版本，"
         "不必等下一次建置。<br><br>"
         "本機以 <code>http.server</code> 預覽時沒有這個代理，"
         "頁面會顯示取不到資料，這是預期行為。")

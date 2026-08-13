@@ -2,7 +2,7 @@
  * quotes.js — 讓報價頁在部署環境下自己更新。
  *
  * 頁面上每個報價欄位都帶 data-quote="代號" 與 data-field="price|change|..."，
- * 這支腳本向 /api/quotes（Netlify Function 代理）拿新報價後就地換掉數字。
+ * 這支腳本向 /api/quotes（serverless function 代理）拿新報價後就地換掉數字。
  *
  * 沒有 /api/quotes 時（本機用 python http.server 預覽、或部署到不支援
  * functions 的主機）會安靜停用，頁面就維持建置時烤進去的快照——不顯示

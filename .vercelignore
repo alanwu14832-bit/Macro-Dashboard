@@ -1,0 +1,12 @@
+# Vercel 只需要 site/（靜態產出）與 api/（serverless function）。
+# 建置在 GitHub Actions 跑完才 commit 回來，雲端不會執行 build.py，
+# 所以 Python 那一整包不必上傳。
+
+build.py
+macro/
+data/
+.github/
+README.md
+__pycache__/
+*.py[cod]
+.venv/

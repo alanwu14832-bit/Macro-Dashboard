@@ -4,7 +4,7 @@
 八個面向，用固定規則收斂成一個**可追蹤、可回溯、可反駁**的判斷，
 再配一頁國際新聞，讓當天的事件跟這些數字對得起來。
 
-產出是純靜態網站（`site/`），可直接部署到 Netlify 或任何靜態主機。
+產出是純靜態網站（`site/`），部署在 Vercel，也可以直接丟到任何靜態主機。
 
 ## 跑起來
 
@@ -75,9 +75,9 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
   （fincept 的 twse_source 需要 requests，與本專案的零依賴原則衝突）。
   含漲跌停價，並依「報價日期 vs 今天」判斷盤中／收盤／盤前。
 
-### 即時更新（Netlify Function 代理）
+### 即時更新（serverless function 代理）
 
-`netlify/functions/quotes.mjs` 在伺服器端代抓報價再加上 CORS 標頭送回瀏覽器，
+`api/quotes.js` 在伺服器端代抓報價再加上 CORS 標頭送回瀏覽器，
 `macro/render/static/quotes.js` 每 45 秒就地換掉頁面上的數字。
 間隔是 45 秒而不是更短，是因為頁面上有四十幾個非台股代號，而 Finnhub
 免費層是每分鐘 60 次呼叫；代理端另有逐檔 45 秒快取，所有訪客共用。
@@ -89,8 +89,9 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
 | 原始指數（^GSPC、^TWII、^KS11…） | ❌ | 報價 API 免費層不開放，維持建置快照 |
 
 要啟用美股與新興市場的即時更新：到 https://finnhub.io 申請免費金鑰，
-在 Netlify 的 Site configuration → Environment variables 新增
-`FINNHUB_API_KEY`（`MARKETDATA_API_KEY` 為相容用的舊名）。
+在 Vercel 的 Project Settings → Environment Variables 新增 `FINNHUB_API_KEY`
+（`MARKETDATA_API_KEY` 是相容用的舊名，但代理端只認 Finnhub 的 API 形狀，
+放進去的必須是 Finnhub 金鑰）。
 沒設定時那些欄位維持建置快照，狀態列會明說，不會假裝有更新。
 
 原始指數改用追蹤同標的的 ETF 代表（SPY／QQQ／DIA／IWM 等），那一組是會動的。
@@ -100,7 +101,7 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
 當下的快照」——不會讓 live 燈號在根本不更新的頁面上繼續跳。
 
 不能用 Fincept Terminal 當這個代理的資料源：它是跑在本機的 Python 程式，
-Netlify Function 在雲端，碰不到；底層的 Yahoo 也會擋資料中心 IP。
+serverless function 在雲端，碰不到；底層的 Yahoo 也會擋資料中心 IP。
 Fincept 的角色是**建置時**取得快照，那部分照舊。
 
 ## 國際新聞（`/news/`）
@@ -147,15 +148,49 @@ macro/
 data/cache/                 原始 API 回應（可安全刪除）
 data/archive/               每日判斷快照（刪掉就失去歷史）
 site/                       產出，部署這個目錄
+api/
+  quotes.js                 報價代理（證交所 MIS + Finnhub）
+  series.js                 FRED 序列代理，給 /explore/ 用
+vercel.json                 Vercel 設定：只 serve site/，不在雲端 build
+.github/workflows/build.yml 每天兩次建置，產出 commit 回 repo
 ```
+
+## 部署（Vercel）
+
+分工是：**GitHub Actions 建置，Vercel 只負責 serve。**
+
+```
+Actions（每天 08:45 / 21:45 台北）
+  → python3 build.py
+  → commit site/、data/archive/、data/quotes_snapshot.json 回 main
+  → Vercel 偵測到 push，直接上架 site/ 與 api/
+```
+
+Vercel 不重跑 `build.py`。這樣做的兩個理由：
+
+1. `data/archive/` 的判斷歷史只有 repo 裡一份，不會和雲端建置的另一份分岔
+2. Vercel 端不需要 `FRED_API_KEY` 去抓那 196 檔序列
+
+Vercel 專案設定：Framework Preset 選 **Other**、Build Command 留空、
+Output Directory 是 `site`（都寫在 `vercel.json` 裡了）。
+根目錄的 `api/*.js` 會自動變成 `/api/quotes` 與 `/api/series` 兩個 function，
+用 Node 的 CommonJS 寫（專案沒有 `package.json`，`.js` 就是 CommonJS）。
+
+需要在 Vercel 設的環境變數：
+
+| 變數 | 給誰用 | 沒設會怎樣 |
+|---|---|---|
+| `FRED_API_KEY` | `api/series.js` | `/explore/` 取不到序列，回 503 |
+| `FINNHUB_API_KEY` | `api/quotes.js` | 非台股報價維持建置快照（台股照常即時） |
+
+GitHub Actions 那邊另外要有同名的 repository secrets 給建置用，兩邊各一份。
+
+**靜態 JSON 在 `/data/`，不在 `/api/`。** `catalogue.json` 與 `state.json` 是建置
+產物、放 `site/data/`；`/api/` 整個命名空間留給 function，兩者不共用路徑。
 
 ## 自動更新
 
-```bash
-cd /path/to/macro-dashboard && python3 build.py
-```
-
-掛到排程即可。目前的設定是 **每天 08:45 與 21:45（台北時間）**：
+排程寫在 `.github/workflows/build.yml`，**每天 08:45 與 21:45（台北時間）**：
 
 | 時間（台北） | 對應 | 抓得到什麼 |
 |---|---|---|

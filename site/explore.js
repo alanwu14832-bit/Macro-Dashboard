@@ -2,7 +2,7 @@
  * explore.js — 自選指標瀏覽器。
  *
  * 從目錄挑最多 4 檔序列，選轉換方式與時間區間，即時比較。
- * 序列資料向 /api/series 取（Netlify Function 代理 FRED），所以看到的
+ * 序列資料向 /api/series 取（serverless function 代理 FRED），所以看到的
  * 永遠是 FRED 上的最新版，不是建置當下的快照。
  *
  * 一個刻意的限制：單位不同的序列不會被畫在同一條 Y 軸上。混合單位時
@@ -369,7 +369,7 @@
   (async () => {
     let payload;
     try {
-      payload = await (await fetch("/api/catalogue.json")).json();
+      payload = await (await fetch("/data/catalogue.json")).json();
     } catch {
       $("#ex-status").textContent = "載入指標目錄失敗。";
       return;
