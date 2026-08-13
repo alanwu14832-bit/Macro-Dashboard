@@ -67,7 +67,8 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
 
 ## 股市報價
 
-`/equities/` 有三個區塊：美股、台股、其他新興市場。分工照來源特性：
+股市報價分兩頁：`/equities/` 美股與國際（含新興市場）、`/tw/` 台股
+（指數、熱力圖、三大法人資金流向、融資融券）。分工照來源特性：
 
 - **美股與新興市場指數、個股** → Fincept Terminal 的 `yfinance_data.py`，
   以子行程呼叫。預設路徑 `~/Desktop/fincept-mcp`，可用環境變數 `FINCEPT_ROOT`

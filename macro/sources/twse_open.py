@@ -139,3 +139,43 @@ def daily_market(*, months: int = 6, ttl: float = 6 * 3600) -> dict:
         "turnover": Series.from_pairs("TW.TURNOVER", turn_pairs, label="成交金額",
                                       unit="億元", frequency="d"),
     }
+
+
+def institutional_history(*, days: int = 130, ttl: float = 6 * 3600) -> list[dict]:
+    """三大法人每日買賣超，往回收約 90 個交易日。
+
+    BFI82U 一天一次呼叫。已走完的日期內容永不改變，快取一年——
+    冷建置會補抓一輪（約 90 次、被 http 層節流），之後每天只多一兩次。
+    假日回「沒有資料」也一樣被快取，不會重打。
+    """
+    from datetime import timedelta
+
+    yi = 100_000_000.0
+    out = []
+    today = date.today()
+    for i in range(days):
+        d = today - timedelta(days=i)
+        if d.weekday() >= 5:                     # 週末必休市，不用問
+            continue
+        day_ttl = ttl if i <= 1 else 365 * 24 * 3600
+        try:
+            payload = get_json(
+                build_url(BFI82U, {"response": "json", "type": "day",
+                                   "dayDate": d.strftime("%Y%m%d")}),
+                ttl=day_ttl, namespace="twse_open", timeout=30, retries=1)
+        except Exception:
+            continue
+        if payload.get("stat") != "OK" or not payload.get("data"):
+            continue                             # 國定假日
+        rows = {r[0]: _num(r[3]) for r in payload["data"] if len(r) >= 4}
+        foreign = ((rows.get("外資及陸資(不含外資自營商)") or 0)
+                   + (rows.get("外資自營商") or 0))
+        out.append({
+            "date": d.isoformat(),
+            "foreign": foreign / yi,
+            "trust": (rows.get("投信") or 0) / yi,
+            "dealer": ((rows.get("自營商(自行買賣)") or 0)
+                       + (rows.get("自營商(避險)") or 0)) / yi,
+        })
+    out.reverse()
+    return out

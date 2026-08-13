@@ -123,7 +123,7 @@ def _status_note(status: str, source: str) -> str:
             f'狀態：{esc(status)}　·　來源：{esc(source)}</p>')
 
 
-def render(ctx: dict) -> str:
+def render_us(ctx: dict) -> str:
     d = ctx.get("equities") or {}
     body = []
 
@@ -141,21 +141,17 @@ def render(ctx: dict) -> str:
         f'<span class="quote-status" id="quote-status">建置快照 {esc(fetched)}</span>'
         f'</div>'
         + callout(
-            f'頁面載入後會透過 <code>/api/quotes</code> 代理更新報價：'
-            f'<strong>台股（含加權指數）每 5 秒</strong>，取自證交所——5 秒就是'
-            f'證交所對外發布行情快照的節奏，這已是它公開資料的即時上限；'
-            f'美股與新興市場的個股與 ETF 每 45 秒，取自 Finnhub（免費層 60 次/分，'
+            f'頁面載入後會透過 <code>/api/quotes</code> 代理更新報價：美股與'
+            f'新興市場的個股與 ETF 每 45 秒，取自 Finnhub（免費層 60 次/分，'
             f'頁面上有四十幾檔，45 秒是不超額的最短間隔）。'
-            f'<strong>收盤後會自動放慢</strong>——連兩輪報價都沒變化就把間隔加倍'
-            f'（台股最慢 90 秒、美股 5 分鐘），一偵測到變化立刻恢復，'
-            f'所以假日與夜間不會白白消耗 API 額度。'
-            f'上方狀態列會顯示實際的更新時間與來源。<br>'
-            f'<strong>美股與新興市場的原始指數（^GSPC、^KS11 等）維持建置快照</strong>'
-            f'——報價 API 的免費層不含指數，所以本站另列一組追蹤同標的的大盤 ETF，'
-            f'那一組才是會跳動的。台股加權指數不受此限，證交所直接提供。<br>'
-            f'沒有代理的環境（例如本機以 http.server 預覽）會安靜降級成建置快照，'
-            f'狀態列的燈號會轉灰並註明。'
-            f'　<a href="/freshness/">看更新時程 →</a>'))
+            f'<strong>收盤後會自動放慢</strong>——連兩輪報價都沒變化就把間隔'
+            f'加倍（最慢 5 分鐘），一偵測到變化立刻恢復。<br>'
+            f'<strong>原始指數（^GSPC、^KS11 等）維持建置快照</strong>'
+            f'——報價 API 的免費層不含指數，所以本站另列一組追蹤同標的的'
+            f'大盤 ETF，那一組才是會跳動的。<br>'
+            f'沒有代理的環境（例如本機以 http.server 預覽）會安靜降級成'
+            f'建置快照，狀態列的燈號會轉灰並註明。'
+            f'　<a href="/tw/">台股報價已獨立成頁 →</a>'))
 
     # ================================================================ 美股 ==
     us = d["us"]
@@ -193,7 +189,7 @@ def render(ctx: dict) -> str:
             + callout("原始指數（^GSPC 等）在報價 API 的免費層不開放，這幾檔 ETF "
                       "追蹤相同標的且開放存取——所以<strong>它們是會即時更新的那一組</strong>，"
                       "上面的指數欄位則維持建置快照。"),
-            note="每 45 秒更新（Finnhub 免費層額度上限）", sub=True))
+            note="每 45 秒更新（Finnhub 免費層額度上限）"))
 
     if us["stocks"]:
         body.append(section(
@@ -201,7 +197,7 @@ def render(ctx: dict) -> str:
             _quote_table(us["stocks"])
             + _breadth_line(us["breadth"], "十檔權值股")
             + _movers_chart(us["stocks"], "權值股漲跌幅"),
-            note=f'報價時間 {_stamp(us["stocks"])}', sub=True))
+            note=f'報價時間 {_stamp(us["stocks"])}'))
 
     if us["sectors"]:
         body.append(section(
@@ -210,9 +206,59 @@ def render(ctx: dict) -> str:
             + _breadth_line(us["sector_breadth"], "八大類股")
             + _movers_chart(us["sectors"], "類股 ETF 漲跌幅",
                             "類股間的差距比大盤本身更能看出資金在想什麼"),
-            note="以 SPDR 類股 ETF 代表", sub=True))
+            note="以 SPDR 類股 ETF 代表"))
 
-    # ================================================================ 台股 ==
+    # ========================================================== 新興市場 ==
+    em = d["em"]
+    if em["indices"]:
+        body.append(section(
+            "em", "其他新興市場指數",
+            _status_note(em["status"], "Fincept Terminal")
+            + _quote_table(em["indices"])
+            + _breadth_line(em["breadth"], "各國指數")
+            + _movers_chart(em["indices"], "各國指數漲跌幅",
+                            "同一天各國方向不一致時，多半是本地因素而非全球因素在主導"),
+            note=f'報價時間 {_stamp(em["indices"])}',
+            terms=["policy_divergence", "dollar_index"]))
+
+    if em["etfs"]:
+        body.append(section(
+            "em-etfs", "新興市場 ETF（美元計價）",
+            _quote_table(em["etfs"])
+            + callout("以美元計價的 ETF 同時含匯率效果。當地指數漲但 ETF 跌，"
+                      "代表那個國家的貨幣正在貶值——這是美元強弱對新興市場"
+                      "最直接的傳導管道。<br><br>"
+                      "中國以 FXI 與 ASHR 兩檔 ETF 代表：上證與深證指數在這個"
+                      "資料來源取不到，本站不以其他指數替代充數。"),
+            terms=["dollar_index"]))
+
+    return "".join(body)
+
+
+def render_tw(ctx: dict) -> str:
+    d = ctx.get("equities") or {}
+    body = []
+
+    if not d.get("available"):
+        return ('<div class="card"><p class="muted">'
+                '報價來源目前不可用，請稍後重新建置。</p></div>')
+
+    fetched = d["fetched_at"].strftime("%Y-%m-%d %H:%M")
+    body.append(
+        f'<div class="live-bar" data-quotes-live>'
+        f'<span class="live-dot"></span>'
+        f'<span class="quote-status" id="quote-status">建置快照 {esc(fetched)}</span>'
+        f'</div>'
+        + callout(
+            f'頁面載入後每 <strong>5 秒</strong>透過 <code>/api/quotes</code> 代理'
+            f'向證交所更新報價（含加權與櫃買指數）——5 秒是證交所對外發布'
+            f'行情快照的節奏，這已是公開資料的即時上限，真正的逐筆行情要'
+            f'付費資訊源。<strong>收盤後自動放慢</strong>（最慢 90 秒），'
+            f'開盤偵測到變化立刻恢復。<br>'
+            f'沒有代理的環境（例如本機以 http.server 預覽）會安靜降級成'
+            f'建置快照，狀態列的燈號會轉灰並註明。'
+            f'　<a href="/equities/">美股與其他市場 →</a>'))
+
     tw = d["tw"]
     if tw["index"] or tw["stocks"]:
         tiles = []
@@ -246,7 +292,7 @@ def render(ctx: dict) -> str:
                               fmt(r["change_percent"], 2, suffix="%", signed=True)),
                 asof=f'{esc(symbol)}　昨收 {fmt(r["previous_close"], 2)}'))
         body.append(section(
-            "tw", "台灣股市",
+            "tw", "大盤指數與權值股",
             _status_note(tw["status"], "證交所 mis.twse.com.tw（指數與個股同源）")
             + f'<div class="grid grid-4">{"".join(tiles)}</div>',
             note=f'報價時間 {_stamp(tw["stocks"] or tw["index"])}'))
@@ -266,7 +312,7 @@ def render(ctx: dict) -> str:
                          include_zero=True, with_table=False)
             + callout("量是價的體檢：指數創高而量能萎縮，漲勢的參與度在下降；"
                       "下跌爆量則常是恐慌或換手。兩張圖同一時間軸，上下對照看。"),
-            note="近六個月日資料，證交所每日市場成交資訊", sub=True))
+            note="近六個月日資料，證交所每日市場成交資訊"))
 
     if tw["stocks"]:
         body.append(section(
@@ -274,7 +320,7 @@ def render(ctx: dict) -> str:
             _quote_table(tw["stocks"], with_limits=True, market="tw")
             + _breadth_line(tw["breadth"], "八檔權值股")
             + _movers_chart(tw["stocks"], "台股權值股漲跌幅"),
-            note="含漲跌停價；資料為證交所官方報價", sub=True))
+            note="含漲跌停價；資料為證交所官方報價"))
 
     if tw.get("groups"):
         body.append(section(
@@ -283,7 +329,7 @@ def render(ctx: dict) -> str:
             + callout("顏色沿用全站慣例：<strong>綠漲紅跌</strong>（跟台灣看盤軟體"
                       "的紅漲綠跌相反），深淺代表幅度，±3% 封頂。族群右上角是"
                       "族群內的平均漲跌幅。磁磚跟著台股報價每 5 秒重刷。"),
-            note="每族群取市值與成交量具代表性的個股", sub=True))
+            note="每族群取市值與成交量具代表性的個股"))
 
     if tw.get("ai"):
         body.append(section(
@@ -312,7 +358,7 @@ def render(ctx: dict) -> str:
         body.append(section(
             "tw-etfs", "台股主要 ETF",
             _quote_table(tw["etfs"], with_limits=True, market="tw"),
-            note="市值型、高股息型與大盤型", sub=True))
+            note="市值型、高股息型與大盤型"))
 
     wide = tw.get("wide_breadth") or {}
     if wide and tw.get("group_avgs"):
@@ -335,7 +381,7 @@ def render(ctx: dict) -> str:
             + callout("樣本是本站追蹤的一百多檔族群代表股，不是全市場統計。"
                       "指數漲但下跌家數多，代表漲勢集中在少數權值股——"
                       "這種分歧比指數本身更值得注意。"),
-            note="建置快照統計，非即時", sub=True))
+            note="建置快照統計，非即時"))
 
     inst = tw.get("institutional") or {}
     marg = tw.get("margin") or {}
@@ -356,39 +402,37 @@ def render(ctx: dict) -> str:
                      delta=f'較前日 {fmt(marg["financing_chg_yi"], 1, suffix=" 億", signed=True)}',
                      asof=f'融券 {fmt(marg["short_units"], 0)} 張'
                           f'（{fmt(marg["short_chg_units"], 0, signed=True)}）'))
+        flows = tw.get("flows") or {}
+        flow_chart = ""
+        if flows.get("foreign_series"):
+            s20 = flows.get("sum20") or {}
+            flow_chart = (
+                line_chart("外資每日買賣超",
+                           [(flows["foreign_series"], "外資買賣超", None)],
+                           years=None, default_years=1, freq="d", digits=0,
+                           suffix=" 億", chart_type="bar", height=200,
+                           include_zero=True, with_table=False,
+                           sign_colors=("delta-up", "critical"))
+                + f'<div class="grid grid-3">'
+                + stat(f'外資近 {s20.get("days", 20)} 日累計',
+                       fmt(s20.get("foreign"), 0, suffix=" 億", signed=True))
+                + stat("投信累計", fmt(s20.get("trust"), 0, suffix=" 億", signed=True),
+                       direction=None)
+                + stat("自營商累計", fmt(s20.get("dealer"), 0, suffix=" 億", signed=True),
+                       direction=None)
+                + "</div>")
         body.append(section(
-            "tw-flows", "三大法人與融資融券",
+            "tw-flows", "三大法人資金流向與融資融券",
             f'<div class="grid grid-4">{"".join(tiles)}</div>'
-            + callout("外資買賣超是台股最重要的資金流向指標；融資餘額大增"
-                      "代表散戶槓桿在堆積，回檔時的賣壓也跟著變大。<br>"
+            + flow_chart
+            + callout("外資買賣超是台股最重要的資金流向指標——柱狀圖看的是"
+                      "「連續性」：連買連賣的天數與力道，比單日金額更有意義。"
+                      "投信買超常反映投顧作帳與 ETF 申購，自營商多為避險部位。<br>"
+                      "融資餘額大增代表散戶槓桿在堆積，回檔時的賣壓也跟著變大。"
                       "<strong>大盤融資維持率沒有放</strong>：整戶擔保維持率需要"
                       "擔保品市值，證交所並未公開，市面上看到的數字都是券商或"
                       "資料商自己算的。這裡放的是公開資料裡最接近的原料——"
                       "融資餘額與其增減。"),
-            note="證交所公開統計，每個交易日收盤後更新", sub=True))
-
-    # ========================================================== 新興市場 ==
-    em = d["em"]
-    if em["indices"]:
-        body.append(section(
-            "em", "其他新興市場指數",
-            _status_note(em["status"], "Fincept Terminal")
-            + _quote_table(em["indices"])
-            + _breadth_line(em["breadth"], "各國指數")
-            + _movers_chart(em["indices"], "各國指數漲跌幅",
-                            "同一天各國方向不一致時，多半是本地因素而非全球因素在主導"),
-            note=f'報價時間 {_stamp(em["indices"])}',
-            terms=["policy_divergence", "dollar_index"]))
-
-    if em["etfs"]:
-        body.append(section(
-            "em-etfs", "新興市場 ETF（美元計價）",
-            _quote_table(em["etfs"])
-            + callout("以美元計價的 ETF 同時含匯率效果。當地指數漲但 ETF 跌，"
-                      "代表那個國家的貨幣正在貶值——這是美元強弱對新興市場"
-                      "最直接的傳導管道。<br><br>"
-                      "中國以 FXI 與 ASHR 兩檔 ETF 代表：上證與深證指數在這個"
-                      "資料來源取不到，本站不以其他指數替代充數。"),
-            terms=["dollar_index"], sub=True))
+            note="證交所公開統計，每個交易日收盤後更新；歷史約三個月"))
 
     return "".join(body)

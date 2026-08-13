@@ -41,17 +41,23 @@ def line_chart(title: str, series_specs: list[tuple[Series, str, str | None]], *
                chart_type: str = "line", target: float | None = None,
                band: list | None = None, height: int = 260,
                include_zero: bool = False, freq: str = "m",
-               with_table: bool = True) -> str:
+               with_table: bool = True,
+               sign_colors: tuple[str, str] | None = None) -> str:
     """Build a chart card from Series objects.
 
     `series_specs` is [(series, display name, colour token or None)].
+    `sign_colors`（bar 圖用）：(正值色token, 負值色token)，例如買賣超
+    這種正負有意義的量，每根柱依正負著色而不是同一色。
     """
     data, legend = [], []
     for s, name, color in series_specs:
         pts = points(s, years)
         if not pts:
             continue
-        data.append({"name": name, "color": color, "data": pts})
+        entry = {"name": name, "color": color, "data": pts}
+        if sign_colors:
+            entry["signColor"] = list(sign_colors)
+        data.append(entry)
         legend.append((name, s))
 
     if not data:

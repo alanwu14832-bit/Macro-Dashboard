@@ -329,6 +329,23 @@ def compute(bundle=None) -> dict:
     margin = twse_open.margin()
     tw_trend = twse_open.daily_market()
 
+    # 三大法人的歷史資金流向：日買賣超序列 + 近 20 日累計
+    flows_history = twse_open.institutional_history()
+    flows = {}
+    if flows_history:
+        from ..series import Series
+        flows["foreign_series"] = Series.from_pairs(
+            "TW.FOREIGN", [(r["date"], r["foreign"]) for r in flows_history],
+            label="外資買賣超", unit="億元", frequency="d")
+        recent = flows_history[-20:]
+        flows["sum20"] = {
+            "foreign": sum(r["foreign"] for r in recent),
+            "trust": sum(r["trust"] for r in recent),
+            "dealer": sum(r["dealer"] for r in recent),
+            "days": len(recent),
+        }
+        flows["history"] = flows_history
+
     # 美元兌台幣（FRED 日頻，建置快照）
     usdtwd = None
     if bundle is not None and bundle["DEXTAUS"]:
@@ -366,6 +383,7 @@ def compute(bundle=None) -> dict:
             "group_avgs": _group_avgs(tw_groups, tw_ai, tw_semi),
             "trend": tw_trend,
             "institutional": institutional,
+            "flows": flows,
             "margin": margin,
             "usdtwd": usdtwd,
             "status": _market_note(tw_stocks or tw_index),

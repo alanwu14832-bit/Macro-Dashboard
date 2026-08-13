@@ -195,11 +195,15 @@
     const when = new Date(payload.fetched_at || Date.now());
     const clock = when.toLocaleTimeString("zh-TW", { hour12: false });
     const via = state.provider ? `　·　美股經 ${state.provider}` : "";
-    const slowed = pace.tw.wait > CADENCE.tw.base
-                || pace.other.wait > CADENCE.other.base;
-    const cadence = `台股每 ${pace.tw.wait / 1000} 秒`
-      + (otherSymbols.length && !state.notSupported
-         ? `、美股每 ${pace.other.wait / 1000} 秒` : "")
+    // 拆頁後單一頁面可能只有其中一組，節奏說明只列存在的那組
+    const slowed = (twSymbols.length && pace.tw.wait > CADENCE.tw.base)
+                || (otherSymbols.length && pace.other.wait > CADENCE.other.base);
+    const parts = [];
+    if (twSymbols.length) parts.push(`台股每 ${pace.tw.wait / 1000} 秒`);
+    if (otherSymbols.length && !state.notSupported) {
+      parts.push(`美股每 ${pace.other.wait / 1000} 秒`);
+    }
+    const cadence = parts.join("、")
       + (slowed ? "（盤外沒有變化，自動放慢）" : "");
     report(state.notSupported
       ? `台股已更新 ${clock}（每 ${pace.tw.wait / 1000} 秒）　·　`

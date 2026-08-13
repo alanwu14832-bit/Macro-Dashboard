@@ -28,6 +28,7 @@ ICONS = {
     "news": "M4 5h13v14H4zM17 9h3v8a2 2 0 0 1-3 2M7 9h7M7 13h7M7 17h4",
     "commodities": "M12 2l9 5v10l-9 5-9-5V7zM12 12l9-5M12 12v10M12 12L3 7",
     "equities": "M3 3v18h18M7 14l3-3 3 3 5-5M18 9h3v3",
+    "twstock": "M4 20v-6M9 20V9M14 20v-8M19 20V5M4 9l5-4 5 3 5-4",
     "market": "M4 20V10M10 20V4M16 20v-7M22 20V7",
     "scenario": "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
     "freshness": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2",
@@ -48,7 +49,8 @@ NAV = [
     ("/news/", "國際新聞", "news", "全球與市場"),
     ("/global/", "全球對照", "global", "全球與市場"),
     ("/commodities/", "大宗商品", "commodities", "全球與市場"),
-    ("/equities/", "股市報價", "equities", "全球與市場"),
+    ("/equities/", "美股與國際", "equities", "全球與市場"),
+    ("/tw/", "台股", "twstock", "全球與市場"),
     ("/market/", "市場面", "market", "全球與市場"),
 
     ("/explore/", "自選比較", "explore", "判讀與紀錄"),
