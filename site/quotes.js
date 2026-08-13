@@ -92,6 +92,14 @@
       tile.style.background = heatColor(quote.change_percent);
     }
 
+    // 自選清單的名稱欄：MIS 的報價自帶名稱，第一輪回來就補上
+    for (const nameCell of document.querySelectorAll("[data-wl-name]")) {
+      const quote = bySymbol.get(nameCell.dataset.wlName);
+      if (quote?.name && nameCell.textContent !== quote.name) {
+        nameCell.textContent = quote.name;
+      }
+    }
+
     for (const cell of cells) {
       const quote = bySymbol.get(cell.dataset.quote);
       if (!quote) continue;
