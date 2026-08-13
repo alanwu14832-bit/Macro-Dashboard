@@ -615,3 +615,53 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
   .enter { opacity: 1; transform: none; }
   .card, .chart-card, .stat { box-shadow: none; break-inside: avoid; }
 }
+
+/* ------------------------------------------------------- 自選指標瀏覽器 --- */
+.ex-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.ex-field { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--ink-2); }
+.ex-field select {
+  font: inherit; font-size: 0.85rem; padding: 4px 8px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--ink);
+}
+.ex-field select:focus-visible { outline: 2px solid var(--series-1); outline-offset: 1px; }
+
+.ex-chosen { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 28px; }
+.ex-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 6px 3px 11px; font-size: 0.84rem; background: var(--surface);
+}
+.ex-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.ex-drop {
+  border: 0; background: transparent; color: var(--ink-muted); cursor: pointer;
+  font-size: 1rem; line-height: 1; padding: 2px 5px; border-radius: 50%;
+}
+.ex-drop:hover { color: var(--ink); background: var(--surface-sunken); }
+
+.ex-picker { margin-top: 22px; }
+#ex-search {
+  width: 100%; font: inherit; font-size: 0.9rem; padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--ink); margin-bottom: 10px;
+}
+#ex-search:focus-visible { outline: 2px solid var(--series-1); outline-offset: 1px; }
+
+.ex-list {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 6px; max-height: 340px; overflow-y: auto; padding-right: 4px;
+}
+.ex-item {
+  display: flex; flex-direction: column; gap: 2px; text-align: left;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); padding: 8px 11px; cursor: pointer;
+  font: inherit; color: var(--ink); transition: border-color 120ms, background 120ms;
+}
+.ex-item:hover:not(:disabled) { border-color: var(--border-strong); background: var(--surface-sunken); }
+.ex-item:disabled { opacity: 0.4; cursor: not-allowed; }
+.ex-item.is-on { border-color: var(--series-1); box-shadow: inset 0 0 0 1px var(--series-1); }
+.ex-item .ex-name { font-size: 0.87rem; font-weight: 550; }
+.ex-item .ex-meta { font-size: 0.74rem; color: var(--ink-muted); }

@@ -30,6 +30,7 @@ ICONS = {
     "scenario": "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
     "freshness": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2",
     "archive": "M3 7h18v13H3zM3 3h18v4H3zM9 12h6",
+    "explore": "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.35-4.35M8 11h6M11 8v6",
 }
 
 # (href, label, icon, group). Grouping is what makes 14 items scannable.
@@ -48,6 +49,7 @@ NAV = [
     ("/equities/", "股市報價", "equities", "全球與市場"),
     ("/market/", "市場面", "market", "全球與市場"),
 
+    ("/explore/", "自選比較", "explore", "判讀與紀錄"),
     ("/scenario/", "情境與部位", "scenario", "判讀與紀錄"),
     ("/freshness/", "資料新鮮度", "freshness", "判讀與紀錄"),
     ("/archive/", "存檔", "archive", "判讀與紀錄"),
@@ -111,7 +113,7 @@ def asset_version() -> str:
     keeps yesterday's chart.js against today's markup.
     """
     stamp = 0.0
-    for name in ("style.css", "chart.js", "sidebar.js", "quotes.js"):
+    for name in ("style.css", "chart.js", "sidebar.js", "quotes.js", "explore.js"):
         candidate = os.path.join(paths.STATIC_DIR, name)
         if os.path.exists(candidate):
             stamp = max(stamp, os.path.getmtime(candidate))
@@ -174,6 +176,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 <script src="/sidebar.js?v={version}" defer></script>
 <script src="/chart.js?v={version}" defer></script>
 <script src="/quotes.js?v={version}" defer></script>
+<script src="/explore.js?v={version}" defer></script>
 </body>
 </html>
 """

@@ -641,4 +641,10 @@
   document.addEventListener("themechange", repaint);
   document.addEventListener("layoutchange", repaint);
   window.addEventListener("scroll", hideTip, { passive: true });
+
+  // 動態插入的圖表（例如 /explore/ 每次重畫）也要被接手
+  document.addEventListener("chartadded", (event) => {
+    const card = event.detail?.card;
+    if (card) renderChart(card);
+  });
 })();

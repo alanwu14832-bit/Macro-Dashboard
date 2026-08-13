@@ -20,11 +20,12 @@ from macro import archive, data, paths
 from macro.compute import (commodities, debt, equities, freshness, growth,
                            inflation, labor, market, news, rates, scenario,
                            signals, world)
-from macro.render import layout
+from macro.render import api, layout
 from macro.render.pages import (archive as archive_page,
                                 commodities as commodities_page,
                                 debt as debt_page,
                                 equities as equities_page,
+                                explore as explore_page,
                                 freshness as freshness_page,
                                 fed as fed_page, growth as growth_page,
                                 inflation as inflation_page, labor as labor_page,
@@ -59,11 +60,11 @@ def main() -> int:
     if args.fresh or args.offline:
         news.TTL_OVERRIDE = ttl
 
-    print("== 1/5 載入資料 ==", flush=True)
+    print("== 1/6 載入資料 ==", flush=True)
     bundle = data.load(verbose=verbose, ttl=ttl)
     print(f"   {len(bundle.series)} 檔序列，缺漏 {len(bundle.missing)} 檔", flush=True)
 
-    print("== 2/5 計算 ==", flush=True)
+    print("== 2/6 計算 ==", flush=True)
     ctx: dict = {}
     failures: list[str] = []
     for name, module in MODULES:
@@ -77,7 +78,7 @@ def main() -> int:
             print(f"   ✗ {name}", flush=True)
             traceback.print_exc()
 
-    print("== 3/5 規則引擎與情境 ==", flush=True)
+    print("== 3/6 規則引擎與情境 ==", flush=True)
     found = signals.evaluate(ctx)
     summary = signals.summarise(found)
     scenario_data = scenario.compute(ctx["labor"], ctx["inflation"], ctx["rates"],
@@ -85,7 +86,7 @@ def main() -> int:
     print(f"   訊號 {summary['total']} 條（{summary['tilt']}）→ "
           f"{scenario_data['name']}／{scenario_data['regime_label']}", flush=True)
 
-    print("== 4/5 存檔與比對 ==", flush=True)
+    print("== 4/6 存檔與比對 ==", flush=True)
     snapshot = archive.build_snapshot(ctx, found, summary, scenario_data)
     prior = archive.previous()
     diff = signals.diff(found, (prior or {}).get("signals"))
@@ -96,7 +97,7 @@ def main() -> int:
     print(f"   存檔共 {len(snapshots)} 筆"
           f"{'；與上期相同' if diff.get('same') else ''}", flush=True)
 
-    print("== 5/5 產生頁面 ==", flush=True)
+    print("== 5/6 產生頁面 ==", flush=True)
     updated = taipei_stamp()
     pages = [
         ("/", "總覽", "美國總經儀表板",
@@ -136,6 +137,9 @@ def main() -> int:
         ("/scenario/", "情境與部位", "情境與部位",
          "九宮格定位、三種政策重心、轉換門檻與部位對照。",
          lambda: scenario_page.render(ctx, scenario_data, summary)),
+        ("/explore/", "自選比較", "自選比較",
+         "從 196 檔序列自選最多 4 個比較，轉換方式與區間隨你調，資料即時取自 FRED。",
+         lambda: explore_page.render(ctx)),
         ("/freshness/", "資料新鮮度", "資料新鮮度",
          "每個指標多新、下次什麼時候更新，以及為什麼總經資料沒有即時可言。",
          lambda: freshness_page.render(ctx)),
@@ -161,6 +165,11 @@ def main() -> int:
             print(f"   ✓ {path}", flush=True)
 
     layout.copy_static()
+
+    print("== 6/6 輸出 JSON API ==", flush=True)
+    stats = api.write_series(bundle)
+    api.write_readings(ctx, found, summary, scenario_data)
+    print(f"   {stats['count']} 檔序列，共 {stats['bytes'] / 1024 / 1024:.1f} MB", flush=True)
 
     elapsed = time.time() - started
     print(f"\n完成：{len(written)} 頁，耗時 {elapsed:.1f} 秒 → {paths.SITE_DIR}")
