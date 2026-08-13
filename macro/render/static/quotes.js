@@ -14,10 +14,12 @@
   const root = document.querySelector("[data-quotes-live]");
   if (!root) return;
 
-  // 45 秒而不是 20：頁面上有四十幾個非台股代號，而報價 API 的免費層是
-  // 每分鐘 60 次呼叫。代理端有逐檔快取，這裡再放慢一點，一起把單一訪客
-  // 的上游用量壓在額度內。
-  const REFRESH_MS = 45_000;
+  // 兩種節奏。台股 5 秒——證交所 MIS 每 5 秒對外發布一次行情快照，
+  // 這是它公開資料的即時上限，再快也只會拿到同一筆。
+  // 美股與新興市場 45 秒——頁面上有四十幾個非台股代號，而 Finnhub
+  // 免費層是每分鐘 60 次呼叫，45 秒是單一訪客不超額的最短間隔。
+  const TW_REFRESH_MS = 5_000;
+  const OTHER_REFRESH_MS = 45_000;
   const status = document.getElementById("quote-status");
   const cells = [...document.querySelectorAll("[data-quote]")];
   if (!cells.length) return;
@@ -27,8 +29,11 @@
   const otherSymbols = [...new Set(cells.filter(c => c.dataset.market !== "tw")
                                         .map(c => c.dataset.quote))];
 
-  let timer = null;
+  let timers = [];
   let failures = 0;
+  let disabled = false;
+  // 兩個群組各自輪詢，狀態列要合起來講，所以記住彼此的最新狀態
+  const state = { provider: null, notSupported: false };
 
   const fmt = (value, digits) =>
     value === null || value === undefined || Number.isNaN(value)
@@ -92,10 +97,26 @@
     status.className = "quote-status" + (kind ? " " + kind : "");
   }
 
-  async function refresh() {
+  function stopTimers() {
+    timers.forEach(clearInterval);
+    timers = [];
+  }
+
+  function startTimers() {
+    stopTimers();
+    if (twSymbols.length) {
+      timers.push(setInterval(() => refresh("tw"), TW_REFRESH_MS));
+    }
+    if (otherSymbols.length) {
+      timers.push(setInterval(() => refresh("other"), OTHER_REFRESH_MS));
+    }
+  }
+
+  async function refresh(kind) {
+    if (disabled) return;
     const params = new URLSearchParams();
-    if (twSymbols.length) params.set("tw", twSymbols.join(","));
-    if (otherSymbols.length) params.set("us", otherSymbols.join(","));
+    if (kind === "tw") params.set("tw", twSymbols.join(","));
+    else params.set("us", otherSymbols.join(","));
 
     let payload;
     try {
@@ -109,10 +130,11 @@
       // 快速重試一次確認不是暫時性的，再確定停用——不要讓「live」燈號在
       // 根本不會更新的頁面上繼續跳。
       if (failures === 1) {
-        clearInterval(timer);
-        setTimeout(refresh, 2000);
+        stopTimers();
+        setTimeout(() => refresh(kind), 2000);
       } else {
-        clearInterval(timer);
+        stopTimers();
+        disabled = true;
         root.classList.add("is-static");
         report("此環境沒有報價代理，顯示的是建置當下的快照", "muted");
       }
@@ -121,34 +143,42 @@
 
     if (failures) {           // 從失敗中恢復，把定時器接回來
       failures = 0;
-      clearInterval(timer);
-      timer = setInterval(refresh, REFRESH_MS);
+      startTimers();
     }
-    const quotes = [...(payload.tw || []), ...(payload.other || [])];
-    apply(quotes);
+    apply([...(payload.tw || []), ...(payload.other || [])]);
 
+    if (kind === "other") {
+      state.notSupported = payload.other_supported === false
+                           && otherSymbols.length > 0;
+      state.provider = payload.provider || null;
+    }
     const when = new Date(payload.fetched_at || Date.now());
     const clock = when.toLocaleTimeString("zh-TW", { hour12: false });
-    const notSupported = payload.other_supported === false && otherSymbols.length;
-    const via = payload.provider ? `　·　美股經 ${payload.provider}` : "";
-    report(notSupported
-      ? `台股已更新 ${clock}　·　美股與新興市場維持建置快照（代理未設定 Finnhub 金鑰）`
-      : `已更新 ${clock}${via}　·　每 ${REFRESH_MS / 1000} 秒自動更新`);
+    const via = state.provider ? `　·　美股經 ${state.provider}` : "";
+    const cadence = `台股每 ${TW_REFRESH_MS / 1000} 秒`
+      + (otherSymbols.length && !state.notSupported
+         ? `、美股每 ${OTHER_REFRESH_MS / 1000} 秒` : "");
+    report(state.notSupported
+      ? `台股已更新 ${clock}（每 ${TW_REFRESH_MS / 1000} 秒）　·　`
+        + "美股與新興市場維持建置快照（代理未設定 Finnhub 金鑰）"
+      : `已更新 ${clock}${via}　·　${cadence}`);
     if (payload.errors?.length) {
       status.title = payload.errors.join("；");   // 詳情放 tooltip，不佔版面
     }
   }
 
-  refresh();
-  timer = setInterval(refresh, REFRESH_MS);
+  if (twSymbols.length) refresh("tw");
+  if (otherSymbols.length) refresh("other");
+  startTimers();
 
   // 分頁在背景時不必一直打 API
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-      clearInterval(timer);
-    } else if (failures < 2) {
-      refresh();
-      timer = setInterval(refresh, REFRESH_MS);
+      stopTimers();
+    } else if (!disabled) {
+      if (twSymbols.length) refresh("tw");
+      if (otherSymbols.length) refresh("other");
+      startTimers();
     }
   });
 })();

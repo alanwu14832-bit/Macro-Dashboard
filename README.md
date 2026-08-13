@@ -68,25 +68,33 @@ AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` �
 
 `/equities/` 有三個區塊：美股、台股、其他新興市場。分工照來源特性：
 
-- **指數與美股／新興市場個股** → Fincept Terminal 的 `yfinance_data.py`，
+- **美股與新興市場指數、個股** → Fincept Terminal 的 `yfinance_data.py`，
   以子行程呼叫。預設路徑 `~/Desktop/fincept-mcp`，可用環境變數 `FINCEPT_ROOT`
   覆寫。Fincept 不在時這一頁會顯示提示訊息，其餘 12 頁不受影響。
-- **台股個股與 ETF** → 直接打證交所 `mis.twse.com.tw`，用 stdlib 實作
-  （fincept 的 twse_source 需要 requests，與本專案的零依賴原則衝突）。
-  含漲跌停價，並依「報價日期 vs 今天」判斷盤中／收盤／盤前。
+- **台股加權指數、個股與 ETF** → 直接打證交所 `mis.twse.com.tw`，用 stdlib
+  實作（fincept 的 twse_source 需要 requests，與本專案的零依賴原則衝突）。
+  加權指數走 MIS 的 `tse_t00.tw` channel，對外代號維持 `^TWII`。
+  個股含漲跌停價，並依「報價日期 vs 今天」判斷盤中／收盤／盤前。
 
 ### 即時更新（serverless function 代理）
 
 `api/quotes.js` 在伺服器端代抓報價再加上 CORS 標頭送回瀏覽器，
-`macro/render/static/quotes.js` 每 45 秒就地換掉頁面上的數字。
-間隔是 45 秒而不是更短，是因為頁面上有四十幾個非台股代號，而 Finnhub
-免費層是每分鐘 60 次呼叫；代理端另有逐檔 45 秒快取，所有訪客共用。
+`macro/render/static/quotes.js` 就地換掉頁面上的數字。兩種節奏：
+
+- **台股（含加權指數）每 5 秒** — 證交所 MIS 每 5 秒對外發布一次行情快照，
+  這是它公開資料的即時上限，再快也只會拿到同一筆。真正的逐筆行情要
+  付費的資訊源，免費管道沒有。
+- **美股與新興市場每 45 秒** — 頁面上有四十幾個非台股代號，而 Finnhub
+  免費層是每分鐘 60 次呼叫，45 秒是單一訪客不超額的最短間隔。
+
+代理端另有快取（台股 5 秒、Finnhub 逐檔 45 秒），所有訪客共用同一次
+上游呼叫，多人同時開頁不會把額度乘上去。
 
 | 區塊 | 部署後是否即時 | 條件 |
 |---|---|---|
-| 台股個股與 ETF | ✅ | 免金鑰，證交所 MIS |
-| 美股個股、類股 ETF、大盤 ETF、新興市場 ETF | ✅ | 需設定 `FINNHUB_API_KEY` |
-| 原始指數（^GSPC、^TWII、^KS11…） | ❌ | 報價 API 免費層不開放，維持建置快照 |
+| 台股加權指數、個股與 ETF | ✅ 每 5 秒 | 免金鑰，證交所 MIS |
+| 美股個股、類股 ETF、大盤 ETF、新興市場 ETF | ✅ 每 45 秒 | 需設定 `FINNHUB_API_KEY` |
+| 美股與新興市場原始指數（^GSPC、^KS11…） | ❌ | 報價 API 免費層不開放，維持建置快照 |
 
 要啟用美股與新興市場的即時更新：到 https://finnhub.io 申請免費金鑰，
 在 Vercel 的 Project Settings → Environment Variables 新增 `FINNHUB_API_KEY`

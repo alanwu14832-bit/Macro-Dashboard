@@ -70,9 +70,11 @@ def _fetch(pairs: list[tuple[str, str]], region: str) -> list[dict]:
     return out
 
 
-def _fetch_taiwan(pairs: list[tuple[str, str]], region: str) -> list[dict]:
+def _fetch_taiwan(pairs: list[tuple[str, str]], region: str,
+                  fetcher=None) -> list[dict]:
     names = dict(pairs)
-    rows = quotes.taiwan_quotes([symbol for symbol, _ in pairs])
+    fetch = fetcher or quotes.taiwan_quotes
+    rows = fetch([symbol for symbol, _ in pairs])
     out = [quotes.normalise(r, name=names.get(str(r.get("symbol", "")), ""), region=region)
            for r in rows]
     order = {symbol: i for i, (symbol, _) in enumerate(pairs)}
@@ -199,8 +201,10 @@ def compute(bundle=None) -> dict:
     us_proxies = _fetch(US_PROXIES, "美股")
     us_sectors = _fetch(US_SECTORS, "美股")
 
-    tw_index = _fetch(TW_INDICES, "台股")          # 加權指數走 yfinance
-    tw_stocks = _fetch_taiwan(TW_TICKERS, "台股")   # 個股走證交所官方
+    # 加權指數與個股都走證交所官方（指數是 MIS 的 t00 channel），
+    # 這樣建置快照與部署後的即時更新是同一個來源、同一套數字。
+    tw_index = _fetch_taiwan(TW_INDICES, "台股", fetcher=quotes.taiwan_index_quotes)
+    tw_stocks = _fetch_taiwan(TW_TICKERS, "台股")
     tw_etfs = _fetch_taiwan(TW_ETFS, "台股")
 
     em_indices = _fetch(EM_INDICES, "新興市場")

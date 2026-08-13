@@ -7,6 +7,7 @@
  *
  * 路由：Vercel 依檔案路徑對應，這個檔就是 /api/quotes
  *   /api/quotes?tw=2330,0050      台股 → 證交所 MIS，免金鑰
+ *   /api/quotes?tw=^TWII          加權指數 → 同一個 MIS，t00 channel
  *   /api/quotes?us=AAPL,SPY       其他市場 → 需要 FINNHUB_API_KEY
  *
  * 用 CommonJS 是因為專案沒有 package.json，.js 會被當成 CommonJS；
@@ -16,8 +17,13 @@
 const TWSE_MIS = "https://mis.twse.com.tw/stock/api/getStockInfo.jsp";
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)";
 
-// 瀏覽器每 45 秒問一次，但對上游最多 10 秒一次，避免被證交所擋。
-const UPSTREAM_TTL_MS = 10_000;
+// 台股的瀏覽器輪詢是 5 秒——那正好是證交所對外發布行情快照的節奏，
+// 更快也只會拿到同一筆。上游同樣 5 秒共用一次，所有訪客吃同一份。
+const UPSTREAM_TTL_MS = 5_000;
+
+// MIS 的大盤指數 channel：保留代號，不是股票代號。
+// 對外仍用 ^TWII 當 key，跟頁面上的 data-quote 與建置快照一致。
+const TW_INDEX = { "^TWII": { channel: "tse_t00.tw", code: "t00" } };
 // 供應商每檔報價都要一次呼叫，而 Finnhub 免費層是 60 次/分。頁面上有
 // 四十幾個非台股代號，逐檔快取讓所有訪客共用同一次上游呼叫。
 const QUOTE_TTL_MS = 45_000;
@@ -28,7 +34,7 @@ const quoteCache = new Map();
 function setCors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Cache-Control", "public, max-age=10");
+  res.setHeader("Cache-Control", "public, max-age=5");
   res.setHeader("Content-Type", "application/json; charset=utf-8");
 }
 
@@ -93,13 +99,15 @@ function shapeTaiwan(row) {
   };
 }
 
-async function fetchTaiwan(codes) {
-  if (!codes.length) return [];
-  const key = "tw:" + codes.join(",");
+async function fetchTaiwan(codes, indexSymbols) {
+  if (!codes.length && !indexSymbols.length) return [];
+  const key = "tw:" + codes.join(",") + "|" + indexSymbols.join(",");
   const hit = twCache.get(key);
   if (hit && Date.now() - hit.at < UPSTREAM_TTL_MS) return hit.data;
 
-  const channels = codes.flatMap((c) => [`tse_${c}.tw`, `otc_${c}.tw`]).join("|");
+  const channels = codes.flatMap((c) => [`tse_${c}.tw`, `otc_${c}.tw`])
+    .concat(indexSymbols.map((s) => TW_INDEX[s].channel))
+    .join("|");
   const url = `${TWSE_MIS}?ex_ch=${encodeURIComponent(channels)}&json=1&delay=0`;
 
   const response = await fetch(url, {
@@ -114,6 +122,13 @@ async function fetchTaiwan(codes) {
   const found = new Map(
     (payload.msgArray || []).filter((r) => r.c).map((r) => [r.c, r]));
   const data = codes.filter((c) => found.has(c)).map((c) => shapeTaiwan(found.get(c)));
+  for (const symbol of indexSymbols) {
+    const row = found.get(TW_INDEX[symbol].code);
+    if (!row) continue;
+    const shaped = shapeTaiwan(row);
+    shaped.symbol = symbol;               // t00 → ^TWII
+    data.push(shaped);
+  }
   twCache.set(key, { at: Date.now(), data });
   return data;
 }
@@ -189,15 +204,15 @@ module.exports = async (req, res) => {
   setCors(res);
   if (req.method === "OPTIONS") return res.status(204).end();
 
-  const twCodes = splitParam(req.query.tw)
-    .map((c) => c.toUpperCase().split(".")[0])
-    .filter((c) => /^\d{4,6}[A-Z]?$/.test(c));
+  const twRaw = splitParam(req.query.tw).map((c) => c.toUpperCase().split(".")[0]);
+  const twCodes = twRaw.filter((c) => /^\d{4,6}[A-Z]?$/.test(c));
+  const twIndices = twRaw.filter((c) => TW_INDEX[c]);
   const others = splitParam(req.query.us);
 
   const body = { fetched_at: new Date().toISOString(), tw: [], other: [], errors: [] };
 
   const [twResult, otherResult] = await Promise.allSettled([
-    fetchTaiwan(twCodes),
+    fetchTaiwan(twCodes, twIndices),
     fetchOther(others),
   ]);
 

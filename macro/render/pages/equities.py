@@ -91,12 +91,15 @@ def render(ctx: dict) -> str:
         f'<span class="quote-status" id="quote-status">建置快照 {esc(fetched)}</span>'
         f'</div>'
         + callout(
-            f'頁面載入後會透過 <code>/api/quotes</code> 代理更新報價，每 45 秒一次：'
-            f'台股取自證交所，美股與新興市場的個股與 ETF 取自 Finnhub。'
+            f'頁面載入後會透過 <code>/api/quotes</code> 代理更新報價：'
+            f'<strong>台股（含加權指數）每 5 秒</strong>，取自證交所——5 秒就是'
+            f'證交所對外發布行情快照的節奏，這已是它公開資料的即時上限；'
+            f'美股與新興市場的個股與 ETF 每 45 秒，取自 Finnhub（免費層 60 次/分，'
+            f'頁面上有四十幾檔，45 秒是不超額的最短間隔）。'
             f'上方狀態列會顯示實際的更新時間與來源。<br>'
-            f'<strong>原始指數（^GSPC、^TWII、^KS11 等）維持建置快照</strong>——'
-            f'報價 API 的免費層不含指數，所以本站另列一組追蹤同標的的大盤 ETF，'
-            f'那一組才是會跳動的。<br>'
+            f'<strong>美股與新興市場的原始指數（^GSPC、^KS11 等）維持建置快照</strong>'
+            f'——報價 API 的免費層不含指數，所以本站另列一組追蹤同標的的大盤 ETF，'
+            f'那一組才是會跳動的。台股加權指數不受此限，證交所直接提供。<br>'
             f'沒有代理的環境（例如本機以 http.server 預覽）會安靜降級成建置快照，'
             f'狀態列的燈號會轉灰並註明。'
             f'　<a href="/freshness/">看更新時程 →</a>'))
@@ -126,7 +129,7 @@ def render(ctx: dict) -> str:
             + callout("原始指數（^GSPC 等）在報價 API 的免費層不開放，這幾檔 ETF "
                       "追蹤相同標的且開放存取——所以<strong>它們是會即時更新的那一組</strong>，"
                       "上面的指數欄位則維持建置快照。"),
-            note="每 45 秒更新"))
+            note="每 45 秒更新（Finnhub 免費層額度上限）"))
 
     if us["stocks"]:
         body.append(section(
@@ -150,10 +153,15 @@ def render(ctx: dict) -> str:
     if tw["index"] or tw["stocks"]:
         tiles = []
         for r in tw["index"]:
+            symbol = str(r["symbol"])
             tiles.append(stat(
-                r["name"], fmt(r["price"], 2),
-                delta=f'{fmt(r["change"], 2, signed=True)}　'
-                      f'{fmt(r["change_percent"], 2, suffix="%", signed=True)}',
+                r["name"],
+                _live(symbol, "price", "tw", 2, fmt(r["price"], 2)),
+                delta=_live(symbol, "change", "tw", 2,
+                            fmt(r["change"], 2, signed=True))
+                      + "　"
+                      + _live(symbol, "change_percent", "tw", 2,
+                              fmt(r["change_percent"], 2, suffix="%", signed=True)),
                 asof=f'昨收 {fmt(r["previous_close"], 2)}'))
         for r in tw["stocks"][:3]:
             symbol = str(r["symbol"])
@@ -168,7 +176,7 @@ def render(ctx: dict) -> str:
                 asof=f'{esc(symbol)}　昨收 {fmt(r["previous_close"], 2)}'))
         body.append(section(
             "tw", "台灣股市",
-            _status_note(tw["status"], "證交所 mis.twse.com.tw（指數為 Fincept）")
+            _status_note(tw["status"], "證交所 mis.twse.com.tw（指數與個股同源）")
             + f'<div class="grid grid-4">{"".join(tiles)}</div>',
             note=f'報價時間 {_stamp(tw["stocks"] or tw["index"])}'))
 

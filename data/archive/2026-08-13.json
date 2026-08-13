@@ -1,6 +1,6 @@
 {
  "date": "2026-08-13",
- "generated_at": "2026-08-13T08:45:50",
+ "generated_at": "2026-08-13T09:42:27",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -15,7 +15,7 @@
    "headline": "核心 CPI 近三月年化明顯低於年增率",
    "direction": "dovish",
    "severity": "high",
-   "evidence": "近三月年化 1.6%，年增 2.8%，低 1.1 個百分點",
+   "evidence": "近三月年化 1.6%，年增 2.5%，低 0.8 個百分點",
    "module": "物價"
   },
   {
@@ -33,6 +33,14 @@
    "severity": "high",
    "evidence": "人口月增 +14.1 萬、勞動力月增 -10.7 萬；黃金年齡就業率 12 個月 -0.3 個百分點",
    "module": "就業"
+  },
+  {
+   "key": "inflation_broad",
+   "headline": "剔除極端值後通膨不比核心低，漲勢是全面性的",
+   "direction": "hawkish",
+   "severity": "medium",
+   "evidence": "核心 2.5%，剔除極端值均值 2.8%",
+   "module": "物價"
   },
   {
    "key": "quits_collapsed",
@@ -55,7 +63,7 @@
    "headline": "住房落後項仍在推升表面讀數，實際通膨比表面低",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "住房年增 3.4%、近三月年化 2.3%，收斂後對整體 CPI 約 -0.38 個百分點",
+   "evidence": "住房年增 3.2%、近三月年化 2.3%，收斂後對整體 CPI 約 -0.30 個百分點",
    "module": "物價"
   },
   {
@@ -71,7 +79,7 @@
    "headline": "核心服務除住房卡在目標之上",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "年增 3.4%，已連 63 個月高於 2.5%",
+   "evidence": "年增 2.9%，已連 63 個月高於 2.5%",
    "module": "物價"
   },
   {
@@ -87,7 +95,7 @@
    "headline": "期限溢酬偏高，長端在要求額外補償",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "期限溢酬（近似）+0.95 個百分點",
+   "evidence": "期限溢酬（近似）+0.94 個百分點",
    "module": "利率"
   },
   {
@@ -100,11 +108,11 @@
   }
  ],
  "summary": {
-  "total": 12,
-  "hawkish": 3,
+  "total": 13,
+  "hawkish": 4,
   "dovish": 7,
   "neutral": 2,
-  "score": -10,
+  "score": -8,
   "tilt": "偏降息"
  },
  "scenario": {
@@ -119,18 +127,18 @@
   "payrolls_3m": 20.0,
   "breakeven": 83.26981016666666,
   "unemployment": 4.1,
-  "core_cpi": 2.786747157096725,
+  "core_cpi": 2.4782661559973107,
   "core_pce": 3.286526430967074,
-  "supercore": 3.4060580229904325,
-  "ten_year": 4.72,
+  "supercore": 2.941399756263796,
+  "ten_year": 4.7,
   "real_ten_year": 2.43,
-  "curve_10_2": 0.46999999999999975,
-  "recession_gauge": 42.361300990134694,
-  "composite_labor": -7.669245534102035
+  "curve_10_2": 0.4800000000000004,
+  "recession_gauge": 42.3596678289909,
+  "composite_labor": -7.1873770257726095
  },
  "as_of": {
   "labor": "2026-07-01",
   "inflation": "2026-07-01",
-  "rates": "2026-08-10"
+  "rates": "2026-08-11"
  }
 }

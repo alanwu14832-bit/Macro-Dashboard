@@ -111,6 +111,31 @@ def _shape_taiwan(row: dict) -> dict:
     }
 
 
+def _mis_fetch(channels: str, ttl: float) -> dict[str, dict]:
+    """打 MIS 並依代號建索引。
+
+    證交所限流時回的是 HTTP 200 加上非 0000 的 rtcode。HTTP 層只看狀態碼，
+    會把這種「成功的錯誤」寫進快取，接下來整個 TTL 都拿不到報價。
+    所以這裡驗過內容才算數，內容不對就繞過快取重抓一次——成功的回應會
+    順帶把壞的快取覆蓋掉。
+    """
+    url = build_url(MIS_URL, {"ex_ch": channels, "json": "1", "delay": "0"})
+    for attempt, cache_ttl in enumerate((ttl, 0)):
+        try:
+            payload = get_json(url, ttl=cache_ttl, namespace="twse",
+                               timeout=30, retries=2)
+        except Exception:
+            return {}
+        if payload.get("rtcode") == "0000":
+            break
+        if attempt == 1:
+            return {}
+    else:
+        return {}
+    return {row.get("c"): row
+            for row in payload.get("msgArray") or [] if row.get("c")}
+
+
 def taiwan_quotes(tickers: list[str], *, ttl: float = 900) -> list[dict]:
     """證交所官方報價。上市與上櫃兩個 channel 都送，MIS 只回存在的那個。"""
     codes = [str(t).strip().upper().split(".")[0] for t in tickers if str(t).strip()]
@@ -118,27 +143,35 @@ def taiwan_quotes(tickers: list[str], *, ttl: float = 900) -> list[dict]:
         return []
     channels = "|".join(f"{market}_{code}.tw"
                         for code in codes for market in ("tse", "otc"))
-    url = build_url(MIS_URL, {"ex_ch": channels, "json": "1", "delay": "0"})
-
-    # 證交所限流時回的是 HTTP 200 加上非 0000 的 rtcode。HTTP 層只看狀態碼，
-    # 會把這種「成功的錯誤」寫進快取，接下來整個 TTL 都拿不到報價。
-    # 所以這裡驗過內容才算數，內容不對就繞過快取重抓一次——成功的回應會
-    # 順帶把壞的快取覆蓋掉。
-    for attempt, cache_ttl in enumerate((ttl, 0)):
-        try:
-            payload = get_json(url, ttl=cache_ttl, namespace="twse",
-                               timeout=30, retries=2)
-        except Exception:
-            return []
-        if payload.get("rtcode") == "0000":
-            break
-        if attempt == 1:
-            return []
-    else:
-        return []
-
-    found = {row.get("c"): row for row in payload.get("msgArray") or [] if row.get("c")}
+    found = _mis_fetch(channels, ttl)
     return [_shape_taiwan(found[code]) for code in codes if code in found]
+
+
+# MIS 也提供大盤指數，channel 是保留代號而不是股票代號。
+# t00 = 發行量加權股價指數（也就是 ^TWII），o00 = 櫃買指數。
+TW_INDEX_CHANNELS = {"^TWII": ("tse_t00.tw", "t00")}
+
+
+def taiwan_index_quotes(symbols: list[str], *, ttl: float = 900) -> list[dict]:
+    """加權指數走證交所官方，跟個股同一個 MIS 端點。
+
+    對外的代號維持 ^TWII——快照存檔、頁面上的 data-quote 與即時更新腳本
+    都用它當 key，來源換掉不該讓 key 跟著換。
+    """
+    wanted = [(s, TW_INDEX_CHANNELS[s]) for s in symbols if s in TW_INDEX_CHANNELS]
+    if not wanted:
+        return []
+    channels = "|".join(channel for _, (channel, _) in wanted)
+    found = _mis_fetch(channels, ttl)
+    out = []
+    for symbol, (_, code) in wanted:
+        row = found.get(code)
+        if not row:
+            continue
+        shaped = _shape_taiwan(row)
+        shaped["symbol"] = symbol            # t00 → ^TWII
+        out.append(shaped)
+    return out
 
 
 # -------------------------------------------------------------- 其他市場 ---
