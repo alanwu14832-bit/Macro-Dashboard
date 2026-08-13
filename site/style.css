@@ -728,3 +728,17 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
 }
 /* 小小標：縮排一層、再小一號 */
 .nav-sub a.sub2 { padding-left: 22px; font-size: 0.74rem; }
+
+/* ---- 首頁：模組卡片的指標名稱、今日財經要聞 ---- */
+.m-metric {
+  font-size: 0.72rem; color: var(--ink-muted); letter-spacing: 0.03em;
+  margin: 8px 0 -4px;
+}
+.digest { display: flex; flex-direction: column; gap: 9px; }
+.digest-item { display: flex; gap: 10px; align-items: baseline; }
+.digest-n {
+  flex: none; font-size: 0.72rem; color: var(--ink-muted);
+  border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.digest-text { font-size: 0.9rem; line-height: 1.5; }

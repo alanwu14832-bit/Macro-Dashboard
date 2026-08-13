@@ -223,9 +223,18 @@ def cluster(items: list[dict]) -> list[dict]:
     return packed
 
 
+# 每個詞尾容許複數 s：'tariffs'、'rate cuts' 也要命中，
+# 但字界仍擋住 'federal'、'credited' 這類前綴誤中。
+_MACRO_RE = re.compile(
+    r"\b(" + "|".join(re.escape(t) + "s?" for t in
+                      sorted(MACRO_TERMS, key=len, reverse=True)) + r")\b")
+
+
 def _is_macro(title: str) -> bool:
     lowered = title.lower()
-    return any(term in lowered for term in MACRO_TERMS)
+    # 用字界而不是子字串：'fed' 不該命中 'federal case'、'credit' 不該
+    # 命中 'credited'。刑事新聞混進財金摘要就是子字串比對的產物。
+    return bool(_MACRO_RE.search(lowered))
 
 
 def _select(catalogue: dict[str, list[dict]]) -> list[tuple[str, str, dict]]:

@@ -1,6 +1,7 @@
 """總覽頁：一句話結論、關鍵訊號、各模組入口、跟上期比什麼變了。"""
 from __future__ import annotations
 
+from ...compute.news import _headline, _is_macro, _same_story, _tokens
 from ...compute.scenario import REGIME_LABELS
 from ...fomc import next_meeting
 from ..common import checks_block, legend_note, signals_block
@@ -95,39 +96,42 @@ def module_cards(ctx: dict, signals: list[dict]) -> str:
                     for s in found)
         return "hawkish" if score > 0 else "dovish" if score < 0 else "neutral"
 
+    # (連結, 模組名, 資料日, 指標名稱, 數值, 方向, 第二行, 導覽)
+    # 指標名稱是給讀者的：光看 -2.3 萬人不知道是什麼，要標明是非農月增。
     cards = [
-        ("/labor/", "勞動市場", zh_date(labor["as_of"]),
+        ("/labor/", "勞動市場", zh_date(labor["as_of"]), "非農就業月增",
          thousands_to_wan(labor["payrolls"]["latest"]), module_direction("就業"),
          f"失業率 {fmt(labor['unemployment']['rate'], 1, suffix='%')}",
          "看損益兩平、修正追蹤、行業拆解與強弱指數"),
-        ("/inflation/", "通膨", zh_date(inflation["as_of"]),
+        ("/inflation/", "通膨", zh_date(inflation["as_of"]), "核心 CPI 年增率",
          pct(inflation["headline"]["core_cpi"], 1), module_direction("物價"),
          f"核心 PCE {pct(inflation['headline']['core_pce'], 1)}",
          "看分項貢獻、廣度、住房落後與能源傳導"),
-        ("/fed/", "聯準會與利率", zh_date(rates["as_of"], freq="d"),
+        ("/fed/", "聯準會與利率", zh_date(rates["as_of"], freq="d"), "10 年期公債殖利率",
          pct(rates["decomposition"]["nominal"], 2), module_direction("利率"),
          f"實質 {pct(rates['decomposition']['real'], 2)}　·　{esc(rates['shape'].get('label',''))}",
          "看完整曲線、長端拆解與信用利差"),
-        ("/debt/", "長端與債務", zh_date(debt["as_of"], freq="q"),
+        ("/debt/", "長端與債務", zh_date(debt["as_of"], freq="q"), "政府債務／GDP",
          fmt(debt["dynamics"]["debt_gdp"], 0, suffix="%"), module_direction("債務"),
          f"供給壓力{esc(debt['supply']['level'])}　·　r−g {fmt(debt['dynamics']['r_minus_g'], 1, signed=True)}",
          "看債務動態、利息負擔與買盤結構"),
-        ("/growth/", "成長與信用", zh_date(growth["as_of"]),
+        ("/growth/", "成長與信用", zh_date(growth["as_of"]), "衰退風險刻度",
          f"{fmt(growth['gauge']['value'], 0)}<span class='unit'>/100</span>",
          module_direction("成長"),
          f"衰退風險刻度「{esc(growth['gauge'].get('level',''))}」",
          "看消費、住宅、放款標準與違約率"),
-        ("/market/", "市場面", zh_date(market["as_of"], freq="d"),
+        ("/market/", "市場面", zh_date(market["as_of"], freq="d"), "VIX 波動率",
          fmt(market["volatility"]["vix"], 1), module_direction("市場"),
          esc(market["stock_bond"].get("verdict", "")),
          "看股債相關性、波動率定位與實質利率張力"),
     ]
 
     out = []
-    for href, name, when, headline, direction, second, more in cards:
+    for href, name, when, metric, headline, direction, second, more in cards:
         out.append(
             f'<a class="module-link" href="{href}">'
             f'<div class="m-name">{esc(name)}<span class="date">{esc(when)} 資料</span></div>'
+            f'<div class="m-metric">{esc(metric)}</div>'
             f'<div class="m-headline">{headline}{tag(direction)}</div>'
             f'<div class="m-second">{second}</div>'
             f'<div class="m-more">{esc(more)} →</div></a>')
@@ -227,6 +231,47 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
             f'發布後本站的下一次建置就會帶進來，訊號與九宮格判定也可能跟著改變。'
             f'　<a href="/freshness/">看完整發布時程與資料新鮮度 →</a></p>',
             note="資料來源：FRED 官方發布行事曆"))
+
+    # ---- 今日財經要聞 ----
+    news = ctx.get("news") or {}
+    if news.get("available"):
+
+        def _clean(title: str) -> str:
+            # 頭條尾巴常拖著「 - 媒體名 | 網站名」，砍到剩正文
+            text = _headline(title)
+            head = text.split(" | ")[0].strip()
+            return head if len(head) >= 20 else text
+
+        digest, chosen_tokens = [], []
+        # 多家同報的財金事件優先——被好幾個編輯台同時認為重要，才上首頁；
+        # 去重用跟 /news/ 分群同一套實詞重疊比對，換個說法的同一件事不重列
+        candidates = (
+            [(_clean(c["headline"]), c["count"]) for c in news.get("clusters") or []
+             if _is_macro(c["headline"])]
+            + [(_clean(m["title"]), 1) for m in news.get("macro") or []])
+        for text, count in candidates:
+            if len(digest) >= 6:
+                break
+            tokens = _tokens(text)
+            if any(_same_story(tokens, t) for t in chosen_tokens):
+                continue
+            chosen_tokens.append(tokens)
+            digest.append({"text": text, "count": count})
+        if digest:
+            rows = "".join(
+                f'<div class="digest-item">'
+                f'<span class="digest-n">{d["count"]} 家</span>'
+                f'<span class="digest-text">{esc(d["text"])}</span></div>'
+                for d in digest)
+            body.append(section(
+                "daily-news", "今日財經要聞",
+                f'<div class="digest">{rows}</div>'
+                f'<p class="muted" style="margin-top:10px">每則一句話、不放外部連結：'
+                f'取多家媒體同時報導的財金事件的代表標題，家數代表有多少家獨立'
+                f'編輯台同時認為這件事重要。完整來源與各分類頭條見'
+                f' <a href="/news/">國際新聞</a>。</p>',
+                note=f'近 {news.get("stats", {}).get("window_hours", 36)} 小時、'
+                     f'財金相關、多家同報優先'))
 
     # ---- 接下來看什麼 ----
     transitions = scenario.get("transitions") or []
