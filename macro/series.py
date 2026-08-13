@@ -119,6 +119,26 @@ class Series:
                       frequency=self.frequency, source=self.source,
                       meta=dict(self.meta))
 
+    def diff_months(self, months: int) -> "Series":
+        """Level change over a calendar window, for monthly/quarterly series.
+
+        跟 yoy() 同一個理由：diff(12) 是「往回數 12 筆」，序列缺格時
+        窗會被拉長。要「跟 12 個月前比」就得對日曆，找不到基期就留白。
+        """
+        by_month = {(d.year, d.month): v for d, v in zip(self.dates, self.values)}
+        d_out, v_out = [], []
+        for d, v in zip(self.dates, self.values):
+            year, month = d.year, d.month - months
+            while month <= 0:
+                month += 12
+                year -= 1
+            base = by_month.get((year, month))
+            if base is None:
+                continue
+            d_out.append(d)
+            v_out.append(v - base)
+        return self._derive(d_out, v_out, f".diff{months}m", unit="")
+
     def diff(self, periods: int = 1) -> "Series":
         d, v = [], []
         for i in range(periods, len(self.values)):

@@ -52,3 +52,33 @@ def load(groups: list[str] | None = None, *, verbose: bool = True,
     if verbose and bundle.missing:
         print(f"  ⚠ 缺漏 {len(bundle.missing)} 檔：{', '.join(bundle.missing)}", flush=True)
     return bundle
+
+
+def calendar_gaps(bundle: Bundle, *, window_years: float = 3.0) -> dict:
+    """月頻序列近幾年的「內部缺格」——序列中間少掉的月份。
+
+    位置型轉換（往回數 N 筆）遇到缺格會默默用錯基期，2025-10 政府關門
+    停發 CPI 就讓年增率錯了 0.2 個百分點而沒有任何錯誤訊息。轉換層已改
+    成日曆對齊，這裡是第二道防線：把缺格攤在建置紀錄上，讓「資料有洞」
+    這件事永遠是看得見的，而不是等有人發現數字對不上才回頭找。
+
+    回傳 {(year, month): [series_id, ...]}，只看每檔序列自己的頭尾之間，
+    所以發布落後（尾端還沒到）不會被誤報。
+    """
+    gaps: dict[tuple[int, int], list[str]] = {}
+    for series_id, s in bundle.series.items():
+        if s.frequency != "m" or len(s) < 3:
+            continue
+        recent = s.last_years(window_years)
+        if len(recent) < 3:
+            continue
+        have = {(d.year, d.month) for d in recent.dates}
+        year, month = recent.dates[0].year, recent.dates[0].month
+        end = (recent.dates[-1].year, recent.dates[-1].month)
+        while (year, month) < end:
+            month += 1
+            if month > 12:
+                month, year = 1, year + 1
+            if (year, month) < end and (year, month) not in have:
+                gaps.setdefault((year, month), []).append(series_id)
+    return gaps

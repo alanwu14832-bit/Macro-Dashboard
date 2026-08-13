@@ -270,7 +270,7 @@ def composite_index(bundle: Bundle, breakeven: dict) -> dict:
 
     unrate = bundle["UNRATE"]
     if len(unrate) >= 13:
-        parts["UNRATE_CHG"] = squash(unrate.diff(12).zscore(10), invert=True)
+        parts["UNRATE_CHG"] = squash(unrate.diff_months(12).zscore(10), invert=True)
 
     claims = bundle["IC4WSA"]
     if claims:
@@ -298,7 +298,7 @@ def composite_index(bundle: Bundle, breakeven: dict) -> dict:
 
     hours = bundle["AWHAETP"]
     if hours:
-        parts["HOURS"] = squash(hours.diff(12).zscore(10))
+        parts["HOURS"] = squash(hours.diff_months(12).zscore(10))
 
     rows, total_weight, total = [], 0.0, 0.0
     for key, name, weight in COMPOSITE_WEIGHTS:

@@ -63,6 +63,11 @@ def main() -> int:
     print("== 1/6 載入資料 ==", flush=True)
     bundle = data.load(verbose=verbose, ttl=ttl)
     print(f"   {len(bundle.series)} 檔序列，缺漏 {len(bundle.missing)} 檔", flush=True)
+    # 內部缺格要一直看得見：2025-10 政府關門停發讓 34 檔 BLS 序列缺一格，
+    # 位置型轉換因此默默用錯基期。轉換層已改日曆對齊，這行是第二道防線。
+    for (year, month), ids in sorted(data.calendar_gaps(bundle).items()):
+        sample = ", ".join(ids[:6]) + ("…" if len(ids) > 6 else "")
+        print(f"   ⚠ 月頻缺格 {year}-{month:02d}：{len(ids)} 檔（{sample}）", flush=True)
 
     print("== 2/6 計算 ==", flush=True)
     ctx: dict = {}

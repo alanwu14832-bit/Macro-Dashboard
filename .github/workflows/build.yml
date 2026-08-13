@@ -40,6 +40,11 @@ jobs:
           restore-keys: |
             macro-cache-
 
+      # 轉換層的迴歸測試。2025-10 停發事件證明過：算錯的數字看起來
+      # 完全正常，只有測試擋得住。測試不過就不建置、不 commit。
+      - name: 測試
+        run: python3 -m unittest discover -s tests
+
       - name: 建置
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
