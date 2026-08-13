@@ -69,6 +69,14 @@ def main() -> int:
         sample = ", ".join(ids[:6]) + ("…" if len(ids) > 6 else "")
         print(f"   ⚠ 月頻缺格 {year}-{month:02d}：{len(ids)} 檔（{sample}）", flush=True)
 
+    # 大面積缺漏 = 資料源整個失效（金鑰、限流、快取沒還原），不是單一序列
+    # 的小狀況。這時繼續建置只會產出一整站的「—」並 commit 出去——
+    # 2026-08-13 就發生過一次。單一來源掛掉（缺幾檔）照舊容忍。
+    if len(bundle.missing) > 10:
+        print(f"\n缺漏 {len(bundle.missing)} 檔，超過容忍上限 10 檔——"
+              f"資料源大面積失效，中止建置，不產出空數字。", flush=True)
+        return 1
+
     print("== 2/6 計算 ==", flush=True)
     ctx: dict = {}
     failures: list[str] = []
