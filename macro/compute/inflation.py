@@ -297,6 +297,29 @@ def _months_above(series: Series, threshold: float) -> int:
 
 
 # ------------------------------------------------------------- 主入口 ------
+def producer_prices(bundle: Bundle) -> dict:
+    """PPI：企業端的投入成本。傳導鏈的最上游。
+
+    PPI 不直接進九宮格——它是「上游壓力」的觀察，不是政策口徑。
+    企業吸收多少、轉嫁多少，中間隔著毛利，傳導既不完全也不即時。
+    """
+    headline = bundle["PPIFIS"]
+    core = bundle["PPIFES"]
+    if not headline:
+        return {}
+    out = {
+        "headline": _yoy_last(headline),
+        "headline_3m": headline.annualised(3).last,
+        "as_of": headline.last_date,
+        "series": headline.yoy(),
+    }
+    if core:
+        out["core"] = _yoy_last(core)
+        out["core_3m"] = core.annualised(3).last
+        out["core_series"] = core.yoy()
+    return out
+
+
 def compute(bundle: Bundle) -> dict:
     cpi = bundle["CPIAUCSL"]
     core_cpi = bundle["CPILFESL"]
@@ -331,8 +354,12 @@ def compute(bundle: Bundle) -> dict:
             "core_cpi_6m": core_cpi.annualised(6).last,
             "core_pce_3m": core_pce.annualised(3).last,
             "core_pce_6m": core_pce.annualised(6).last,
+            # 傳導鏈的三個口徑各自要有總體與近三月年化
+            "cpi_3m": cpi.annualised(3).last,
+            "pce_3m": pce.annualised(3).last,
             "core_3m_series": core_cpi.annualised(3),
         },
+        "ppi": producer_prices(bundle),
         "supercore": {
             "yoy": _yoy_last(supercore),
             "ann3": supercore.annualised(3).last if supercore else None,

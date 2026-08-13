@@ -834,3 +834,57 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
 .fd-add-row { background: rgba(12, 163, 12, 0.06); }
 .fd-del-row { background: rgba(208, 59, 59, 0.06); text-decoration: line-through; color: var(--ink-muted); }
 .fd-full { font-size: 0.84rem; line-height: 1.75; color: var(--ink-2); }
+
+/* ================================================ 雙目標卡（就業／通膨） == */
+.mc-eyebrow {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+  color: var(--series-1); margin-bottom: 10px;
+}
+.mc-title { font-size: 1.35rem; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.01em; }
+.mc-lede { color: var(--ink-2); font-size: 0.9rem; margin: 0 0 18px; line-height: 1.6; }
+
+.mc-cells {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.mc-cell { padding: 16px 20px; border-left: 1px solid var(--border); }
+.mc-cell:first-child { border-left: none; padding-left: 0; }
+/* 判定實際採用的口徑：左側實心綠邊 */
+.mc-key { border-left: 3px solid var(--good); padding-left: 18px; }
+.mc-label { font-size: 0.78rem; color: var(--ink-2); margin-bottom: 6px; }
+.mc-sub { color: var(--ink-muted); font-weight: 400; }
+.mc-value {
+  font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums; line-height: 1.15;
+}
+.mc-foot { font-size: 0.76rem; color: var(--ink-muted); margin-top: 5px; }
+
+.mc-chain-wrap { margin: 20px 0 4px; }
+.mc-chain-toggle {
+  font-size: 0.85rem; font-weight: 600; color: var(--series-1);
+  cursor: pointer; list-style: none;
+}
+.mc-chain-toggle::-webkit-details-marker { display: none; }
+.mc-chain-toggle::after { content: " –"; }
+.mc-chain-wrap:not([open]) .mc-chain-toggle::after { content: " +"; }
+.mc-chain {
+  display: grid; grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center; gap: 10px; margin-top: 14px;
+}
+.mc-step {
+  background: var(--surface-sunken); border-radius: var(--radius-sm);
+  padding: 14px 16px; height: 100%;
+}
+.mc-step-head { font-weight: 700; font-size: 0.95rem; margin-bottom: 8px; }
+.mc-step-read { font-size: 0.84rem; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+.mc-step-note { font-size: 0.8rem; color: var(--ink-muted); line-height: 1.5; }
+.mc-arrow { color: var(--ink-muted); font-size: 1.1rem; }
+.mc-foot-note { font-size: 0.76rem; color: var(--ink-muted); margin-top: 16px; }
+
+@media (max-width: 860px) {
+  .mc-cells { grid-template-columns: repeat(2, 1fr); }
+  .mc-cell { border-left: none; padding-left: 0; }
+  .mc-key { padding-left: 12px; }
+  .mc-chain { grid-template-columns: 1fr; }
+  .mc-arrow { transform: rotate(90deg); justify-self: center; }
+}

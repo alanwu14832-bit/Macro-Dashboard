@@ -110,6 +110,7 @@ INFLATION: dict[str, Spec] = {
     "ECIWAG":    ("僱用成本-薪資", "指數", "q", LONG_START),
     "PPIACO":    ("PPI 全商品", "指數", "m", LONG_START),
     "PPIFIS":    ("PPI 最終需求", "指數", "m", "2009-01-01"),
+    "PPIFES":    ("PPI 最終需求除食物能源", "指數", "m", "2009-01-01"),
     "DCOILWTICO": ("WTI 原油", "美元/桶", "d", "1990-01-01"),
     "DCOILBRENTEU": ("布蘭特原油", "美元/桶", "d", "1990-01-01"),
     "GASREGW":   ("零售汽油", "美元/加侖", "w", "1995-01-01"),

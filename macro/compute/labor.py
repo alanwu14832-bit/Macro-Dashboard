@@ -341,6 +341,9 @@ def compute(bundle: Bundle) -> dict:
         "as_of": payrolls.last_date,
         "payrolls": {
             "latest": latest, "avg3": avg3, "avg6": avg6, "avg12": avg12,
+            # 上一個月的月增。非農每月會被修正兩次，所以「上期」在下次
+            # 發布時可能跟當初公布的初值不同——這裡取的是現值。
+            "prev": monthly.at(-2),
             "series": monthly, "level": payrolls.last,
             "ma3": monthly.rolling_mean(3),
         },

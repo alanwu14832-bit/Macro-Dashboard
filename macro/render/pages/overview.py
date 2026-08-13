@@ -4,6 +4,7 @@ from __future__ import annotations
 from ...compute.news import _headline, _is_macro, _same_story, _tokens
 from ...compute.scenario import REGIME_LABELS
 from ...fomc import next_meeting
+from . import mandate_cards as cards
 from . import overview_blocks as blocks
 from ..common import checks_block, legend_note, signals_block
 from ..html import (accordion, callout, delta_span, direction_label,
@@ -303,59 +304,57 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
         + glance_board(ctx, scenario)
         + f'<div class="callout key">'
           f'{direction_line(scenario, summary, (ctx["rates"] or {}).get("stance") or {})}</div>'
+        + accordion(f"本期關鍵訊號（{summary['total']} 條）",
+                    signals_block(signals) + legend_note())
         + accordion("完整敘述", narrative(ctx, scenario, summary))
         + f'<p style="margin:12px 0 0"><a href="/scenario/">'
           f'這個判斷怎麼來的、對應什麼部位　→</a></p>'
         f'</div>')
 
-    # ---- 1 目前情境：利率結構 ----
+    # ---- 1 就業、2 通膨（雙目標，同一套視覺語言）----
+    body.append(cards.employment(ctx, scenario))
+    body.append(cards.inflation(ctx, scenario))
+
+    # ---- 3 聯準會立場與政策 ----
+    body.append(blocks.fed_stance(ctx, scenario, next_meeting()))
+
+    # ---- 4 公債利率 ----
     body.append(blocks.rate_structure(ctx))
 
-    # ---- 2 數據與二階解讀 ----
-    body.append(blocks.data_reads(ctx))
-    body.append(indicator_drawers(ctx))
+    # ---- 5 市場定價 ----
+    body.append(blocks.market_pricing(ctx))
 
-    # ---- 3 隔夜市場回顧 ----
-    body.append(blocks.overnight(ctx))
+    # ---- 6 商品與傳導 ----
+    body.append(blocks.commodities_block(ctx))
 
-    # ---- 4 商品與傳導 ----
-    body.append(blocks.commodities_transmission(ctx))
-
-    # ---- 5 資金流與部位 ----
-    body.append(blocks.flows_positioning(ctx))
-
-    # ---- 6 對股市的含義 ----
+    # ---- 7 對股市的含義 ----
     body.append(blocks.implications(ctx, scenario, summary))
 
-    # ---- 各模組入口 ----
-    body.append(section("modules", "各模組現況", module_cards(ctx, signals),
-                        terms=["nine_grid"]))
-
-    # ---- 關鍵訊號 ----
-    body.append(section(
-        "signals", "本期關鍵訊號",
-        signals_block(signals) + legend_note(),
-        note=f"共 {summary['total']} 條：{summary['dovish']} 條利降息、"
-             f"{summary['hawkish']} 條利升息、{summary['neutral']} 條中性。依嚴重度排序。",
-        terms=["signal_engine", "hawkish_dovish"]))
-
-    # ---- 7 今日觀察清單 ----
+    # ---- 8 今日觀察清單 ----
     body.append(blocks.watchlist(ctx, next_meeting()))
 
-    # ---- 接下來看什麼 ----
-    transitions = scenario.get("transitions") or []
-    if transitions:
-        rows = [[esc(t["name"]), esc(t["need"]),
-                 (f'<span class="num">{fmt(abs(t["gap"]), 2)} {esc(t["unit"])}</span>'
-                  if t.get("gap") is not None else '<span class="muted">—</span>')]
-                for t in transitions]
-        body.append(section("watch", "情境轉換的門檻",
-                            table(["情境轉換", "需要什麼", "還差"], rows),
-                            note="規則寫死的閘門：這些數字到了，判定才會換",
-                        terms=["transition_threshold"]))
+    # ---- 頁尾：模組導覽（精簡）與期間比對 ----
+    body.append(module_nav())
 
     # ---- 變化 ----
     body.append(section("changed", "跟上期比，什麼變了",
-                        changes_block(diff, reading_changes)))
+                        accordion("展開比對",
+                                  changes_block(diff, reading_changes)),
+                        note="每天一筆判斷快照，可回看任一天的結論"))
 
     return "".join(body)
+
+
+def module_nav() -> str:
+    """頁尾的精簡模組導覽。
+
+    詳細數據現在直接在總覽上，所以這裡不需要六張大卡——一行連結
+    就夠了，給習慣從首頁進各模組的讀者。
+    """
+    links = [("/labor/", "勞動市場"), ("/inflation/", "通膨"),
+             ("/fed/", "聯準會與利率"), ("/debt/", "長端與債務"),
+             ("/growth/", "成長與信用"), ("/market/", "市場面"),
+             ("/scenario/", "情境與部位")]
+    items = "　·　".join(f'<a href="{h}">{esc(t)}</a>' for h, t in links)
+    return section("modules", "看更詳細的模組",
+                   f'<p class="mc-foot-note" style="font-size:.88rem">{items}</p>')

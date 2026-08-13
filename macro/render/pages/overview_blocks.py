@@ -79,7 +79,7 @@ def rate_structure(ctx: dict) -> str:
     credit_verdict = _credit_verdict(hy.get("pct10y"), hy.get("chg_3m"))
 
     return section(
-        "rates", "利率結構",
+        "rates", "公債利率",
         f'<div class="grid grid-4">{"".join(tiles)}</div>'
         + callout(f'<strong>曲線</strong>：{move}<br><strong>驅動</strong>：{driver}')
         + '<h3 class="fd-h">殖利率上升是成長還是通膨？</h3>'
@@ -277,56 +277,69 @@ def _inflation_read(core_pce, ann3) -> str:
             "更早反映轉折，也是降息預期最容易被推翻的地方。")
 
 
-# -------------------------------------------------- 3 隔夜市場回顧 --------
+# ------------------------------------------- 5 市場定價（精簡＋導向專頁） --
 
-def overnight(ctx: dict) -> str:
-    """美股與區域市場的漲跌、板塊輪動反映的敘事、當日重大事件。"""
+def market_pricing(ctx: dict) -> str:
+    """市場怎麼定價這個總經環境。這裡只給結論，細節在各專頁。"""
     eq = ctx.get("equities") or {}
-    if not eq.get("available"):
-        return ""
+    market = ctx.get("market") or {}
+    tw = eq.get("tw") or {}
     us = eq.get("us") or {}
-    em = eq.get("em") or {}
+    vol = market.get("volatility") or {}
+    risk = market.get("risk") or {}
+    liq = market.get("liquidity") or {}
 
     tiles = []
-    for row in (us.get("indices") or [])[:4]:
-        tiles.append(stat(
-            row["name"], fmt(row["price"], 2),
-            delta=(f'{fmt(row["change"], 2, signed=True)}　'
-                   f'{fmt(row["change_percent"], 2, suffix="%", signed=True)}'),
-            asof=f'昨收 {fmt(row["previous_close"], 2)}'))
+    for row in (us.get("indices") or [])[:2]:
+        tiles.append(stat(row["name"], fmt(row["price"], 2),
+                          delta=fmt(row["change_percent"], 2, suffix="%", signed=True),
+                          asof=f'昨收 {fmt(row["previous_close"], 2)}'))
+    twii = next((r for r in (tw.get("index") or [])
+                 if str(r.get("symbol")) == "^TWII"), None)
+    if twii:
+        tiles.append(stat("台股加權", fmt(twii["price"], 2),
+                          delta=fmt(twii["change_percent"], 2, suffix="%", signed=True),
+                          asof="證交所即時"))
+    if vol.get("vix") is not None:
+        tiles.append(stat("VIX", fmt(vol["vix"], 1),
+                          delta=esc(vol.get("verdict", "")), direction=None,
+                          asof="波動率定價"))
+
+    parts = [f'<div class="grid grid-4">{"".join(tiles)}</div>'] if tiles else []
 
     rotation = _rotation(us.get("sectors") or [])
-    regional = [
-        [esc(r["name"]), fmt(r["price"], 2),
-         delta_span(r["change_percent"], 2, suffix="%")]
-        for r in (em.get("indices") or [])[:8]
-    ]
-
-    parts = [f'<div class="grid grid-4">{"".join(tiles)}</div>']
-    if rotation:
-        parts.append(callout(rotation["verdict"]))
-        sector_rows = [
-            [esc(s["name"]), delta_span(s["change_percent"], 2, suffix="%")]
-            for s in rotation["ranked"][:5]]
-        sector_rows += [["…", ""]] if len(rotation["ranked"]) > 8 else []
-        sector_rows += [
-            [esc(s["name"]), delta_span(s["change_percent"], 2, suffix="%")]
-            for s in rotation["ranked"][-3:]]
-        parts.append('<h3 class="fd-h">板塊輪動（領漲與領跌）</h3>')
-        parts.append(table(["類股", "漲跌幅"], sector_rows))
-    if regional:
-        parts.append('<h3 class="fd-h">區域市場</h3>')
-        parts.append(table(["市場", "點數", "漲跌幅"], regional))
+    lines = []
+    if rotation.get("verdict"):
+        lines.append(f'<strong>板塊輪動</strong>：{rotation["verdict"]}')
+    if risk.get("score") is not None:
+        lines.append(f'<strong>風險胃納</strong>：{risk["score"]:.0f}/100'
+                     f'（{esc(risk.get("label", ""))}）')
+    if liq.get("latest") is not None:
+        lines.append(f'<strong>聯準會淨流動性</strong>：'
+                     f'{fmt(liq["latest"] / 1000, 2, suffix=" 兆美元")}，'
+                     f'近三月 {fmt(liq.get("chg_3m"), 0, suffix=" 十億", signed=True)}')
+    inst = tw.get("institutional") or {}
+    if inst.get("foreign") is not None:
+        lines.append(f'<strong>台股外資</strong>：'
+                     f'{fmt(inst["foreign"], 1, suffix=" 億", signed=True)}'
+                     f'（{esc(inst.get("date", ""))}）')
+    if lines:
+        parts.append(callout("<br>".join(lines)))
 
     events = _events(ctx)
     if events:
-        parts.append('<h3 class="fd-h">重大事件</h3>')
+        parts.append('<h3 class="fd-h">當日重大事件</h3>')
         parts.append(f'<div class="digest">{events}</div>')
 
-    return section(
-        "overnight", "隔夜市場回顧",
-        "".join(parts),
-        note="指數為建置快照；板塊輪動判定由固定規則產生")
+    parts.append('<p class="mc-foot-note">'
+                 '<a href="/equities/">看完整美股與國際 →</a>　'
+                 '<a href="/tw/">看完整台股 →</a>　'
+                 '<a href="/market/">看股債相關性與實質利率張力 →</a></p>')
+
+    if not parts:
+        return ""
+    return section("market", "市場定價", "".join(parts),
+                   note="指數為建置快照，台股為即時；板塊輪動判定由固定規則產生")
 
 
 # 類股 ETF 的宏觀屬性。判定 risk-on/off 與循環／防禦要靠這個分類。
@@ -354,21 +367,16 @@ def _rotation(sectors: list[dict]) -> dict:
     if cyc is not None and dfn is not None:
         gap = cyc - dfn
         if gap > 0.3:
-            bits.append(f"<strong>risk-on</strong>：循環類股領先防禦類股 "
-                        f"{fmt(gap, 2, suffix=' 個百分點')}，資金在追逐景氣敏感的部位")
+            bits.append(f"risk-on，循環類股領先防禦 {fmt(gap, 2, suffix=' 個百分點')}")
         elif gap < -0.3:
-            bits.append(f"<strong>risk-off</strong>：防禦類股領先循環類股 "
-                        f"{fmt(abs(gap), 2, suffix=' 個百分點')}，資金在往必需消費、"
-                        f"公用事業與醫療撤退")
+            bits.append(f"risk-off，防禦類股領先循環 {fmt(abs(gap), 2, suffix=' 個百分點')}")
         else:
-            bits.append("循環與防禦類股差距不到 0.3 個百分點，沒有明顯的風險偏好方向")
+            bits.append("循環與防禦差距不到 0.3 個百分點，沒有明顯方向")
     if gro is not None and val is not None and abs(gro - val) > 0.3:
         bits.append("成長股領先價值股" if gro > val else "價值股領先成長股")
-
-    return {
-        "ranked": ranked,
-        "verdict": "；".join(bits) + "。" if bits else "",
-    }
+    if ranked:
+        bits.append(f'領漲 {esc(ranked[0]["name"])}、領跌 {esc(ranked[-1]["name"])}')
+    return {"ranked": ranked, "verdict": "；".join(bits) + "。" if bits else ""}
 
 
 def _events(ctx: dict) -> str:
@@ -385,131 +393,9 @@ def _events(ctx: dict) -> str:
                      f'<span class="digest-n">{c["count"]} 家</span>'
                      f'<span class="digest-text">{esc(_headline(c["headline"]))}</span>'
                      f'</div>')
-        if len(items) >= 5:
+        if len(items) >= 4:
             break
     return "".join(items)
-
-
-# ------------------------------------------------ 4 商品與對族群的傳導 ----
-
-# 商品 → 台股族群的傳導。方向是「成本」還是「售價」決定受惠或承壓，
-# 這是規則，不是預測：油價漲對塑化是原料成本、對航運是燃油成本。
-TRANSMISSION = [
-    ("WTI 原油", "塑化", "cost",
-     "原油是乙烯的原料，油價漲推升進料成本；但若下游報價跟得上，反而擴大價差"),
-    ("WTI 原油", "航運", "cost", "燃油是航運最大的變動成本，油價漲直接壓縮毛利"),
-    ("銅", "電線電纜", "revenue", "銅是電纜的主要原料，銅價漲通常帶動報價與庫存利益"),
-    ("銅", "重電與電力設備", "revenue", "銅價是全球電網與資本支出的景氣代理指標"),
-    ("黃金", "金融", "macro", "金價反映實質利率與避險需求，與利率敏感的金融股互為鏡像"),
-]
-
-
-def commodities_transmission(ctx: dict) -> str:
-    comm = ctx.get("commodities") or {}
-    rows = []
-    for group in (comm.get("groups") or []):
-        rows.extend(group.get("rows") or [])
-    # 貴金屬自成一組（走 LBMA 定盤價），黃金要從那裡取
-    rows.extend((comm.get("precious") or {}).get("rows") or [])
-    by_name = {r["name"]: r for r in rows}
-
-    tiles = []
-    for name, note in [("WTI 原油", "供需與地緣的合成價"),
-                       ("黃金", "實質利率與避險需求"),
-                       ("銅", "全球製造業景氣的代理")]:
-        row = by_name.get(name)
-        if not row:
-            continue
-        tiles.append(stat(
-            name, fmt(row.get("value"), 2),
-            delta=(f'近一月 {fmt(row.get("chg_1m"), 1, suffix="%", signed=True)}　'
-                   f'近一年 {fmt(row.get("chg_1y"), 1, suffix="%", signed=True)}'),
-            direction=None, asof=note))
-
-    if not tiles:
-        return ""
-
-    # 傳導表：只列本站真的有追蹤該族群報價的組合
-    eq = ctx.get("equities") or {}
-    group_avgs = {g["name"]: g["value"]
-                  for g in ((eq.get("tw") or {}).get("group_avgs") or [])}
-    trans_rows = []
-    for commodity, group, kind, why in TRANSMISSION:
-        src = by_name.get(commodity)
-        if not src or src.get("chg_1m") is None:
-            continue
-        move = src["chg_1m"]
-        if kind == "cost":
-            effect = "成本壓力↑" if move > 3 else "成本壓力↓" if move < -3 else "影響有限"
-        elif kind == "revenue":
-            effect = "報價／庫存利益↑" if move > 3 else "報價壓力↓" if move < -3 else "影響有限"
-        else:
-            effect = "避險需求↑" if move > 3 else "避險需求↓" if move < -3 else "影響有限"
-        today = group_avgs.get(group)
-        trans_rows.append([
-            esc(commodity), fmt(move, 1, suffix="%", signed=True),
-            esc(group), esc(effect),
-            delta_span(today, 2, suffix="%") if today is not None else "—",
-            esc(why),
-        ])
-
-    body = f'<div class="grid grid-3">{"".join(tiles)}</div>'
-    if trans_rows:
-        body += ('<h3 class="fd-h">對台股族群的傳導</h3>'
-                 + table(["商品", "近一月", "族群", "方向", "族群今日", "機制"],
-                         trans_rows)
-                 + callout("傳導方向是規則，不是預測：油價對塑化與航運是成本、"
-                           "銅價對電纜是售價。<strong>「族群今日」是即時報價的"
-                           "平均，不是傳導的結果</strong>——當天的股價還受到"
-                           "無數其他因素影響，這一欄是給你自己對照用的。"))
-    return section("commodities", "商品與傳導", body,
-                   note="商品為建置快照；族群漲跌幅取自台股熱力圖")
-
-
-# ------------------------------------------------- 5 資金流與部位 --------
-
-def flows_positioning(ctx: dict) -> str:
-    market = ctx.get("market") or {}
-    eq = ctx.get("equities") or {}
-    tw = eq.get("tw") or {}
-    vol = market.get("volatility") or {}
-    risk = market.get("risk") or {}
-    liq = market.get("liquidity") or {}
-
-    tiles = []
-    if vol.get("vix") is not None:
-        pct10 = next((r.get("pct10y") for r in vol.get("rows") or []
-                      if r["name"].startswith("VIX")), None)
-        tiles.append(stat(
-            "VIX", fmt(vol["vix"], 1),
-            delta=(f'十年百分位 {fmt(pct10, 0, suffix="%")}' if pct10 is not None else ""),
-            direction=None, asof=esc(vol.get("verdict", ""))))
-    if risk.get("score") is not None:
-        tiles.append(stat("風險胃納", f'{risk["score"]:.0f}/100',
-                          delta=esc(risk.get("label", "")), direction=None,
-                          asof="VIX、信用利差、美元、股債相關性加權"))
-    if liq.get("latest") is not None:
-        tiles.append(stat("聯準會淨流動性",
-                          fmt(liq["latest"] / 1000, 2, suffix=" 兆美元"),
-                          delta=f'近三月 {fmt(liq.get("chg_3m"), 0, suffix=" 十億", signed=True)}',
-                          direction=None, asof="總資產 − TGA − 逆回購"))
-    inst = tw.get("institutional") or {}
-    if inst.get("foreign") is not None:
-        tiles.append(stat("台股外資買賣超",
-                          fmt(inst["foreign"], 1, suffix=" 億", signed=True),
-                          delta=(f'投信 {fmt(inst.get("trust"), 1, suffix=" 億", signed=True)}'),
-                          asof=f'{esc(inst.get("date", ""))} 收盤後'))
-
-    if not tiles:
-        return ""
-
-    note = callout(
-        "<strong>Put/Call ratio 沒有放</strong>：CBOE 停止對外免費供應這個"
-        "序列了，本站不以其他指標假冒。情緒面目前以 VIX 與信用利差為主，"
-        "兩者的十年百分位比絕對水準更有意義。")
-    return section("flows", "資金流與部位", 
-                   f'<div class="grid grid-4">{"".join(tiles)}</div>' + note,
-                   note="情緒、流動性與實際資金流向")
 
 
 # --------------------------------------------- 6 對股市的含義（機械對照） --
@@ -660,3 +546,137 @@ def _next_opex() -> dict | None:
         if third >= today:
             return {"date": third, "days": (third - today).days}
     return None
+
+
+# ------------------------------------------ 3 聯準會立場與政策（三處合一） --
+
+def fed_stance(ctx: dict, scenario: dict, fomc: dict | None) -> str:
+    """政策現況、上次聲明改了什麼、換檔門檻——三件事合成一段。
+
+    合併的理由：它們回答的是同一個問題「聯準會現在站在哪、什麼會讓它動」。
+    原本散在三個區塊，讀者要自己把它們接起來。
+    """
+    rates = ctx.get("rates") or {}
+    stance = rates.get("stance") or {}
+    statement = rates.get("statement") or {}
+
+    tiles = []
+    if stance.get("policy") is not None:
+        tiles.append(stat("政策利率上緣", pct(stance["policy"], 2),
+                          delta=f'有效聯邦資金 {pct(stance.get("effective"), 2)}',
+                          direction=None, asof="目標區間上緣"))
+    if stance.get("real_policy") is not None:
+        tiles.append(stat("實質政策利率", pct(stance["real_policy"], 2),
+                          delta="政策利率減核心 PCE", direction=None,
+                          asof="正值代表政策具限制性"))
+    if stance.get("market_implies"):
+        tiles.append(stat("市場定價", esc(stance["market_implies"].replace("市場定價", "")),
+                          delta=f'2 年期減政策利率 {fmt(stance.get("market_gap"), 2, suffix=" pp", signed=True)}',
+                          direction=None, asof="短端公債隱含，非 CME FedWatch"))
+    if fomc:
+        tiles.append(stat("下次 FOMC",
+                          f'{fomc["date"].month}/{fomc["date"].day}',
+                          delta=f'還有 {fomc["days"]} 天', direction="hawkish",
+                          asof="決策日（聲明與記者會）"))
+
+    parts = [f'<div class="grid grid-4">{"".join(tiles)}</div>'] if tiles else []
+
+    # 上次聲明：只放結論，逐句 diff 在聯準會頁
+    if statement:
+        vote_changed = statement.get("vote") and statement["vote"] != statement.get("vote_prev")
+        bits = [f'{esc(statement["date"])} 的聲明與前一次相比，'
+                f'改寫 {len(statement.get("changed") or [])} 句、'
+                f'新增 {len(statement.get("added") or [])} 句、'
+                f'刪除 {len(statement.get("removed") or [])} 句']
+        if statement.get("vote"):
+            bits.append(f'表決 {esc(statement["vote"])}'
+                        + (f'（前次 {esc(statement["vote_prev"])}）' if vote_changed else ""))
+        parts.append(callout(
+            "<strong>上次會議聲明</strong>：" + "；".join(bits) + "。"
+            + ("　<strong>異議票增加</strong>代表委員會內部對下一步的看法不再一致。"
+               if vote_changed else "")
+            + f'　<a href="/fed/#statement">看逐句比對與措辭變化 →</a>',
+            key=vote_changed))
+
+    # 換檔門檻：規則寫死的閘門
+    transitions = [t for t in (scenario.get("transitions") or [])
+                   if t.get("gap") is not None]
+    if transitions:
+        rows = [[esc(t["name"]), esc(t["need"]),
+                 f'{fmt(abs(t["gap"]), 2)} {esc(t["unit"])}']
+                for t in transitions]
+        parts.append('<h3 class="fd-h">什麼會讓判定換檔</h3>')
+        parts.append(table(["情境轉換", "需要什麼", "還差"], rows))
+
+    if not parts:
+        return ""
+    return section("fed", "聯準會立場與政策", "".join(parts),
+                   note="政策利率為每日更新；聲明比對取自聯準會官網",
+                   terms=["fed_funds", "real_policy_rate"])
+
+
+# ------------------------------------ 6 商品與傳導（精簡＋導向專頁） --------
+
+TRANSMISSION = [
+    ("WTI 原油", "塑化", "cost",
+     "原油是乙烯的原料，油價漲推升進料成本"),
+    ("WTI 原油", "航運", "cost", "燃油是航運最大的變動成本"),
+    ("銅", "重電與電力設備", "revenue", "銅價是全球電網與資本支出的景氣代理"),
+    ("黃金", "金融", "macro", "金價反映實質利率與避險需求"),
+]
+
+
+def commodities_block(ctx: dict) -> str:
+    comm = ctx.get("commodities") or {}
+    rows = []
+    for group in (comm.get("groups") or []):
+        rows.extend(group.get("rows") or [])
+    rows.extend((comm.get("precious") or {}).get("rows") or [])
+    by_name = {r["name"]: r for r in rows}
+
+    tiles = []
+    for name, note in [("WTI 原油", "供需與地緣"),
+                       ("黃金", "實質利率與避險"),
+                       ("銅", "全球製造業景氣")]:
+        row = by_name.get(name)
+        if not row:
+            continue
+        tiles.append(stat(name, fmt(row.get("value"), 2),
+                          delta=f'近一月 {fmt(row.get("chg_1m"), 1, suffix="%", signed=True)}',
+                          direction=None, asof=note))
+    if not tiles:
+        return ""
+
+    eq = ctx.get("equities") or {}
+    group_avgs = {g["name"]: g["value"]
+                  for g in ((eq.get("tw") or {}).get("group_avgs") or [])}
+    trans_rows = []
+    for commodity, group, kind, why in TRANSMISSION:
+        src = by_name.get(commodity)
+        if not src or src.get("chg_1m") is None:
+            continue
+        move = src["chg_1m"]
+        if kind == "cost":
+            effect = "成本壓力↑" if move > 3 else "成本壓力↓" if move < -3 else "影響有限"
+        elif kind == "revenue":
+            effect = "報價／庫存利益↑" if move > 3 else "報價壓力↓" if move < -3 else "影響有限"
+        else:
+            effect = "避險需求↑" if move > 3 else "避險需求↓" if move < -3 else "影響有限"
+        today = group_avgs.get(group)
+        trans_rows.append([esc(commodity), fmt(move, 1, suffix="%", signed=True),
+                           esc(group), esc(effect),
+                           delta_span(today, 2, suffix="%") if today is not None else "—",
+                           esc(why)])
+
+    body = f'<div class="grid grid-3">{"".join(tiles)}</div>'
+    if trans_rows:
+        body += ('<h3 class="fd-h">對台股族群的傳導</h3>'
+                 + table(["商品", "近一月", "族群", "方向", "族群今日", "機制"],
+                         trans_rows)
+                 + callout("傳導方向是規則，不是預測。「族群今日」是即時報價的"
+                           "平均，不是傳導的結果——當天股價還受無數其他因素影響。"))
+    body += ('<p class="mc-foot-note">'
+             '<a href="/commodities/">看貴金屬、能源、工業金屬與農產全表 →</a>　'
+             '<a href="/tw/#tw-heat">看台股族群熱力圖 →</a></p>')
+    return section("commodities", "商品與傳導", body,
+                   note="商品為建置快照；族群漲跌幅取自台股熱力圖")
