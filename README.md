@@ -54,7 +54,8 @@ python3 -m http.server 8787 --directory site
 | ECB Data Portal | 歐元區失業率、核心 HICP | 免金鑰 |
 | 行政院主計總處 | 台灣 CPI | 免金鑰；走 curl（見下） |
 | LBMA | 黃金、白銀官方定盤價 | 免金鑰 |
-| 證交所 mis.twse.com.tw | 台股個股與 ETF 報價 | 免金鑰 |
+| 證交所 mis.twse.com.tw | 台股加權／櫃買指數、個股與 ETF 報價 | 免金鑰 |
+| 證交所 www.twse.com.tw | 三大法人、融資融券、大盤日線與成交量 | 免金鑰，rwd JSON |
 | Fincept Terminal | 美股、台股與新興市場指數報價 | 需本機安裝，見下 |
 
 FRED 金鑰讀取順序：環境變數 `FRED_API_KEY` → `~/.config/fincept/keys.json`。

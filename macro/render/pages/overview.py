@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ...compute.scenario import REGIME_LABELS
+from ...fomc import next_meeting
 from ..common import checks_block, legend_note, signals_block
 from ..html import (accordion, callout, delta_span, direction_label,
                     direction_class, esc, fmt, kv, pct, section, stat, table,
@@ -206,12 +207,19 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
     # ---- 資料新鮮度 ----
     fresh = ctx.get("freshness") or {}
     imminent = fresh.get("imminent") or []
-    if imminent:
+    fomc = next_meeting()
+    if imminent or fomc:
         chips = "".join(
             f'<span class="chip">{esc(r["name"])}'
             f'<strong style="margin-left:4px">{esc(_when(r["days_away"]))}</strong>'
             f'</span>'
             for r in imminent[:6])
+        if fomc:
+            # FOMC 不是資料發布，是事件——排最前面、標色以示區別
+            chips = (f'<span class="chip hawkish"><span class="dot"></span>'
+                     f'FOMC 利率決策 {fomc["date"].month}/{fomc["date"].day}'
+                     f'<strong style="margin-left:4px">還有 {fomc["days"]} 天</strong>'
+                     f'</span>') + chips
         body.append(section(
             "fresh", "接下來幾天會有新數字",
             f'<div class="chips">{chips}</div>'

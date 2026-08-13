@@ -153,6 +153,100 @@ def crypto(bundle: Bundle) -> dict:
     return {"rows": rows}
 
 
+def net_liquidity(bundle: Bundle) -> dict:
+    """聯準會淨流動性 = 總資產 − 財政部帳戶 − 隔夜逆回購。
+
+    三項都是聯準會與財政部的公開數字。邏輯：QT 縮表抽走的錢，可能被
+    TGA 下降或逆回購資金回流抵銷——單看縮表會誤判，要看淨額。
+    以 WALCL 的週頻日期為準對齊另外兩檔（value_on 取當日或之前最近值）。
+    """
+    walcl = bundle["WALCL"]          # 百萬美元
+    tga = bundle["WTREGEN"]          # 百萬美元（FRED 檔名沿用舊版，實測是百萬）
+    rrp = bundle["RRPONTSYD"]        # 十億美元
+    if not (walcl and tga and rrp):
+        return {}
+
+    # 單位防呆：TGA 頂多兩兆（= 2,000 十億），讀到超過兩萬一定是百萬計。
+    # 曾經因為目錄標籤寫錯單位，淨流動性算出 -90 兆——量級檢查比標籤可信。
+    def to_billion(v: float) -> float:
+        return v / 1000.0 if abs(v) > 20_000 else v
+
+    dates, values = [], []
+    for d, v in walcl.last_years(4).pairs():
+        t, r = tga.value_on(d), rrp.value_on(d)
+        if t is None or r is None:
+            continue
+        dates.append(d)
+        values.append(v / 1000.0 - to_billion(t) - to_billion(r))   # 十億美元
+    if not dates:
+        return {}
+
+    s = Series("NETLIQ", dates, values, label="淨流動性",
+               unit="十億美元", frequency="w")
+    prior_3m = s.at(-14)                            # 週頻，約 13 週前
+    prior_1y = s.at(-53)
+    return {
+        "series": s, "latest": s.last, "as_of": s.last_date,
+        "chg_3m": (s.last - prior_3m) if prior_3m is not None else None,
+        "chg_1y": (s.last - prior_1y) if prior_1y is not None else None,
+        "walcl": walcl.last / 1000.0 if walcl.last else None,
+        "tga": tga.last, "rrp": rrp.last,
+    }
+
+
+# 風險胃納的組成與權重。全部寫死：同一份資料永遠算出同一個分數。
+# 每一項都轉成 0–100 的「風險偏好分數」，高 = 貪婪、低 = 恐慌。
+RISK_WEIGHTS = [("vix", 0.30), ("credit", 0.30), ("dollar", 0.20), ("stock_bond", 0.20)]
+
+
+def risk_appetite(bundle: Bundle, sb: dict) -> dict:
+    """把散在各處的風險定價收斂成一個刻度。
+
+    VIX 與高收益利差取十年百分位反轉（利差低 = 市場不擔心違約 = 偏貪婪）；
+    美元取近三月變化的十年百分位反轉（美元急升 = 避險資金流 = 偏恐慌）；
+    股債相關性直接線性映射（正相關 = 成長主導 = 風險偏好有支撐）。
+    """
+    parts = []
+
+    vix = bundle["VIXCLS"]
+    if vix.last is not None:
+        pct = vix.percentile_rank(10)
+        if pct is not None:
+            parts.append({"key": "vix", "name": "VIX 波動率",
+                          "reading": f"{vix.last:.1f}", "score": 100.0 - pct})
+
+    hy = bundle["BAMLH0A0HYM2"]
+    if hy.last is not None:
+        pct = hy.percentile_rank(10)
+        if pct is not None:
+            parts.append({"key": "credit", "name": "高收益利差",
+                          "reading": f"{hy.last:.2f}%", "score": 100.0 - pct})
+
+    dxy = bundle["DTWEXBGS"]
+    if dxy:
+        chg = dxy.pct_change(63)                    # 近三月變化的歷史分布
+        pct = chg.percentile_rank(10)
+        if pct is not None and chg.last is not None:
+            parts.append({"key": "dollar", "name": "美元近三月",
+                          "reading": f"{chg.last:+.1f}%", "score": 100.0 - pct})
+
+    if sb.get("latest") is not None:
+        corr = sb["latest"]
+        parts.append({"key": "stock_bond", "name": "股債相關性",
+                      "reading": f"{corr:+.2f}",
+                      "score": max(0.0, min(100.0, 50.0 + corr * 100.0))})
+
+    weights = dict(RISK_WEIGHTS)
+    total_w = sum(weights[p["key"]] for p in parts)
+    if not parts or total_w == 0:
+        return {}
+    score = sum(p["score"] * weights[p["key"]] for p in parts) / total_w
+
+    label = ("恐慌" if score < 25 else "謹慎" if score < 45
+             else "中性" if score < 55 else "樂觀" if score < 75 else "貪婪")
+    return {"score": score, "label": label, "parts": parts}
+
+
 def health_checks(bundle: Bundle, vol: dict, sb: dict, rr: dict) -> list[dict]:
     checks = []
 
@@ -209,6 +303,8 @@ def compute(bundle: Bundle) -> dict:
         "volatility": vol,
         "stock_bond": sb,
         "real_rate": rr,
+        "liquidity": net_liquidity(bundle),
+        "risk": risk_appetite(bundle, sb),
         "commodities": commodities(bundle),
         "crypto": crypto(bundle),
         "checks": health_checks(bundle, vol, sb, rr),

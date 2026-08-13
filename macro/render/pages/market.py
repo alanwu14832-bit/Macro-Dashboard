@@ -33,6 +33,48 @@ def render(ctx: dict, signals: list[dict]) -> str:
             note=f'{zh_date(equities["as_of"], freq="d")} 資料',
         terms=["drawdown"]))
 
+    # ---- 風險胃納 ----
+    risk = d.get("risk") or {}
+    if risk.get("parts"):
+        rows = [[esc(p["name"]), esc(p["reading"]), fmt(p["score"], 0)]
+                for p in risk["parts"]]
+        body.append(section(
+            "risk", "風險胃納",
+            f'<div class="card">'
+            f'<div class="hero-figure">{fmt(risk["score"], 0)}'
+            f'<span style="font-size:.3em;color:var(--ink-muted)"> /100　{esc(risk["label"])}</span></div>'
+            + table(["組成", "讀數", "風險偏好分數"], rows)
+            + callout("固定規則的加權平均：VIX 與高收益利差取十年百分位反轉"
+                      "（各 30%），美元近三月變化取百分位反轉（20%），"
+                      "股債相關性線性映射（20%）。高 = 貪婪、低 = 恐慌，"
+                      "同一份資料永遠算出同一個分數，可拿去跟存檔比對。")
+            + "</div>",
+            note="0–100，收斂四個市場的風險定價"))
+
+    # ---- 聯準會淨流動性 ----
+    liq = d.get("liquidity") or {}
+    if liq.get("series"):
+        body.append(section(
+            "liquidity", "聯準會淨流動性",
+            line_chart("淨流動性 = 總資產 − 財政部帳戶 − 隔夜逆回購",
+                       [(liq["series"], "淨流動性", "series-1")],
+                       years=4, default_years=4, suffix="B", freq="w",
+                       digits=0)
+            + f'<div class="grid grid-4">'
+            + stat("目前水位", fmt(liq["latest"] / 1000, 2, suffix=" 兆美元"))
+            + stat("近三月變化", fmt(liq["chg_3m"], 0, suffix=" 十億", signed=True),
+                   direction=None)
+            + stat("近一年變化", fmt(liq["chg_1y"], 0, suffix=" 十億", signed=True),
+                   direction=None)
+            + stat("組成", f'{fmt(liq["walcl"]/1000, 2)} 兆',
+                   delta=f'TGA {fmt(liq["tga"]/1000, 0)}B　RRP {fmt(liq["rrp"], 0)}B',
+                   asof="總資產 − 兩個抽水池")
+            + "</div>"
+            + callout("QT 縮表抽走的錢，可能被財政部帳戶下降或逆回購資金回流"
+                      "抵銷——單看縮表會誤判，要看淨額。淨流動性收縮而股市"
+                      "仍漲，代表漲勢靠的是獲利或估值，不是錢變多。"),
+            note=f'{zh_date(liq["as_of"], freq="d")} 資料，週頻'))
+
     # ---- 股債相關性 ----
     if stock_bond.get("windows"):
         rows = [[esc(w["label"]), fmt(w["corr"], 2, signed=True)]

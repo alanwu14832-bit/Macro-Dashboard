@@ -253,9 +253,15 @@ def terms_block(keys: list[str], *, title: str = "這一段的名詞與意義") 
 
 
 def section(anchor: str, title: str, body: str, *, note: str = "",
-            terms: list[str] | None = None) -> str:
+            terms: list[str] | None = None, sub: bool = False) -> str:
+    """sub=True 的區塊在側欄目錄裡是「小小標」，縮排列在前一個小標下。
+
+    頁面本身的呈現不變——這個旗標只影響側欄大綱的層級，讓區塊很多的
+    頁（如股市報價）不會把側欄撐成一長串同級項目。
+    """
     note_html = f'<p class="note">{esc(note)}</p>' if note else ""
-    return (f'<section id="{esc(anchor)}">'
+    cls = ' class="sub-section"' if sub else ""
+    return (f'<section id="{esc(anchor)}"{cls}>'
             f'<div class="section-head"><h2>{esc(title)}</h2>{note_html}</div>'
             f'{body}{terms_block(terms) if terms else ""}</section>')
 

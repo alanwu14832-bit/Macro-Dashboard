@@ -102,8 +102,10 @@ def _sidebar(path: str, sections: dict[str, list[tuple[str, str]]] | None = None
         subs = sections.get(href) or []
         if subs:
             sub_links = "".join(
-                f'<a href="{esc(href)}#{esc(anchor)}">{esc(title)}</a>'
-                for anchor, title in subs)
+                f'<a href="{esc(href)}#{esc(anchor)}"'
+                + (' class="sub2"' if level == 2 else "")
+                + f'>{esc(title)}</a>'
+                for anchor, title, level in subs)
             open_attr = " open" if href == path else ""
             items.append(
                 f'<details class="nav-details"{open_attr}>'
@@ -147,13 +149,17 @@ def asset_version() -> str:
 
 
 SECTION_RE = re.compile(
-    r'<section id="([^"]+)"><div class="section-head"><h2>([^<]+)</h2>')
+    r'<section id="([^"]+)"( class="sub-section")?>'
+    r'<div class="section-head"><h2>([^<]+)</h2>')
 
 
-def extract_sections(body: str) -> list[tuple[str, str]]:
-    """從渲染完的頁面 HTML 抽出 (錨點, 標題) 清單，給側欄小標用。"""
-    return [(anchor, html_module.unescape(title))
-            for anchor, title in SECTION_RE.findall(body)]
+def extract_sections(body: str) -> list[tuple[str, str, int]]:
+    """從渲染完的頁面 HTML 抽出 (錨點, 標題, 層級) 清單，給側欄目錄用。
+
+    層級 1 是小標、2 是小小標（section(sub=True) 的區塊）。
+    """
+    return [(anchor, html_module.unescape(title), 2 if sub else 1)
+            for anchor, sub, title in SECTION_RE.findall(body)]
 
 
 def page(*, title: str, path: str, body: str, lede: str = "",

@@ -157,7 +157,8 @@ def taiwan_quotes(tickers: list[str], *, ttl: float = 900) -> list[dict]:
 
 # MIS 也提供大盤指數，channel 是保留代號而不是股票代號。
 # t00 = 發行量加權股價指數（也就是 ^TWII），o00 = 櫃買指數。
-TW_INDEX_CHANNELS = {"^TWII": ("tse_t00.tw", "t00")}
+TW_INDEX_CHANNELS = {"^TWII": ("tse_t00.tw", "t00"),
+                     "^TWOII": ("otc_o00.tw", "o00")}
 
 
 def taiwan_index_quotes(symbols: list[str], *, ttl: float = 900) -> list[dict]:
@@ -219,6 +220,34 @@ def finnhub_quotes(symbols: list[str], *, ttl: float = 900) -> list[dict]:
             "timestamp": q.get("t"),
             "source": "finnhub.io",
         })
+    return out
+
+
+FINNHUB_EARNINGS = "https://finnhub.io/api/v1/calendar/earnings"
+
+
+def finnhub_earnings(symbols: list[str], *, days: int = 14,
+                     ttl: float = 6 * 3600) -> list[dict]:
+    """追蹤個股接下來兩週的財報日。一次呼叫拿全市場，本地過濾。"""
+    token = finnhub_key()
+    if not token or not symbols:
+        return []
+    from datetime import date, timedelta
+    start = date.today()
+    url = build_url(FINNHUB_EARNINGS, {
+        "from": start.isoformat(),
+        "to": (start + timedelta(days=days)).isoformat(),
+        "token": token})
+    try:
+        payload = get_json(url, ttl=ttl, namespace="finnhub", timeout=25, retries=2)
+    except Exception:
+        return []
+    wanted = set(symbols)
+    out = [{"symbol": e.get("symbol"), "date": e.get("date"),
+            "hour": {"bmo": "盤前", "amc": "盤後", "dmh": "盤中"}.get(e.get("hour"), "")}
+           for e in payload.get("earningsCalendar") or []
+           if e.get("symbol") in wanted and e.get("date")]
+    out.sort(key=lambda e: e["date"])
     return out
 
 

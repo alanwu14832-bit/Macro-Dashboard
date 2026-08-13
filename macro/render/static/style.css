@@ -726,3 +726,5 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
   :root.rail-collapsed .nav-caret { display: flex; }
   :root.rail-collapsed .nav-details > summary { justify-content: flex-start; }
 }
+/* 小小標：縮排一層、再小一號 */
+.nav-sub a.sub2 { padding-left: 22px; font-size: 0.74rem; }

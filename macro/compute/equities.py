@@ -10,7 +10,7 @@ import json
 import os
 from datetime import datetime
 
-from ..sources import quotes
+from ..sources import quotes, twse_open
 
 # ---- 美股：指數 + 權值股 -------------------------------------------------
 US_INDICES = [
@@ -35,7 +35,7 @@ US_SECTORS = [
 ]
 
 # ---- 台股：指數 + 權值股（走證交所）--------------------------------------
-TW_INDICES = [("^TWII", "台股加權指數")]
+TW_INDICES = [("^TWII", "台股加權指數"), ("^TWOII", "櫃買指數")]
 TW_TICKERS = [
     ("2330", "台積電"), ("2317", "鴻海"), ("2454", "聯發科"), ("2308", "台達電"),
     ("2382", "廣達"), ("2412", "中華電"), ("2881", "富邦金"), ("2882", "國泰金"),
@@ -153,6 +153,19 @@ def _group_rows(defs: list[tuple[str, list]], rows: list[dict]) -> list[dict]:
     return [{"name": name,
              "rows": [by_symbol[s] for s, _ in pairs if s in by_symbol]}
             for name, pairs in defs]
+
+
+def _group_avgs(*group_lists: list[dict]) -> list[dict]:
+    """各族群的平均漲跌幅，由強到弱。給市場寬度的族群排行用。"""
+    out = []
+    for groups in group_lists:
+        for g in groups:
+            moves = [r["change_percent"] for r in g["rows"]
+                     if r.get("change_percent") is not None]
+            if moves:
+                out.append({"name": g["name"], "value": sum(moves) / len(moves)})
+    out.sort(key=lambda r: r["value"], reverse=True)
+    return out
 
 
 def _breadth(rows: list[dict]) -> dict:
@@ -307,6 +320,27 @@ def compute(bundle=None) -> dict:
     em_indices = _fill_gaps(em_indices, EM_INDICES, "新興市場", snapshot)
     em_etfs = _fill_gaps(em_etfs, EM_ETFS, "新興市場", snapshot)
 
+    tw_groups = _group_rows(TW_GROUPS, tw_heat)
+    tw_ai = _group_rows(TW_AI_CHAIN, tw_heat)
+    tw_semi = _group_rows(TW_SEMI_CHAIN, tw_heat)
+
+    # 證交所公開統計與大盤日線。單一來源掛掉不影響其餘區塊。
+    institutional = twse_open.institutional()
+    margin = twse_open.margin()
+    tw_trend = twse_open.daily_market()
+
+    # 美元兌台幣（FRED 日頻，建置快照）
+    usdtwd = None
+    if bundle is not None and bundle["DEXTAUS"]:
+        fx = bundle["DEXTAUS"]
+        base_3m = fx.at(-64)
+        usdtwd = {"value": fx.last, "as_of": fx.last_date,
+                  "chg_3m": ((fx.last / base_3m) - 1) * 100 if base_3m else None,
+                  "series": fx}
+
+    # 追蹤個股接下來兩週的財報日（Finnhub，沒金鑰就留空）
+    earnings = quotes.finnhub_earnings([s for s, _ in US_STOCKS])
+
     everything = (us_indices + us_proxies + us_stocks + us_sectors
                   + tw_index + tw_stocks + tw_etfs + em_indices + em_etfs)
 
@@ -321,14 +355,19 @@ def compute(bundle=None) -> dict:
             "stocks": us_stocks, "sectors": us_sectors,
             "breadth": _breadth(us_stocks),
             "sector_breadth": _breadth(us_sectors),
+            "earnings": earnings,
             "status": _market_note(us_indices),
         },
         "tw": {
             "index": tw_index, "stocks": tw_stocks, "etfs": tw_etfs,
-            "groups": _group_rows(TW_GROUPS, tw_heat),
-            "ai": _group_rows(TW_AI_CHAIN, tw_heat),
-            "semi": _group_rows(TW_SEMI_CHAIN, tw_heat),
+            "groups": tw_groups, "ai": tw_ai, "semi": tw_semi,
             "breadth": _breadth(tw_stocks),
+            "wide_breadth": _breadth(tw_heat),
+            "group_avgs": _group_avgs(tw_groups, tw_ai, tw_semi),
+            "trend": tw_trend,
+            "institutional": institutional,
+            "margin": margin,
+            "usdtwd": usdtwd,
             "status": _market_note(tw_stocks or tw_index),
         },
         "em": {

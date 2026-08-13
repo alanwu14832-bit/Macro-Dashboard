@@ -1,8 +1,9 @@
 """股市報價頁：美股、台股、其他新興市場。"""
 from __future__ import annotations
 
-from ..common import hbar_chart
-from ..html import (callout, delta_span, esc, fmt, section, stat, table)
+from ..common import hbar_chart, line_chart
+from ..html import (callout, delta_span, esc, fmt, section, stat, table,
+                    zh_date)
 
 
 def _stamp(rows: list[dict]) -> str:
@@ -167,10 +168,21 @@ def render(ctx: dict) -> str:
                  asof=f'昨收 {fmt(r["previous_close"], 2)}')
             for r in us["indices"][:6]
         ]
+        earnings_html = ""
+        if us.get("earnings"):
+            chips = "".join(
+                f'<span class="chip">{esc(e["symbol"])}'
+                f'<strong style="margin-left:4px">{esc(e["date"][5:].replace("-", "/"))}'
+                f'{("　" + esc(e["hour"])) if e["hour"] else ""}</strong></span>'
+                for e in us["earnings"][:8])
+            earnings_html = (f'<div class="chips" style="margin-top:12px">'
+                             f'<span class="chip" style="font-weight:600">即將公布財報</span>'
+                             f'{chips}</div>')
         body.append(section(
             "us", "美股",
             _status_note(us["status"], "Fincept Terminal")
-            + f'<div class="grid grid-3">{"".join(tiles)}</div>',
+            + f'<div class="grid grid-3">{"".join(tiles)}</div>'
+            + earnings_html,
             note=f'報價時間 {_stamp(us["indices"])}',
             terms=["drawdown", "vix"]))
 
@@ -181,7 +193,7 @@ def render(ctx: dict) -> str:
             + callout("原始指數（^GSPC 等）在報價 API 的免費層不開放，這幾檔 ETF "
                       "追蹤相同標的且開放存取——所以<strong>它們是會即時更新的那一組</strong>，"
                       "上面的指數欄位則維持建置快照。"),
-            note="每 45 秒更新（Finnhub 免費層額度上限）"))
+            note="每 45 秒更新（Finnhub 免費層額度上限）", sub=True))
 
     if us["stocks"]:
         body.append(section(
@@ -189,7 +201,7 @@ def render(ctx: dict) -> str:
             _quote_table(us["stocks"])
             + _breadth_line(us["breadth"], "十檔權值股")
             + _movers_chart(us["stocks"], "權值股漲跌幅"),
-            note=f'報價時間 {_stamp(us["stocks"])}'))
+            note=f'報價時間 {_stamp(us["stocks"])}', sub=True))
 
     if us["sectors"]:
         body.append(section(
@@ -198,7 +210,7 @@ def render(ctx: dict) -> str:
             + _breadth_line(us["sector_breadth"], "八大類股")
             + _movers_chart(us["sectors"], "類股 ETF 漲跌幅",
                             "類股間的差距比大盤本身更能看出資金在想什麼"),
-            note="以 SPDR 類股 ETF 代表"))
+            note="以 SPDR 類股 ETF 代表", sub=True))
 
     # ================================================================ 台股 ==
     tw = d["tw"]
@@ -215,6 +227,13 @@ def render(ctx: dict) -> str:
                       + _live(symbol, "change_percent", "tw", 2,
                               fmt(r["change_percent"], 2, suffix="%", signed=True)),
                 asof=f'昨收 {fmt(r["previous_close"], 2)}'))
+        fx = tw.get("usdtwd")
+        if fx:
+            tiles.append(stat(
+                "美元兌台幣", fmt(fx["value"], 2),
+                delta=f'近三月 {fmt(fx["chg_3m"], 1, suffix="%", signed=True)}',
+                direction=None,
+                asof=f'{zh_date(fx["as_of"], freq="d")} 資料　FRED 日頻'))
         for r in tw["stocks"][:3]:
             symbol = str(r["symbol"])
             tiles.append(stat(
@@ -232,13 +251,30 @@ def render(ctx: dict) -> str:
             + f'<div class="grid grid-4">{"".join(tiles)}</div>',
             note=f'報價時間 {_stamp(tw["stocks"] or tw["index"])}'))
 
+    trend = tw.get("trend") or {}
+    if trend.get("index"):
+        body.append(section(
+            "tw-trend", "大盤走勢與成交量",
+            line_chart("加權指數（收盤）",
+                       [(trend["index"], "加權指數", "series-1")],
+                       years=None, default_years=1, freq="d", digits=0,
+                       with_table=False)
+            + line_chart("每日成交金額",
+                         [(trend["turnover"], "成交金額", "series-4")],
+                         years=None, default_years=1, freq="d", digits=0,
+                         suffix=" 億", chart_type="bar", height=180,
+                         include_zero=True, with_table=False)
+            + callout("量是價的體檢：指數創高而量能萎縮，漲勢的參與度在下降；"
+                      "下跌爆量則常是恐慌或換手。兩張圖同一時間軸，上下對照看。"),
+            note="近六個月日資料，證交所每日市場成交資訊", sub=True))
+
     if tw["stocks"]:
         body.append(section(
             "tw-stocks", "台股權值股",
             _quote_table(tw["stocks"], with_limits=True, market="tw")
             + _breadth_line(tw["breadth"], "八檔權值股")
             + _movers_chart(tw["stocks"], "台股權值股漲跌幅"),
-            note="含漲跌停價；資料為證交所官方報價"))
+            note="含漲跌停價；資料為證交所官方報價", sub=True))
 
     if tw.get("groups"):
         body.append(section(
@@ -247,7 +283,7 @@ def render(ctx: dict) -> str:
             + callout("顏色沿用全站慣例：<strong>綠漲紅跌</strong>（跟台灣看盤軟體"
                       "的紅漲綠跌相反），深淺代表幅度，±3% 封頂。族群右上角是"
                       "族群內的平均漲跌幅。磁磚跟著台股報價每 5 秒重刷。"),
-            note="每族群取市值與成交量具代表性的個股"))
+            note="每族群取市值與成交量具代表性的個股", sub=True))
 
     if tw.get("ai"):
         body.append(section(
@@ -259,7 +295,7 @@ def render(ctx: dict) -> str:
                       "支出流到台灣的路徑：上游漲、中游跌，跟整條鏈齊漲，反映的"
                       "是完全不同的訂單預期。半導體製程環節的細部拆解見下方"
                       "「半導體產業鏈」。"),
-            note="與其他熱力圖共用報價，不增加 API 用量"))
+            note="與其他熱力圖共用報價，不增加 API 用量", sub=True))
 
     if tw.get("semi"):
         body.append(section(
@@ -269,13 +305,67 @@ def render(ctx: dict) -> str:
                       "載板 → 通路。同一天各環節的<strong>分歧</strong>比大盤漲跌"
                       "本身更有資訊量——設計漲、封測跌，跟整條鏈齊漲，是兩種"
                       "完全不同的行情。"),
-            note="含上櫃（世界先進、群聯、環球晶、頎邦等），同走證交所 MIS"))
+            note="含上櫃（世界先進、群聯、環球晶、頎邦等），同走證交所 MIS",
+            sub=True))
 
     if tw["etfs"]:
         body.append(section(
             "tw-etfs", "台股主要 ETF",
             _quote_table(tw["etfs"], with_limits=True, market="tw"),
-            note="市值型、高股息型與大盤型"))
+            note="市值型、高股息型與大盤型", sub=True))
+
+    wide = tw.get("wide_breadth") or {}
+    if wide and tw.get("group_avgs"):
+        avgs = tw["group_avgs"]
+        body.append(section(
+            "tw-breadth", "台股市場寬度",
+            f'<div class="grid grid-4">'
+            + stat("上漲", f'{wide["up"]} 檔', direction=None,
+                   asof=f'追蹤宇宙 {wide["n"]} 檔')
+            + stat("下跌", f'{wide["down"]} 檔', direction=None,
+                   asof=f'持平 {wide["flat"]} 檔')
+            + stat("平均漲跌", fmt(wide["average"], 2, suffix="%", signed=True))
+            + stat("最強族群", esc(avgs[0]["name"]),
+                   delta=fmt(avgs[0]["value"], 2, suffix="%", signed=True),
+                   asof=f'最弱：{esc(avgs[-1]["name"])} '
+                        f'{fmt(avgs[-1]["value"], 2, suffix="%", signed=True)}')
+            + "</div>"
+            + hbar_chart("族群平均漲跌幅", avgs, suffix="%", digits=2,
+                         label_width=150, sub="由強到弱；顏色只標漲跌")
+            + callout("樣本是本站追蹤的一百多檔族群代表股，不是全市場統計。"
+                      "指數漲但下跌家數多，代表漲勢集中在少數權值股——"
+                      "這種分歧比指數本身更值得注意。"),
+            note="建置快照統計，非即時", sub=True))
+
+    inst = tw.get("institutional") or {}
+    marg = tw.get("margin") or {}
+    if inst or marg:
+        tiles = []
+        if inst:
+            tiles += [
+                stat("外資買賣超", fmt(inst["foreign"], 1, suffix=" 億", signed=True),
+                     asof=f'{esc(inst["date"])} 收盤後'),
+                stat("投信買賣超", fmt(inst["trust"], 1, suffix=" 億", signed=True),
+                     direction=None),
+                stat("自營商買賣超", fmt(inst["dealer"], 1, suffix=" 億", signed=True),
+                     direction=None, asof="自行買賣＋避險"),
+            ]
+        if marg:
+            tiles.append(
+                stat("融資餘額", fmt(marg["financing_yi"], 0, suffix=" 億"),
+                     delta=f'較前日 {fmt(marg["financing_chg_yi"], 1, suffix=" 億", signed=True)}',
+                     asof=f'融券 {fmt(marg["short_units"], 0)} 張'
+                          f'（{fmt(marg["short_chg_units"], 0, signed=True)}）'))
+        body.append(section(
+            "tw-flows", "三大法人與融資融券",
+            f'<div class="grid grid-4">{"".join(tiles)}</div>'
+            + callout("外資買賣超是台股最重要的資金流向指標；融資餘額大增"
+                      "代表散戶槓桿在堆積，回檔時的賣壓也跟著變大。<br>"
+                      "<strong>大盤融資維持率沒有放</strong>：整戶擔保維持率需要"
+                      "擔保品市值，證交所並未公開，市面上看到的數字都是券商或"
+                      "資料商自己算的。這裡放的是公開資料裡最接近的原料——"
+                      "融資餘額與其增減。"),
+            note="證交所公開統計，每個交易日收盤後更新", sub=True))
 
     # ========================================================== 新興市場 ==
     em = d["em"]
@@ -299,6 +389,6 @@ def render(ctx: dict) -> str:
                       "最直接的傳導管道。<br><br>"
                       "中國以 FXI 與 ASHR 兩檔 ETF 代表：上證與深證指數在這個"
                       "資料來源取不到，本站不以其他指數替代充數。"),
-            terms=["dollar_index"]))
+            terms=["dollar_index"], sub=True))
 
     return "".join(body)

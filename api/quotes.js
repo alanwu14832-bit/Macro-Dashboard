@@ -22,8 +22,11 @@ const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)";
 const UPSTREAM_TTL_MS = 5_000;
 
 // MIS 的大盤指數 channel：保留代號，不是股票代號。
-// 對外仍用 ^TWII 當 key，跟頁面上的 data-quote 與建置快照一致。
-const TW_INDEX = { "^TWII": { channel: "tse_t00.tw", code: "t00" } };
+// 對外仍用 ^ 開頭的 key，跟頁面上的 data-quote 與建置快照一致。
+const TW_INDEX = {
+  "^TWII": { channel: "tse_t00.tw", code: "t00" },
+  "^TWOII": { channel: "otc_o00.tw", code: "o00" },
+};
 // 供應商每檔報價都要一次呼叫，而 Finnhub 免費層是 60 次/分。頁面上有
 // 四十幾個非台股代號，逐檔快取讓所有訪客共用同一次上游呼叫。
 const QUOTE_TTL_MS = 45_000;
