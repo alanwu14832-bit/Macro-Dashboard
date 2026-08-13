@@ -300,6 +300,11 @@ def _months_above(series: Series, threshold: float) -> int:
 def compute(bundle: Bundle) -> dict:
     cpi = bundle["CPIAUCSL"]
     core_cpi = bundle["CPILFESL"]
+    # 標題年增率用未季調指數，跟 BLS 新聞稿同口徑（季調版的年增率會差
+    # 約 0.1 個百分點，讀者對報導核對時會以為網站算錯）。月增動能與
+    # 分項貢獻仍用季調版——比較相鄰月份時才需要去季節性。
+    cpi_nsa = bundle["CPIAUCNS"] or cpi
+    core_nsa = bundle["CPILFENS"] or core_cpi
     pce = bundle["PCEPI"]
     core_pce = bundle["PCEPILFE"]
     supercore = core_services_ex_housing(bundle)
@@ -315,9 +320,9 @@ def compute(bundle: Bundle) -> dict:
         "as_of": core_cpi.last_date,
         "pce_as_of": core_pce.last_date,
         "headline": {
-            "cpi": _yoy_last(cpi), "core_cpi": _yoy_last(core_cpi),
+            "cpi": _yoy_last(cpi_nsa), "core_cpi": _yoy_last(core_nsa),
             "pce": _yoy_last(pce), "core_pce": _yoy_last(core_pce),
-            "cpi_series": cpi.yoy(), "core_series": core_cpi.yoy(),
+            "cpi_series": cpi_nsa.yoy(), "core_series": core_nsa.yoy(),
             "core_pce_series": core_pce.yoy(),
             "gap_to_target": (_yoy_last(core_pce) - TARGET) if _yoy_last(core_pce) is not None else None,
         },

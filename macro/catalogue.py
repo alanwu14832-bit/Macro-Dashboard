@@ -76,6 +76,10 @@ LABOR_SECTORS: dict[str, str] = {
 INFLATION: dict[str, Spec] = {
     "CPIAUCSL":     ("CPI 總體", "指數", "m", LONG_START),
     "CPILFESL":     ("核心 CPI", "指數", "m", LONG_START),
+    # BLS 新聞稿的年增率用「未季調」指數算。標題數字用這兩檔才對得上
+    # 官方發布；季調版留給月增動能與分項貢獻（那裡才需要去季節性）。
+    "CPIAUCNS":     ("CPI 總體（未季調）", "指數", "m", LONG_START),
+    "CPILFENS":     ("核心 CPI（未季調）", "指數", "m", LONG_START),
     "PCEPI":        ("PCE 物價", "指數", "m", LONG_START),
     "PCEPILFE":     ("核心 PCE", "指數", "m", LONG_START),
     "CPIUFDSL":     ("食物 CPI", "指數", "m", LONG_START),

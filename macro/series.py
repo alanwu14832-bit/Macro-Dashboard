@@ -137,11 +137,50 @@ class Series:
         return self._derive(d, v, f".pct{periods}", unit="%")
 
     def yoy(self) -> "Series":
-        """Year-over-year percent change, using the frequency's period count."""
+        """Year-over-year percent change.
+
+        Monthly/quarterly/annual series match on the calendar (same month one
+        year earlier), not on position: 2025-10 的 CPI 因政府關門停發，FRED 的
+        序列就是缺一格，「往回數 12 筆」會除到 13 個月前的基期，年增率整個
+        偏高。找不到去年同月就跳過該點——留白比錯數字好。
+        Daily/weekly series keep the positional approximation.
+        """
+        if self.frequency in ("m", "q", "a"):
+            by_month = {(d.year, d.month): v
+                        for d, v in zip(self.dates, self.values)}
+            d_out, v_out = [], []
+            for d, v in zip(self.dates, self.values):
+                base = by_month.get((d.year - 1, d.month))
+                if not base:
+                    continue
+                d_out.append(d)
+                v_out.append((v / base - 1.0) * 100.0)
+            return self._derive(d_out, v_out, ".yoy", unit="%")
         return self.pct_change(self._periods_per_year())
 
     def annualised(self, months: int) -> "Series":
-        """Compound annualised rate over a trailing window, in percent."""
+        """Compound annualised rate over a trailing window, in percent.
+
+        Monthly/quarterly series anchor the window on the calendar, same
+        reason as yoy()：序列缺一格時「往回數 N 筆」的窗其實比 N 個月長，
+        年化指數卻還是按 N 個月算，結果整段期間都偏高。
+        """
+        if self.frequency in ("m", "q"):
+            by_month = {(d.year, d.month): v
+                        for d, v in zip(self.dates, self.values)}
+            d_out, v_out = [], []
+            for d, v in zip(self.dates, self.values):
+                year, month = d.year, d.month - months
+                while month <= 0:
+                    month += 12
+                    year -= 1
+                base = by_month.get((year, month))
+                if not base or base <= 0:
+                    continue
+                d_out.append(d)
+                v_out.append(((v / base) ** (12.0 / months) - 1.0) * 100.0)
+            return self._derive(d_out, v_out, f".ann{months}m", unit="%")
+
         per_year = self._periods_per_year()
         periods = max(1, round(per_year * months / 12))
         d, v = [], []

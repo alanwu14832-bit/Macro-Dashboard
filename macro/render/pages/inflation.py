@@ -30,7 +30,7 @@ def render(ctx: dict, signals: list[dict]) -> str:
                     headline["core_series"].tail(36).pairs()]),
         stat("總體 CPI", pct(headline["cpi"], 1),
              delta=f'總體 PCE {pct(headline["pce"], 1)}',
-             asof="含食物與能源"),
+             asof="含食物與能源　未季調，同 BLS 發布口徑"),
         stat("核心服務除住房", pct(supercore["yoy"], 1),
              delta=f'近三月年化 {pct(supercore["ann3"], 1)}',
              asof=f'連 {supercore["months_above"]} 個月高於 2.5%'),
