@@ -29,11 +29,23 @@
   const otherSymbols = [...new Set(cells.filter(c => c.dataset.market !== "tw")
                                         .map(c => c.dataset.quote))];
 
-  let timers = [];
   let failures = 0;
   let disabled = false;
   // 兩個群組各自輪詢，狀態列要合起來講，所以記住彼此的最新狀態
   const state = { provider: null, notSupported: false };
+
+  // 自適應節奏：連兩輪完全沒有任何欄位變化（收盤、週末、假日）就把
+  // 間隔加倍，一路放慢到上限；一偵測到變化立刻回到基本節奏。
+  // 台股一天只有 4.5 小時盤中，這一招把其餘 19.5 小時的呼叫量
+  // 砍掉九成以上，而且不用維護交易日曆——假日自己會慢下來。
+  const CADENCE = {
+    tw:    { base: TW_REFRESH_MS,    max: 90_000 },
+    other: { base: OTHER_REFRESH_MS, max: 300_000 },
+  };
+  const pace = {
+    tw:    { wait: CADENCE.tw.base,    idle: 0, timer: null },
+    other: { wait: CADENCE.other.base, idle: 0, timer: null },
+  };
 
   const fmt = (value, digits) =>
     value === null || value === undefined || Number.isNaN(value)
@@ -115,18 +127,20 @@
   }
 
   function stopTimers() {
-    timers.forEach(clearInterval);
-    timers = [];
+    for (const p of Object.values(pace)) {
+      clearTimeout(p.timer);
+      p.timer = null;
+    }
+  }
+
+  function schedule(kind, delay) {
+    clearTimeout(pace[kind].timer);
+    pace[kind].timer = setTimeout(() => refresh(kind), delay ?? pace[kind].wait);
   }
 
   function startTimers() {
-    stopTimers();
-    if (twSymbols.length) {
-      timers.push(setInterval(() => refresh("tw"), TW_REFRESH_MS));
-    }
-    if (otherSymbols.length) {
-      timers.push(setInterval(() => refresh("other"), OTHER_REFRESH_MS));
-    }
+    if (twSymbols.length) schedule("tw");
+    if (otherSymbols.length) schedule("other");
   }
 
   async function refresh(kind) {
@@ -158,11 +172,20 @@
       return;
     }
 
-    if (failures) {           // 從失敗中恢復，把定時器接回來
-      failures = 0;
-      startTimers();
+    const recovering = failures > 0;
+    failures = 0;
+    const changed = apply([...(payload.tw || []), ...(payload.other || [])]);
+
+    // 自適應：有變化 → 回到基本節奏；連兩輪沒變化 → 間隔加倍到上限
+    const p = pace[kind];
+    if (changed > 0) {
+      p.idle = 0;
+      p.wait = CADENCE[kind].base;
+    } else if (++p.idle >= 2) {
+      p.wait = Math.min(p.wait * 2, CADENCE[kind].max);
     }
-    apply([...(payload.tw || []), ...(payload.other || [])]);
+    if (recovering) startTimers();   // 失敗時兩組都停了，一起接回來
+    else schedule(kind);
 
     if (kind === "other") {
       state.notSupported = payload.other_supported === false
@@ -172,11 +195,14 @@
     const when = new Date(payload.fetched_at || Date.now());
     const clock = when.toLocaleTimeString("zh-TW", { hour12: false });
     const via = state.provider ? `　·　美股經 ${state.provider}` : "";
-    const cadence = `台股每 ${TW_REFRESH_MS / 1000} 秒`
+    const slowed = pace.tw.wait > CADENCE.tw.base
+                || pace.other.wait > CADENCE.other.base;
+    const cadence = `台股每 ${pace.tw.wait / 1000} 秒`
       + (otherSymbols.length && !state.notSupported
-         ? `、美股每 ${OTHER_REFRESH_MS / 1000} 秒` : "");
+         ? `、美股每 ${pace.other.wait / 1000} 秒` : "")
+      + (slowed ? "（盤外沒有變化，自動放慢）" : "");
     report(state.notSupported
-      ? `台股已更新 ${clock}（每 ${TW_REFRESH_MS / 1000} 秒）　·　`
+      ? `台股已更新 ${clock}（每 ${pace.tw.wait / 1000} 秒）　·　`
         + "美股與新興市場維持建置快照（代理未設定 Finnhub 金鑰）"
       : `已更新 ${clock}${via}　·　${cadence}`);
     if (payload.errors?.length) {
