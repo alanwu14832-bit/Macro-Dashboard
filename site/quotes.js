@@ -269,7 +269,35 @@
     };
     const save = (list) => {
       try { localStorage.setItem(storageKey, JSON.stringify(list)); } catch {}
+      pushCloud();                       // 有登入才會真的送出，見下
     };
+
+    // 雲端同步（account.js 登入後提供 window.__wlCloud）。
+    // localStorage 永遠是操作的即時來源，雲端是它的備份與同步管道，
+    // 所以沒網路、沒登入、Supabase 掛了，清單功能都照常。
+    function pushCloud() {
+      const cloud = window.__wlCloud;
+      if (!cloud) return;
+      const tw = JSON.parse(localStorage.getItem("wl-tw") || "[]");
+      const us = JSON.parse(localStorage.getItem("wl-us") || "[]");
+      cloud.set(tw, us).catch(() => {});  // 失敗就等下一次變動再送
+    }
+
+    document.addEventListener("wl-cloud-ready", async () => {
+      const cloud = window.__wlCloud;
+      if (!cloud) return;
+      try {
+        const remote = await cloud.get();
+        // 第一次登入：本機與雲端聯集（誰都不丟），之後以合併結果為準
+        const merged = [...new Set([...(remote[market] || []), ...load()])]
+          .slice(0, rules.max);
+        try { localStorage.setItem(storageKey, JSON.stringify(merged)); } catch {}
+        renderList();
+        recollect();
+        kick(kind);
+        pushCloud();
+      } catch { /* 拉不到就維持本機清單 */ }
+    });
 
     function renderList() {
       const list = load();

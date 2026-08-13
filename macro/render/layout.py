@@ -61,6 +61,12 @@ NAV = [
 
 SITE_NAME = "總經儀表板"
 
+# Supabase（帳號與自選清單同步）。anon key 是「設計上就公開」的前端金鑰，
+# 資料隔離靠資料庫的 Row Level Security，不靠把 key 藏起來。
+# 兩個值都留空時，登入介面整個不出現，自選清單維持純 localStorage。
+SUPABASE_URL = ""
+SUPABASE_ANON_KEY = ""
+
 # Theme and rail state are applied before first paint so neither flashes.
 BOOT = """
 (function(){var d=document.documentElement;try{
@@ -136,6 +142,16 @@ def _sidebar(path: str, sections: dict[str, list[tuple[str, str]]] | None = None
   <div class="rail-scrim" id="rail-scrim" hidden></div>"""
 
 
+def _supabase_config() -> str:
+    """帳號功能的前端設定。沒填就輸出空字串，account.js 會自動休眠。"""
+    if not (SUPABASE_URL and SUPABASE_ANON_KEY):
+        return ""
+    import json
+    return ("<script>window.__SB=" +
+            json.dumps({"url": SUPABASE_URL, "key": SUPABASE_ANON_KEY}) +
+            "</script>\n")
+
+
 def asset_version() -> str:
     """Cache-buster from the static files' mtimes.
 
@@ -143,7 +159,8 @@ def asset_version() -> str:
     keeps yesterday's chart.js against today's markup.
     """
     stamp = 0.0
-    for name in ("style.css", "chart.js", "sidebar.js", "quotes.js", "explore.js"):
+    for name in ("style.css", "chart.js", "sidebar.js", "quotes.js",
+                 "explore.js", "account.js"):
         candidate = os.path.join(paths.STATIC_DIR, name)
         if os.path.exists(candidate):
             stamp = max(stamp, os.path.getmtime(candidate))
@@ -217,8 +234,9 @@ def page(*, title: str, path: str, body: str, lede: str = "",
     </main>
   </div>
 </div>
-<script src="/sidebar.js?v={version}" defer></script>
+{_supabase_config()}<script src="/sidebar.js?v={version}" defer></script>
 <script src="/chart.js?v={version}" defer></script>
+<script src="/account.js?v={version}" defer></script>
 <script src="/quotes.js?v={version}" defer></script>
 <script src="/explore.js?v={version}" defer></script>
 </body>

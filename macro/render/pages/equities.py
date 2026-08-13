@@ -131,6 +131,7 @@ def _watchlist(market: str) -> str:
             "輸入美股代號（AAPL、SPY、QQQ…）；^ 開頭的指數不支援，請用對應 ETF")
     return (
         f'<div data-watchlist="{market}">'
+        f'<div data-account-slot></div>'
         f'<form class="wl-form" data-wl-form>'
         f'<input class="wl-input" maxlength="10" autocomplete="off" '
         f'placeholder="{esc(hint)}" aria-label="新增自選代號">'

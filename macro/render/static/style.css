@@ -790,3 +790,27 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
 }
 .wl-remove:hover { background: var(--surface-sunken); color: var(--critical); }
 .wl-empty { font-size: 0.85rem; }
+
+/* ---- 帳號列（自選清單同步） ---- */
+.acct { margin-bottom: 12px; font-size: 0.84rem; }
+.acct-in { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.acct-mail { font-weight: 600; }
+.acct-note { color: var(--ink-muted); font-size: 0.78rem; }
+.acct-link {
+  border: none; background: none; cursor: pointer; padding: 0;
+  color: var(--series-1); font-size: 0.84rem; text-decoration: underline;
+}
+.acct summary.acct-link { list-style: none; display: inline; }
+.acct summary.acct-link::-webkit-details-marker { display: none; }
+.acct-form { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+.acct-form input {
+  padding: 7px 11px; font-size: 0.85rem;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+}
+.acct-form button {
+  padding: 7px 14px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  background: var(--surface-sunken); color: var(--ink);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+}
+.acct-form button:first-of-type { background: var(--ink); color: var(--page); border: none; }
