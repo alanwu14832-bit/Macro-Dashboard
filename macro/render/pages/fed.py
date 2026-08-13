@@ -6,6 +6,99 @@ from ..common import (checks_block, curve_chart, hbar_chart,
 from ..html import (accordion, callout, delta_span, esc, fmt, kv, pct, section,
                     stat, table, zh_date)
 
+def _mark_words(sentence: str, words: list[dict], side: str) -> str:
+    """把改動的字詞在句子裡標色。side="before" 標刪除、"after" 標新增。"""
+    out = esc(sentence)
+    for w in words:
+        piece = w.get(side) or ""
+        if not piece:
+            continue
+        marked = (f'<span class="fd-{"del" if side == "before" else "add"}">'
+                  f'{esc(piece)}</span>')
+        out = out.replace(esc(piece), marked, 1)
+    return out
+
+
+def _statement_block(st: dict) -> str:
+    """FOMC 聲明文本分析。看的是「哪一句改了」，不是重讀整份聲明。"""
+    if not st:
+        return section("statement", "上次會議聲明",
+                       '<div class="card"><p class="muted">'
+                       '目前取不到聯準會的聲明全文。</p></div>')
+
+    vote_changed = st["vote"] and st["vote"] != st["vote_prev"]
+    tiles = "".join([
+        stat("聲明日期", esc(st["date"]), asof=f'對照 {esc(st["prev_date"])}'),
+        stat("表決", esc(st["vote"] or "—"),
+             delta=(f'上次 {esc(st["vote_prev"])}' if st["vote_prev"] else ""),
+             direction="hawkish" if vote_changed else None,
+             asof="第二個數字是異議票"),
+        stat("句子改動", f'{len(st["changed"])} 句改寫',
+             delta=f'新增 {len(st["added"])}　刪除 {len(st["removed"])}',
+             direction=None, asof=f'全文共 {st["sentences"]} 句'),
+    ])
+
+    parts = [f'<div class="grid grid-3">{tiles}</div>']
+
+    if vote_changed:
+        parts.append(callout(
+            f'<strong>表決結構變了</strong>：{esc(st["prev_date"])} 是 '
+            f'{esc(st["vote_prev"])}，這次是 {esc(st["vote"])}。'
+            f'異議票數是聲明裡最直接的分歧訊號——委員會內部對下一步的'
+            f'看法不再一致。', key=True))
+
+    if st["same"]:
+        parts.append('<p class="muted">這次聲明與上次逐句相同。'
+                     '完全不改字本身就是訊號：委員會認為情勢沒有變化。</p>')
+
+    if st["changed"]:
+        rows = []
+        for c in st["changed"]:
+            rows.append(
+                f'<div class="fd-pair">'
+                f'<div class="fd-old">{_mark_words(c["before"], c["words"], "before")}</div>'
+                f'<div class="fd-new">{_mark_words(c["after"], c["words"], "after")}</div>'
+                f'</div>')
+        parts.append('<h3 class="fd-h">改寫的句子</h3>'
+                     f'<div class="fd-list">{"".join(rows)}</div>')
+
+    for key, label, cls in [("added", "新增的句子", "fd-add-row"),
+                            ("removed", "刪除的句子", "fd-del-row")]:
+        if st.get(key):
+            items = "".join(f'<div class="{cls}">{esc(s)}</div>' for s in st[key])
+            parts.append(f'<h3 class="fd-h">{label}</h3><div class="fd-list">{items}</div>')
+
+    # 措辭光譜：只報次數，不做評分
+    def term_row(now: dict, prev: dict, label: str) -> str:
+        keys = sorted(set(now) | set(prev))
+        if not keys:
+            return ""
+        cells = "".join(
+            f'<div class="gl-row"><span>{esc(k)}</span><span class="gl-v">'
+            f'{prev.get(k, 0)} → {now.get(k, 0)}</span></div>' for k in keys)
+        return f'<div class="gl-col"><div class="gl-head">{esc(label)}</div>{cells}</div>'
+
+    spectrum = (term_row(st["hawkish_now"], st["hawkish_prev"], "偏緊措辭")
+                + term_row(st["dovish_now"], st["dovish_prev"], "偏鬆措辭"))
+    if spectrum:
+        parts.append(f'<h3 class="fd-h">措辭次數（上次 → 這次）</h3>'
+                     f'<div class="glance">{spectrum}</div>')
+
+    parts.append(accordion("聲明全文（英文原文）",
+                           f'<p class="fd-full">{esc(st["text"])}</p>'))
+    parts.append(
+        f'<p class="muted" style="margin-top:10px">'
+        f'原文：<a href="{esc(st["url"])}" target="_blank" rel="noopener noreferrer">'
+        f'{esc(st["date"])} 聲明</a>　·　'
+        f'<a href="{esc(st["prev_url"])}" target="_blank" rel="noopener noreferrer">'
+        f'{esc(st["prev_date"])} 聲明</a></p>')
+
+    return section(
+        "statement", "上次會議聲明：跟前一次比，改了什麼",
+        "".join(parts),
+        note="逐句比對，不做語意評分——同一份聲明永遠得到同一個結果")
+
+
 def render(ctx: dict, signals: list[dict]) -> str:
     d = ctx["rates"]
     stance = d["stance"]
@@ -33,6 +126,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
     body.append(section("numbers", "政策立場",
                         f'<div class="grid grid-4">{"".join(tiles)}</div>',
                         terms=["fed_funds", "real_policy_rate"]))
+
+    body.append(_statement_block(d.get("statement") or {}))
 
     # ---- 曲線 ----
     curve_rows = d["curve"]["rows"]

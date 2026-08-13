@@ -78,7 +78,8 @@ def main() -> int:
         return 1
 
     print("== 2/6 計算 ==", flush=True)
-    ctx: dict = {}
+    # 總覽的全指標下拉要讀原始序列的最新值，所以把 bundle 也放進 ctx
+    ctx: dict = {"_bundle": bundle}
     failures: list[str] = []
     for name, module in MODULES:
         try:

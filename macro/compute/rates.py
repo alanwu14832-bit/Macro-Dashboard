@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 from ..data import Bundle
+from ..sources import fomc_text
 from ..series import Series
 
 CURVE = [
@@ -283,6 +284,7 @@ def compute(bundle: Bundle) -> dict:
         "credit": credit_data,
         "conditions": fci,
         "stance": stance,
+        "statement": fomc_text.compare(),
         "mortgage": bundle["MORTGAGE30US"].last,
         "mortgage_series": bundle["MORTGAGE30US"],
         "checks": health_checks(bundle, shape, decomp, credit_data, fci, stance),

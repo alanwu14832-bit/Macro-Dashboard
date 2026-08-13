@@ -4,6 +4,7 @@ from __future__ import annotations
 from ...compute.news import _headline, _is_macro, _same_story, _tokens
 from ...compute.scenario import REGIME_LABELS
 from ...fomc import next_meeting
+from . import overview_blocks as blocks
 from ..common import checks_block, legend_note, signals_block
 from ..html import (accordion, callout, delta_span, direction_label,
                     direction_class, esc, fmt, kv, pct, section, stat, table,
@@ -148,6 +149,47 @@ def key_line(scenario: dict) -> str:
             f"還差 {fmt(abs(first['gap']), 2)} {esc(first['unit'])}。")
 
 
+def indicator_drawers(ctx: dict) -> str:
+    """就業與通膨的全指標下拉。
+
+    目錄裡就有分組與中文名，直接照 catalogue 的分組列出來——不必另外
+    維護一份清單，加了新序列自動出現在這裡。
+    """
+    from ... import catalogue
+    from ...data import Bundle
+
+    bundle: Bundle | None = ctx.get("_bundle")
+    drawers = []
+    for group_key, label in [("labor", "就業"), ("inflation", "通膨")]:
+        specs = catalogue.ALL_GROUPS.get(group_key) or {}
+        rows = []
+        for series_id, (name, unit, freq, _start) in specs.items():
+            series = bundle[series_id] if bundle else None
+            latest = (fmt(series.last, 2, suffix=f" {unit}" if unit else "")
+                      if series is not None and series.last is not None else "—")
+            asof = (zh_date(series.last_date, freq=freq)
+                    if series is not None and series.last_date else "—")
+            rows.append([
+                f'<a href="/explore/?id={esc(series_id)}">{esc(name)}</a>',
+                f'<code>{esc(series_id)}</code>', latest, asof,
+                {"d": "日", "w": "週", "m": "月", "q": "季", "a": "年"}.get(freq, freq),
+            ])
+        if not rows:
+            continue
+        drawers.append(accordion(
+            f"{label}：全部 {len(rows)} 檔指標",
+            table(["指標", "序列代號", "最新值", "資料日期", "頻率"], rows)))
+
+    if not drawers:
+        return ""
+    return section(
+        "indicators", "全部指標",
+        "".join(drawers)
+        + '<p class="muted" style="margin-top:10px">點指標名稱會到自選比較頁，'
+          '可以跟其他序列疊圖。資料直接取自 FRED，本站只做轉換與判定。</p>',
+        note="依 FRED 序列代號分組，加新序列會自動出現在這裡")
+
+
 def module_cards(ctx: dict, signals: list[dict]) -> str:
     labor = ctx["labor"]
     inflation = ctx["inflation"]
@@ -266,48 +308,26 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
           f'這個判斷怎麼來的、對應什麼部位　→</a></p>'
         f'</div>')
 
-    # ---- 今日財經要聞 ----
-    news = ctx.get("news") or {}
-    if news.get("available"):
+    # ---- 1 目前情境：利率結構 ----
+    body.append(blocks.rate_structure(ctx))
 
-        def _clean(title: str) -> str:
-            # 頭條尾巴常拖著「 - 媒體名 | 網站名」，砍到剩正文
-            text = _headline(title)
-            head = text.split(" | ")[0].strip()
-            return head if len(head) >= 20 else text
+    # ---- 2 數據與二階解讀 ----
+    body.append(blocks.data_reads(ctx))
+    body.append(indicator_drawers(ctx))
 
-        digest, chosen_tokens = [], []
-        # 多家同報的財金事件優先——被好幾個編輯台同時認為重要，才上首頁；
-        # 去重用跟 /news/ 分群同一套實詞重疊比對，換個說法的同一件事不重列
-        candidates = (
-            [(_clean(c["headline"]), c["count"]) for c in news.get("clusters") or []
-             if _is_macro(c["headline"])]
-            + [(_clean(m["title"]), 1) for m in news.get("macro") or []])
-        for text, count in candidates:
-            if len(digest) >= 6:
-                break
-            tokens = _tokens(text)
-            if any(_same_story(tokens, t) for t in chosen_tokens):
-                continue
-            chosen_tokens.append(tokens)
-            digest.append({"text": text, "count": count})
-        if digest:
-            rows = "".join(
-                f'<div class="digest-item">'
-                f'<span class="digest-n">{d["count"]} 家</span>'
-                f'<span class="digest-text">{esc(d["text"])}</span></div>'
-                for d in digest)
-            body.append(section(
-                "daily-news", "今日財經要聞",
-                f'<div class="digest">{rows}</div>'
-                f'<p class="muted" style="margin-top:10px">每則一句話、不放外部連結：'
-                f'取多家媒體同時報導的財金事件的代表標題，家數代表有多少家獨立'
-                f'編輯台同時認為這件事重要。完整來源與各分類頭條見'
-                f' <a href="/news/">國際新聞</a>。</p>',
-                note=f'近 {news.get("stats", {}).get("window_hours", 36)} 小時、'
-                     f'財金相關、多家同報優先'))
+    # ---- 3 隔夜市場回顧 ----
+    body.append(blocks.overnight(ctx))
 
-    # ---- 模組入口 ----
+    # ---- 4 商品與傳導 ----
+    body.append(blocks.commodities_transmission(ctx))
+
+    # ---- 5 資金流與部位 ----
+    body.append(blocks.flows_positioning(ctx))
+
+    # ---- 6 對股市的含義 ----
+    body.append(blocks.implications(ctx, scenario, summary))
+
+    # ---- 各模組入口 ----
     body.append(section("modules", "各模組現況", module_cards(ctx, signals),
                         terms=["nine_grid"]))
 
@@ -319,29 +339,8 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
              f"{summary['hawkish']} 條利升息、{summary['neutral']} 條中性。依嚴重度排序。",
         terms=["signal_engine", "hawkish_dovish"]))
 
-    # ---- 資料新鮮度 ----
-    fresh = ctx.get("freshness") or {}
-    imminent = fresh.get("imminent") or []
-    fomc = next_meeting()
-    if imminent or fomc:
-        chips = "".join(
-            f'<span class="chip">{esc(r["name"])}'
-            f'<strong style="margin-left:4px">{esc(_when(r["days_away"]))}</strong>'
-            f'</span>'
-            for r in imminent[:6])
-        if fomc:
-            # FOMC 不是資料發布，是事件——排最前面、標色以示區別
-            chips = (f'<span class="chip hawkish"><span class="dot"></span>'
-                     f'FOMC 利率決策 {fomc["date"].month}/{fomc["date"].day}'
-                     f'<strong style="margin-left:4px">還有 {fomc["days"]} 天</strong>'
-                     f'</span>') + chips
-        body.append(section(
-            "fresh", "接下來幾天會有新數字",
-            f'<div class="chips">{chips}</div>'
-            f'<p class="muted" style="margin-top:10px">'
-            f'發布後本站的下一次建置就會帶進來，訊號與九宮格判定也可能跟著改變。'
-            f'　<a href="/freshness/">看完整發布時程與資料新鮮度 →</a></p>',
-            note="資料來源：FRED 官方發布行事曆"))
+    # ---- 7 今日觀察清單 ----
+    body.append(blocks.watchlist(ctx, next_meeting()))
 
     # ---- 接下來看什麼 ----
     transitions = scenario.get("transitions") or []
@@ -350,8 +349,9 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
                  (f'<span class="num">{fmt(abs(t["gap"]), 2)} {esc(t["unit"])}</span>'
                   if t.get("gap") is not None else '<span class="muted">—</span>')]
                 for t in transitions]
-        body.append(section("watch", "接下來要盯什麼",
+        body.append(section("watch", "情境轉換的門檻",
                             table(["情境轉換", "需要什麼", "還差"], rows),
+                            note="規則寫死的閘門：這些數字到了，判定才會換",
                         terms=["transition_threshold"]))
 
     # ---- 變化 ----

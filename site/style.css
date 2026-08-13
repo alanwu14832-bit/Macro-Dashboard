@@ -814,3 +814,23 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
   border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
 }
 .acct-form button:first-of-type { background: var(--ink); color: var(--page); border: none; }
+
+/* ---- FOMC 聲明比對 ---- */
+.fd-h { font-size: 0.88rem; margin: 20px 0 8px; color: var(--ink-2); }
+.fd-list { display: flex; flex-direction: column; gap: 10px; }
+.fd-pair {
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  overflow: hidden; font-size: 0.85rem; line-height: 1.6;
+}
+.fd-old, .fd-new { padding: 9px 12px; }
+.fd-old { background: rgba(208, 59, 59, 0.06); color: var(--ink-2); }
+.fd-new { background: rgba(12, 163, 12, 0.06); border-top: 1px solid var(--border); }
+.fd-del { background: rgba(208, 59, 59, 0.22); text-decoration: line-through; padding: 0 3px; border-radius: 3px; }
+.fd-add { background: rgba(12, 163, 12, 0.22); font-weight: 600; padding: 0 3px; border-radius: 3px; }
+.fd-add-row, .fd-del-row {
+  padding: 9px 12px; border-radius: var(--radius-sm); font-size: 0.85rem; line-height: 1.6;
+  border: 1px solid var(--border);
+}
+.fd-add-row { background: rgba(12, 163, 12, 0.06); }
+.fd-del-row { background: rgba(208, 59, 59, 0.06); text-decoration: line-through; color: var(--ink-muted); }
+.fd-full { font-size: 0.84rem; line-height: 1.75; color: var(--ink-2); }
