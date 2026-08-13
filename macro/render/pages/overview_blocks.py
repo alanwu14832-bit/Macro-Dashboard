@@ -78,10 +78,13 @@ def rate_structure(ctx: dict) -> str:
     hy = credit.get("高收益") or {}
     credit_verdict = _credit_verdict(hy.get("pct10y"), hy.get("chg_3m"))
 
+    pricing_map = _pricing_map(ctx, curve, decomp)
+
     return section(
         "rates", "公債利率",
         f'<div class="grid grid-4">{"".join(tiles)}</div>'
         + callout(f'<strong>曲線</strong>：{move}<br><strong>驅動</strong>：{driver}')
+        + pricing_map
         + '<h3 class="fd-h">殖利率上升是成長還是通膨？</h3>'
         + table(["拆解（近三月）", "現值", "變動"], decomp_rows)
         + '<h3 class="fd-h">信用利差（風險胃納的價格）</h3>'
@@ -89,6 +92,52 @@ def rate_structure(ctx: dict) -> str:
         + callout(credit_verdict),
         note="殖利率、利差皆為每日更新；百分位取十年分布",
         terms=["yield_curve", "real_rate"])
+
+
+def _pricing_map(ctx: dict, curve: dict, decomp: dict) -> str:
+    """市場在定價什麼：每個數字對應到它反映的那件事。
+
+    同一條殖利率曲線裡混著三種訊息——政策預期、通膨預期、債務風險。
+    這張表把它們拆開：讀者看到 2 年期動，知道那是在說政策；看到
+    期限貼水動，知道那是在說供給與財政。混著看就全部變成「利率漲了」。
+    """
+    rates = ctx.get("rates") or {}
+    stance = rates.get("stance") or {}
+    expectations = (ctx.get("inflation") or {}).get("expectations") or {}
+    shape = rates.get("shape") or {}
+
+    two = curve.get("2Y") or {}
+    gap = stance.get("market_gap")
+
+    rows = [
+        # ---- 利率政策 ----
+        ["<strong>利率政策</strong>", "2 年期殖利率",
+         pct(two.get("value"), 2),
+         "未來兩年政策路徑的加權平均，最貼近市場的利率預期"],
+        ["", "2 年期 − 政策利率",
+         fmt(gap, 2, suffix=" pp", signed=True),
+         ("正值＝市場定價升息、負值＝定價降息；目前"
+          + esc((stance.get("market_implies") or "").replace("市場定價", "")))],
+        # ---- 通貨膨脹 ----
+        ["<strong>通貨膨脹</strong>", "10 年通膨補償（breakeven）",
+         pct(decomp.get("inflation_comp"), 2),
+         "名目減抗通膨債，市場對未來十年平均通膨的定價"],
+        ["", "5 年後 5 年遠期通膨",
+         pct(expectations.get("t5y5y"), 2),
+         "長期通膨錨；聯準會盯這個判斷預期有沒有脫錨，2.0–2.5% 算錨住"],
+        # ---- 債務風險 ----
+        ["<strong>債務風險</strong>", "期限貼水（近似）",
+         pct(decomp.get("term_premium"), 2),
+         "持有長債要求的額外補償——公債供給與財政風險的價格"],
+        ["", "30 年減 10 年",
+         fmt(shape.get("slope_30_10"), 2, suffix=" pp", signed=True),
+         "最長端的斜率；財政與供給擔憂通常先反映在這裡"],
+    ]
+    return ('<h3 class="fd-h">市場在定價什麼：三類風險各看哪個數字</h3>'
+            + table(["類別", "指標", "現值", "怎麼讀"], rows)
+            + '<p class="muted" style="font-size:.8rem;margin-top:8px">'
+              '債務風險最直接的指標是美國主權 CDS，但那是付費資料'
+              '（ICE/Markit 授權），此處以期限貼水與最長端斜率為公開替代。</p>')
 
 
 def _curve_move(shape: dict, curve: dict) -> str:
