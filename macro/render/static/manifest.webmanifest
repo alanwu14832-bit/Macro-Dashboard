@@ -1,0 +1,16 @@
+{
+  "name": "總經儀表板",
+  "short_name": "總經儀表板",
+  "description": "把勞動、通膨、利率、債務、成長、全球與市場七個面向，收斂成一個可追蹤的判斷。",
+  "lang": "zh-Hant",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f9f9f7",
+  "theme_color": "#12223a",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

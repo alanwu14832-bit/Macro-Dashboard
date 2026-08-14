@@ -204,6 +204,13 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 <title>{esc(title)}｜{esc(SITE_NAME)}</title>
 <meta name="description" content="{esc(description or lede)}">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="總經儀表板">
 <link rel="stylesheet" href="/style.css?v={version}">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>📊</text></svg>">
 <script>{BOOT}</script>
@@ -242,6 +249,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 <script src="/account.js?v={version}" defer></script>
 <script src="/quotes.js?v={version}" defer></script>
 <script src="/explore.js?v={version}" defer></script>
+<script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
 </html>
 """

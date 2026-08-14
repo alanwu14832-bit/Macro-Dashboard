@@ -115,10 +115,13 @@ def compute(bundle: Bundle) -> dict:
 
     # 剛公布的數據：FRED 在今天或昨天更新過的序列。使用者打開網站時
     # 不會記得每個發布日，這個集合讓渲染層能在對應讀數旁掛「新」徽章。
+    # 日頻排除——殖利率每個交易日都更新，天天掛「新」會把月度發布
+    # 這種真正的事件淹沒。
     fresh = {r["id"]: {"name": r["name"],
                        "date": r["updated"].date().isoformat()}
              for r in rows
-             if r["updated_days"] is not None and r["updated_days"] <= 1}
+             if r["updated_days"] is not None and r["updated_days"] <= 1
+             and r["frequency"] != "d"}
 
     return {
         "rows": rows,
