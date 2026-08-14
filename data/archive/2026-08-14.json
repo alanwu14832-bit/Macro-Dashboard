@@ -1,6 +1,6 @@
 {
  "date": "2026-08-14",
- "generated_at": "2026-08-14T08:53:57",
+ "generated_at": "2026-08-14T06:09:38",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -142,7 +142,7 @@
   "real_ten_year": 2.42,
   "curve_10_2": 0.47999999999999954,
   "recession_gauge": 42.694603915909255,
-  "composite_labor": -6.359891985106878
+  "composite_labor": -6.359891985106876
  },
  "as_of": {
   "labor": "2026-07-01",
