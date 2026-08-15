@@ -1,6 +1,6 @@
 {
  "date": "2026-08-15",
- "generated_at": "2026-08-15T03:23:59",
+ "generated_at": "2026-08-15T14:46:35",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -87,7 +87,7 @@
    "headline": "初值近一年呈系統性下修，實質動能弱於初值",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "近 10 個月有 70% 遭下修，平均修正 -4.5 萬人",
+   "evidence": "近 11 個月有 64% 遭下修，平均修正 -4.1 萬人",
    "module": "就業"
   },
   {
