@@ -50,12 +50,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="建置總經儀表板")
     parser.add_argument("--fresh", action="store_true", help="忽略快取，全部重抓")
     parser.add_argument("--offline", action="store_true", help="只用快取，不連網")
+    parser.add_argument("--ttl", type=int, default=None, metavar="秒",
+                        help="快取有效期（預設 6 小時）。排程每小時建置時要壓在"
+                             "間隔以下，否則整輪都在重用舊快取")
     parser.add_argument("--no-archive", action="store_true", help="不寫入當天存檔")
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args()
 
     started = time.time()
-    ttl = 0 if args.fresh else (float("inf") if args.offline else 6 * 3600)
+    ttl = (0 if args.fresh else float("inf") if args.offline
+           else args.ttl if args.ttl is not None else 6 * 3600)
     verbose = not args.quiet
     # 新聞平常走自己的短 TTL，只有使用者明講要全抓或全離線時才跟著全站走。
     if args.fresh or args.offline:

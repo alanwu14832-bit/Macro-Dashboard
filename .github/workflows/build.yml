@@ -1,13 +1,13 @@
 name: 建置儀表板
 
-# 排程用 UTC。台北 08:45 = UTC 00:45；台北 21:45 = UTC 13:45。
-# 這兩個時點分別對應「美國前一交易日收盤後」與「美國 8:30am ET 數據發布後」。
+# 排程用 UTC，每小時 :45 跑一次——來源一公布，最多一小時上站。
+# :45 對齊美國 8:30am ET（UTC 12:30/13:30）的數據發布時點。
+# 總經資料源本身一天最多動一次，比每小時更密只是空轉。
 #
 # 刻意不掛 push 觸發：這個 workflow 自己會 commit 回 repo，掛 push 會無限迴圈。
 on:
   schedule:
-    - cron: "45 0 * * *"
-    - cron: "45 13 * * *"
+    - cron: "45 * * * *"
   workflow_dispatch:          # 也可以在 Actions 頁面手動按
 
 concurrency:
@@ -45,11 +45,13 @@ jobs:
       - name: 測試
         run: python3 -m unittest discover -s tests
 
+      # --ttl 3000（50 分鐘）：壓在每小時的排程間隔以下，讓每輪建置
+      # 都真的重抓資料，而不是重用上一輪的快取。
       - name: 建置
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
-        run: python3 build.py
+        run: python3 build.py --ttl 3000
 
       - name: 檢查產出是否合理
         run: |

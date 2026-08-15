@@ -81,10 +81,11 @@ def compute(bundle: Bundle) -> dict:
             continue
         # 一般載入為了省 API 呼叫略過 metadata，這裡只為這十幾檔補抓，
         # 因為「FRED 什麼時候更新的」正是這張表要回答的問題。
+        # TTL 壓在每小時建置的間隔以下，「新」徽章才不會晚好幾小時出現。
         meta = series.meta or {}
         if not meta.get("updated"):
             try:
-                meta = fred.metadata(series_id, ttl=6 * 3600)
+                meta = fred.metadata(series_id, ttl=3000)
                 meta = {"updated": meta.get("last_updated", "")}
             except Exception:
                 meta = {}
