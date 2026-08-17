@@ -1,6 +1,6 @@
 {
  "date": "2026-08-17",
- "generated_at": "2026-08-17T14:08:04",
+ "generated_at": "2026-08-17T15:50:11",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -103,7 +103,7 @@
    "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
    "direction": "neutral",
    "severity": "low",
-   "evidence": "高收益利差 2.71%，十年百分位 11%",
+   "evidence": "高收益利差 2.67%，十年百分位 6%",
    "module": "利率"
   },
   {
