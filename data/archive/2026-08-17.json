@@ -1,6 +1,6 @@
 {
  "date": "2026-08-17",
- "generated_at": "2026-08-17T11:53:08",
+ "generated_at": "2026-08-17T14:08:04",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -111,7 +111,7 @@
    "headline": "波動率處於低檔，市場對總經風險定價不足",
    "direction": "neutral",
    "severity": "low",
-   "evidence": "VIX 14.6",
+   "evidence": "VIX 14.2",
    "module": "市場"
   }
  ],
