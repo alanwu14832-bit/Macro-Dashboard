@@ -1,6 +1,6 @@
 {
  "date": "2026-08-18",
- "generated_at": "2026-08-18T11:55:08",
+ "generated_at": "2026-08-18T14:21:34",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -105,21 +105,13 @@
    "severity": "low",
    "evidence": "高收益利差 2.67%，十年百分位 6%",
    "module": "利率"
-  },
-  {
-   "key": "volatility_complacent",
-   "headline": "波動率處於低檔，市場對總經風險定價不足",
-   "direction": "neutral",
-   "severity": "low",
-   "evidence": "VIX 14.2",
-   "module": "市場"
   }
  ],
  "summary": {
-  "total": 14,
+  "total": 13,
   "hawkish": 4,
   "dovish": 7,
-  "neutral": 3,
+  "neutral": 2,
   "score": -8,
   "tilt": "偏降息"
  },
@@ -141,7 +133,7 @@
   "ten_year": 4.68,
   "real_ten_year": 2.41,
   "curve_10_2": 0.5099999999999998,
-  "recession_gauge": 42.09508742036365,
+  "recession_gauge": 39.62389826358779,
   "composite_labor": -6.359891985106876
  },
  "as_of": {
