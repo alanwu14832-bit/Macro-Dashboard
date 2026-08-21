@@ -60,20 +60,28 @@
 
   btn.addEventListener("click", async () => {
     btn.disabled = true;
+    let step = "初始化";
     try {
       const reg = await navigator.serviceWorker.ready;
       let sub = await reg.pushManager.getSubscription();
       if (sub) {
+        step = "取消訂閱";
         await remove(sub).catch(() => {});
         await sub.unsubscribe();
         paint(null);
         return;
       }
-      if (await Notification.requestPermission() !== "granted") return;
+      step = "通知權限";
+      if (await Notification.requestPermission() !== "granted") {
+        alert("通知權限未開啟。到 設定 → 通知 → 總經儀表板 開啟後再試。");
+        return;
+      }
+      step = "建立訂閱";
       sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: b64ToU8(VAPID_PUBLIC),
       });
+      step = "寫入資料庫";
       try {
         await save(sub);
       } catch (err) {
@@ -81,6 +89,9 @@
         throw err;
       }
       paint(sub);
+    } catch (err) {
+      // 手機上沒有開發者工具，失敗一定要說得出原因
+      alert("訂閱失敗（" + step + "）：" + (err && err.message ? err.message : err));
     } finally {
       btn.disabled = false;
     }
