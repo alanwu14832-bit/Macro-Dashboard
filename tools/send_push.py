@@ -29,14 +29,69 @@ SUPABASE_URL = "https://nwbfjoroqnhpymdtdbwu.supabase.co"  # 公開常數，同 
 SITE = "https://macro-dashboard-aaalan1.vercel.app"
 MAX_HEADLINES = 3
 
+# 中文資本市場新聞源。三家輪流取，單一來源掛掉不影響其他家。
+CH_FEEDS = [
+    ("中央社財經", "https://feeds.feedburner.com/rsscna/finance"),
+    ("鉅亨台股", "https://news.cnyes.com/rss/v1/news/category/tw_stock"),
+    ("自由財經", "https://news.ltn.com.tw/rss/business.xml"),
+]
+
+
+def _clean_title(title: str) -> str:
+    """去掉「[WEB][即時]」這類編輯標記，通知欄位寸土寸金。"""
+    import re
+    text = re.sub(r"^(\[[^\]]{1,8}\]|【[^】]{1,8}】)+\s*", "", title.strip())
+    return text[:42] + ("…" if len(text) > 42 else "")
+
+
+def _chinese_lines() -> list[str]:
+    """近 24 小時的中文財經頭條，三家來源輪流取，同題只留一則。"""
+    from datetime import datetime, timedelta, timezone
+    from macro import http as macro_http
+    from macro.compute.news import parse_feed
+
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+    per_source: list[list[dict]] = []
+    for name, url in CH_FEEDS:
+        try:
+            body = macro_http.get(url, ttl=1800, namespace="news", timeout=15)
+        except Exception:
+            continue
+        items = [i for i in parse_feed(body, name)
+                 if i["published"] and i["published"] >= cutoff]
+        items.sort(key=lambda i: i["published"], reverse=True)
+        per_source.append(items)
+
+    lines: list[str] = []
+    seen: set[str] = set()
+    rank = 0
+    while len(lines) < MAX_HEADLINES and any(per_source):
+        for items in per_source:            # 輪流取，來源觀點才有多樣性
+            while items:
+                item = items.pop(0)
+                key = _clean_title(item["title"])[:15]
+                if key in seen:
+                    continue
+                seen.add(key)
+                lines.append("・" + _clean_title(item["title"]))
+                break
+            if len(lines) >= MAX_HEADLINES:
+                break
+        rank += 1
+        if rank > 10:                       # 保險絲
+            break
+    return lines
+
 
 def compose() -> dict | None:
-    """從新聞聚合取焦點事件；沒有夠格的焦點就不推（寧缺勿濫）。"""
-    digest = news.compute(None)
-    clusters = (digest or {}).get("clusters") or []
-    if not clusters:
+    """中文資本市場新聞優先；全部抓不到才退回英文多源聚合。"""
+    lines = _chinese_lines()
+    if not lines:
+        digest = news.compute(None)
+        clusters = (digest or {}).get("clusters") or []
+        lines = [f"・{c['headline']}" for c in clusters[:MAX_HEADLINES]]
+    if not lines:
         return None
-    lines = [f"・{c['headline']}" for c in clusters[:MAX_HEADLINES]]
     return {
         "title": "今日財經焦點",
         "body": "\n".join(lines),
