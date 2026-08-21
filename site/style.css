@@ -363,7 +363,17 @@ section { margin: 34px 0; scroll-margin-top: calc(var(--topbar-h) + 18px); }
 }
 .verdict .eyebrow { color: var(--ink-muted); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
 .hero-figure { font-size: 2.6rem; font-weight: 680; letter-spacing: -0.03em; line-height: 1.15; margin: 2px 0 6px; }
-@media (max-width: 620px) { .hero-figure { font-size: 2.1rem; } }
+/* 手機收緊：APP 視窗小，標題與留白按比例縮，內容密度才不會被排版吃掉 */
+@media (max-width: 620px) {
+  h1 { font-size: 1.42rem; }
+  .page-head { margin-bottom: 14px; }
+  .page-head .lede { font-size: 0.88rem; }
+  section { margin: 24px 0; }
+  .verdict { padding: 16px 14px; }
+  .hero-figure { font-size: 1.85rem; }
+  .topbar-guide { margin-right: 0; }
+  .fresh-line { font-size: 0.84rem; padding: 7px 10px; }
+}
 .verdict .summary { color: var(--ink-2); margin: 10px 0 0; max-width: 74ch; }
 .verdict .summary strong { color: var(--ink); font-weight: 620; }
 
