@@ -89,6 +89,7 @@ def main() -> int:
         # 金鑰格式不對的訂閱（歷史測試資料、被截斷的列）直接清掉，
         # 否則 pywebpush 解碼時丟 binascii.Error 會拖垮整批發送。
         if len(sub.get("p256dh") or "") < 80 or len(sub.get("auth") or "") < 16:
+            print(f"  － 金鑰格式不對，清除：{sub['endpoint'][:70]}")
             drop(sub["endpoint"])
             gone += 1
             continue
@@ -104,7 +105,8 @@ def main() -> int:
         except WebPushException as exc:
             status = getattr(exc.response, "status_code", None)
             if status in (404, 410):
-                # 裝置已解除訂閱（換機、清資料）——順手清掉
+                # 裝置已解除訂閱（換機、清資料、重裝 APP）——順手清掉
+                print(f"  － 裝置已失效（{status}），清除：{sub['endpoint'][:70]}")
                 drop(sub["endpoint"])
                 gone += 1
             else:
