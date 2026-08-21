@@ -35,16 +35,21 @@
 
   async function save(sub) {
     const json = sub.toJSON();
+    // 純 insert，不用 upsert：這張表沒有 select policy（誰都讀不到訂閱
+    // 清單），而 upsert 的衝突合併需要回讀既有列，會被 RLS 擋下。
+    // 同一個 endpoint 的金鑰不會變——409（已訂閱過）直接視為成功。
     const res = await fetch(SB.url + "/rest/v1/push_subs", {
       method: "POST",
-      headers: { ...headers, Prefer: "resolution=merge-duplicates" },
+      headers: { ...headers, Prefer: "return=minimal" },
       body: JSON.stringify({
         endpoint: sub.endpoint,
         p256dh: json.keys.p256dh,
         auth: json.keys.auth,
       }),
     });
-    if (!res.ok) throw new Error("subscribe store failed " + res.status);
+    if (!res.ok && res.status !== 409) {
+      throw new Error("subscribe store failed " + res.status);
+    }
   }
 
   function remove(sub) {
