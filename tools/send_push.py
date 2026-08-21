@@ -79,8 +79,19 @@ def main() -> int:
     with open(key_path, "w", encoding="utf-8") as fh:
         fh.write(private_key + ("\n" if not private_key.endswith("\n") else ""))
 
+    def drop(endpoint: str) -> None:
+        _rest("/rest/v1/push_subs?endpoint=eq."
+              + urllib.parse.quote(endpoint, safe=""),
+              method="DELETE", service_key=service_key)
+
     sent = gone = failed = 0
     for sub in subs:
+        # 金鑰格式不對的訂閱（歷史測試資料、被截斷的列）直接清掉，
+        # 否則 pywebpush 解碼時丟 binascii.Error 會拖垮整批發送。
+        if len(sub.get("p256dh") or "") < 80 or len(sub.get("auth") or "") < 16:
+            drop(sub["endpoint"])
+            gone += 1
+            continue
         info = {"endpoint": sub["endpoint"],
                 "keys": {"p256dh": sub["p256dh"], "auth": sub["auth"]}}
         try:
@@ -94,13 +105,14 @@ def main() -> int:
             status = getattr(exc.response, "status_code", None)
             if status in (404, 410):
                 # 裝置已解除訂閱（換機、清資料）——順手清掉
-                _rest("/rest/v1/push_subs?endpoint=eq."
-                      + urllib.parse.quote(sub["endpoint"], safe=""),
-                      method="DELETE", service_key=service_key)
+                drop(sub["endpoint"])
                 gone += 1
             else:
                 failed += 1
                 print(f"  ✗ {status}: {str(exc)[:120]}")
+        except Exception as exc:  # 單筆資料異常不該讓其他裝置收不到
+            failed += 1
+            print(f"  ✗ {sub['endpoint'][:60]}…: {type(exc).__name__} {str(exc)[:100]}")
 
     print(f"送出 {sent}，清除失效 {gone}，失敗 {failed}")
     return 0 if failed == 0 else 1
