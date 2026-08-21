@@ -1,6 +1,6 @@
 {
  "date": "2026-08-21",
- "generated_at": "2026-08-21T19:47:32",
+ "generated_at": "2026-08-21T20:53:55",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -130,15 +130,15 @@
   "core_cpi": 2.4782661559973107,
   "core_pce": 3.286526430967074,
   "supercore": 2.941399756263796,
-  "ten_year": 4.65,
+  "ten_year": 4.69,
   "real_ten_year": 2.35,
-  "curve_10_2": 0.45999999999999996,
+  "curve_10_2": 0.5,
   "recession_gauge": 39.49479564535805,
   "composite_labor": -6.427422890957581
  },
  "as_of": {
   "labor": "2026-07-01",
   "inflation": "2026-07-01",
-  "rates": "2026-08-19"
+  "rates": "2026-08-20"
  }
 }
