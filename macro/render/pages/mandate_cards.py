@@ -117,7 +117,7 @@ def employment(ctx: dict, scenario: dict) -> str:
         f'<p class="mc-lede">先看失業率的格位，再用非農看流量、用職缺與離職'
         f'看需求端；月增波動大，趨勢看三月均。</p>'
         f'<div class="mc-cells">{cells}</div>'
-        f'<details class="mc-chain-wrap" open><summary class="mc-chain-toggle">'
+        f'<details class="mc-chain-wrap"><summary class="mc-chain-toggle">'
         f'查看 職缺、流量、失業率 傳導</summary>{chain}</details>'
         + callout("<strong>二階解讀</strong>：" + _payroll_read(latest, avg3, breakeven))
         + _drawer(ctx.get("_bundle"), "labor", "就業")
@@ -223,7 +223,7 @@ def inflation(ctx: dict, scenario: dict) -> str:
         f'<p class="mc-lede">先看核心 PCE 的格位與方向，再用 CPI 拆消費端、'
         f'PPI 看上游風險；三者不混成單一分數。</p>'
         f'<div class="mc-cells">{cells}</div>'
-        f'<details class="mc-chain-wrap" open><summary class="mc-chain-toggle">'
+        f'<details class="mc-chain-wrap"><summary class="mc-chain-toggle">'
         f'查看 PPI、CPI、PCE 傳導</summary>{chain}</details>'
         + callout("<strong>二階解讀</strong>：" + _inflation_read(core_pce, core_pce_3m))
         + _drawer(ctx.get("_bundle"), "inflation", "通膨")

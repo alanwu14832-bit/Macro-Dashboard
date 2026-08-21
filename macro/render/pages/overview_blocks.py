@@ -80,16 +80,19 @@ def rate_structure(ctx: dict) -> str:
 
     pricing_map = _pricing_map(ctx, curve, decomp)
 
+    # 判斷留在檯面（磁磚＋曲線與信用的結論），三張對照表收進摺疊——
+    # 總覽要能一眼掃完，細節留給想深挖的人。
     return section(
         "rates", "公債利率",
         f'<div class="grid grid-4">{"".join(tiles)}</div>'
         + callout(f'<strong>曲線</strong>：{move}<br><strong>驅動</strong>：{driver}')
-        + pricing_map
-        + '<h3 class="fd-h">殖利率上升是成長還是通膨？</h3>'
-        + table(["拆解（近三月）", "現值", "變動"], decomp_rows)
-        + '<h3 class="fd-h">信用利差（風險胃納的價格）</h3>'
-        + table(["類別", "利差", "近三月", "十年百分位"], credit_rows)
-        + callout(credit_verdict),
+        + callout(credit_verdict)
+        + accordion("市場定價表、長端拆解與信用利差",
+                    pricing_map
+                    + '<h3 class="fd-h">殖利率上升是成長還是通膨？</h3>'
+                    + table(["拆解（近三月）", "現值", "變動"], decomp_rows)
+                    + '<h3 class="fd-h">信用利差（風險胃納的價格）</h3>'
+                    + table(["類別", "利差", "近三月", "十年百分位"], credit_rows)),
         note="殖利率、利差皆為每日更新；百分位取十年分布",
         terms=["yield_curve", "real_rate"])
 
@@ -470,11 +473,14 @@ def implications(ctx: dict, scenario: dict, summary: dict) -> str:
         f'<strong>不是投資建議</strong>，未考慮任何個人的風險承受度、'
         f'稅務與既有部位。', key=True)]
 
+    tables = ""
     if rows:
-        parts.append(table(["資產", "情境對照的方向", "機制"], rows))
+        tables += table(["資產", "情境對照的方向", "機制"], rows)
     if sector_rows:
-        parts.append('<h3 class="fd-h">類股的傳導方向</h3>')
-        parts.append(table(["類股", "在這個情境下", "機制"], sector_rows))
+        tables += ('<h3 class="fd-h">類股的傳導方向</h3>'
+                   + table(["類股", "在這個情境下", "機制"], sector_rows))
+    if tables:
+        parts.append(accordion("資產與類股的對照表", tables))
     parts.append(f'<p style="margin-top:12px"><a href="/scenario/">'
                  f'看完整的九宮格定位、轉換門檻與部位對照　→</a></p>')
 
@@ -654,8 +660,8 @@ def fed_stance(ctx: dict, scenario: dict, fomc: dict | None) -> str:
         rows = [[esc(t["name"]), esc(t["need"]),
                  f'{fmt(abs(t["gap"]), 2)} {esc(t["unit"])}']
                 for t in transitions]
-        parts.append('<h3 class="fd-h">什麼會讓判定換檔</h3>')
-        parts.append(table(["情境轉換", "需要什麼", "還差"], rows))
+        parts.append(accordion("什麼會讓判定換檔",
+                               table(["情境轉換", "需要什麼", "還差"], rows)))
 
     if not parts:
         return ""
@@ -719,11 +725,12 @@ def commodities_block(ctx: dict) -> str:
 
     body = f'<div class="grid grid-3">{"".join(tiles)}</div>'
     if trans_rows:
-        body += ('<h3 class="fd-h">對台股族群的傳導</h3>'
-                 + table(["商品", "近一月", "族群", "方向", "族群今日", "機制"],
-                         trans_rows)
-                 + callout("傳導方向是規則，不是預測。「族群今日」是即時報價的"
-                           "平均，不是傳導的結果——當天股價還受無數其他因素影響。"))
+        body += accordion(
+            "對台股族群的傳導",
+            table(["商品", "近一月", "族群", "方向", "族群今日", "機制"],
+                  trans_rows)
+            + callout("傳導方向是規則，不是預測。「族群今日」是即時報價的"
+                      "平均，不是傳導的結果——當天股價還受無數其他因素影響。"))
     body += ('<p class="mc-foot-note">'
              '<a href="/commodities/">看貴金屬、能源、工業金屬與農產全表 →</a>　'
              '<a href="/tw/#tw-heat">看台股族群熱力圖 →</a></p>')
