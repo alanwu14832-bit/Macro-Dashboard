@@ -423,6 +423,9 @@ section { margin: 34px 0; scroll-margin-top: calc(var(--topbar-h) + 18px); }
 }
 .fresh-line .new-badge { margin-left: 0; margin-right: 8px; cursor: default; }
 
+/* 推播開關開啟時給個明確的「on」狀態 */
+#push-toggle.on { color: var(--good); border-color: var(--good); }
+
 /* ------------------------------------------------------------- signals ---- */
 .signal-list { display: flex; flex-direction: column; gap: 0; }
 .signal {

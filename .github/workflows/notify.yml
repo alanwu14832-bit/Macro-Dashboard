@@ -1,0 +1,33 @@
+name: 每日推播
+
+# 台北 08:05（UTC 00:05）發送前一天的財經焦點。
+# 內容取自 news 聚合：多家獨立媒體同時報導的事件，沒有焦點就不推。
+on:
+  schedule:
+    - cron: "5 0 * * *"
+  workflow_dispatch:          # 測試時可在 Actions 頁手動觸發
+
+permissions:
+  contents: read
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 網站本體零依賴；Web Push 的簽章與加密只在這個發送 job 需要
+      - name: 安裝 pywebpush
+        run: pip install pywebpush
+
+      - name: 發送
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python3 tools/send_push.py

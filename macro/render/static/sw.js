@@ -16,6 +16,37 @@ self.addEventListener("activate", (event) => {
       .then(() => self.clients.claim()));
 });
 
+/* 每日財經推播：payload 由 tools/send_push.py 發出（title/body/url）。 */
+self.addEventListener("push", (event) => {
+  let data = {};
+  try { data = event.data.json(); } catch (_) { /* 非 JSON 就用預設 */ }
+  event.waitUntil(self.registration.showNotification(
+    data.title || "總經儀表板",
+    {
+      body: data.body || "",
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      tag: data.tag || "daily-news",
+      data: { url: data.url || "/news/" },
+    }));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = (event.notification.data || {}).url || "/";
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true })
+      .then((wins) => {
+        for (const win of wins) {
+          if (new URL(win.url).origin === self.location.origin) {
+            win.navigate(url);
+            return win.focus();
+          }
+        }
+        return clients.openWindow(url);
+      }));
+});
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);

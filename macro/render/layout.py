@@ -229,6 +229,8 @@ def page(*, title: str, path: str, body: str, lede: str = "",
       <div class="topbar-title">{esc(title)}</div>
       <a class="topbar-guide" href="/guide/">使用講義</a>
       <div class="topbar-meta">{esc(updated)}</div>
+      <button type="button" class="icon-btn" id="push-toggle" hidden
+              aria-label="每日財經推播" aria-pressed="false">通知</button>
       <button type="button" class="icon-btn" id="theme-toggle" aria-label="切換深淺色">主題</button>
     </header>
     <main class="content" id="content">
@@ -249,6 +251,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 <script src="/account.js?v={version}" defer></script>
 <script src="/quotes.js?v={version}" defer></script>
 <script src="/explore.js?v={version}" defer></script>
+<script src="/notify.js?v={version}" defer></script>
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
 </html>
