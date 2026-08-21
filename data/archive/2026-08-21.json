@@ -1,6 +1,6 @@
 {
  "date": "2026-08-21",
- "generated_at": "2026-08-21T11:58:07",
+ "generated_at": "2026-08-21T14:24:19",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -103,23 +103,15 @@
    "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
    "direction": "neutral",
    "severity": "low",
-   "evidence": "高收益利差 2.73%，十年百分位 14%",
+   "evidence": "高收益利差 2.75%，十年百分位 17%",
    "module": "利率"
-  },
-  {
-   "key": "volatility_complacent",
-   "headline": "波動率處於低檔，市場對總經風險定價不足",
-   "direction": "neutral",
-   "severity": "low",
-   "evidence": "VIX 14.9",
-   "module": "市場"
   }
  ],
  "summary": {
-  "total": 14,
+  "total": 13,
   "hawkish": 4,
   "dovish": 7,
-  "neutral": 3,
+  "neutral": 2,
   "score": -8,
   "tilt": "偏降息"
  },
