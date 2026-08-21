@@ -4,7 +4,7 @@
    策略是 network-first：有網路永遠拿最新建置，快取只是離線備援——
    本站一天重建兩次，cache-first 會讓人看到過期的判斷，比沒有快取更糟。
    報價（/api/）完全不碰：盤中數字快取毫無意義。 */
-const CACHE = "macro-static-v1";
+const CACHE = "macro-static-v2";   // 版本號一換，activate 就會清光舊快取
 
 self.addEventListener("install", () => self.skipWaiting());
 

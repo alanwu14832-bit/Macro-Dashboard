@@ -61,27 +61,34 @@
   btn.addEventListener("click", async () => {
     btn.disabled = true;
     let step = "初始化";
+    const label = btn.textContent;
+    // 每一步都反映在按鈕文字上；卡住 20 秒就跳視窗說卡在哪。
+    // 「什麼都沒發生」不是可接受的失敗模式。
+    const watchdog = setTimeout(
+      () => alert("訂閱卡住了，停在步驟：" + step), 20000);
+    const mark = (s) => { step = s; btn.textContent = s + "…"; };
     try {
+      mark("等待SW");
       const reg = await navigator.serviceWorker.ready;
       let sub = await reg.pushManager.getSubscription();
       if (sub) {
-        step = "取消訂閱";
+        mark("取消訂閱");
         await remove(sub).catch(() => {});
         await sub.unsubscribe();
         paint(null);
         return;
       }
-      step = "通知權限";
+      mark("通知權限");
       if (await Notification.requestPermission() !== "granted") {
         alert("通知權限未開啟。到 設定 → 通知 → 總經儀表板 開啟後再試。");
         return;
       }
-      step = "建立訂閱";
+      mark("建立訂閱");
       sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: b64ToU8(VAPID_PUBLIC),
       });
-      step = "寫入資料庫";
+      mark("寫入資料庫");
       try {
         await save(sub);
       } catch (err) {
@@ -89,10 +96,13 @@
         throw err;
       }
       paint(sub);
+      alert("訂閱成功！之後每天早上 8:05 會收到財經焦點。");
     } catch (err) {
       // 手機上沒有開發者工具，失敗一定要說得出原因
       alert("訂閱失敗（" + step + "）：" + (err && err.message ? err.message : err));
     } finally {
+      clearTimeout(watchdog);
+      btn.textContent = label;
       btn.disabled = false;
     }
   });
