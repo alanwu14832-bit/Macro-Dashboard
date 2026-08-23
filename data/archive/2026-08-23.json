@@ -1,0 +1,144 @@
+{
+ "date": "2026-08-23",
+ "generated_at": "2026-08-23T00:02:28",
+ "signals": [
+  {
+   "key": "core_pce_above_target",
+   "headline": "核心 PCE 顯著高於目標",
+   "direction": "hawkish",
+   "severity": "high",
+   "evidence": "核心 PCE 3.3%，距 2% 目標 +1.3 個百分點",
+   "module": "物價"
+  },
+  {
+   "key": "momentum_cooling",
+   "headline": "核心 CPI 近三月年化明顯低於年增率",
+   "direction": "dovish",
+   "severity": "high",
+   "evidence": "近三月年化 1.6%，年增 2.5%，低 0.8 個百分點",
+   "module": "物價"
+  },
+  {
+   "key": "payrolls_below_breakeven",
+   "headline": "三月均非農低於損益兩平，撐不住現有失業率",
+   "direction": "dovish",
+   "severity": "high",
+   "evidence": "三月均 +2.0 萬人，損益兩平約 8.3 萬人",
+   "module": "就業"
+  },
+  {
+   "key": "unemployment_falling_for_wrong_reason",
+   "headline": "失業率下降來自勞動力萎縮，不是就業改善",
+   "direction": "dovish",
+   "severity": "high",
+   "evidence": "人口月增 +14.1 萬、勞動力月增 -10.7 萬；黃金年齡就業率 12 個月 -0.3 個百分點",
+   "module": "就業"
+  },
+  {
+   "key": "inflation_broad",
+   "headline": "剔除極端值後通膨不比核心低，漲勢是全面性的",
+   "direction": "hawkish",
+   "severity": "medium",
+   "evidence": "核心 2.5%，剔除極端值均值 2.8%",
+   "module": "物價"
+  },
+  {
+   "key": "quits_collapsed",
+   "headline": "主動離職率降到低檔，勞工議價力下降",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "主動離職率 2.0%",
+   "module": "就業"
+  },
+  {
+   "key": "real_rate_restrictive",
+   "headline": "10年實質利率處於限制性水準",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "10年實質利率 2.35%",
+   "module": "利率"
+  },
+  {
+   "key": "shelter_still_dragging",
+   "headline": "住房落後項仍在推升表面讀數，實際通膨比表面低",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "住房年增 3.2%、近三月年化 2.3%，收斂後對整體 CPI 約 -0.30 個百分點",
+   "module": "物價"
+  },
+  {
+   "key": "stock_bond_correlation_positive",
+   "headline": "股債同向，債券失去對沖股票的功能",
+   "direction": "neutral",
+   "severity": "medium",
+   "evidence": "標普報酬與10年殖利率變動相關 -0.31（近一年）",
+   "module": "市場"
+  },
+  {
+   "key": "supercore_sticky",
+   "headline": "核心服務除住房卡在目標之上",
+   "direction": "hawkish",
+   "severity": "medium",
+   "evidence": "年增 2.9%，已連 63 個月高於 2.5%",
+   "module": "物價"
+  },
+  {
+   "key": "systematic_downward_revisions",
+   "headline": "初值近一年呈系統性下修，實質動能弱於初值",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "近 11 個月有 64% 遭下修，平均修正 -4.1 萬人",
+   "module": "就業"
+  },
+  {
+   "key": "term_premium_elevated",
+   "headline": "期限溢酬偏高，長端在要求額外補償",
+   "direction": "hawkish",
+   "severity": "medium",
+   "evidence": "期限溢酬（近似）+0.94 個百分點",
+   "module": "利率"
+  },
+  {
+   "key": "credit_complacent",
+   "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
+   "direction": "neutral",
+   "severity": "low",
+   "evidence": "高收益利差 2.75%，十年百分位 17%",
+   "module": "利率"
+  }
+ ],
+ "summary": {
+  "total": 13,
+  "hawkish": 4,
+  "dovish": 7,
+  "neutral": 2,
+  "score": -8,
+  "tilt": "偏降息"
+ },
+ "scenario": {
+  "name": "停滯性通膨",
+  "employment": "弱",
+  "inflation": "高",
+  "regime": "通膨優先",
+  "lean": "hawkish"
+ },
+ "readings": {
+  "payrolls_latest": -23.0,
+  "payrolls_3m": 20.0,
+  "breakeven": 83.26981016666666,
+  "unemployment": 4.1,
+  "core_cpi": 2.4782661559973107,
+  "core_pce": 3.286526430967074,
+  "supercore": 2.941399756263796,
+  "ten_year": 4.69,
+  "real_ten_year": 2.35,
+  "curve_10_2": 0.5,
+  "recession_gauge": 39.2362767196344,
+  "composite_labor": -6.427422890957581
+ },
+ "as_of": {
+  "labor": "2026-07-01",
+  "inflation": "2026-07-01",
+  "rates": "2026-08-20"
+ }
+}
