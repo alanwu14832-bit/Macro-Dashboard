@@ -1,6 +1,6 @@
 {
  "date": "2026-08-25",
- "generated_at": "2026-08-25T19:22:37",
+ "generated_at": "2026-08-25T21:03:26",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -55,7 +55,7 @@
    "headline": "10年實質利率處於限制性水準",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "10年實質利率 2.40%",
+   "evidence": "10年實質利率 2.38%",
    "module": "利率"
   },
   {
@@ -71,7 +71,7 @@
    "headline": "股債同向，債券失去對沖股票的功能",
    "direction": "neutral",
    "severity": "medium",
-   "evidence": "標普報酬與10年殖利率變動相關 -0.30（近一年）",
+   "evidence": "標普報酬與10年殖利率變動相關 -0.29（近一年）",
    "module": "市場"
   },
   {
@@ -95,7 +95,7 @@
    "headline": "期限溢酬偏高，長端在要求額外補償",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "期限溢酬（近似）+0.97 個百分點",
+   "evidence": "期限溢酬（近似）+0.95 個百分點",
    "module": "利率"
   },
   {
@@ -130,15 +130,15 @@
   "core_cpi": 2.4782661559973107,
   "core_pce": 3.286526430967074,
   "supercore": 2.941399756263796,
-  "ten_year": 4.74,
-  "real_ten_year": 2.4,
-  "curve_10_2": 0.5,
+  "ten_year": 4.7,
+  "real_ten_year": 2.38,
+  "curve_10_2": 0.45999999999999996,
   "recession_gauge": 39.793258872097724,
   "composite_labor": -6.427422890957581
  },
  "as_of": {
   "labor": "2026-07-01",
   "inflation": "2026-07-01",
-  "rates": "2026-08-21"
+  "rates": "2026-08-24"
  }
 }
