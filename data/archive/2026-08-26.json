@@ -1,6 +1,6 @@
 {
  "date": "2026-08-26",
- "generated_at": "2026-08-26T12:05:30",
+ "generated_at": "2026-08-26T16:52:49",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -103,7 +103,7 @@
    "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
    "direction": "neutral",
    "severity": "low",
-   "evidence": "高收益利差 2.69%，十年百分位 9%",
+   "evidence": "高收益利差 2.70%，十年百分位 10%",
    "module": "利率"
   }
  ],
@@ -128,12 +128,12 @@
   "breakeven": 83.26981016666666,
   "unemployment": 4.1,
   "core_cpi": 2.4782661559973107,
-  "core_pce": 3.286526430967074,
+  "core_pce": 3.3441430040338282,
   "supercore": 2.941399756263796,
   "ten_year": 4.7,
   "real_ten_year": 2.38,
   "curve_10_2": 0.45999999999999996,
-  "recession_gauge": 40.11753259307908,
+  "recession_gauge": 39.69439510838599,
   "composite_labor": -6.427422890957581
  },
  "as_of": {
