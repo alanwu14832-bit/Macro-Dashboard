@@ -142,6 +142,29 @@ Fincept 的角色是**建置時**取得快照，那部分照舊。
 授權：WorldMonitor 是 AGPL-3.0。這裡取用的是 feed 網址與分類名稱這類事實資料，
 沒有內含或改作它的原始碼；新聞內容版權屬各原始媒體，頁面只存標題與連結。
 
+## 記帳（`/expense/`）
+
+手機優先的個人記帳頁：手動記一筆，或讓 iPhone 在 **Apple Pay 刷卡當下自動入帳**。
+把頁面加到主畫面（分享 → 加入主畫面）就是一個獨立的記帳 App。
+
+**自動記帳的原理。** iOS 不讓第三方直接讀 Apple Pay 交易，官方唯一的管道是
+捷徑的「交易」自動化：刷卡觸發捷徑，把金額與商家 POST 到 `/api/expense`。
+捷徑做不了 OAuth，所以用 ingest token 認人——使用者在頁面上登入後產生
+（存 `expense_tokens` 表、RLS 保護），貼進捷徑；function 用 service role key
+查 token → user_id 再寫入 `expenses` 表。商家名稱照關鍵字自動分類
+（全聯→超市、星巴克→餐飲……規則在 `api/expense.js` 與 `expense.js` 各一份，
+兩邊要一起改），兩分鐘內同商家同金額視為重複觸發、不重複入帳。
+
+**儲存與同步。** 與自選清單同一套哲學：localStorage 優先（沒登入全功能可用、
+資料不離開裝置），登入後同步到 Supabase（RLS 隔離），頁面開著每分鐘拉一次，
+刷完卡回來看就有了。可匯出 CSV。
+
+開通需要兩步：
+
+1. Supabase SQL Editor 執行 `tools/expense_schema.sql`（建表 + RLS）
+2. Vercel 環境變數加 `SUPABASE_SERVICE_ROLE_KEY`（沒設時 `/api/expense` 回 503，
+   手動記帳不受影響）
+
 ## 目錄
 
 ```
@@ -167,6 +190,8 @@ site/                       產出，部署這個目錄
 api/
   quotes.js                 報價代理（證交所 MIS + Finnhub）
   series.js                 FRED 序列代理，給 /explore/ 用
+  expense.js                自動記帳收單（iOS 捷徑 → Supabase）
+tools/expense_schema.sql    記帳資料表與 RLS（在 Supabase 執行一次）
 vercel.json                 Vercel 設定：只 serve site/，不在雲端 build
 .github/workflows/build.yml 每天兩次建置，產出 commit 回 repo
 ```
@@ -198,6 +223,7 @@ Output Directory 是 `site`（都寫在 `vercel.json` 裡了）。
 |---|---|---|
 | `FRED_API_KEY` | `api/series.js` | `/explore/` 取不到序列，回 503 |
 | `FINNHUB_API_KEY` | `api/quotes.js` | 非台股報價維持建置快照（台股照常即時） |
+| `SUPABASE_SERVICE_ROLE_KEY` | `api/expense.js` | Apple Pay 自動記帳回 503（手動記帳不受影響） |
 
 GitHub Actions 那邊另外要有同名的 repository secrets 給建置用，兩邊各一份。
 

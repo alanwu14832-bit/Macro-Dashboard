@@ -30,7 +30,7 @@
       ]
     },
     {
-      "source": "/(style.css|chart.js|sidebar.js|quotes.js|explore.js|account.js|notify.js)",
+      "source": "/(style.css|chart.js|sidebar.js|quotes.js|explore.js|account.js|notify.js|expense.js)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]

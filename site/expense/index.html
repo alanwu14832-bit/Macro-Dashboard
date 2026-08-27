@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>記帳｜總經儀表板</title>
+<meta name="description" content="手動記帳與 Apple Pay 自動記帳">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="總經儀表板">
+<link rel="stylesheet" href="/style.css?v=1787803620">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>📊</text></svg>">
+<script>
+(function(){var d=document.documentElement;try{
+var t=localStorage.getItem('theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);
+if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
+}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">跳到主要內容</a>
+<div class="app">
+
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <a class="rail-brand" href="/">
+        <span class="rail-mark" aria-hidden="true"></span>
+        <span class="nav-label">總經儀表板</span>
+      </a>
+      <button type="button" class="rail-toggle" id="rail-toggle"
+              aria-expanded="true" aria-controls="rail" aria-label="收合側邊選單">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="nav" aria-label="主選單"><a class="nav-item" href="/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v4h-7zM14 11h7v10h-7zM3 14h7v7H3z"/></svg><span class="nav-label">總覽</span><span class="nav-tip">總覽</span></a><div class="nav-group"><span>美國總經</span></div><a class="nav-item" href="/labor/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87"/></svg><span class="nav-label">勞動市場</span><span class="nav-tip">勞動市場</span></a><a class="nav-item" href="/inflation/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M21 7h-6M21 7v6"/></svg><span class="nav-label">通膨</span><span class="nav-tip">通膨</span></a><a class="nav-item" href="/fed/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V10M9 21V10M15 21V10M19 21V10M2 10h20L12 3z"/></svg><span class="nav-label">聯準會與利率</span><span class="nav-tip">聯準會與利率</span></a><a class="nav-item" href="/debt/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span class="nav-label">長端與債務</span><span class="nav-tip">長端與債務</span></a><a class="nav-item" href="/growth/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></svg><span class="nav-label">成長與信用</span><span class="nav-tip">成長與信用</span></a><div class="nav-group"><span>全球與市場</span></div><a class="nav-item" href="/news/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13v14H4zM17 9h3v8a2 2 0 0 1-3 2M7 9h7M7 13h7M7 17h4"/></svg><span class="nav-label">國際新聞</span><span class="nav-tip">國際新聞</span></a><a class="nav-item" href="/global/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18"/></svg><span class="nav-label">全球對照</span><span class="nav-tip">全球對照</span></a><a class="nav-item" href="/commodities/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7zM12 12l9-5M12 12v10M12 12L3 7"/></svg><span class="nav-label">大宗商品</span><span class="nav-tip">大宗商品</span></a><a class="nav-item" href="/equities/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18M7 14l3-3 3 3 5-5M18 9h3v3"/></svg><span class="nav-label">美股與國際</span><span class="nav-tip">美股與國際</span></a><a class="nav-item" href="/tw/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20v-6M9 20V9M14 20v-8M19 20V5M4 9l5-4 5 3 5-4"/></svg><span class="nav-label">台股</span><span class="nav-tip">台股</span></a><a class="nav-item" href="/market/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/></svg><span class="nav-label">市場面</span><span class="nav-tip">市場面</span></a><div class="nav-group"><span>判讀與紀錄</span></div><a class="nav-item" href="/explore/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.35-4.35M8 11h6M11 8v6"/></svg><span class="nav-label">自選比較</span><span class="nav-tip">自選比較</span></a><a class="nav-item" href="/scenario/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg><span class="nav-label">情境與部位</span><span class="nav-tip">情境與部位</span></a><a class="nav-item" href="/freshness/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2"/></svg><span class="nav-label">資料新鮮度</span><span class="nav-tip">資料新鮮度</span></a><a class="nav-item" href="/guide/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5zM8 7h8M8 11h8"/></svg><span class="nav-label">使用講義</span><span class="nav-tip">使用講義</span></a><a class="nav-item" href="/archive/"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v13H3zM3 3h18v4H3zM9 12h6"/></svg><span class="nav-label">存檔</span><span class="nav-tip">存檔</span></a><div class="nav-group"><span>個人工具</span></div><details class="nav-details" open><summary><a class="nav-item" href="/expense/" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h15v-5M16 12a2 2 0 0 0 0 4h5v-4z"/></svg><span class="nav-label">記帳</span><span class="nav-tip">記帳</span></a><span class="nav-caret" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></summary><div class="nav-sub"><a href="/expense/#summary">本月總覽</a><a href="/expense/#add">記一筆</a><a href="/expense/#list">明細</a><a href="/expense/#auto">Apple Pay 自動記帳</a><a href="/expense/#privacy">資料存在哪</a></div></details></nav>
+  </aside>
+  <div class="rail-scrim" id="rail-scrim" hidden></div>
+  <div class="shell">
+    <header class="topbar">
+      <button type="button" class="icon-btn drawer-btn" id="rail-open"
+              aria-label="開啟選單" aria-controls="rail" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="topbar-title">記帳</div>
+      <a class="topbar-guide" href="/guide/">使用講義</a>
+      <div class="topbar-meta"></div>
+      <button type="button" class="icon-btn" id="push-toggle" hidden
+              aria-label="每日財經推播" aria-pressed="false">通知</button>
+      <button type="button" class="icon-btn" id="theme-toggle" aria-label="切換深淺色">主題</button>
+    </header>
+    <main class="content" id="content">
+      <div class="wrap">
+<header class="page-head"><h1>記帳</h1><p class="lede">手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。</p></header>
+<div id="exp-status" class="exp-status" role="status" aria-live="polite">載入中…</div><section id="summary"><div class="section-head"><h2>本月總覽</h2><p class="note">金額統計以台幣計；外幣筆數會列出但不併入合計。</p></div><div id="exp-summary"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></section><section id="add"><div class="section-head"><h2>記一筆</h2><p class="note">填商家後分類會自動猜（全聯→超市、星巴克→餐飲），猜錯點分類改掉。</p></div>
+<form id="exp-form" class="exp-form" autocomplete="off">
+  <div class="exp-form-grid">
+    <label class="exp-field exp-field-amt">
+      <span>金額</span>
+      <input name="amount" type="number" inputmode="decimal" step="0.01"
+             min="0" placeholder="0" required>
+    </label>
+    <label class="exp-field">
+      <span>商家或項目</span>
+      <input name="merchant" type="text" maxlength="120" placeholder="例：全聯、午餐">
+    </label>
+    <label class="exp-field">
+      <span>日期</span>
+      <input name="date" type="date">
+    </label>
+    <label class="exp-field">
+      <span>備註（可空）</span>
+      <input name="note" type="text" maxlength="300" placeholder="">
+    </label>
+  </div>
+  <div class="exp-field">
+    <span>分類</span>
+    <div id="exp-chips" class="exp-chips"></div>
+    <input name="category" type="hidden" value="未分類">
+  </div>
+  <div class="exp-actions">
+    <button type="submit" class="exp-primary" data-submit>記一筆</button>
+    <button type="button" class="exp-ghost" data-cancel hidden>取消編輯</button>
+  </div>
+</form>
+</section><section id="list"><div class="section-head"><h2>明細</h2><p class="note">點「改」進入編輯、「刪」移除。CSV 匯出的是目前檢視的月份。</p></div><div id="exp-month-nav" class="exp-month-nav"></div><div id="exp-list"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></section><section id="auto"><div class="section-head"><h2>Apple Pay 自動記帳</h2><p class="note">金鑰等同你的記帳權限：只給自己的捷徑用，外洩就到這裡撤銷重發。</p></div><p>iOS 不讓 App 直接讀取 Apple Pay 交易——官方唯一的管道是捷徑的<strong>「交易」自動化</strong>：刷卡當下觸發捷徑，把金額與商家送到這個網站的 <code>/api/expense</code>，寫進你的帳。設定一次，之後全自動。</p><div class="exp-auto-grid"><div class="exp-auto-col"><h3>你的金鑰</h3><div data-account-slot></div><div id="exp-token"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></div><div class="exp-auto-col"><h3>捷徑設定步驟</h3>
+<ol class="exp-steps">
+  <li>打開 iPhone 的<strong>「捷徑」App</strong> → 底部「自動化」→ 右上「＋」新增。</li>
+  <li>觸發條件往下找到<strong>「交易」</strong>（Transaction）→ 勾選你的
+      Apple Pay 卡片（可多張）→ 選<strong>「立即執行」</strong>，這樣刷卡當下就記帳，
+      不會跳出來問你。</li>
+  <li>動作選<strong>「取得 URL 內容」</strong>（Get Contents of URL），照左邊
+      金鑰區塊顯示的設定填：URL、方法 POST、請求本文 JSON，
+      金額、商家、卡片三個欄位從「快速指令輸入」變數裡選。</li>
+  <li>完成。之後每一筆 Apple Pay（含 Apple Watch）付款會自動出現在這一頁，
+      商家會照關鍵字自動分類，猜錯的點「改」修一次即可。</li>
+</ol>
+<p class="note">現金或別人的請款不會經過 Apple Pay——用上面的表單手動補一筆就好。
+實體卡直接插卡／感應（沒過 Apple Pay）的交易，iOS 收不到通知，同樣手動補。</p>
+</div></div></section><section id="privacy"><div class="section-head"><h2>資料存在哪</h2></div><p><strong>沒登入：</strong>只存在這台裝置瀏覽器的 localStorage，不離開你的手機。清瀏覽器資料會清掉，記得先匯出 CSV。</p><p><strong>登入後：</strong>同步到本站的 Supabase 資料庫，由資料庫的 Row Level Security 隔離——每個帳號只能讀寫自己的紀錄。手機記的帳，電腦上登入同一帳號就看得到；Apple Pay 自動記帳需要登入（金鑰要綁在帳號上）。</p><p>把這一頁加到主畫面（分享 → 加入主畫面）就是一個獨立的記帳 App，離線也能開。</p></section><script src="/expense.js?v=1787803620" defer></script>
+      </div>
+      <footer class="site">
+        <p>資料來源：FRED（BLS、BEA、DOL、Treasury、Federal Reserve、EIA、IMF 原始資料）、OECD SDMX、ECB Data Portal、行政院主計總處、LBMA、證交所、Finnhub。新聞來源目錄取自 <a href="https://github.com/koala73/worldmonitor" target="_blank" rel="noopener noreferrer">WorldMonitor</a>（AGPL-3.0），新聞內容版權屬各原始媒體。</p>
+        <p>所有量化判定由固定規則產生，同一份資料每次執行結果一致。指標定義與門檻見各區塊底部的名詞說明。</p>
+        <p>本站為個人資料整理，不構成投資建議。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+<script>window.__SB={"url": "https://nwbfjoroqnhpymdtdbwu.supabase.co", "key": "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"}</script>
+<script src="/sidebar.js?v=1787803620" defer></script>
+<script src="/chart.js?v=1787803620" defer></script>
+<script src="/account.js?v=1787803620" defer></script>
+<script src="/quotes.js?v=1787803620" defer></script>
+<script src="/explore.js?v=1787803620" defer></script>
+<script src="/notify.js?v=1787803620" defer></script>
+<script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
+</body>
+</html>
