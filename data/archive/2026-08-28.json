@@ -1,6 +1,6 @@
 {
  "date": "2026-08-28",
- "generated_at": "2026-08-28T01:33:28",
+ "generated_at": "2026-08-28T21:57:59",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -95,7 +95,7 @@
    "headline": "期限溢酬偏高，長端在要求額外補償",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "期限溢酬（近似）+0.92 個百分點",
+   "evidence": "期限溢酬（近似）+0.90 個百分點",
    "module": "利率"
   },
   {
@@ -103,15 +103,23 @@
    "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
    "direction": "neutral",
    "severity": "low",
-   "evidence": "高收益利差 2.67%，十年百分位 6%",
+   "evidence": "高收益利差 2.63%，十年百分位 2%",
    "module": "利率"
+  },
+  {
+   "key": "volatility_complacent",
+   "headline": "波動率處於低檔，市場對總經風險定價不足",
+   "direction": "neutral",
+   "severity": "low",
+   "evidence": "VIX 14.5",
+   "module": "市場"
   }
  ],
  "summary": {
-  "total": 13,
+  "total": 14,
   "hawkish": 4,
   "dovish": 7,
-  "neutral": 2,
+  "neutral": 3,
   "score": -8,
   "tilt": "偏降息"
  },
@@ -130,15 +138,15 @@
   "core_cpi": 2.4782661559973107,
   "core_pce": 3.3441430040338282,
   "supercore": 2.941399756263796,
-  "ten_year": 4.66,
+  "ten_year": 4.67,
   "real_ten_year": 2.34,
   "curve_10_2": 0.46999999999999975,
-  "recession_gauge": 39.38663017105874,
+  "recession_gauge": 39.38731284956006,
   "composite_labor": -6.448812319365424
  },
  "as_of": {
   "labor": "2026-07-01",
   "inflation": "2026-07-01",
-  "rates": "2026-08-26"
+  "rates": "2026-08-27"
  }
 }
