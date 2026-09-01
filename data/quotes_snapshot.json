@@ -6,13 +6,13 @@
   "limit_down": 95.65,
   "limit_up": 116.85,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "元大台灣50",
   "open": null,
   "previous_close": 106.25,
   "price": 106.25,
   "quoted_at": "2026-09-01T08:58:47+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "0056": {
@@ -22,13 +22,13 @@
   "limit_down": 49.14,
   "limit_up": 60.05,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "元大高股息",
   "open": null,
   "previous_close": 54.6,
   "price": 54.65,
   "quoted_at": "2026-09-01T08:58:51+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "006208": {
@@ -38,13 +38,13 @@
   "limit_down": 218.65,
   "limit_up": 267.15,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "富邦台50",
   "open": null,
   "previous_close": 242.9,
   "price": 243.55,
   "quoted_at": "2026-09-01T08:58:54+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "00878": {
@@ -54,13 +54,13 @@
   "limit_down": 29.87,
   "limit_up": 36.49,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "國泰永續高股息",
   "open": null,
   "previous_close": 33.18,
   "price": 33.28,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "009816": {
@@ -70,13 +70,13 @@
   "limit_down": 14.01,
   "limit_up": 17.11,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "凱基台灣TOP50",
   "open": null,
   "previous_close": 15.56,
   "price": 15.58,
   "quoted_at": "2026-09-01T08:58:53+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "1301": {
@@ -86,13 +86,13 @@
   "limit_down": 59.6,
   "limit_up": 72.8,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "台塑",
   "open": null,
   "previous_close": 66.2,
   "price": 66.4,
   "quoted_at": "2026-09-01T08:58:57+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "1303": {
@@ -102,13 +102,13 @@
   "limit_down": 218.5,
   "limit_up": 266.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "南亞",
   "open": null,
   "previous_close": 242.5,
   "price": 245.0,
   "quoted_at": "2026-09-01T08:58:51+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "1326": {
@@ -118,13 +118,13 @@
   "limit_down": 61.5,
   "limit_up": 75.1,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "台化",
   "open": null,
   "previous_close": 68.3,
   "price": 71.7,
   "quoted_at": "2026-09-01T08:58:54+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "1503": {
@@ -134,13 +134,13 @@
   "limit_down": 180.0,
   "limit_up": 220.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "士電",
   "open": null,
   "previous_close": 200.0,
   "price": 200.0,
   "quoted_at": "2026-09-01T08:58:58+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "1513": {
@@ -150,13 +150,13 @@
   "limit_down": 148.0,
   "limit_up": 180.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "中興電",
   "open": null,
   "previous_close": 164.0,
   "price": 164.0,
   "quoted_at": "2026-09-01T08:58:44+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "1519": {
@@ -166,13 +166,13 @@
   "limit_down": 657.0,
   "limit_up": 801.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "華城",
   "open": null,
   "previous_close": 729.0,
   "price": 727.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "1560": {
@@ -182,13 +182,13 @@
   "limit_down": 615.0,
   "limit_up": 751.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "中砂",
   "open": null,
   "previous_close": 683.0,
   "price": 682.0,
   "quoted_at": "2026-09-01T08:58:14+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2002": {
@@ -198,13 +198,13 @@
   "limit_down": 17.1,
   "limit_up": 20.8,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "中鋼",
   "open": null,
   "previous_close": 18.95,
   "price": 18.95,
   "quoted_at": "2026-09-01T08:58:57+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2027": {
@@ -214,13 +214,13 @@
   "limit_down": 43.95,
   "limit_up": 53.6,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "大成鋼",
   "open": null,
   "previous_close": 48.8,
   "price": 48.7,
   "quoted_at": "2026-09-01T08:58:49+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2059": {
@@ -230,13 +230,13 @@
   "limit_down": 12765.0,
   "limit_up": 15595.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "川湖",
   "open": null,
   "previous_close": 14180.0,
   "price": 13980.0,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2301": {
@@ -246,13 +246,13 @@
   "limit_down": 274.5,
   "limit_up": 335.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "光寶科",
   "open": null,
   "previous_close": 305.0,
   "price": 305.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2303": {
@@ -262,13 +262,13 @@
   "limit_down": 116.5,
   "limit_up": 141.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "聯電",
   "open": null,
   "previous_close": 129.0,
   "price": 128.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2308": {
@@ -278,13 +278,13 @@
   "limit_down": 1660.0,
   "limit_up": 2020.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "台達電",
   "open": null,
   "previous_close": 1840.0,
   "price": 1860.0,
   "quoted_at": "2026-09-01T08:58:58+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2317": {
@@ -294,13 +294,13 @@
   "limit_down": 225.0,
   "limit_up": 275.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "鴻海",
   "open": null,
   "previous_close": 250.0,
   "price": 253.5,
   "quoted_at": "2026-09-01T08:58:59+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2330": {
@@ -310,13 +310,13 @@
   "limit_down": 2165.0,
   "limit_up": 2645.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "台積電",
   "open": null,
   "previous_close": 2405.0,
   "price": 2395.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2344": {
@@ -326,13 +326,13 @@
   "limit_down": 164.5,
   "limit_up": 200.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "華邦電",
   "open": null,
   "previous_close": 182.5,
   "price": 183.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2345": {
@@ -342,13 +342,13 @@
   "limit_down": 1835.0,
   "limit_up": 2235.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "智邦",
   "open": null,
   "previous_close": 2035.0,
   "price": 2110.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2356": {
@@ -358,13 +358,13 @@
   "limit_down": 60.1,
   "limit_up": 73.3,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "英業達",
   "open": null,
   "previous_close": 66.7,
   "price": 66.7,
   "quoted_at": "2026-09-01T08:58:58+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2357": {
@@ -374,13 +374,13 @@
   "limit_down": 900.0,
   "limit_up": 1095.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "華碩",
   "open": null,
   "previous_close": 999.0,
   "price": 1005.0,
   "quoted_at": "2026-09-01T08:58:54+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2360": {
@@ -390,13 +390,13 @@
   "limit_down": 1765.0,
   "limit_up": 2155.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "致茂",
   "open": null,
   "previous_close": 1960.0,
   "price": 1980.0,
   "quoted_at": "2026-09-01T08:58:57+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2368": {
@@ -406,13 +406,13 @@
   "limit_down": 1050.0,
   "limit_up": 1280.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "金像電",
   "open": null,
   "previous_close": 1165.0,
   "price": 1195.0,
   "quoted_at": "2026-09-01T08:58:53+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2376": {
@@ -422,13 +422,13 @@
   "limit_down": 322.5,
   "limit_up": 393.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "技嘉",
   "open": null,
   "previous_close": 358.0,
   "price": 359.0,
   "quoted_at": "2026-09-01T08:58:50+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2379": {
@@ -438,13 +438,13 @@
   "limit_down": 649.0,
   "limit_up": 793.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "瑞昱",
   "open": null,
   "previous_close": 721.0,
   "price": 718.0,
   "quoted_at": "2026-09-01T08:58:27+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2382": {
@@ -454,13 +454,13 @@
   "limit_down": 305.0,
   "limit_up": 372.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "廣達",
   "open": null,
   "previous_close": 338.5,
   "price": 338.5,
   "quoted_at": "2026-09-01T08:58:53+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2383": {
@@ -470,13 +470,13 @@
   "limit_down": 4940.0,
   "limit_up": 6030.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "台光電",
   "open": null,
   "previous_close": 5485.0,
   "price": 5495.0,
   "quoted_at": "2026-09-01T08:58:32+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2408": {
@@ -486,13 +486,13 @@
   "limit_down": 489.0,
   "limit_up": 597.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "南亞科",
   "open": null,
   "previous_close": 543.0,
   "price": 554.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2409": {
@@ -502,13 +502,13 @@
   "limit_down": 24.0,
   "limit_up": 29.3,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "友達",
   "open": null,
   "previous_close": 26.65,
   "price": 26.85,
   "quoted_at": "2026-09-01T08:58:53+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2412": {
@@ -518,13 +518,13 @@
   "limit_down": 122.5,
   "limit_up": 149.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "中華電",
   "open": null,
   "previous_close": 136.0,
   "price": 136.0,
   "quoted_at": "2026-09-01T08:58:58+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2421": {
@@ -534,13 +534,13 @@
   "limit_down": 162.0,
   "limit_up": 197.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "建準",
   "open": null,
   "previous_close": 179.5,
   "price": 184.5,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2449": {
@@ -550,13 +550,13 @@
   "limit_down": 231.5,
   "limit_up": 282.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "京元電子",
   "open": null,
   "previous_close": 257.0,
   "price": 258.5,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2451": {
@@ -566,13 +566,13 @@
   "limit_down": 265.5,
   "limit_up": 323.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "創見",
   "open": null,
   "previous_close": 294.5,
   "price": 295.5,
   "quoted_at": "2026-09-01T08:58:50+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2454": {
@@ -582,13 +582,13 @@
   "limit_down": 3535.0,
   "limit_up": 4315.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "聯發科",
   "open": null,
   "previous_close": 3925.0,
   "price": 4315.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2603": {
@@ -598,13 +598,13 @@
   "limit_down": 210.5,
   "limit_up": 256.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "長榮",
   "open": null,
   "previous_close": 233.5,
   "price": 234.0,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2609": {
@@ -614,13 +614,13 @@
   "limit_down": 53.6,
   "limit_up": 65.4,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "陽明",
   "open": null,
   "previous_close": 59.5,
   "price": 60.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2610": {
@@ -630,13 +630,13 @@
   "limit_down": 18.25,
   "limit_up": 22.25,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "華航",
   "open": null,
   "previous_close": 20.25,
   "price": 20.25,
   "quoted_at": "2026-09-01T08:58:53+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2615": {
@@ -646,13 +646,13 @@
   "limit_down": 103.0,
   "limit_up": 125.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "萬海",
   "open": null,
   "previous_close": 114.0,
   "price": 113.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2618": {
@@ -662,13 +662,13 @@
   "limit_down": 37.8,
   "limit_up": 46.2,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "長榮航",
   "open": null,
   "previous_close": 42.0,
   "price": 41.65,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2881": {
@@ -678,13 +678,13 @@
   "limit_down": 130.0,
   "limit_up": 158.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "富邦金",
   "open": null,
   "previous_close": 144.0,
   "price": 143.0,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2882": {
@@ -694,13 +694,13 @@
   "limit_down": 99.5,
   "limit_up": 121.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "國泰金",
   "open": null,
   "previous_close": 110.5,
   "price": 110.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2884": {
@@ -710,13 +710,13 @@
   "limit_down": 35.8,
   "limit_up": 43.7,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "玉山金",
   "open": null,
   "previous_close": 39.75,
   "price": 39.15,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2885": {
@@ -726,13 +726,13 @@
   "limit_down": 58.9,
   "limit_up": 71.9,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "元大金",
   "open": null,
   "previous_close": 65.4,
   "price": 65.0,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2886": {
@@ -742,13 +742,13 @@
   "limit_down": 43.7,
   "limit_up": 53.4,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "兆豐金",
   "open": null,
   "previous_close": 48.55,
   "price": 48.3,
   "quoted_at": "2026-09-01T08:58:57+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "2891": {
@@ -758,13 +758,13 @@
   "limit_down": 58.3,
   "limit_up": 71.1,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "中信金",
   "open": null,
   "previous_close": 64.7,
   "price": 65.2,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3006": {
@@ -774,13 +774,13 @@
   "limit_down": 263.5,
   "limit_up": 321.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "晶豪科",
   "open": null,
   "previous_close": 292.5,
   "price": 307.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3008": {
@@ -790,13 +790,13 @@
   "limit_down": 6885.0,
   "limit_up": 8415.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "大立光",
   "open": null,
   "previous_close": 7650.0,
   "price": 7680.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3013": {
@@ -806,13 +806,13 @@
   "limit_down": 78.9,
   "limit_up": 96.3,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "晟銘電",
   "open": null,
   "previous_close": 87.6,
   "price": 89.0,
   "quoted_at": "2026-09-01T08:58:53+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3017": {
@@ -822,13 +822,13 @@
   "limit_down": 3085.0,
   "limit_up": 3765.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "奇鋐",
   "open": null,
   "previous_close": 3425.0,
   "price": 3450.0,
   "quoted_at": "2026-09-01T08:58:57+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3023": {
@@ -838,13 +838,13 @@
   "limit_down": 281.5,
   "limit_up": 343.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "信邦",
   "open": null,
   "previous_close": 312.5,
   "price": 310.5,
   "quoted_at": "2026-09-01T08:58:47+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3034": {
@@ -854,13 +854,13 @@
   "limit_down": 486.0,
   "limit_up": 594.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "聯詠",
   "open": null,
   "previous_close": 540.0,
   "price": 536.0,
   "quoted_at": "2026-09-01T08:58:57+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3036": {
@@ -870,13 +870,13 @@
   "limit_down": 176.5,
   "limit_up": 215.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "文曄",
   "open": null,
   "previous_close": 196.0,
   "price": 195.0,
   "quoted_at": "2026-09-01T08:58:59+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3037": {
@@ -886,13 +886,13 @@
   "limit_down": 900.0,
   "limit_up": 1095.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "欣興",
   "open": null,
   "previous_close": 999.0,
   "price": 900.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3044": {
@@ -902,13 +902,13 @@
   "limit_down": 447.0,
   "limit_up": 546.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "健鼎",
   "open": null,
   "previous_close": 496.5,
   "price": 497.0,
   "quoted_at": "2026-09-01T08:58:58+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3045": {
@@ -918,13 +918,13 @@
   "limit_down": 104.5,
   "limit_up": 127.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "台灣大",
   "open": null,
   "previous_close": 116.0,
   "price": 115.0,
   "quoted_at": "2026-09-01T08:58:54+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3131": {
@@ -934,13 +934,13 @@
   "limit_down": 2170.0,
   "limit_up": 2650.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "弘塑",
   "open": null,
   "previous_close": 2410.0,
   "price": 2420.0,
   "quoted_at": "2026-09-01T08:58:35+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3231": {
@@ -950,13 +950,13 @@
   "limit_down": 160.5,
   "limit_up": 195.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "緯創",
   "open": null,
   "previous_close": 178.0,
   "price": 180.0,
   "quoted_at": "2026-09-01T08:58:51+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3324": {
@@ -966,13 +966,13 @@
   "limit_down": 1125.0,
   "limit_up": 1375.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "雙鴻",
   "open": null,
   "previous_close": 1250.0,
   "price": 1300.0,
   "quoted_at": "2026-09-01T08:59:00+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3374": {
@@ -982,13 +982,13 @@
   "limit_down": 380.5,
   "limit_up": 464.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "精材",
   "open": null,
   "previous_close": 422.5,
   "price": 425.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3406": {
@@ -998,13 +998,13 @@
   "limit_down": 905.0,
   "limit_up": 1105.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "玉晶光",
   "open": null,
   "previous_close": 1005.0,
   "price": 1010.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3443": {
@@ -1014,13 +1014,13 @@
   "limit_down": 5490.0,
   "limit_up": 6710.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "創意",
   "open": null,
   "previous_close": 6100.0,
   "price": 6550.0,
   "quoted_at": "2026-09-01T08:58:53+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3481": {
@@ -1030,13 +1030,13 @@
   "limit_down": 44.9,
   "limit_up": 54.8,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "群創",
   "open": null,
   "previous_close": 49.85,
   "price": 49.95,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3529": {
@@ -1046,13 +1046,13 @@
   "limit_down": 2160.0,
   "limit_up": 2640.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "力旺",
   "open": null,
   "previous_close": 2400.0,
   "price": 2450.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3532": {
@@ -1062,13 +1062,13 @@
   "limit_down": 341.5,
   "limit_up": 416.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "台勝科",
   "open": null,
   "previous_close": 379.0,
   "price": 378.5,
   "quoted_at": "2026-09-01T08:58:54+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3533": {
@@ -1078,13 +1078,13 @@
   "limit_down": 1525.0,
   "limit_up": 1855.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "嘉澤",
   "open": null,
   "previous_close": 1690.0,
   "price": 1685.0,
   "quoted_at": "2026-09-01T08:58:57+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3583": {
@@ -1094,13 +1094,13 @@
   "limit_down": 652.0,
   "limit_up": 796.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "辛耘",
   "open": null,
   "previous_close": 724.0,
   "price": 725.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3596": {
@@ -1110,13 +1110,13 @@
   "limit_down": 142.5,
   "limit_up": 173.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "智易",
   "open": null,
   "previous_close": 158.0,
   "price": 158.5,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3653": {
@@ -1126,13 +1126,13 @@
   "limit_down": 5395.0,
   "limit_up": 6585.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "健策",
   "open": null,
   "previous_close": 5990.0,
   "price": 6010.0,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3661": {
@@ -1142,13 +1142,13 @@
   "limit_down": 3670.0,
   "limit_up": 4480.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "世芯-KY",
   "open": null,
   "previous_close": 4075.0,
   "price": 4290.0,
   "quoted_at": "2026-09-01T08:58:57+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3665": {
@@ -1158,13 +1158,13 @@
   "limit_down": 1955.0,
   "limit_up": 2385.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "貿聯-KY",
   "open": null,
   "previous_close": 2170.0,
   "price": 2175.0,
   "quoted_at": "2026-09-01T08:58:50+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3680": {
@@ -1174,13 +1174,13 @@
   "limit_down": 444.0,
   "limit_up": 542.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "家登",
   "open": null,
   "previous_close": 493.0,
   "price": 524.0,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3702": {
@@ -1190,13 +1190,13 @@
   "limit_down": 89.7,
   "limit_up": 109.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "大聯大",
   "open": null,
   "previous_close": 99.6,
   "price": 100.0,
   "quoted_at": "2026-09-01T08:58:54+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3706": {
@@ -1206,13 +1206,13 @@
   "limit_down": 83.3,
   "limit_up": 101.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "神達",
   "open": null,
   "previous_close": 92.5,
   "price": 92.9,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "3711": {
@@ -1222,13 +1222,13 @@
   "limit_down": 526.0,
   "limit_up": 642.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "日月光投控",
   "open": null,
   "previous_close": 584.0,
   "price": 587.0,
   "quoted_at": "2026-09-01T08:58:54+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "4904": {
@@ -1238,13 +1238,13 @@
   "limit_down": 90.9,
   "limit_up": 111.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "遠傳",
   "open": null,
   "previous_close": 101.0,
   "price": 100.5,
   "quoted_at": "2026-09-01T08:58:48+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "4958": {
@@ -1254,13 +1254,13 @@
   "limit_down": 450.0,
   "limit_up": 550.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "臻鼎-KY",
   "open": null,
   "previous_close": 500.0,
   "price": 514.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "4977": {
@@ -1270,13 +1270,13 @@
   "limit_down": 152.0,
   "limit_up": 192.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "眾達-KY",
   "open": null,
   "previous_close": 175.0,
   "price": 177.5,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "5269": {
@@ -1286,13 +1286,13 @@
   "limit_down": 1285.0,
   "limit_up": 1565.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "祥碩",
   "open": null,
   "previous_close": 1425.0,
   "price": 1420.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "5347": {
@@ -1302,13 +1302,13 @@
   "limit_down": 136.5,
   "limit_up": 166.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "世界先進",
   "open": null,
   "previous_close": 151.5,
   "price": 153.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "5434": {
@@ -1318,13 +1318,13 @@
   "limit_down": 463.5,
   "limit_up": 566.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "崇越",
   "open": null,
   "previous_close": 515.0,
   "price": 521.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6147": {
@@ -1334,13 +1334,13 @@
   "limit_down": 158.0,
   "limit_up": 193.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "頎邦",
   "open": null,
   "previous_close": 175.5,
   "price": 177.5,
   "quoted_at": "2026-09-01T08:58:53+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6196": {
@@ -1350,13 +1350,13 @@
   "limit_down": 436.5,
   "limit_up": 533.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "帆宣",
   "open": null,
   "previous_close": 485.0,
   "price": 486.0,
   "quoted_at": "2026-09-01T08:57:54+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6239": {
@@ -1366,13 +1366,13 @@
   "limit_down": 249.5,
   "limit_up": 304.5,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "力成",
   "open": null,
   "previous_close": 277.0,
   "price": 274.5,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6285": {
@@ -1382,13 +1382,13 @@
   "limit_down": 220.0,
   "limit_up": 268.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "啟碁",
   "open": null,
   "previous_close": 244.0,
   "price": 246.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6409": {
@@ -1398,13 +1398,13 @@
   "limit_down": 932.0,
   "limit_up": 1135.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "旭隼",
   "open": null,
   "previous_close": 1035.0,
   "price": 1035.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6442": {
@@ -1414,13 +1414,13 @@
   "limit_down": 1470.0,
   "limit_up": 1790.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "光聖",
   "open": null,
   "previous_close": 1630.0,
   "price": 1625.0,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6488": {
@@ -1430,13 +1430,13 @@
   "limit_down": 821.0,
   "limit_up": 1000.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "環球晶",
   "open": null,
   "previous_close": 912.0,
   "price": 907.0,
   "quoted_at": "2026-09-01T08:58:58+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6505": {
@@ -1446,13 +1446,13 @@
   "limit_down": 66.2,
   "limit_up": 80.8,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "台塑化",
   "open": null,
   "previous_close": 73.5,
   "price": 73.5,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6669": {
@@ -1462,13 +1462,13 @@
   "limit_down": 6390.0,
   "limit_up": 7800.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "緯穎",
   "open": null,
   "previous_close": 7095.0,
   "price": 7115.0,
   "quoted_at": "2026-09-01T08:58:50+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "6770": {
@@ -1478,13 +1478,13 @@
   "limit_down": 65.7,
   "limit_up": 80.3,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "力積電",
   "open": null,
   "previous_close": 73.0,
   "price": 73.8,
   "quoted_at": "2026-09-01T08:58:56+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "8046": {
@@ -1494,13 +1494,13 @@
   "limit_down": 1110.0,
   "limit_up": 1350.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "南電",
   "open": null,
   "previous_close": 1230.0,
   "price": 1260.0,
   "quoted_at": "2026-09-01T08:58:55+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "8210": {
@@ -1510,13 +1510,13 @@
   "limit_down": 873.0,
   "limit_up": 1065.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "勤誠",
   "open": null,
   "previous_close": 969.0,
   "price": 970.0,
   "quoted_at": "2026-09-01T08:58:50+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "8299": {
@@ -1526,13 +1526,13 @@
   "limit_down": 1950.0,
   "limit_up": 2380.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "群聯",
   "open": null,
   "previous_close": 2165.0,
   "price": 2185.0,
   "quoted_at": "2026-09-01T08:58:58+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "8996": {
@@ -1542,13 +1542,13 @@
   "limit_down": 1060.0,
   "limit_up": 1290.0,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "高力",
   "open": null,
   "previous_close": 1175.0,
   "price": 1175.0,
   "quoted_at": "2026-09-01T08:58:50+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "9958": {
@@ -1558,13 +1558,13 @@
   "limit_down": 81.3,
   "limit_up": 99.3,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "世紀鋼",
   "open": null,
   "previous_close": 90.3,
   "price": 90.3,
   "quoted_at": "2026-09-01T08:58:52+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "AAPL": {
@@ -1580,7 +1580,7 @@
   "previous_close": 319.7,
   "price": 316.85,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "AMZN": {
@@ -1596,7 +1596,7 @@
   "previous_close": 266.43,
   "price": 259.77,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "ASHR": {
@@ -1612,7 +1612,7 @@
   "previous_close": 34.29,
   "price": 34.33,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "AVGO": {
@@ -1628,7 +1628,7 @@
   "previous_close": 368.79,
   "price": 370.34,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "DIA": {
@@ -1644,7 +1644,7 @@
   "previous_close": 535.06,
   "price": 531.57,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "EEM": {
@@ -1660,7 +1660,7 @@
   "previous_close": 67.14,
   "price": 67.02,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "EWT": {
@@ -1676,7 +1676,7 @@
   "previous_close": 107.9,
   "price": 108.03,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "EWY": {
@@ -1692,7 +1692,7 @@
   "previous_close": 180.2,
   "price": 180.86,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "EWZ": {
@@ -1708,7 +1708,7 @@
   "previous_close": 35.55,
   "price": 36.03,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "FXI": {
@@ -1724,7 +1724,7 @@
   "previous_close": 35.51,
   "price": 35.37,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "GOOGL": {
@@ -1740,7 +1740,7 @@
   "previous_close": 346.59,
   "price": 339.35,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "INDA": {
@@ -1756,7 +1756,7 @@
   "previous_close": 49.56,
   "price": 49.7,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "IWM": {
@@ -1772,7 +1772,7 @@
   "previous_close": 295.75,
   "price": 293.93,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "JPM": {
@@ -1788,7 +1788,7 @@
   "previous_close": 357.62,
   "price": 356.02,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "META": {
@@ -1804,7 +1804,7 @@
   "previous_close": 578.02,
   "price": 572.34,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "MSFT": {
@@ -1820,7 +1820,7 @@
   "previous_close": 513.53,
   "price": 507.29,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "NVDA": {
@@ -1836,7 +1836,7 @@
   "previous_close": 217.55,
   "price": 220.78,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "QQQ": {
@@ -1852,7 +1852,7 @@
   "previous_close": 716.43,
   "price": 716.76,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "SPY": {
@@ -1868,7 +1868,7 @@
   "previous_close": 769.35,
   "price": 767.05,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "TSLA": {
@@ -1884,7 +1884,7 @@
   "previous_close": 348.75,
   "price": 367.95,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "VXX": {
@@ -1900,7 +1900,7 @@
   "previous_close": 18.36,
   "price": 18,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "XLE": {
@@ -1916,7 +1916,7 @@
   "previous_close": 62.68,
   "price": 63.96,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "XLF": {
@@ -1932,7 +1932,7 @@
   "previous_close": 58.1,
   "price": 57.71,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "XLI": {
@@ -1948,7 +1948,7 @@
   "previous_close": 177.14,
   "price": 175.13,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "XLK": {
@@ -1964,7 +1964,7 @@
   "previous_close": 185.69,
   "price": 186.5,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "XLP": {
@@ -1980,7 +1980,7 @@
   "previous_close": 85.45,
   "price": 84.98,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "XLU": {
@@ -1996,7 +1996,7 @@
   "previous_close": 42.73,
   "price": 42.23,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "XLV": {
@@ -2012,7 +2012,7 @@
   "previous_close": 171.16,
   "price": 170.54,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "XLY": {
@@ -2028,7 +2028,7 @@
   "previous_close": 117.21,
   "price": 116.59,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "XOM": {
@@ -2044,7 +2044,7 @@
   "previous_close": 156.71,
   "price": 160.95,
   "quoted_at": "2026-08-31T20:00:00+00:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "finnhub.io"
  },
  "^BSESN": {
@@ -2246,13 +2246,13 @@
   "limit_down": null,
   "limit_up": null,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "台股加權指數",
   "open": null,
   "previous_close": 46128.47,
   "price": 46128.47,
   "quoted_at": "2026-09-01T07:50:00+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "^TWOII": {
@@ -2262,13 +2262,13 @@
   "limit_down": null,
   "limit_up": null,
   "low": null,
-  "market_status": "盤前",
+  "market_status": "盤中",
   "name": "櫃買指數",
   "open": null,
   "previous_close": 401.7,
   "price": 401.7,
   "quoted_at": "2026-09-01T07:50:00+08:00",
-  "saved_at": "2026-09-01T00:59:05",
+  "saved_at": "2026-09-01T01:54:58",
   "source": "mis.twse.com.tw"
  },
  "^VIX": {
