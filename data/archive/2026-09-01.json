@@ -1,6 +1,6 @@
 {
  "date": "2026-09-01",
- "generated_at": "2026-09-01T13:55:54",
+ "generated_at": "2026-09-01T14:59:37",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -47,7 +47,7 @@
    "headline": "主動離職率降到低檔，勞工議價力下降",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "主動離職率 2.0%",
+   "evidence": "主動離職率 1.9%",
    "module": "就業"
   },
   {
@@ -142,7 +142,7 @@
   "real_ten_year": 2.42,
   "curve_10_2": 0.39000000000000057,
   "recession_gauge": 39.31904803363218,
-  "composite_labor": -6.448812319365424
+  "composite_labor": -7.7616835447956865
  },
  "as_of": {
   "labor": "2026-07-01",
