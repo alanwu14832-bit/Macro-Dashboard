@@ -142,10 +142,16 @@ Fincept 的角色是**建置時**取得快照，那部分照舊。
 授權：WorldMonitor 是 AGPL-3.0。這裡取用的是 feed 網址與分類名稱這類事實資料，
 沒有內含或改作它的原始碼；新聞內容版權屬各原始媒體，頁面只存標題與連結。
 
-## 記帳（`/expense/`）
+## 記帳（`/expense/`，獨立 App）
 
-手機優先的個人記帳頁：手動記一筆，或讓 iPhone 在 **Apple Pay 刷卡當下自動入帳**。
-把頁面加到主畫面（分享 → 加入主畫面）就是一個獨立的記帳 App。
+**跟儀表板是兩個不同的 App**：同一個 repo 與網域部署（共用 style.css、
+Supabase 帳號與 `/api/expense`），但 `/expense/` 有自己的外殼（沒有儀表板的
+側欄與導覽）、自己的 manifest（scope 限在 `/expense/`）、自己的名字與圖示。
+從 `/expense/` 加入主畫面得到的是獨立的「記帳」App；儀表板的側欄也不會
+出現記帳的入口，兩邊互不相干。頁面由 `build.py` 尾段以
+`expense_page.render_page()` 直接產出完整 HTML，不經過 `layout.page()`。
+
+功能：手動記一筆，或讓 iPhone 在 **Apple Pay 刷卡當下自動入帳**。
 
 **自動記帳的原理。** iOS 不讓第三方直接讀 Apple Pay 交易，官方唯一的管道是
 捷徑的「交易」自動化：刷卡觸發捷徑，把金額與商家 POST 到 `/api/expense`。

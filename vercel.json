@@ -36,7 +36,7 @@
       ]
     },
     {
-      "source": "/(icon-192.png|icon-512.png|icon-maskable-512.png|apple-touch-icon.png|manifest.webmanifest)",
+      "source": "/(icon-192.png|icon-512.png|icon-maskable-512.png|apple-touch-icon.png|manifest.webmanifest|expense-icon-192.png|expense-icon-512.png|expense-icon-maskable-512.png|expense-apple-touch-icon.png|expense-manifest.webmanifest)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400" }
       ]

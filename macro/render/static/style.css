@@ -1145,3 +1145,20 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
 .exp-sk-bar:nth-child(4) { width: 46%; }
 @keyframes exp-shimmer { to { background-position: -200% 0; } }
 @media (prefers-reduced-motion: reduce) { .exp-sk-bar { animation: none; } }
+
+/* 記帳獨立 App 的外殼（/expense/ 不用儀表板版型） */
+.exp-app { display: block; }
+.exp-topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(10px + env(safe-area-inset-top)) 18px 10px;
+  background: var(--page); border-bottom: 1px solid var(--border);
+}
+.exp-brand { display: flex; align-items: center; gap: 9px; font-weight: 680; }
+.exp-brand-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 7px;
+  background: linear-gradient(140deg, var(--series-3), var(--series-6));
+  color: #fff; font-size: 0.9rem; font-weight: 700;
+}
+.exp-main { padding-bottom: calc(40px + env(safe-area-inset-bottom)); }

@@ -35,7 +35,6 @@ ICONS = {
     "freshness": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2",
     "archive": "M3 7h18v13H3zM3 3h18v4H3zM9 12h6",
     "explore": "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.35-4.35M8 11h6M11 8v6",
-    "expense": "M20 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h15v-5M16 12a2 2 0 0 0 0 4h5v-4z",
 }
 
 # (href, label, icon, group). Grouping is what makes 14 items scannable.
@@ -60,8 +59,6 @@ NAV = [
     ("/freshness/", "資料新鮮度", "freshness", "判讀與紀錄"),
     ("/guide/", "使用講義", "guide", "判讀與紀錄"),
     ("/archive/", "存檔", "archive", "判讀與紀錄"),
-
-    ("/expense/", "記帳", "expense", "個人工具"),
 ]
 
 SITE_NAME = "總經儀表板"

@@ -172,9 +172,6 @@ def main() -> int:
         ("/archive/", "存檔", "存檔",
          "每天的判斷與關鍵讀數，可回看任一天的結論。",
          lambda: archive_page.render(snapshots)),
-        ("/expense/", "記帳", "記帳",
-         "手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。",
-         lambda: expense_page.render()),
     ]
 
     # 兩段式：先渲染出全部頁面的內文、抽出各頁的區塊清單，
@@ -202,6 +199,16 @@ def main() -> int:
         written.append(target)
         if verbose:
             print(f"   ✓ {path}", flush=True)
+
+    # 記帳是獨立的 PWA（自己的外殼與 manifest），不進側欄、不包儀表板版型
+    try:
+        written.append(layout.write_page("/expense/", expense_page.render_page()))
+        if verbose:
+            print("   ✓ /expense/（獨立 App）", flush=True)
+    except Exception:
+        print("   ✗ /expense/", flush=True)
+        traceback.print_exc()
+        failures.append("/expense/")
 
     layout.copy_static()
 
