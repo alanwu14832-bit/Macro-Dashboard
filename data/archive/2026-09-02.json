@@ -1,6 +1,6 @@
 {
  "date": "2026-09-02",
- "generated_at": "2026-09-02T16:55:54",
+ "generated_at": "2026-09-02T17:53:24",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -33,6 +33,14 @@
    "severity": "high",
    "evidence": "人口月增 +14.1 萬、勞動力月增 -10.7 萬；黃金年齡就業率 12 個月 -0.3 個百分點",
    "module": "就業"
+  },
+  {
+   "key": "energy_upside",
+   "headline": "油價上行，未來一至兩月推升總體 CPI",
+   "direction": "hawkish",
+   "severity": "medium",
+   "evidence": "WTI 近一月 +9.0%，能源佔 CPI 約 6.2%",
+   "module": "物價"
   },
   {
    "key": "inflation_broad",
@@ -108,11 +116,11 @@
   }
  ],
  "summary": {
-  "total": 13,
-  "hawkish": 4,
+  "total": 14,
+  "hawkish": 5,
   "dovish": 7,
   "neutral": 2,
-  "score": -8,
+  "score": -6,
   "tilt": "偏降息"
  },
  "scenario": {
