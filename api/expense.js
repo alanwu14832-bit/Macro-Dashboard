@@ -20,6 +20,9 @@
  *     source    "applepay"（預設）或 "manual"——快速記帳捷徑
  *               （LINE Pay、現金）傳 manual，這種是人主動按的，
  *               不做兩分鐘去重（連買兩杯一樣的飲料是真的兩筆）
+ *     dedupe_hours  1–72 的整數。設了就做跨管道去重：spent_at 前後這個
+ *               小時數內已有「同金額」的任何紀錄（不分來源）就跳過。
+ *               給郵件收據匯入用——同一筆消費可能已被 Apple Pay 記過
  *
  * 需要的環境變數（Vercel Project Settings）：
  *   SUPABASE_SERVICE_ROLE_KEY   Supabase 的 service role key。沒設回 503。
@@ -153,6 +156,29 @@ module.exports = async (req, res) => {
   if (body.date) {
     const parsed = new Date(body.date);
     if (!Number.isNaN(parsed.getTime())) spentAt = parsed;
+  }
+
+  // 跨管道去重（郵件收據匯入用）：同一筆消費可能已被 Apple Pay 自動化
+  // 或手動記過。呼叫端設 dedupe_hours，窗內已有同金額（不分來源、不分
+  // 商家——兩邊的商家字串幾乎不會一樣）就跳過。
+  const dedupeHours = Number(body.dedupe_hours);
+  if (Number.isFinite(dedupeHours) && dedupeHours >= 1) {
+    const hours = Math.min(dedupeHours, 72);
+    const from = new Date(spentAt.getTime() - hours * 3600_000).toISOString();
+    const to = new Date(spentAt.getTime() + hours * 3600_000).toISOString();
+    const crossResp = await sb(
+      "/expenses?select=id&user_id=eq." + userId
+      + "&amount=eq." + amount
+      + "&spent_at=gte." + encodeURIComponent(from)
+      + "&spent_at=lte." + encodeURIComponent(to)
+      + "&limit=1",
+      { method: "GET" });
+    if (crossResp.ok) {
+      const rows = await crossResp.json();
+      if (rows.length) {
+        return res.status(200).json({ ok: true, duplicate: true, id: rows[0].id });
+      }
+    }
   }
 
   // 去重：交易自動化偶爾會對同一筆刷卡觸發兩次。同人同商家同金額、
