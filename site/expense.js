@@ -508,8 +508,17 @@
     try {
       tokens = await rest("GET", "/expense_tokens?select=token,label,created_at&order=created_at.desc");
     } catch (error) {
-      box.innerHTML = `<p class="muted">讀取金鑰失敗（${esc(error.message)}）。`
-        + "若資料表尚未建立，先到 Supabase 執行 tools/expense_schema.sql。</p>";
+      // PostgREST 對不存在的資料表回 404——代表建表 SQL 還沒執行
+      if (/404/.test(String(error.message))) {
+        box.innerHTML = '<p class="muted"><strong>資料表還沒建立</strong>，'
+          + "所以讀不到金鑰。到 Supabase 儀表板 → SQL Editor，貼上 "
+          + "repo 裡 tools/expense_schema.sql 的內容按 Run（結果顯示 "
+          + "Success. No rows returned 就是成功），完成後回來重新整理這一頁。"
+          + "若你有多個 Supabase 專案，要在「這個網站用的那個」執行。</p>";
+        return;
+      }
+      box.innerHTML = `<p class="muted">讀取金鑰失敗（${esc(error.message)}），`
+        + "稍後重新整理再試。</p>";
       return;
     }
 
