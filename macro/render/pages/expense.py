@@ -15,6 +15,7 @@ data-account-slot）。骨架佔位（.exp-skeleton）讓 JS 載入前不是一�
 from __future__ import annotations
 
 import json
+import os
 
 from .. import layout
 
@@ -182,9 +183,18 @@ def _body() -> str:
     return "".join(parts)
 
 
-def render_page() -> str:
-    """完整 HTML 文件——獨立 App 外殼，不經過 layout.page()。"""
+def render_page(*, standalone: bool = False) -> str:
+    """完整 HTML 文件——獨立 App 外殼，不經過 layout.page()。
+
+    standalone=True 是「獨立網域」的變體（standalone/ 部署目錄）：
+    manifest 與圖示用根目錄的通用檔名，scope 是整個網域。
+    False 是掛在儀表板網域 /expense/ 底下的版本，資產帶 expense- 前綴
+    避免跟儀表板自己的 manifest 與圖示撞名。
+    """
     version = layout.asset_version()
+    manifest = "/manifest.webmanifest" if standalone else "/expense-manifest.webmanifest"
+    touch_icon = "/apple-touch-icon.png" if standalone else "/expense-apple-touch-icon.png"
+    favicon = "/icon-192.png" if standalone else "/expense-icon-192.png"
     sb = ""
     if layout.SUPABASE_URL and layout.SUPABASE_ANON_KEY:
         sb = ("<script>window.__SB=" +
@@ -202,13 +212,13 @@ def render_page() -> str:
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/expense-manifest.webmanifest">
-<link rel="apple-touch-icon" href="/expense-apple-touch-icon.png">
+<link rel="manifest" href="{manifest}">
+<link rel="apple-touch-icon" href="{touch_icon}">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="記帳">
 <link rel="stylesheet" href="/style.css?v={version}">
-<link rel="icon" href="/expense-icon-192.png">
+<link rel="icon" href="{favicon}">
 <script>{layout.BOOT}</script>
 </head>
 <body class="exp-app">
@@ -232,3 +242,91 @@ def render_page() -> str:
 </body>
 </html>
 """
+
+
+# ------------------------------------------------- 獨立網域部署（standalone/）
+
+STANDALONE_MANIFEST = """{
+  "name": "記帳",
+  "short_name": "記帳",
+  "description": "手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。",
+  "lang": "zh-Hant",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f9f9f7",
+  "theme_color": "#0e7a4f",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
+"""
+
+# 極簡 service worker：只求可安裝與離線開啟上次的頁面。network-first——
+# 記帳資料在 localStorage/Supabase，殼過期沒有代價，舊殼才有。
+STANDALONE_SW = """const CACHE = "expense-static-v1";
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (event) => {
+  event.waitUntil(caches.keys()
+    .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+    .then(() => self.clients.claim()));
+});
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith("/api/")) return;
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request)));
+});
+"""
+
+
+def write_standalone(root_dir: str) -> None:
+    """把獨立網域用的完整部署目錄寫到 <root_dir>/standalone/site。
+
+    這個目錄是給 Vercel 第二個專案用的（Root Directory 設成 standalone），
+    部署後有自己的網域，跟儀表板徹底分開。standalone/api 與
+    standalone/vercel.json 是手寫檔案、不在這裡產生；這裡只負責
+    站台內容，讓每次建置都跟 /expense/ 用同一份程式。
+    """
+    import shutil
+
+    from ... import paths
+
+    site = os.path.join(root_dir, "standalone", "site")
+    os.makedirs(site, exist_ok=True)
+
+    with open(os.path.join(site, "index.html"), "w", encoding="utf-8") as fh:
+        fh.write(render_page(standalone=True))
+    with open(os.path.join(site, "manifest.webmanifest"), "w", encoding="utf-8") as fh:
+        fh.write(STANDALONE_MANIFEST)
+    with open(os.path.join(site, "sw.js"), "w", encoding="utf-8") as fh:
+        fh.write(STANDALONE_SW)
+
+    copies = {
+        "style.css": "style.css",
+        "account.js": "account.js",
+        "expense.js": "expense.js",
+        "expense-icon-192.png": "icon-192.png",
+        "expense-icon-512.png": "icon-512.png",
+        "expense-icon-maskable-512.png": "icon-maskable-512.png",
+        "expense-apple-touch-icon.png": "apple-touch-icon.png",
+    }
+    for source, target in copies.items():
+        shutil.copy2(os.path.join(paths.STATIC_DIR, source),
+                     os.path.join(site, target))
+
+    # API 也複製一份進去——Root Directory 設 standalone 的專案看不到
+    # 上層的 api/，靠建置同步讓兩邊永遠同一份程式。
+    api_dir = os.path.join(root_dir, "standalone", "api")
+    os.makedirs(api_dir, exist_ok=True)
+    shutil.copy2(os.path.join(paths.ROOT_DIR, "api", "expense.js"),
+                 os.path.join(api_dir, "expense.js"))
