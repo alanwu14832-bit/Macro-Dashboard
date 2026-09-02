@@ -38,7 +38,7 @@
   const CATEGORY_RULES = [
     [/7-?eleven|統一超商|全家|family\s*mart|萊爾富|hi-?life|ok\s*mart|超商/i, "超商"],
     [/全聯|pxmart|家樂福|carrefour|大潤發|愛買|costco|好市多|美廉社|超市|市場/i, "超市"],
-    [/麥當勞|mcdonald|肯德基|kfc|摩斯|mos\s*burger|漢堡王|burger\s*king|必勝客|pizza|壽司|sushi|拉麵|火鍋|燒肉|食堂|餐廳|餐飲|小吃|便當|鍋貼|水餃|早餐|豆漿|茶|咖啡|coffee|starbucks|星巴克|路易莎|louisa|cama|85度|foodpanda|uber\s*eats/i, "餐飲"],
+    [/麥當勞|mcdonald|肯德基|kfc|摩斯|mos\s*burger|漢堡王|burger\s*king|必勝客|pizza|壽司|sushi|拉麵|火鍋|燒肉|食堂|餐廳|餐飲|小吃|便當|鍋貼|水餃|早餐|豆漿|茶|咖啡|coffee|starbucks|星巴克|路易莎|louisa|cama|85度|五十嵐|50嵐|清心|可不可|迷客夏|珍煮丹|得正|foodpanda|uber\s*eats/i, "餐飲"],
     [/台鐵|高鐵|thsr|捷運|metro|悠遊|easycard|一卡通|ipass|客運|公車|uber(?!\s*eats)|計程|taxi|line\s*go|停車|parking|中油|cpc|台亞|全國加油|加油/i, "交通"],
     [/藥局|藥妝|屈臣氏|watsons|康是美|cosmed|診所|醫院|牙醫|clinic|hospital|pharmacy/i, "醫療"],
     [/netflix|spotify|youtube|disney|apple\.com|apple\s*services|itunes|icloud|google\s*(one|play|storage)|steam|nintendo|playstation|訂閱/i, "訂閱與娛樂"],
@@ -525,9 +525,13 @@
       ).join("");
       const first = tokens[0].token;
       html += `<p class="exp-token-hint">捷徑「取得 URL 內容」的設定：URL 填 `
-        + `<code>${esc(endpoint)}</code>、方法 POST、請求本文 JSON，欄位如下——`
-        + `<code>token</code> 填上面的金鑰，其餘選捷徑提供的變數。</p>`
-        + `<pre class="exp-json">{\n  "token": "${esc(first)}",\n  "amount": 快速指令輸入 › 金額,\n  "merchant": 快速指令輸入 › 商家,\n  "card": 快速指令輸入 › 卡片\n}</pre>`;
+        + `<code>${esc(endpoint)}</code>、方法 POST、請求本文 JSON。</p>`
+        + `<p class="exp-token-hint">Apple Pay 自動記帳（「交易」自動化）的欄位——`
+        + `<code>token</code> 填上面的金鑰，其餘選捷徑提供的變數：</p>`
+        + `<pre class="exp-json">{\n  "token": "${esc(first)}",\n  "amount": 快速指令輸入 › 金額,\n  "merchant": 快速指令輸入 › 商家,\n  "card": 快速指令輸入 › 卡片\n}</pre>`
+        + `<p class="exp-token-hint">快速記帳捷徑（LINE Pay、現金）的欄位——`
+        + `金額與商家選「要求輸入」的結果：</p>`
+        + `<pre class="exp-json">{\n  "token": "${esc(first)}",\n  "amount": 要求輸入 › 金額,\n  "merchant": 要求輸入 › 商家,\n  "source": "manual",\n  "note": "LINE Pay"\n}</pre>`;
     }
     html += '<button type="button" class="exp-gen" data-gen>產生新金鑰</button>';
     box.innerHTML = html;

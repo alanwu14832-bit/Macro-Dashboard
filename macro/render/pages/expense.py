@@ -78,8 +78,29 @@ SHORTCUT_STEPS = """
   <li>完成。之後每一筆 Apple Pay（含 Apple Watch）付款會自動出現在這一頁，
       商家會照關鍵字自動分類，猜錯的點「改」修一次即可。</li>
 </ol>
-<p class="note">現金或別人的請款不會經過 Apple Pay——用上面的表單手動補一筆就好。
-實體卡直接插卡／感應（沒過 Apple Pay）的交易，iOS 收不到通知，同樣手動補。</p>
+<p class="note">實體卡直接插卡／感應（沒過 Apple Pay）的交易，iOS 收不到通知——
+能用 Apple Pay 感應就用 Apple Pay，記帳與回饋都不會少。</p>
+"""
+
+QUICK_STEPS = """
+<p>LINE Pay 掃碼、現金這類<strong>不經過 Apple Pay</strong> 的消費，iOS 攔不到
+（LINE Pay 沒有開放個人交易 API，捷徑的「交易」觸發器只認 Apple Pay）。
+替代做法是放一顆「快速記帳」在主畫面：付完點一下、輸入金額，2 秒入帳。</p>
+<ol class="exp-steps">
+  <li>捷徑 App → 底部「捷徑」分頁（不是自動化）→ 右上「＋」新增，
+      名稱取「快速記帳」。</li>
+  <li>加動作<strong>「要求輸入」</strong>：輸入類型選「數字」，提示文字填「金額」。</li>
+  <li>再加一個<strong>「要求輸入」</strong>：類型「文字」，提示填「商家」
+      （分類會照商家自動猜）。</li>
+  <li>加動作<strong>「取得 URL 內容」</strong>：URL 與金鑰照左邊區塊，
+      方法 POST、JSON，欄位照左邊的「快速記帳」範例——<code>source</code>
+      固定填 <code>manual</code>，<code>note</code> 可填「LINE Pay」方便辨識。</li>
+  <li>捷徑詳細資訊 → <strong>「加入主畫面」</strong>。完成——LINE Pay 付完
+      順手點一下就記好。</li>
+</ol>
+<p class="note">小訣竅：LINE Pay 聯名卡或 LINE Bank 簽帳卡加進 Apple Wallet 後，
+實體店改用 Apple Pay 感應——回饋照拿（回饋綁卡片，不綁付款方式），
+而且會被上面的自動記帳直接抓到，連點都不用點。</p>
 """
 
 # App bar 的主題切換：獨立 App 不載 sidebar.js，這裡自帶最小版，
@@ -141,6 +162,11 @@ def _body() -> str:
         f'<div class="exp-auto-col"><h3>捷徑設定步驟</h3>{SHORTCUT_STEPS}</div>'
         "</div>",
         note="金鑰等同你的記帳權限：只給自己的捷徑用，外洩就到這裡撤銷重發。"))
+
+    parts.append(_section(
+        "quick", "LINE Pay 與現金：快速記帳捷徑",
+        QUICK_STEPS,
+        note="這條路走的是同一組金鑰與同一個端點，只是由你主動觸發。"))
 
     parts.append(_section(
         "privacy", "資料存在哪",

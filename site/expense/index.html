@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="記帳">
-<link rel="stylesheet" href="/style.css?v=1788373166">
+<link rel="stylesheet" href="/style.css?v=1788374316">
 <link rel="icon" href="/expense-icon-192.png">
 <script>
 (function(){var d=document.documentElement;try{
@@ -76,9 +76,28 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
   <li>完成。之後每一筆 Apple Pay（含 Apple Watch）付款會自動出現在這一頁，
       商家會照關鍵字自動分類，猜錯的點「改」修一次即可。</li>
 </ol>
-<p class="note">現金或別人的請款不會經過 Apple Pay——用上面的表單手動補一筆就好。
-實體卡直接插卡／感應（沒過 Apple Pay）的交易，iOS 收不到通知，同樣手動補。</p>
-</div></div></section><section id="privacy"><div class="section-head"><h2>資料存在哪</h2></div><p><strong>沒登入：</strong>只存在這台裝置瀏覽器的 localStorage，不離開你的手機。清瀏覽器資料會清掉，記得先匯出 CSV。</p><p><strong>登入後：</strong>同步到雲端資料庫（Supabase），由 Row Level Security 隔離——每個帳號只能讀寫自己的紀錄。手機記的帳，電腦上登入同一帳號就看得到；Apple Pay 自動記帳需要登入（金鑰要綁在帳號上）。</p><p>在 Safari 打開這一頁 → 分享 → <strong>加入主畫面</strong>，就是一個獨立的「記帳」App，有自己的圖示，離線也能開。</p></section>
+<p class="note">實體卡直接插卡／感應（沒過 Apple Pay）的交易，iOS 收不到通知——
+能用 Apple Pay 感應就用 Apple Pay，記帳與回饋都不會少。</p>
+</div></div></section><section id="quick"><div class="section-head"><h2>LINE Pay 與現金：快速記帳捷徑</h2><p class="note">這條路走的是同一組金鑰與同一個端點，只是由你主動觸發。</p></div>
+<p>LINE Pay 掃碼、現金這類<strong>不經過 Apple Pay</strong> 的消費，iOS 攔不到
+（LINE Pay 沒有開放個人交易 API，捷徑的「交易」觸發器只認 Apple Pay）。
+替代做法是放一顆「快速記帳」在主畫面：付完點一下、輸入金額，2 秒入帳。</p>
+<ol class="exp-steps">
+  <li>捷徑 App → 底部「捷徑」分頁（不是自動化）→ 右上「＋」新增，
+      名稱取「快速記帳」。</li>
+  <li>加動作<strong>「要求輸入」</strong>：輸入類型選「數字」，提示文字填「金額」。</li>
+  <li>再加一個<strong>「要求輸入」</strong>：類型「文字」，提示填「商家」
+      （分類會照商家自動猜）。</li>
+  <li>加動作<strong>「取得 URL 內容」</strong>：URL 與金鑰照左邊區塊，
+      方法 POST、JSON，欄位照左邊的「快速記帳」範例——<code>source</code>
+      固定填 <code>manual</code>，<code>note</code> 可填「LINE Pay」方便辨識。</li>
+  <li>捷徑詳細資訊 → <strong>「加入主畫面」</strong>。完成——LINE Pay 付完
+      順手點一下就記好。</li>
+</ol>
+<p class="note">小訣竅：LINE Pay 聯名卡或 LINE Bank 簽帳卡加進 Apple Wallet 後，
+實體店改用 Apple Pay 感應——回饋照拿（回饋綁卡片，不綁付款方式），
+而且會被上面的自動記帳直接抓到，連點都不用點。</p>
+</section><section id="privacy"><div class="section-head"><h2>資料存在哪</h2></div><p><strong>沒登入：</strong>只存在這台裝置瀏覽器的 localStorage，不離開你的手機。清瀏覽器資料會清掉，記得先匯出 CSV。</p><p><strong>登入後：</strong>同步到雲端資料庫（Supabase），由 Row Level Security 隔離——每個帳號只能讀寫自己的紀錄。手機記的帳，電腦上登入同一帳號就看得到；Apple Pay 自動記帳需要登入（金鑰要綁在帳號上）。</p><p>在 Safari 打開這一頁 → 分享 → <strong>加入主畫面</strong>，就是一個獨立的「記帳」App，有自己的圖示，離線也能開。</p></section>
   </div>
 </main>
 <script>window.__SB={"url": "https://nwbfjoroqnhpymdtdbwu.supabase.co", "key": "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"}</script>
@@ -102,8 +121,8 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
   });
 })();
 </script>
-<script src="/account.js?v=1788373166" defer></script>
-<script src="/expense.js?v=1788373166" defer></script>
+<script src="/account.js?v=1788374316" defer></script>
+<script src="/expense.js?v=1788374316" defer></script>
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
 </html>

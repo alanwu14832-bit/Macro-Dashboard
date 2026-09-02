@@ -17,6 +17,9 @@
  *     currency  幣別，預設 TWD
  *     note      備註
  *     date      ISO 時間，預設現在
+ *     source    "applepay"（預設）或 "manual"——快速記帳捷徑
+ *               （LINE Pay、現金）傳 manual，這種是人主動按的，
+ *               不做兩分鐘去重（連買兩杯一樣的飲料是真的兩筆）
  *
  * 需要的環境變數（Vercel Project Settings）：
  *   SUPABASE_SERVICE_ROLE_KEY   Supabase 的 service role key。沒設回 503。
@@ -35,7 +38,7 @@ const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const CATEGORY_RULES = [
   [/7-?eleven|統一超商|全家|family\s*mart|萊爾富|hi-?life|ok\s*mart|超商/i, "超商"],
   [/全聯|pxmart|家樂福|carrefour|大潤發|愛買|costco|好市多|美廉社|超市|市場/i, "超市"],
-  [/麥當勞|mcdonald|肯德基|kfc|摩斯|mos\s*burger|漢堡王|burger\s*king|必勝客|pizza|壽司|sushi|拉麵|火鍋|燒肉|食堂|餐廳|餐飲|小吃|便當|鍋貼|水餃|早餐|豆漿|茶|咖啡|coffee|starbucks|星巴克|路易莎|louisa|cama|85度|foodpanda|uber\s*eats/i, "餐飲"],
+  [/麥當勞|mcdonald|肯德基|kfc|摩斯|mos\s*burger|漢堡王|burger\s*king|必勝客|pizza|壽司|sushi|拉麵|火鍋|燒肉|食堂|餐廳|餐飲|小吃|便當|鍋貼|水餃|早餐|豆漿|茶|咖啡|coffee|starbucks|星巴克|路易莎|louisa|cama|85度|五十嵐|50嵐|清心|可不可|迷客夏|珍煮丹|得正|foodpanda|uber\s*eats/i, "餐飲"],
   [/台鐵|高鐵|thsr|捷運|metro|悠遊|easycard|一卡通|ipass|客運|公車|uber(?!\s*eats)|計程|taxi|line\s*go|停車|parking|中油|cpc|台亞|全國加油|加油/i, "交通"],
   [/藥局|藥妝|屈臣氏|watsons|康是美|cosmed|診所|醫院|牙醫|藥師|clinic|hospital|pharmacy/i, "醫療"],
   [/netflix|spotify|youtube|disney|apple\.com|apple\s*services|itunes|icloud|google\s*(one|play|storage)|steam|nintendo|playstation|game|訂閱/i, "訂閱與娛樂"],
@@ -139,6 +142,7 @@ module.exports = async (req, res) => {
   }
   const userId = tokenRows[0].user_id;
 
+  const source = body.source === "manual" ? "manual" : "applepay";
   const merchant = String(body.merchant || body.name || "").trim().slice(0, 120);
   const card = String(body.card || "").trim().slice(0, 80);
   const currency = (String(body.currency || "TWD").trim().toUpperCase() || "TWD").slice(0, 8);
@@ -151,21 +155,24 @@ module.exports = async (req, res) => {
     if (!Number.isNaN(parsed.getTime())) spentAt = parsed;
   }
 
-  // 去重：捷徑偶爾會對同一筆交易觸發兩次。同人同商家同金額、
+  // 去重：交易自動化偶爾會對同一筆刷卡觸發兩次。同人同商家同金額、
   // 兩分鐘內已有一筆，就當同一筆，回 ok 但不重複入帳。
-  const windowStart = new Date(spentAt.getTime() - 2 * 60 * 1000).toISOString();
-  const dupResp = await sb(
-    "/expenses?select=id&user_id=eq." + userId
-    + "&amount=eq." + amount
-    + "&merchant=eq." + encodeURIComponent(merchant)
-    + "&source=eq.applepay"
-    + "&spent_at=gte." + encodeURIComponent(windowStart)
-    + "&limit=1",
-    { method: "GET" });
-  if (dupResp.ok) {
-    const dupRows = await dupResp.json();
-    if (dupRows.length) {
-      return res.status(200).json({ ok: true, duplicate: true, id: dupRows[0].id });
+  // 只對 applepay 做——手動快速記帳是人按的，連兩筆一樣的是真的兩筆。
+  if (source === "applepay") {
+    const windowStart = new Date(spentAt.getTime() - 2 * 60 * 1000).toISOString();
+    const dupResp = await sb(
+      "/expenses?select=id&user_id=eq." + userId
+      + "&amount=eq." + amount
+      + "&merchant=eq." + encodeURIComponent(merchant)
+      + "&source=eq.applepay"
+      + "&spent_at=gte." + encodeURIComponent(windowStart)
+      + "&limit=1",
+      { method: "GET" });
+    if (dupResp.ok) {
+      const dupRows = await dupResp.json();
+      if (dupRows.length) {
+        return res.status(200).json({ ok: true, duplicate: true, id: dupRows[0].id });
+      }
     }
   }
 
@@ -176,7 +183,7 @@ module.exports = async (req, res) => {
     merchant,
     category: guessCategory(merchant + " " + note),
     note,
-    source: "applepay",
+    source,
     spent_at: spentAt.toISOString(),
   };
   const insertResp = await sb("/expenses?select=id,category", {
