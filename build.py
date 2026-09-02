@@ -22,6 +22,7 @@ from macro.compute import (commodities, debt, equities, freshness, growth,
                            signals, world)
 from macro.render import api, layout
 from macro.render.pages import (archive as archive_page,
+                                expense as expense_page,
                                 guide as guide_page,
                                 commodities as commodities_page,
                                 debt as debt_page,
@@ -198,6 +199,16 @@ def main() -> int:
         written.append(target)
         if verbose:
             print(f"   ✓ {path}", flush=True)
+
+    # 記帳是獨立的 PWA（自己的外殼與 manifest），不進側欄、不包儀表板版型
+    try:
+        written.append(layout.write_page("/expense/", expense_page.render_page()))
+        if verbose:
+            print("   ✓ /expense/（獨立 App）", flush=True)
+    except Exception:
+        print("   ✗ /expense/", flush=True)
+        traceback.print_exc()
+        failures.append("/expense/")
 
     layout.copy_static()
 

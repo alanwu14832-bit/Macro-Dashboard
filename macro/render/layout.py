@@ -162,7 +162,7 @@ def asset_version() -> str:
     """
     stamp = 0.0
     for name in ("style.css", "chart.js", "sidebar.js", "quotes.js",
-                 "explore.js", "account.js"):
+                 "explore.js", "account.js", "expense.js"):
         candidate = os.path.join(paths.STATIC_DIR, name)
         if os.path.exists(candidate):
             stamp = max(stamp, os.path.getmtime(candidate))

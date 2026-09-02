@@ -996,3 +996,169 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
   padding: 3px 10px; border: 1px solid var(--border); border-radius: 999px;
 }
 .topbar-guide:hover { color: var(--ink); background: var(--surface-sunken); }
+
+/* -------------------------------------------------------------- 記帳頁 ---- */
+.exp-status {
+  font-size: 0.82rem; color: var(--ink-muted);
+  padding: 8px 12px; margin-bottom: 18px;
+  background: var(--surface-sunken); border-radius: var(--radius-sm);
+}
+
+/* 分類長條（本月總覽） */
+.exp-cats { margin-top: 16px; display: flex; flex-direction: column; gap: 7px; }
+.exp-cat-row {
+  display: grid; grid-template-columns: 6.5em minmax(0, 1fr) auto;
+  align-items: center; gap: 10px; font-size: 0.86rem;
+}
+.exp-cat-name { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.exp-cat-bar {
+  height: 12px; border-radius: 999px; background: var(--surface-sunken);
+  overflow: hidden; display: block;
+}
+.exp-cat-bar i { display: block; height: 100%; border-radius: 999px; }
+.exp-cat-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.exp-cat-amt em { font-style: normal; font-size: 0.86em; }
+
+/* 表單 */
+.exp-form {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.exp-form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 900px) { .exp-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.exp-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.exp-field > span { font-size: 0.78rem; color: var(--ink-muted); }
+.exp-field input {
+  font: inherit; color: var(--ink); background: var(--page);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  padding: 9px 11px; min-width: 0; width: 100%;
+}
+.exp-field input:focus-visible { outline: 2px solid var(--series-1); outline-offset: 1px; }
+.exp-field-amt input { font-size: 1.15rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.exp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.exp-chip {
+  font: inherit; font-size: 0.82rem; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 12px; color: var(--ink-2); background: var(--surface);
+}
+.exp-chip:hover { border-color: var(--border-strong); color: var(--ink); }
+.exp-chip.on {
+  background: var(--ink); color: var(--page); border-color: var(--ink); font-weight: 600;
+}
+.exp-actions { display: flex; gap: 10px; }
+.exp-primary {
+  font: inherit; font-weight: 650; cursor: pointer;
+  background: var(--ink); color: var(--page); border: 1px solid var(--ink);
+  border-radius: var(--radius-sm); padding: 9px 22px;
+}
+.exp-primary:hover { opacity: 0.88; }
+.exp-ghost {
+  font: inherit; cursor: pointer; background: transparent;
+  color: var(--ink-2); border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm); padding: 9px 16px;
+}
+
+/* 月份導覽 + 明細列表 */
+.exp-month-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.exp-nav-btn {
+  font: inherit; font-size: 1.1rem; cursor: pointer; line-height: 1;
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink-2);
+}
+.exp-nav-btn:hover { color: var(--ink); border-color: var(--border-strong); }
+.exp-month-label { font-weight: 650; min-width: 7.5em; text-align: center; }
+.exp-csv {
+  font: inherit; font-size: 0.8rem; cursor: pointer; margin-left: auto;
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 13px; color: var(--ink-2); background: var(--surface);
+}
+.exp-csv:hover { color: var(--ink); border-color: var(--border-strong); }
+
+.exp-day {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 0.78rem; color: var(--ink-muted);
+  padding: 14px 2px 5px; border-bottom: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+}
+.exp-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 2px; border-bottom: 1px solid var(--border);
+}
+.exp-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.exp-main { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.exp-merchant { font-weight: 560; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exp-sub { font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exp-badge {
+  display: inline-block; font-size: 0.86em; font-weight: 650;
+  color: var(--series-1); letter-spacing: 0.01em;
+}
+.exp-amt { font-variant-numeric: tabular-nums; font-weight: 650; white-space: nowrap; }
+.exp-ops { display: flex; gap: 5px; flex: none; }
+.exp-ops button {
+  font: inherit; font-size: 0.76rem; cursor: pointer;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--ink-muted); padding: 3px 9px;
+}
+.exp-ops button:hover { color: var(--ink); border-color: var(--border-strong); }
+
+/* 自動記帳（金鑰 + 教學）雙欄 */
+.exp-auto-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin-top: 14px; }
+@media (max-width: 900px) { .exp-auto-grid { grid-template-columns: minmax(0, 1fr); } }
+.exp-auto-col h3 { font-size: 0.95rem; margin: 0 0 10px; }
+.exp-token-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  min-width: 0;
+}
+.exp-token-row code {
+  font-family: var(--mono); font-size: 0.74rem; flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: var(--surface-sunken); border-radius: var(--radius-sm); padding: 6px 9px;
+}
+.exp-copy, .exp-revoke, .exp-gen {
+  font: inherit; font-size: 0.78rem; cursor: pointer; flex: none;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--ink-2); padding: 5px 11px;
+}
+.exp-copy:hover, .exp-gen:hover { color: var(--ink); }
+.exp-revoke:hover { color: var(--critical); border-color: var(--critical); }
+.exp-gen { margin-top: 6px; }
+.exp-token-hint { font-size: 0.85rem; margin: 12px 0 8px; }
+.exp-token-hint code { font-family: var(--mono); font-size: 0.82em; background: var(--surface-sunken); padding: 1px 5px; border-radius: 4px; word-break: break-all; }
+.exp-json {
+  font-family: var(--mono); font-size: 0.76rem; line-height: 1.55;
+  background: var(--surface-sunken); border-radius: var(--radius-sm);
+  padding: 12px 14px; overflow-x: auto; margin: 0;
+}
+.exp-steps { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
+
+/* 骨架佔位：JS 接手前的載入狀態（比空白或轉圈誠實） */
+.exp-skeleton { display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
+.exp-sk-bar {
+  height: 16px; border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--surface-sunken) 25%,
+              var(--grid) 50%, var(--surface-sunken) 75%);
+  background-size: 200% 100%; animation: exp-shimmer 1.4s ease infinite;
+}
+.exp-sk-bar:nth-child(2) { width: 82%; }
+.exp-sk-bar:nth-child(3) { width: 64%; }
+.exp-sk-bar:nth-child(4) { width: 46%; }
+@keyframes exp-shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .exp-sk-bar { animation: none; } }
+
+/* 記帳獨立 App 的外殼（/expense/ 不用儀表板版型） */
+.exp-app { display: block; }
+.exp-topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(10px + env(safe-area-inset-top)) 18px 10px;
+  background: var(--page); border-bottom: 1px solid var(--border);
+}
+.exp-brand { display: flex; align-items: center; gap: 9px; font-weight: 680; }
+.exp-brand-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 7px;
+  background: linear-gradient(140deg, var(--series-3), var(--series-6));
+  color: #fff; font-size: 0.9rem; font-weight: 700;
+}
+.exp-main { padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
