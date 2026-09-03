@@ -1,16 +1,15 @@
 """記帳——獨立的 PWA，跟總經儀表板是兩個不同的 App。
 
-同一個 repo、同一個網域部署（共用 style.css、account.js、/api/expense 與
-Supabase 帳號），但對使用者是另一個 App：
-  - 自己的 manifest（/expense-manifest.webmanifest，scope 限在 /expense/）、
-    自己的名字與圖示——加入主畫面後是獨立的「記帳」App，
-    與「總經儀表板」互不相干
-  - 自己的外殼：沒有儀表板的側欄、導覽與頁尾，只有一條 App bar
-  - 不走 layout.page()——render_page() 直接產出完整 HTML 文件，
-    build.py 用 layout.write_page() 落地
+同一個 repo 部署（共用 Supabase 帳號與 /api/expense），但對使用者是
+另一個 App，而且**介面骨架也不同**：儀表板是資訊密度優先的側欄佈局，
+這裡是單手操作的行動 App——頂欄薄、內容分頁、底部分頁列、浮動記帳鈕，
+記帳表單走底部彈出（打斷式任務做完就回到原本在看的地方）。
 
-動態邏輯都在 static/expense.js；帳號介面沿用 account.js（掛在
-data-account-slot）。骨架佔位（.exp-skeleton）讓 JS 載入前不是一片空白。
+樣式在 static/expense-app.css（自己一套設計系統，不吃儀表板的
+style.css）；動態邏輯在 static/expense.js；帳號介面沿用 account.js。
+
+render_page(standalone=True) 是獨立網域版（manifest 與圖示用根路徑
+通用檔名）；False 是掛在儀表板網域 /expense/ 底下的版本。
 """
 from __future__ import annotations
 
@@ -21,215 +20,242 @@ from .. import layout
 
 
 def _skeleton(rows: int = 3) -> str:
-    """JS 尚未接手前的骨架佔位——比空白或轉圈誠實，樣式在 style.css。"""
-    return ('<div class="exp-skeleton" aria-hidden="true">'
-            + '<span class="exp-sk-bar"></span>' * rows
+    """JS 接手前的骨架佔位——比空白或轉圈誠實。"""
+    return ('<div class="skeleton" aria-hidden="true">'
+            + '<span class="sk-bar"></span>' * rows
             + "</div>")
 
 
-def _section(anchor: str, title: str, body: str, *, note: str = "") -> str:
-    note_html = f'<p class="note">{note}</p>' if note else ""
-    return (f'<section id="{anchor}">'
-            f'<div class="section-head"><h2>{title}</h2>{note_html}</div>'
-            f"{body}</section>")
+# 20×20 線性圖示，跟著文字走（分頁列的身份不靠顏色單獨表意）
+TAB_ICONS = {
+    "home": "M3 10.5 12 3l9 7.5M5.5 9.5V20h13V9.5",
+    "list": "M4 6h16M4 12h16M4 18h10",
+    "budget": "M3 8a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM16 6V4.9a1 1 0 0 0-1.25-.97L4.6 6.4M16.6 12.5h.01",
+    "settings": "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z",
+}
+
+TABS = [("home", "總覽"), ("list", "明細"), ("budget", "預算"), ("settings", "設定")]
 
 
-QUICK = """
-<div class="exp-quick">
-  <input id="exp-nl" type="text" autocomplete="off"
-         placeholder="一句話記帳：昨天 全家 120 現金">
-  <button type="button" id="exp-nl-go">解析</button>
-</div>
-<p id="exp-nl-hint" class="note">會拆出日期、商家、金額與付款方式，填進下面的表單讓你確認。</p>
-"""
+def _tab(key: str, label: str) -> str:
+    selected = "true" if key == "home" else "false"
+    return (f'<button type="button" class="tab" data-tab="{key}" role="tab"'
+            f' aria-selected="{selected}">'
+            f'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+            f' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+            f'<path d="{TAB_ICONS[key]}"/></svg>'
+            f"<span>{label}</span></button>")
 
-FORM = """
-<form id="exp-form" class="exp-form" autocomplete="off">
-  <div class="exp-form-grid">
-    <label class="exp-field exp-field-amt">
-      <span>金額</span>
-      <input name="amount" type="number" inputmode="decimal" step="0.01"
-             min="0" placeholder="0" required>
-    </label>
-    <label class="exp-field">
-      <span>商家或項目</span>
-      <input name="merchant" type="text" maxlength="120" placeholder="例：全聯、午餐">
-    </label>
-    <label class="exp-field">
-      <span>日期</span>
-      <input name="date" type="date">
-    </label>
-    <label class="exp-field">
-      <span>備註（可空）</span>
-      <input name="note" type="text" maxlength="300" placeholder="">
-    </label>
-  </div>
-  <div class="exp-field">
-    <span>分類</span>
-    <div id="exp-chips" class="exp-chips"></div>
-    <input name="category" type="hidden" value="未分類">
-  </div>
-  <div class="exp-field">
-    <span>付款方式</span>
-    <div id="exp-pay-chips" class="exp-chips"></div>
-    <input name="pay" type="hidden" value="現金">
-  </div>
-  <div class="exp-field">
-    <span>收據照片（可空）</span>
-    <div class="exp-photo-row">
-      <label class="exp-ghost exp-photo-pick">
-        拍照或選圖
-        <input name="photo" type="file" accept="image/*" hidden>
-      </label>
-      <div id="exp-photo-preview" class="exp-photo-preview"></div>
+
+def _tabbar() -> str:
+    """四個分頁＋中央記帳鈕。
+
+    記帳鈕本來是右下角的浮動按鈕，但它會壓在圓餅圖圖例的金額上——
+    永遠遮住內容的按鈕是設計缺陷，不是風格。放進分頁列中央後不遮任何
+    東西，而且落在單手拇指最順的位置。
+    """
+    left = "".join(_tab(key, label) for key, label in TABS[:2])
+    right = "".join(_tab(key, label) for key, label in TABS[2:])
+    add = ('<button type="button" class="tab-add" id="exp-fab" aria-label="記一筆">'
+           '<span class="tab-add-btn" aria-hidden="true">'
+           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+           ' stroke-width="2.4" stroke-linecap="round" aria-hidden="true">'
+           '<path d="M12 6v12M6 12h12"/></svg></span></button>')
+    return f'<nav class="tabbar" role="tablist">{left}{add}{right}</nav>'
+
+
+HOME_VIEW = f"""
+<section class="view" id="view-home" data-view="home">
+  <div class="hero">
+    <div class="hero-label">本月支出</div>
+    <div class="hero-amount" id="hero-amount">—</div>
+    <div class="hero-delta" id="hero-delta" hidden></div>
+    <div class="hero-foot">
+      <div><div class="hero-stat-label">筆數</div>
+           <div class="hero-stat-value" id="hero-count">—</div></div>
+      <div><div class="hero-stat-label">日均</div>
+           <div class="hero-stat-value" id="hero-daily">—</div></div>
+      <div><div class="hero-stat-label">預算剩餘</div>
+           <div class="hero-stat-value" id="hero-budget">—</div></div>
     </div>
   </div>
-  <div class="exp-actions">
-    <button type="submit" class="exp-primary" data-submit>記一筆</button>
-    <button type="button" class="exp-ghost" data-cancel hidden>取消編輯</button>
+  <div id="exp-status" class="status-pill" role="status" aria-live="polite"></div>
+  <div id="exp-charts">{_skeleton(4)}</div>
+  <div class="card">
+    <h2 class="card-title">最近紀錄</h2>
+    <div id="exp-recent">{_skeleton(3)}</div>
   </div>
-</form>
+</section>
+"""
+
+LIST_VIEW = f"""
+<section class="view" id="view-list" data-view="list" hidden>
+  <h1 class="view-title">明細</h1>
+  <div id="exp-month-nav" class="month-nav"></div>
+  <div id="exp-list">{_skeleton(5)}</div>
+</section>
+"""
+
+BUDGET_VIEW = f"""
+<section class="view" id="view-budget" data-view="budget" hidden>
+  <h1 class="view-title">預算</h1>
+  <div class="card">
+    <h2 class="card-title">本月進度</h2>
+    <div id="exp-budget">{_skeleton(3)}</div>
+  </div>
+</section>
 """
 
 SHORTCUT_STEPS = """
-<ol class="exp-steps">
-  <li>打開 iPhone 的<strong>「捷徑」App</strong> → 底部「自動化」→ 右上「＋」新增。</li>
-  <li>觸發條件往下找到<strong>「交易」</strong>（Transaction）→ 勾選你的
-      Apple Pay 卡片（可多張）→ 選<strong>「立即執行」</strong>，這樣刷卡當下就記帳，
-      不會跳出來問你。</li>
-  <li>動作選<strong>「取得 URL 內容」</strong>（Get Contents of URL），照左邊
-      金鑰區塊顯示的設定填：URL、方法 POST、請求本文 JSON，
-      金額、商家、卡片三個欄位從「快速指令輸入」變數裡選。</li>
-  <li>完成。之後每一筆 Apple Pay（含 Apple Watch）付款會自動出現在這一頁，
-      商家會照關鍵字自動分類，猜錯的點「改」修一次即可。</li>
+<ol class="steps">
+  <li>捷徑 App → 底部「自動化」→ 右上「＋」新增。</li>
+  <li>觸發條件找到<strong>「交易」</strong>→ 勾選 Apple Pay 卡片 →
+      選<strong>「立即執行」</strong>。</li>
+  <li>動作選<strong>「取得 URL 內容」</strong>，照上面金鑰區的設定填：
+      URL、POST、JSON，金額與商家用「快速指令輸入」變數。</li>
+  <li>完成。之後每筆 Apple Pay 付款自動入帳，商家會自動分類。</li>
 </ol>
-<p class="note">實體卡直接插卡／感應（沒過 Apple Pay）的交易，iOS 收不到通知——
-能用 Apple Pay 感應就用 Apple Pay，記帳與回饋都不會少。</p>
 """
 
 QUICK_STEPS = """
-<p>LINE Pay 掃碼、現金這類<strong>不經過 Apple Pay</strong> 的消費，iOS 攔不到
-（LINE Pay 沒有開放個人交易 API，捷徑的「交易」觸發器只認 Apple Pay）。
-替代做法是放一顆「快速記帳」在主畫面：付完點一下、輸入金額，2 秒入帳。</p>
-<ol class="exp-steps">
-  <li>捷徑 App → 底部「捷徑」分頁（不是自動化）→ 右上「＋」新增，
-      名稱取「快速記帳」。</li>
-  <li>加動作<strong>「要求輸入」</strong>：輸入類型選「數字」，提示文字填「金額」。</li>
-  <li>再加一個<strong>「要求輸入」</strong>：類型「文字」，提示填「商家」
-      （分類會照商家自動猜）。</li>
-  <li>加動作<strong>「取得 URL 內容」</strong>：URL 與金鑰照左邊區塊，
-      方法 POST、JSON，欄位照左邊的「快速記帳」範例——<code>source</code>
-      固定填 <code>manual</code>，<code>note</code> 可填「LINE Pay」方便辨識。</li>
-  <li>捷徑詳細資訊 → <strong>「加入主畫面」</strong>。完成——LINE Pay 付完
-      順手點一下就記好。</li>
+<ol class="steps">
+  <li>捷徑 App →「捷徑」分頁 → 新增，命名「快速記帳」。</li>
+  <li>加兩個<strong>「要求輸入」</strong>：數字（金額）、文字（商家）。</li>
+  <li>加<strong>「取得 URL 內容」</strong>，照上面「快速記帳」的 JSON 範例填。</li>
+  <li>捷徑詳細資訊 →<strong>「加入主畫面」</strong>。付完款點一下就記好。</li>
 </ol>
-<p class="note">小訣竅：LINE Pay 聯名卡或 LINE Bank 簽帳卡加進 Apple Wallet 後，
-實體店改用 Apple Pay 感應——回饋照拿（回饋綁卡片，不綁付款方式），
-而且會被上面的自動記帳直接抓到，連點都不用點。</p>
 """
 
-# App bar 的主題切換：獨立 App 不載 sidebar.js，這裡自帶最小版，
-# 用同一個 localStorage key（theme），跟儀表板互通深淺色偏好。
-THEME_TOGGLE = """
-(function () {
-  var root = document.documentElement;
-  var btn = document.getElementById("exp-theme");
-  if (!btn) return;
-  var label = function () {
-    var t = root.getAttribute("data-theme");
-    btn.textContent = t === "dark" ? "淺色" : t === "light" ? "深色" : "主題";
-  };
-  label();
-  btn.addEventListener("click", function () {
-    var t = root.getAttribute("data-theme");
-    var dark = matchMedia("(prefers-color-scheme: dark)").matches;
-    var next = t ? (t === "dark" ? "light" : "dark") : (dark ? "light" : "dark");
-    root.setAttribute("data-theme", next);
-    try { localStorage.setItem("theme", next); } catch (e) {}
-    label();
-  });
-})();
+SETTINGS_VIEW = f"""
+<section class="view" id="view-settings" data-view="settings" hidden>
+  <h1 class="view-title">設定</h1>
+
+  <div class="card setting-group">
+    <h2 class="card-title">帳號</h2>
+    <div data-account-slot></div>
+    <p class="note">登入後紀錄、預算與收據照片跨裝置同步；沒登入也能完整使用，
+       資料存在這台裝置。</p>
+  </div>
+
+  <div class="card setting-group">
+    <h2 class="card-title">自動記帳金鑰</h2>
+    <div id="exp-token">{_skeleton(2)}</div>
+  </div>
+
+  <div class="card setting-group">
+    <h3>Apple Pay 自動記帳</h3>
+    <p>iOS 不讓 App 直接讀 Apple Pay 交易，官方唯一管道是捷徑的
+       <strong>「交易」自動化</strong>：刷卡當下觸發，把金額與商家送到
+       <code>/api/expense</code>。設定一次，之後全自動。</p>
+    {SHORTCUT_STEPS}
+  </div>
+
+  <div class="card setting-group">
+    <h3>LINE Pay 與現金</h3>
+    <p>掃碼付款不經過 Apple Pay，iOS 攔不到。放一顆「快速記帳」在主畫面，
+       付完點一下、輸入金額，2 秒入帳。</p>
+    {QUICK_STEPS}
+    <p class="note">小訣竅：LINE Pay 聯名卡加進 Apple Wallet 後改用 Apple Pay
+       感應，回饋照拿，而且會被上面的自動記帳直接抓到。</p>
+  </div>
+
+  <div class="card setting-group">
+    <h3>資料存在哪</h3>
+    <p><strong>沒登入：</strong>只存在這台裝置的瀏覽器，不離開你的手機。
+       清瀏覽器資料會清掉，記得先匯出 CSV。</p>
+    <p><strong>登入後：</strong>同步到雲端資料庫，由 Row Level Security 隔離
+       ——每個帳號只能讀寫自己的紀錄。</p>
+    <p class="note">在 Safari 開這一頁 → 分享 → 加入主畫面，就是獨立的
+       「記帳」App，離線也能開。</p>
+  </div>
+</section>
 """
 
+SHEET = """
+<div class="scrim" id="exp-scrim" hidden></div>
+<div class="sheet" id="exp-sheet" role="dialog" aria-modal="true"
+     aria-labelledby="exp-sheet-title" hidden>
+  <div class="sheet-inner">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <div class="sheet-head">
+      <span class="sheet-title" id="exp-sheet-title">記一筆</span>
+      <button type="button" class="sheet-close" id="exp-sheet-close">關閉</button>
+    </div>
 
-def _body() -> str:
-    parts = []
+    <div class="quick">
+      <input id="exp-nl" type="text" autocomplete="off"
+             placeholder="一句話記帳：昨天 全家 120 現金">
+      <button type="button" id="exp-nl-go">解析</button>
+    </div>
+    <p id="exp-nl-hint" class="quick-hint">會拆出日期、商家、金額與付款方式，填進下面讓你確認。</p>
 
-    parts.append(
-        '<div id="exp-status" class="exp-status" role="status" aria-live="polite">'
-        "載入中…</div>")
-
-    parts.append(_section(
-        "summary", "本月總覽",
-        f'<div id="exp-summary">{_skeleton(4)}</div>',
-        note="金額統計以台幣計；外幣筆數會列出但不併入合計。"))
-
-    parts.append(_section(
-        "budget", "預算",
-        f'<div id="exp-budget">{_skeleton(3)}</div>',
-        note="設每月總預算與分類預算；超支會標紅，接近上限標黃。"))
-
-    parts.append(_section(
-        "add", "記一筆",
-        QUICK + FORM,
-        note="填商家後分類會自動猜（全聯→超市、星巴克→餐飲），猜錯點分類改掉。"))
-
-    parts.append(_section(
-        "list", "明細",
-        f'<div id="exp-month-nav" class="exp-month-nav"></div>'
-        f'<div id="exp-list">{_skeleton(6)}</div>',
-        note="點「改」進入編輯、「刪」移除。CSV 匯出的是目前檢視的月份。"))
-
-    parts.append(_section(
-        "auto", "Apple Pay 自動記帳",
-        '<p>iOS 不讓 App 直接讀取 Apple Pay 交易——官方唯一的管道是捷徑的'
-        '<strong>「交易」自動化</strong>：刷卡當下觸發捷徑，把金額與商家送到'
-        '<code>/api/expense</code>，寫進你的帳。設定一次，之後全自動。</p>'
-        '<div class="exp-auto-grid">'
-        '<div class="exp-auto-col"><h3>你的金鑰</h3>'
-        '<div data-account-slot></div>'
-        f'<div id="exp-token">{_skeleton(2)}</div></div>'
-        f'<div class="exp-auto-col"><h3>捷徑設定步驟</h3>{SHORTCUT_STEPS}</div>'
-        "</div>",
-        note="金鑰等同你的記帳權限：只給自己的捷徑用，外洩就到這裡撤銷重發。"))
-
-    parts.append(_section(
-        "quick", "LINE Pay 與現金：快速記帳捷徑",
-        QUICK_STEPS,
-        note="這條路走的是同一組金鑰與同一個端點，只是由你主動觸發。"))
-
-    parts.append(_section(
-        "privacy", "資料存在哪",
-        '<p><strong>沒登入：</strong>只存在這台裝置瀏覽器的 localStorage，'
-        '不離開你的手機。清瀏覽器資料會清掉，記得先匯出 CSV。</p>'
-        '<p><strong>登入後：</strong>同步到雲端資料庫（Supabase），'
-        '由 Row Level Security 隔離——每個帳號只能讀寫自己的紀錄。'
-        '手機記的帳，電腦上登入同一帳號就看得到；Apple Pay 自動記帳需要登入'
-        '（金鑰要綁在帳號上）。</p>'
-        '<p>在 Safari 打開這一頁 → 分享 → <strong>加入主畫面</strong>，'
-        '就是一個獨立的「記帳」App，有自己的圖示，離線也能開。</p>'))
-
-    return "".join(parts)
+    <form id="exp-form" autocomplete="off">
+      <div class="form-grid">
+        <label class="field field-amount">
+          <span>金額</span>
+          <input name="amount" type="number" inputmode="decimal" step="0.01"
+                 min="0" placeholder="0" required>
+        </label>
+        <label class="field field-wide">
+          <span>商家或項目</span>
+          <input name="merchant" type="text" maxlength="120" placeholder="例：全聯、午餐">
+        </label>
+        <label class="field">
+          <span>日期</span>
+          <input name="date" type="date">
+        </label>
+        <label class="field">
+          <span>備註（可空）</span>
+          <input name="note" type="text" maxlength="300">
+        </label>
+      </div>
+      <div class="field">
+        <span>分類</span>
+        <div id="exp-chips" class="chips"></div>
+        <input name="category" type="hidden" value="未分類">
+      </div>
+      <div class="field">
+        <span>付款方式</span>
+        <div id="exp-pay-chips" class="chips"></div>
+        <input name="pay" type="hidden" value="現金">
+      </div>
+      <div class="field">
+        <span>收據照片（可空）</span>
+        <div class="photo-row">
+          <label class="photo-pick">拍照或選圖
+            <input name="photo" type="file" accept="image/*" hidden>
+          </label>
+          <div id="exp-photo-preview" class="photo-preview"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn-primary" data-submit>記一筆</button>
+        <button type="button" class="btn-ghost" data-cancel hidden>取消</button>
+      </div>
+    </form>
+  </div>
+</div>
+"""
 
 
 def render_page(*, standalone: bool = False) -> str:
-    """完整 HTML 文件——獨立 App 外殼，不經過 layout.page()。
-
-    standalone=True 是「獨立網域」的變體（standalone/ 部署目錄）：
-    manifest 與圖示用根目錄的通用檔名，scope 是整個網域。
-    False 是掛在儀表板網域 /expense/ 底下的版本，資產帶 expense- 前綴
-    避免跟儀表板自己的 manifest 與圖示撞名。
-    """
+    """完整 HTML 文件——App 外殼，不經過 layout.page()。"""
     version = layout.asset_version()
     manifest = "/manifest.webmanifest" if standalone else "/expense-manifest.webmanifest"
     touch_icon = "/apple-touch-icon.png" if standalone else "/expense-apple-touch-icon.png"
     favicon = "/icon-192.png" if standalone else "/expense-icon-192.png"
+
     sb = ""
     if layout.SUPABASE_URL and layout.SUPABASE_ANON_KEY:
         sb = ("<script>window.__SB=" +
               json.dumps({"url": layout.SUPABASE_URL,
                           "key": layout.SUPABASE_ANON_KEY}) +
               "</script>\n")
+
+    # 主題在第一次繪製前套用，避免深色模式閃白
+    boot = ("(function(){try{var t=localStorage.getItem('theme');"
+            "if(t==='dark'||t==='light')document.documentElement"
+            ".setAttribute('data-theme',t);}catch(e){}})();")
 
     return f"""<!doctype html>
 <html lang="zh-Hant">
@@ -239,33 +265,37 @@ def render_page(*, standalone: bool = False) -> str:
 <title>記帳</title>
 <meta name="description" content="手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0e12" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="{manifest}">
 <link rel="apple-touch-icon" href="{touch_icon}">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="記帳">
-<link rel="stylesheet" href="/style.css?v={version}">
+<link rel="stylesheet" href="/expense-app.css?v={version}">
 <link rel="icon" href="{favicon}">
-<script>{layout.BOOT}</script>
+<script>{boot}</script>
 </head>
-<body class="exp-app">
-<header class="exp-topbar">
-  <span class="exp-brand"><span class="exp-brand-mark" aria-hidden="true">$</span>記帳</span>
-  <button type="button" class="icon-btn" id="exp-theme" aria-label="切換深淺色">主題</button>
-</header>
-<main class="content exp-main" id="content">
-  <div class="wrap">
-    <header class="page-head">
-      <h1>記帳</h1>
-      <p class="lede">手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。</p>
-    </header>
-{_body()}
-  </div>
-</main>
-{sb}<script>{THEME_TOGGLE}</script>
-<script src="/account.js?v={version}" defer></script>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <span class="brand"><span class="brand-mark" aria-hidden="true">$</span>記帳</span>
+    <span class="topbar-spacer"></span>
+    <button type="button" class="icon-btn" id="exp-theme" aria-label="切換深淺色">◐</button>
+  </header>
+
+  <main class="views" id="exp-views">
+{HOME_VIEW}
+{LIST_VIEW}
+{BUDGET_VIEW}
+{SETTINGS_VIEW}
+  </main>
+
+{_tabbar()}
+</div>
+{SHEET}
+{sb}<script src="/account.js?v={version}" defer></script>
 <script src="/expense.js?v={version}" defer></script>
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
@@ -283,7 +313,7 @@ STANDALONE_MANIFEST = """{
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f9f9f7",
+  "background_color": "#f4f5f7",
   "theme_color": "#0e7a4f",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
@@ -293,9 +323,9 @@ STANDALONE_MANIFEST = """{
 }
 """
 
-# 極簡 service worker：只求可安裝與離線開啟上次的頁面。network-first——
-# 記帳資料在 localStorage/Supabase，殼過期沒有代價，舊殼才有。
-STANDALONE_SW = """const CACHE = "expense-static-v1";
+# 極簡 service worker：只求可安裝與離線開啟。network-first——記帳資料在
+# localStorage/Supabase，殼過期沒有代價，舊殼才有。
+STANDALONE_SW = """const CACHE = "expense-static-v2";
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => {
   event.waitUntil(caches.keys()
@@ -319,12 +349,10 @@ self.addEventListener("fetch", (event) => {
 
 
 def write_standalone(root_dir: str) -> None:
-    """把獨立網域用的完整部署目錄寫到 <root_dir>/standalone/site。
+    """把獨立網域用的完整部署目錄寫到 <root_dir>/standalone。
 
-    這個目錄是給 Vercel 第二個專案用的（Root Directory 設成 standalone），
-    部署後有自己的網域，跟儀表板徹底分開。standalone/api 與
-    standalone/vercel.json 是手寫檔案、不在這裡產生；這裡只負責
-    站台內容，讓每次建置都跟 /expense/ 用同一份程式。
+    給 expense-app repo（自己的網域）同步用；內容由建置產出，
+    不手改。standalone/vercel.json 是手寫檔案，不在這裡產生。
     """
     import shutil
 
@@ -341,7 +369,7 @@ def write_standalone(root_dir: str) -> None:
         fh.write(STANDALONE_SW)
 
     copies = {
-        "style.css": "style.css",
+        "expense-app.css": "expense-app.css",
         "account.js": "account.js",
         "expense.js": "expense.js",
         "expense-icon-192.png": "icon-192.png",
@@ -353,8 +381,7 @@ def write_standalone(root_dir: str) -> None:
         shutil.copy2(os.path.join(paths.STATIC_DIR, source),
                      os.path.join(site, target))
 
-    # API 也複製一份進去——Root Directory 設 standalone 的專案看不到
-    # 上層的 api/，靠建置同步讓兩邊永遠同一份程式。
+    # API 也複製一份：Root Directory 設 standalone 的專案看不到上層的 api/
     api_dir = os.path.join(root_dir, "standalone", "api")
     os.makedirs(api_dir, exist_ok=True)
     shutil.copy2(os.path.join(paths.ROOT_DIR, "api", "expense.js"),

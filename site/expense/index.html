@@ -6,145 +6,198 @@
 <title>記帳</title>
 <meta name="description" content="手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0e12" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="/expense-manifest.webmanifest">
 <link rel="apple-touch-icon" href="/expense-apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="記帳">
-<link rel="stylesheet" href="/style.css?v=1788466776">
+<link rel="stylesheet" href="/expense-app.css?v=1788468115">
 <link rel="icon" href="/expense-icon-192.png">
-<script>
-(function(){var d=document.documentElement;try{
-var t=localStorage.getItem('theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);
-if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
-}catch(e){}})();
-</script>
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
-<body class="exp-app">
-<header class="exp-topbar">
-  <span class="exp-brand"><span class="exp-brand-mark" aria-hidden="true">$</span>記帳</span>
-  <button type="button" class="icon-btn" id="exp-theme" aria-label="切換深淺色">主題</button>
-</header>
-<main class="content exp-main" id="content">
-  <div class="wrap">
-    <header class="page-head">
-      <h1>記帳</h1>
-      <p class="lede">手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。</p>
-    </header>
-<div id="exp-status" class="exp-status" role="status" aria-live="polite">載入中…</div><section id="summary"><div class="section-head"><h2>本月總覽</h2><p class="note">金額統計以台幣計；外幣筆數會列出但不併入合計。</p></div><div id="exp-summary"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></section><section id="budget"><div class="section-head"><h2>預算</h2><p class="note">設每月總預算與分類預算；超支會標紅，接近上限標黃。</p></div><div id="exp-budget"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></section><section id="add"><div class="section-head"><h2>記一筆</h2><p class="note">填商家後分類會自動猜（全聯→超市、星巴克→餐飲），猜錯點分類改掉。</p></div>
-<div class="exp-quick">
-  <input id="exp-nl" type="text" autocomplete="off"
-         placeholder="一句話記帳：昨天 全家 120 現金">
-  <button type="button" id="exp-nl-go">解析</button>
-</div>
-<p id="exp-nl-hint" class="note">會拆出日期、商家、金額與付款方式，填進下面的表單讓你確認。</p>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <span class="brand"><span class="brand-mark" aria-hidden="true">$</span>記帳</span>
+    <span class="topbar-spacer"></span>
+    <button type="button" class="icon-btn" id="exp-theme" aria-label="切換深淺色">◐</button>
+  </header>
 
-<form id="exp-form" class="exp-form" autocomplete="off">
-  <div class="exp-form-grid">
-    <label class="exp-field exp-field-amt">
-      <span>金額</span>
-      <input name="amount" type="number" inputmode="decimal" step="0.01"
-             min="0" placeholder="0" required>
-    </label>
-    <label class="exp-field">
-      <span>商家或項目</span>
-      <input name="merchant" type="text" maxlength="120" placeholder="例：全聯、午餐">
-    </label>
-    <label class="exp-field">
-      <span>日期</span>
-      <input name="date" type="date">
-    </label>
-    <label class="exp-field">
-      <span>備註（可空）</span>
-      <input name="note" type="text" maxlength="300" placeholder="">
-    </label>
-  </div>
-  <div class="exp-field">
-    <span>分類</span>
-    <div id="exp-chips" class="exp-chips"></div>
-    <input name="category" type="hidden" value="未分類">
-  </div>
-  <div class="exp-field">
-    <span>付款方式</span>
-    <div id="exp-pay-chips" class="exp-chips"></div>
-    <input name="pay" type="hidden" value="現金">
-  </div>
-  <div class="exp-field">
-    <span>收據照片（可空）</span>
-    <div class="exp-photo-row">
-      <label class="exp-ghost exp-photo-pick">
-        拍照或選圖
-        <input name="photo" type="file" accept="image/*" hidden>
-      </label>
-      <div id="exp-photo-preview" class="exp-photo-preview"></div>
+  <main class="views" id="exp-views">
+
+<section class="view" id="view-home" data-view="home">
+  <div class="hero">
+    <div class="hero-label">本月支出</div>
+    <div class="hero-amount" id="hero-amount">—</div>
+    <div class="hero-delta" id="hero-delta" hidden></div>
+    <div class="hero-foot">
+      <div><div class="hero-stat-label">筆數</div>
+           <div class="hero-stat-value" id="hero-count">—</div></div>
+      <div><div class="hero-stat-label">日均</div>
+           <div class="hero-stat-value" id="hero-daily">—</div></div>
+      <div><div class="hero-stat-label">預算剩餘</div>
+           <div class="hero-stat-value" id="hero-budget">—</div></div>
     </div>
   </div>
-  <div class="exp-actions">
-    <button type="submit" class="exp-primary" data-submit>記一筆</button>
-    <button type="button" class="exp-ghost" data-cancel hidden>取消編輯</button>
+  <div id="exp-status" class="status-pill" role="status" aria-live="polite"></div>
+  <div id="exp-charts"><div class="skeleton" aria-hidden="true"><span class="sk-bar"></span><span class="sk-bar"></span><span class="sk-bar"></span><span class="sk-bar"></span></div></div>
+  <div class="card">
+    <h2 class="card-title">最近紀錄</h2>
+    <div id="exp-recent"><div class="skeleton" aria-hidden="true"><span class="sk-bar"></span><span class="sk-bar"></span><span class="sk-bar"></span></div></div>
   </div>
-</form>
-</section><section id="list"><div class="section-head"><h2>明細</h2><p class="note">點「改」進入編輯、「刪」移除。CSV 匯出的是目前檢視的月份。</p></div><div id="exp-month-nav" class="exp-month-nav"></div><div id="exp-list"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></section><section id="auto"><div class="section-head"><h2>Apple Pay 自動記帳</h2><p class="note">金鑰等同你的記帳權限：只給自己的捷徑用，外洩就到這裡撤銷重發。</p></div><p>iOS 不讓 App 直接讀取 Apple Pay 交易——官方唯一的管道是捷徑的<strong>「交易」自動化</strong>：刷卡當下觸發捷徑，把金額與商家送到<code>/api/expense</code>，寫進你的帳。設定一次，之後全自動。</p><div class="exp-auto-grid"><div class="exp-auto-col"><h3>你的金鑰</h3><div data-account-slot></div><div id="exp-token"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></div><div class="exp-auto-col"><h3>捷徑設定步驟</h3>
-<ol class="exp-steps">
-  <li>打開 iPhone 的<strong>「捷徑」App</strong> → 底部「自動化」→ 右上「＋」新增。</li>
-  <li>觸發條件往下找到<strong>「交易」</strong>（Transaction）→ 勾選你的
-      Apple Pay 卡片（可多張）→ 選<strong>「立即執行」</strong>，這樣刷卡當下就記帳，
-      不會跳出來問你。</li>
-  <li>動作選<strong>「取得 URL 內容」</strong>（Get Contents of URL），照左邊
-      金鑰區塊顯示的設定填：URL、方法 POST、請求本文 JSON，
-      金額、商家、卡片三個欄位從「快速指令輸入」變數裡選。</li>
-  <li>完成。之後每一筆 Apple Pay（含 Apple Watch）付款會自動出現在這一頁，
-      商家會照關鍵字自動分類，猜錯的點「改」修一次即可。</li>
-</ol>
-<p class="note">實體卡直接插卡／感應（沒過 Apple Pay）的交易，iOS 收不到通知——
-能用 Apple Pay 感應就用 Apple Pay，記帳與回饋都不會少。</p>
-</div></div></section><section id="quick"><div class="section-head"><h2>LINE Pay 與現金：快速記帳捷徑</h2><p class="note">這條路走的是同一組金鑰與同一個端點，只是由你主動觸發。</p></div>
-<p>LINE Pay 掃碼、現金這類<strong>不經過 Apple Pay</strong> 的消費，iOS 攔不到
-（LINE Pay 沒有開放個人交易 API，捷徑的「交易」觸發器只認 Apple Pay）。
-替代做法是放一顆「快速記帳」在主畫面：付完點一下、輸入金額，2 秒入帳。</p>
-<ol class="exp-steps">
-  <li>捷徑 App → 底部「捷徑」分頁（不是自動化）→ 右上「＋」新增，
-      名稱取「快速記帳」。</li>
-  <li>加動作<strong>「要求輸入」</strong>：輸入類型選「數字」，提示文字填「金額」。</li>
-  <li>再加一個<strong>「要求輸入」</strong>：類型「文字」，提示填「商家」
-      （分類會照商家自動猜）。</li>
-  <li>加動作<strong>「取得 URL 內容」</strong>：URL 與金鑰照左邊區塊，
-      方法 POST、JSON，欄位照左邊的「快速記帳」範例——<code>source</code>
-      固定填 <code>manual</code>，<code>note</code> 可填「LINE Pay」方便辨識。</li>
-  <li>捷徑詳細資訊 → <strong>「加入主畫面」</strong>。完成——LINE Pay 付完
-      順手點一下就記好。</li>
-</ol>
-<p class="note">小訣竅：LINE Pay 聯名卡或 LINE Bank 簽帳卡加進 Apple Wallet 後，
-實體店改用 Apple Pay 感應——回饋照拿（回饋綁卡片，不綁付款方式），
-而且會被上面的自動記帳直接抓到，連點都不用點。</p>
-</section><section id="privacy"><div class="section-head"><h2>資料存在哪</h2></div><p><strong>沒登入：</strong>只存在這台裝置瀏覽器的 localStorage，不離開你的手機。清瀏覽器資料會清掉，記得先匯出 CSV。</p><p><strong>登入後：</strong>同步到雲端資料庫（Supabase），由 Row Level Security 隔離——每個帳號只能讀寫自己的紀錄。手機記的帳，電腦上登入同一帳號就看得到；Apple Pay 自動記帳需要登入（金鑰要綁在帳號上）。</p><p>在 Safari 打開這一頁 → 分享 → <strong>加入主畫面</strong>，就是一個獨立的「記帳」App，有自己的圖示，離線也能開。</p></section>
+</section>
+
+
+<section class="view" id="view-list" data-view="list" hidden>
+  <h1 class="view-title">明細</h1>
+  <div id="exp-month-nav" class="month-nav"></div>
+  <div id="exp-list"><div class="skeleton" aria-hidden="true"><span class="sk-bar"></span><span class="sk-bar"></span><span class="sk-bar"></span><span class="sk-bar"></span><span class="sk-bar"></span></div></div>
+</section>
+
+
+<section class="view" id="view-budget" data-view="budget" hidden>
+  <h1 class="view-title">預算</h1>
+  <div class="card">
+    <h2 class="card-title">本月進度</h2>
+    <div id="exp-budget"><div class="skeleton" aria-hidden="true"><span class="sk-bar"></span><span class="sk-bar"></span><span class="sk-bar"></span></div></div>
   </div>
-</main>
+</section>
+
+
+<section class="view" id="view-settings" data-view="settings" hidden>
+  <h1 class="view-title">設定</h1>
+
+  <div class="card setting-group">
+    <h2 class="card-title">帳號</h2>
+    <div data-account-slot></div>
+    <p class="note">登入後紀錄、預算與收據照片跨裝置同步；沒登入也能完整使用，
+       資料存在這台裝置。</p>
+  </div>
+
+  <div class="card setting-group">
+    <h2 class="card-title">自動記帳金鑰</h2>
+    <div id="exp-token"><div class="skeleton" aria-hidden="true"><span class="sk-bar"></span><span class="sk-bar"></span></div></div>
+  </div>
+
+  <div class="card setting-group">
+    <h3>Apple Pay 自動記帳</h3>
+    <p>iOS 不讓 App 直接讀 Apple Pay 交易，官方唯一管道是捷徑的
+       <strong>「交易」自動化</strong>：刷卡當下觸發，把金額與商家送到
+       <code>/api/expense</code>。設定一次，之後全自動。</p>
+    
+<ol class="steps">
+  <li>捷徑 App → 底部「自動化」→ 右上「＋」新增。</li>
+  <li>觸發條件找到<strong>「交易」</strong>→ 勾選 Apple Pay 卡片 →
+      選<strong>「立即執行」</strong>。</li>
+  <li>動作選<strong>「取得 URL 內容」</strong>，照上面金鑰區的設定填：
+      URL、POST、JSON，金額與商家用「快速指令輸入」變數。</li>
+  <li>完成。之後每筆 Apple Pay 付款自動入帳，商家會自動分類。</li>
+</ol>
+
+  </div>
+
+  <div class="card setting-group">
+    <h3>LINE Pay 與現金</h3>
+    <p>掃碼付款不經過 Apple Pay，iOS 攔不到。放一顆「快速記帳」在主畫面，
+       付完點一下、輸入金額，2 秒入帳。</p>
+    
+<ol class="steps">
+  <li>捷徑 App →「捷徑」分頁 → 新增，命名「快速記帳」。</li>
+  <li>加兩個<strong>「要求輸入」</strong>：數字（金額）、文字（商家）。</li>
+  <li>加<strong>「取得 URL 內容」</strong>，照上面「快速記帳」的 JSON 範例填。</li>
+  <li>捷徑詳細資訊 →<strong>「加入主畫面」</strong>。付完款點一下就記好。</li>
+</ol>
+
+    <p class="note">小訣竅：LINE Pay 聯名卡加進 Apple Wallet 後改用 Apple Pay
+       感應，回饋照拿，而且會被上面的自動記帳直接抓到。</p>
+  </div>
+
+  <div class="card setting-group">
+    <h3>資料存在哪</h3>
+    <p><strong>沒登入：</strong>只存在這台裝置的瀏覽器，不離開你的手機。
+       清瀏覽器資料會清掉，記得先匯出 CSV。</p>
+    <p><strong>登入後：</strong>同步到雲端資料庫，由 Row Level Security 隔離
+       ——每個帳號只能讀寫自己的紀錄。</p>
+    <p class="note">在 Safari 開這一頁 → 分享 → 加入主畫面，就是獨立的
+       「記帳」App，離線也能開。</p>
+  </div>
+</section>
+
+  </main>
+
+<nav class="tabbar" role="tablist"><button type="button" class="tab" data-tab="home" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5.5 9.5V20h13V9.5"/></svg><span>總覽</span></button><button type="button" class="tab" data-tab="list" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>明細</span></button><button type="button" class="tab-add" id="exp-fab" aria-label="記一筆"><span class="tab-add-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></span></button><button type="button" class="tab" data-tab="budget" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM16 6V4.9a1 1 0 0 0-1.25-.97L4.6 6.4M16.6 12.5h.01"/></svg><span>預算</span></button><button type="button" class="tab" data-tab="settings" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg><span>設定</span></button></nav>
+</div>
+
+<div class="scrim" id="exp-scrim" hidden></div>
+<div class="sheet" id="exp-sheet" role="dialog" aria-modal="true"
+     aria-labelledby="exp-sheet-title" hidden>
+  <div class="sheet-inner">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <div class="sheet-head">
+      <span class="sheet-title" id="exp-sheet-title">記一筆</span>
+      <button type="button" class="sheet-close" id="exp-sheet-close">關閉</button>
+    </div>
+
+    <div class="quick">
+      <input id="exp-nl" type="text" autocomplete="off"
+             placeholder="一句話記帳：昨天 全家 120 現金">
+      <button type="button" id="exp-nl-go">解析</button>
+    </div>
+    <p id="exp-nl-hint" class="quick-hint">會拆出日期、商家、金額與付款方式，填進下面讓你確認。</p>
+
+    <form id="exp-form" autocomplete="off">
+      <div class="form-grid">
+        <label class="field field-amount">
+          <span>金額</span>
+          <input name="amount" type="number" inputmode="decimal" step="0.01"
+                 min="0" placeholder="0" required>
+        </label>
+        <label class="field field-wide">
+          <span>商家或項目</span>
+          <input name="merchant" type="text" maxlength="120" placeholder="例：全聯、午餐">
+        </label>
+        <label class="field">
+          <span>日期</span>
+          <input name="date" type="date">
+        </label>
+        <label class="field">
+          <span>備註（可空）</span>
+          <input name="note" type="text" maxlength="300">
+        </label>
+      </div>
+      <div class="field">
+        <span>分類</span>
+        <div id="exp-chips" class="chips"></div>
+        <input name="category" type="hidden" value="未分類">
+      </div>
+      <div class="field">
+        <span>付款方式</span>
+        <div id="exp-pay-chips" class="chips"></div>
+        <input name="pay" type="hidden" value="現金">
+      </div>
+      <div class="field">
+        <span>收據照片（可空）</span>
+        <div class="photo-row">
+          <label class="photo-pick">拍照或選圖
+            <input name="photo" type="file" accept="image/*" hidden>
+          </label>
+          <div id="exp-photo-preview" class="photo-preview"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn-primary" data-submit>記一筆</button>
+        <button type="button" class="btn-ghost" data-cancel hidden>取消</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>window.__SB={"url": "https://nwbfjoroqnhpymdtdbwu.supabase.co", "key": "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"}</script>
-<script>
-(function () {
-  var root = document.documentElement;
-  var btn = document.getElementById("exp-theme");
-  if (!btn) return;
-  var label = function () {
-    var t = root.getAttribute("data-theme");
-    btn.textContent = t === "dark" ? "淺色" : t === "light" ? "深色" : "主題";
-  };
-  label();
-  btn.addEventListener("click", function () {
-    var t = root.getAttribute("data-theme");
-    var dark = matchMedia("(prefers-color-scheme: dark)").matches;
-    var next = t ? (t === "dark" ? "light" : "dark") : (dark ? "light" : "dark");
-    root.setAttribute("data-theme", next);
-    try { localStorage.setItem("theme", next); } catch (e) {}
-    label();
-  });
-})();
-</script>
-<script src="/account.js?v=1788466776" defer></script>
-<script src="/expense.js?v=1788466776" defer></script>
+<script src="/account.js?v=1788468115" defer></script>
+<script src="/expense.js?v=1788468115" defer></script>
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
 </html>

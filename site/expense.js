@@ -31,7 +31,7 @@
   const CAT_COLOR = {
     "餐飲": "var(--series-2)", "超商": "var(--series-4)", "超市": "var(--series-3)",
     "交通": "var(--series-1)", "停車費": "var(--series-6)",
-    "相機": "var(--series-7)", "吉他": "var(--series-8)",
+    "相機": "var(--series-9)", "吉他": "var(--series-10)",
     "網購": "var(--series-5)", "訂閱與娛樂": "var(--series-7)",
     "醫療": "var(--series-8)", "居住與帳單": "var(--series-6)", "教育": "var(--series-3)",
     "其他": "var(--neutral)", "未分類": "var(--neutral)",
@@ -430,13 +430,13 @@
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;",
               '"': "&quot;", "'": "&#39;" }[c]));
 
-  /* ---------------------------------------------------------------- 摘要 -- */
+  /* -------------------------------------------------------------- 總覽頁 -- */
 
-  function renderSummary() {
-    const box = document.getElementById("exp-summary");
-    if (!box) return;
-    const rows = items.filter(inView).filter((it) => it.currency === "TWD" || !it.currency);
-    const foreign = items.filter(inView).length - rows.length;
+  // Hero 是這個 App 的頭條：本月花了多少。其餘（筆數、日均、預算剩餘）
+  // 是支撐數字，放在同一張卡的下緣，不另開卡片搶注意力。
+  function renderHome() {
+    const all = items.filter(inView);
+    const rows = all.filter((it) => it.currency === "TWD" || !it.currency);
     const total = rows.reduce((sum, it) => sum + it.amount, 0);
 
     const prev = new Date(viewYear, viewMonth - 1, 1);
@@ -444,47 +444,106 @@
       .filter((it) => monthKey(new Date(it.spent_at)) === monthKey(prev))
       .filter((it) => it.currency === "TWD" || !it.currency)
       .reduce((sum, it) => sum + it.amount, 0);
-
     const isCurrent = viewKey() === monthKey(today);
     const daysElapsed = isCurrent ? today.getDate()
       : new Date(viewYear, viewMonth + 1, 0).getDate();
-    const perDay = daysElapsed ? total / daysElapsed : 0;
-    const deltaPct = prevTotal ? ((total - prevTotal) / prevTotal) * 100 : null;
 
-    const stats = [
-      ["本月支出", money(total, "TWD"),
-       deltaPct === null ? "上月無資料"
-         : `比上月${deltaPct >= 0 ? "多" : "少"} ${Math.abs(deltaPct).toFixed(0)}%`],
-      ["筆數", String(items.filter(inView).length), foreign ? `含外幣 ${foreign} 筆（不計入合計）` : "手動與自動合計"],
-      ["日均", money(perDay, "TWD"), isCurrent ? `以本月已過 ${daysElapsed} 天計` : "以整月計"],
-    ];
-    let html = '<div class="grid grid-3">' + stats.map(([label, value, note]) =>
-      `<div class="stat"><div class="label">${esc(label)}</div>` +
-      `<div class="value">${esc(value)}</div>` +
-      `<div class="delta"><span class="muted">${esc(note)}</span></div></div>`).join("") +
-      "</div>";
+    const setText = (id, text) => {
+      const node = document.getElementById(id);
+      if (node) node.textContent = text;
+    };
+    setText("hero-amount", money(total, "TWD"));
+    setText("hero-count", String(all.length));
+    setText("hero-daily", money(daysElapsed ? total / daysElapsed : 0, "TWD"));
 
-    // 兩張甜甜圈圖：花費分類、支付方式。最多 6 片（前 5 大 + 其他項目），
-    // 圖例列出名稱、金額與佔比——身份靠文字，顏色只是輔助。
-    const byCat = new Map();
-    for (const it of rows) {
-      byCat.set(it.category || "未分類",
-                (byCat.get(it.category || "未分類") || 0) + it.amount);
+    const limit = Number(budgets[""]) || 0;
+    setText("hero-budget", limit ? money(limit - total, "TWD") : "未設定");
+
+    const delta = document.getElementById("hero-delta");
+    if (delta) {
+      if (prevTotal) {
+        // 上個月只記了幾筆時，百分比會變成「多 1481%」這種沒有資訊量的數字。
+        // 超過 3 倍就改講金額差，讀者要的是「差多少錢」不是「差幾趴」。
+        const pct = ((total - prevTotal) / prevTotal) * 100;
+        const up = pct >= 0;
+        const arrow = up ? "▲" : "▼";
+        const word = up ? "多" : "少";
+        delta.textContent = Math.abs(pct) > 300
+          ? `${arrow} 比上月${word} ${money(Math.abs(total - prevTotal), "TWD")}`
+          : `${arrow} 比上月${word} ${Math.abs(pct).toFixed(0)}%`;
+        delta.hidden = false;
+      } else {
+        delta.hidden = true;
+      }
     }
+
+    renderCharts(rows);
+    renderRecent(all);
+  }
+
+  // 兩張圓餅圖問的是同一筆錢的兩個問題（花在什麼、用什麼付），
+  // 疊成兩張卡會把「最近紀錄」擠到螢幕外兩頁遠。合成一張卡、上面切換，
+  // 中間的合計也不用重複寫兩次。
+  let chartTab = "cat";
+
+  function renderCharts(rows) {
+    const box = document.getElementById("exp-charts");
+    if (!box) return;
+    if (!rows.length) {
+      box.innerHTML = '<div class="card"><div class="empty">'
+        + '<div class="empty-mark" aria-hidden="true">🧾</div>'
+        + '<div class="empty-title">這個月還沒有紀錄</div>'
+        + '<div class="empty-note">按下方的＋記第一筆，或設定好自動記帳後刷一次 Apple Pay。</div>'
+        + "</div></div>";
+      return;
+    }
+    const byCat = new Map();
     const byPay = new Map();
     for (const it of rows) {
+      const cat = it.category || "未分類";
+      byCat.set(cat, (byCat.get(cat) || 0) + it.amount);
       const method = payMethod(it);
       byPay.set(method, (byPay.get(method) || 0) + it.amount);
     }
-    if (byCat.size) {
-      html += '<div class="exp-pies">'
-        + donut("花費分類", byCat, (name) => CAT_COLOR[name] || fallbackColor(name))
-        + donut("支付方式", byPay, payColor)
-        + "</div>";
-    } else {
-      html += '<p class="muted">這個月還沒有任何紀錄。</p>';
+
+    const panes = [
+      ["cat", "花費分類", donut(byCat, (name) => CAT_COLOR[name] || fallbackColor(name))],
+      ["pay", "支付方式", donut(byPay, payColor, payLabel)],
+    ];
+    box.innerHTML = '<div class="card">'
+      + '<div class="seg" role="tablist">'
+      + panes.map(([key, title]) =>
+          `<button type="button" class="seg-btn" role="tab" data-seg="${key}"`
+          + ` aria-selected="${key === chartTab}">${esc(title)}</button>`).join("")
+      + "</div>"
+      + panes.map(([key, , body]) =>
+          `<div data-pane="${key}"${key === chartTab ? "" : " hidden"}>${body}</div>`).join("")
+      + "</div>";
+
+    for (const btn of box.querySelectorAll("[data-seg]")) {
+      btn.addEventListener("click", () => {
+        chartTab = btn.dataset.seg;
+        for (const other of box.querySelectorAll("[data-seg]")) {
+          other.setAttribute("aria-selected", String(other.dataset.seg === chartTab));
+        }
+        for (const pane of box.querySelectorAll("[data-pane]")) {
+          pane.hidden = pane.dataset.pane !== chartTab;
+        }
+      });
     }
-    box.innerHTML = html;
+  }
+
+  // 總覽只放最近 5 筆——它的任務是「有沒有漏記」，完整明細在明細頁。
+  function renderRecent(all) {
+    const box = document.getElementById("exp-recent");
+    if (!box) return;
+    const rows = [...all].sort((a, b) => new Date(b.spent_at) - new Date(a.spent_at)).slice(0, 5);
+    if (!rows.length) {
+      box.innerHTML = '<p class="muted">這個月還沒有紀錄。</p>';
+      return;
+    }
+    box.innerHTML = '<div class="rows">' + rows.map((it) => itemRow(it, true)).join("") + "</div>";
+    bindRows(box);
   }
 
   /* --------------------------------------------------------- 甜甜圈圖 -- */
@@ -519,14 +578,33 @@
     return PAY_COLOR[name] || fallbackColor(name);
   }
 
+  // 圖例只有一行寬度，「Apple Pay（凱基）」與「Apple Pay（國泰）」
+  // 會雙雙被截成「Apple Pa…」——把識別度最高的卡名放前面。
+  function rowPay(it) {
+    const name = payMethod(it);
+    if (name === "未標付款方式") return "";
+    const card = name.match(/^Apple Pay（(.+)）$/);
+    if (card) return card[1];                 // 標題旁的 Pay 徽章已經說了是 Apple Pay
+    if (name === "Apple 帳號扣款") return "Apple 扣款";
+    return name;
+  }
+
+  function payLabel(name) {
+    const card = name.match(/^Apple Pay（(.+)）$/);
+    if (card) return `${card[1]}・Pay`;
+    if (name === "未標付款方式") return "未標註";
+    return name;
+  }
+
   // 自訂分類沒有固定色：拿名稱做穩定雜湊分到色槽，同名永遠同色。
   function fallbackColor(name) {
     let hash = 0;
     for (const ch of String(name)) hash = (hash * 31 + ch.codePointAt(0)) >>> 0;
-    return `var(--series-${(hash % 8) + 1})`;
+    return `var(--series-${(hash % 10) + 1})`;
   }
 
-  function donut(title, byName, colorOf) {
+  function donut(byName, colorOf, labelOf) {
+    const label = labelOf || ((name) => name);
     let entries = [...byName.entries()].sort((a, b) => b[1] - a[1]);
     const total = entries.reduce((sum, [, amount]) => sum + amount, 0);
     if (!total) return "";
@@ -535,8 +613,8 @@
       entries = [...entries.slice(0, 5), ["其他項目", rest]];
     }
 
-    const R = 52, W = 20, SIZE = 150, C = 2 * Math.PI * R;
-    const gap = entries.length > 1 ? 2 : 0;     // 片與片之間 2px 的底色間隔
+    const R = 50, W = 18, SIZE = 142, C = 2 * Math.PI * R;
+    const gap = entries.length > 1 ? 2 : 0;     // 片與片之間留 2px 底色
     let offset = 0;
     const slices = entries.map(([name, amount]) => {
       const len = (amount / total) * C;
@@ -555,20 +633,19 @@
     const legend = entries.map(([name, amount]) => {
       const color = name === "其他項目" ? "var(--neutral)" : colorOf(name);
       const pct = ((amount / total) * 100).toFixed(0);
-      return `<div class="exp-legend-row">` +
-        `<span class="exp-dot" style="background:${color}" aria-hidden="true"></span>` +
-        `<span class="exp-legend-name">${esc(name)}</span>` +
-        `<span class="exp-legend-amt">${esc(money(amount, "TWD"))}<em class="muted"> ${pct}%</em></span></div>`;
+      return `<div class="legend-row">` +
+        `<span class="dot" style="background:${color}" aria-hidden="true"></span>` +
+        `<span class="legend-name" title="${esc(name)}">${esc(label(name))}</span>` +
+        `<span class="legend-amt">${esc(money(amount, "TWD"))}<em> ${pct}%</em></span></div>`;
     }).join("");
 
-    return `<div class="exp-pie"><h3>${esc(title)}</h3>` +
-      `<div class="exp-pie-body">` +
-      `<svg viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}" role="img" aria-label="${esc(title)}">` +
+    return `<div class="pie-body">` +
+      `<svg viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}" role="img">` +
       `<g transform="rotate(-90 ${SIZE / 2} ${SIZE / 2})">${slices}</g>` +
-      `<text x="${SIZE / 2}" y="${SIZE / 2 - 4}" text-anchor="middle" class="exp-pie-total">${esc(money(total, "TWD"))}</text>` +
-      `<text x="${SIZE / 2}" y="${SIZE / 2 + 14}" text-anchor="middle" class="exp-pie-sub">合計</text>` +
+      `<text x="${SIZE / 2}" y="${SIZE / 2 - 3}" text-anchor="middle" class="pie-total">${esc(money(total, "TWD"))}</text>` +
+      `<text x="${SIZE / 2}" y="${SIZE / 2 + 14}" text-anchor="middle" class="pie-sub">合計</text>` +
       `</svg>` +
-      `<div class="exp-legend">${legend}</div></div></div>`;
+      `<div class="legend">${legend}</div></div>`;
   }
 
   /* ---------------------------------------------------------------- 預算 -- */
@@ -601,29 +678,28 @@
       const note = !limit ? "未設定"
         : left >= 0 ? `剩 ${money(left, "TWD")}`
         : `超支 ${money(-left, "TWD")}`;
-      return `<div class="exp-budget-row" data-budget-cat="${esc(label === "每月總預算" ? "" : label)}">` +
-        `<div class="exp-budget-head"><span class="exp-budget-name">${esc(label)}</span>` +
-        `<span class="exp-budget-note exp-b-${state}">${esc(note)}</span></div>` +
-        `<span class="exp-budget-bar"><i class="exp-b-${state}" style="width:${pct}%"></i></span>` +
-        `<div class="exp-budget-foot muted">${esc(money(spent, "TWD"))}` +
+      const key = label === "每月總預算" ? "" : label;
+      return `<div class="budget-row">` +
+        `<div class="budget-head"><span class="budget-name">${esc(label)}</span>` +
+        `<span class="budget-note b-${state}">${esc(note)}</span></div>` +
+        `<span class="budget-bar"><i class="b-${state}" style="width:${pct}%"></i></span>` +
+        `<div class="budget-foot">${esc(money(spent, "TWD"))}` +
         (limit ? ` / ${esc(money(limit, "TWD"))}` : "") +
-        `<button type="button" class="exp-budget-set" data-set-budget="${esc(label === "每月總預算" ? "" : label)}">` +
+        `<button type="button" class="budget-set" data-set-budget="${esc(key)}">` +
         (limit ? "改預算" : "設預算") + `</button></div></div>`;
     };
 
     let html = bar("每月總預算", total, Number(budgets[""]) || 0);
-
-    // 有設分類預算的先列；其餘讓使用者從下拉新增
     const catKeys = Object.keys(budgets).filter((k) => k && Number(budgets[k]) > 0)
       .sort((a, b) => (spentByCat.get(b) || 0) - (spentByCat.get(a) || 0));
     html += catKeys.map((cat) => bar(cat, spentByCat.get(cat) || 0, Number(budgets[cat]))).join("");
 
     const available = [...new Set([...CATEGORIES, ...customCats()])]
       .filter((cat) => !catKeys.includes(cat));
-    html += '<div class="exp-budget-add">'
-      + '<select id="exp-budget-pick"><option value="">＋ 為分類設預算…</option>'
+    html += '<select class="budget-pick" id="exp-budget-pick">'
+      + '<option value="">＋ 為分類設預算…</option>'
       + available.map((cat) => `<option value="${esc(cat)}">${esc(cat)}</option>`).join("")
-      + "</select></div>";
+      + "</select>";
     if (!hasBudgetTable) {
       html += '<p class="note">預算目前只存在這台裝置：資料表尚未建立，'
         + "到 Supabase 執行 expense_schema.sql 後就會跨裝置同步。</p>";
@@ -641,6 +717,7 @@
       budgetsDirty = true;
       persistBudgets();
       renderBudget();
+      renderHome();
       scheduleSync();
     };
     for (const btn of box.querySelectorAll("[data-set-budget]")) {
@@ -652,16 +729,67 @@
 
   /* ---------------------------------------------------------------- 明細 -- */
 
+  // 一列的樣子：分類色的圓角方塊當頭像（放商家首字）、商家＋分類/付款、
+  // 金額、操作。頭像讓長列表能靠形狀掃讀，不必逐行讀字。
+  const svg = (d, extra) =>
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"'
+    + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + (extra || "") + `<path d="${d}"/></svg>`;
+  const ICON = {
+    photo: svg("M4 8.5A1.5 1.5 0 0 1 5.5 7h2L9 5h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v8A1.5 1.5 0 0 1 18.5 18h-13A1.5 1.5 0 0 1 4 16.5z",
+               '<circle cx="12" cy="12.3" r="3.2"/>'),
+    edit: svg("M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3M14.5 7.5l2 2"),
+    del: svg("M6 6l12 12M18 6 6 18"),
+  };
+
+  function itemRow(it, compact) {
+    const color = CAT_COLOR[it.category] || fallbackColor(it.category || "未分類");
+    const name = (it.merchant || "").trim();
+    const initial = name ? [...name][0] : "·";
+    const sub = [it.category || "未分類", rowPay(it)].filter(Boolean).join("・");
+    // 備註如果只是「（凱基銀行）」這種卡名，上一行已經寫過了——
+    // 同一件事寫兩行只會讓列表看起來很吵。
+    let note = compact ? "" : (it.note || "").trim();
+    if (note && sub.includes(note.replace(/^（|）$/g, ""))) note = "";
+    return `<div class="row" data-id="${esc(it.id)}">`
+      + `<span class="row-avatar" style="background:${color}" aria-hidden="true">${esc(initial)}</span>`
+      + `<span class="row-main">`
+      + `<span class="row-title">${esc(name || "（未填商家）")}`
+      + (it.source === "applepay" ? '<span class="row-badge">Pay</span>' : "")
+      + `</span><span class="row-sub">${esc(sub)}</span>`
+      + (note ? `<span class="row-note">${esc(note)}</span>` : "")
+      + "</span>"
+      + `<span class="row-amt">${esc(money(it.amount, it.currency))}</span>`
+      + `<span class="row-ops">`
+      + (it.photo || it.hasPhoto
+         ? `<button type="button" data-photo aria-label="看收據">${ICON.photo}</button>` : "")
+      + `<button type="button" data-edit aria-label="編輯">${ICON.edit}</button>`
+      + (compact ? "" : `<button type="button" data-del aria-label="刪除">${ICON.del}</button>`)
+      + "</span></div>";
+  }
+
+  function bindRows(scope) {
+    for (const row of scope.querySelectorAll(".row")) {
+      const id = row.dataset.id;
+      const edit = row.querySelector("[data-edit]");
+      if (edit) edit.addEventListener("click", () => startEdit(id));
+      const del = row.querySelector("[data-del]");
+      if (del) del.addEventListener("click", () => removeItem(id));
+      const photoBtn = row.querySelector("[data-photo]");
+      if (photoBtn) photoBtn.addEventListener("click", () => showPhoto(id, photoBtn));
+    }
+  }
+
   function renderList() {
     const nav = document.getElementById("exp-month-nav");
     const box = document.getElementById("exp-list");
     if (!nav || !box) return;
 
     nav.innerHTML =
-      `<button type="button" class="exp-nav-btn" data-nav="-1" aria-label="上一個月">‹</button>` +
-      `<span class="exp-month-label">${viewYear} 年 ${viewMonth + 1} 月</span>` +
-      `<button type="button" class="exp-nav-btn" data-nav="1" aria-label="下一個月">›</button>` +
-      `<button type="button" class="exp-csv" data-csv>匯出 CSV</button>`;
+      '<button type="button" class="month-btn" data-nav="-1" aria-label="上一個月">‹</button>' +
+      `<span class="month-label">${viewYear} 年 ${viewMonth + 1} 月</span>` +
+      '<button type="button" class="month-btn" data-nav="1" aria-label="下一個月">›</button>' +
+      '<button type="button" class="pill-btn" data-csv>匯出 CSV</button>';
     for (const btn of nav.querySelectorAll("[data-nav]")) {
       btn.addEventListener("click", () => {
         const shift = Number(btn.dataset.nav);
@@ -676,8 +804,11 @@
     const rows = items.filter(inView)
       .sort((a, b) => new Date(b.spent_at) - new Date(a.spent_at));
     if (!rows.length) {
-      box.innerHTML = '<p class="muted">這個月沒有紀錄。用上面的表單記一筆，'
-        + '或設定好自動記帳後用 Apple Pay 付一筆看看。</p>';
+      box.innerHTML = '<div class="card"><div class="empty">'
+        + '<div class="empty-mark" aria-hidden="true">📅</div>'
+        + '<div class="empty-title">這個月沒有紀錄</div>'
+        + '<div class="empty-note">按右下角的＋記一筆，或切到其他月份看看。</div>'
+        + "</div></div>";
       return;
     }
 
@@ -696,34 +827,12 @@
       const dayTotal = dayRows
         .filter((it) => it.currency === "TWD" || !it.currency)
         .reduce((sum, it) => sum + it.amount, 0);
-      html += `<div class="exp-day"><span>${d.getMonth() + 1}/${d.getDate()}`
-        + `（${weekdays[d.getDay()]}）</span><span>${esc(money(dayTotal, "TWD"))}</span></div>`;
-      for (const it of dayRows) {
-        const color = CAT_COLOR[it.category] || "var(--neutral)";
-        html += `<div class="exp-row" data-id="${esc(it.id)}">`
-          + `<span class="exp-dot" style="background:${color}" aria-hidden="true"></span>`
-          + `<span class="exp-main"><span class="exp-merchant">${esc(it.merchant || "（未填商家）")}</span>`
-          + `<span class="exp-sub muted">${esc(it.category || "未分類")}`
-          + (it.source === "applepay" ? '<span class="exp-badge"> Pay</span>' : "")
-          + (it.pay ? `｜${esc(it.pay)}` : "")
-          + (it.note ? `｜${esc(it.note)}` : "") + `</span></span>`
-          + `<span class="exp-amt">${esc(money(it.amount, it.currency))}</span>`
-          + `<span class="exp-ops">`
-          + (it.photo || it.hasPhoto
-             ? '<button type="button" data-photo aria-label="看收據">📷</button>' : "")
-          + `<button type="button" data-edit aria-label="編輯">改</button>`
-          + `<button type="button" data-del aria-label="刪除">刪</button></span></div>`;
-      }
+      html += `<div class="day-head"><span>${d.getMonth() + 1}/${d.getDate()}`
+        + `（${weekdays[d.getDay()]}）</span><span>${esc(money(dayTotal, "TWD"))}</span></div>`
+        + '<div class="rows">' + dayRows.map((it) => itemRow(it, false)).join("") + "</div>";
     }
     box.innerHTML = html;
-
-    for (const row of box.querySelectorAll(".exp-row")) {
-      const id = row.dataset.id;
-      row.querySelector("[data-edit]").addEventListener("click", () => startEdit(id));
-      row.querySelector("[data-del]").addEventListener("click", () => removeItem(id));
-      const photoBtn = row.querySelector("[data-photo]");
-      if (photoBtn) photoBtn.addEventListener("click", () => showPhoto(id, photoBtn));
-    }
+    bindRows(box);
   }
 
   // 照片本體不在列表資料裡：本機有就直接看，否則跟雲端要那一筆的 photo。
@@ -742,9 +851,9 @@
       if (!src) { alert("讀不到這張收據（可能還沒同步上雲端）"); return; }
     }
     const overlay = document.createElement("div");
-    overlay.className = "exp-photo-modal";
+    overlay.className = "photo-modal";
     overlay.innerHTML = `<img alt="收據照片" src="${esc(src)}">`
-      + '<button type="button" class="exp-photo-close" aria-label="關閉">✕</button>';
+      + '<button type="button" class="photo-close" aria-label="關閉">✕</button>';
     overlay.addEventListener("click", () => overlay.remove());
     document.body.appendChild(overlay);
   }
@@ -777,9 +886,9 @@
     const all = [...PAY_METHODS, ...customPays()];
     if (selected && !all.includes(selected)) all.push(selected);
     payBox.innerHTML = all.map((pay) =>
-      `<button type="button" class="exp-chip${pay === selected ? " on" : ""}" data-pay="${esc(pay)}">${esc(pay)}</button>`
+      `<button type="button" class="chip${pay === selected ? " on" : ""}" data-pay="${esc(pay)}">${esc(pay)}</button>`
     ).join("") +
-      '<button type="button" class="exp-chip exp-chip-add" data-add-pay>＋自訂</button>';
+      '<button type="button" class="chip chip-add" data-add-pay>＋自訂</button>';
     for (const chip of payBox.querySelectorAll("[data-pay]")) {
       chip.addEventListener("click", () => {
         field("pay").value = chip.dataset.pay;
@@ -800,9 +909,9 @@
     const all = [...CATEGORIES, ...customCats()];
     if (selected && !all.includes(selected)) all.push(selected);
     chipBox.innerHTML = all.map((cat) =>
-      `<button type="button" class="exp-chip${cat === selected ? " on" : ""}" data-cat="${esc(cat)}">${esc(cat)}</button>`
+      `<button type="button" class="chip${cat === selected ? " on" : ""}" data-cat="${esc(cat)}">${esc(cat)}</button>`
     ).join("") +
-      '<button type="button" class="exp-chip exp-chip-add" data-add-cat>＋自訂</button>';
+      '<button type="button" class="chip chip-add" data-add-cat>＋自訂</button>';
     for (const chip of chipBox.querySelectorAll("[data-cat]")) {
       chip.addEventListener("click", () => {
         field("category").value = chip.dataset.cat;
@@ -832,7 +941,7 @@
     if (!photoBox) return;
     photoBox.innerHTML = formPhoto
       ? `<img alt="收據預覽" src="${esc(formPhoto)}">`
-        + '<button type="button" class="exp-ghost" data-drop-photo>移除</button>'
+        + '<button type="button" class="mini-btn" data-drop-photo>移除</button>'
       : '<span class="muted">未附照片</span>';
     const drop = photoBox.querySelector("[data-drop-photo]");
     if (drop) drop.addEventListener("click", () => { formPhoto = ""; renderPhotoPreview(); });
@@ -886,8 +995,7 @@
     renderPhotoPreview();
     form.querySelector("[data-submit]").textContent = "儲存修改";
     form.querySelector("[data-cancel]").hidden = false;
-    form.scrollIntoView({ behavior: "smooth", block: "center" });
-    field("amount").focus();
+    openSheet("編輯紀錄");
   }
 
   function removeItem(id) {
@@ -897,7 +1005,7 @@
     items = items.filter((x) => x.id !== id);
     dirty.delete(id);
     tombs.add(id);
-    if (editingId === id) resetForm();
+    if (editingId === id) closeSheet();
     persist();
     render();
     scheduleSync();
@@ -952,12 +1060,12 @@
       dirty.add(it.id);
     }
     persist();
-    resetForm();
+    closeSheet();
     render();
     scheduleSync();
   });
 
-  form.querySelector("[data-cancel]").addEventListener("click", resetForm);
+  form.querySelector("[data-cancel]").addEventListener("click", closeSheet);
 
   /* ------------------------------------------------------ 一句話記帳 -- */
 
@@ -1004,24 +1112,32 @@
 
   /* --------------------------------------------------------- 同步狀態列 -- */
 
+  // 狀態是背景資訊：一行灰字、一顆狀態點；需要使用者處理時（沒登入、
+  // 同步失敗）才多給一個可按的連結，按了直接跳到能處理的地方。
   function renderStatus() {
     const box = document.getElementById("exp-status");
     if (!box) return;
+
+    const line = (tone, text, action) =>
+      `<span class="status-dot ${tone}" aria-hidden="true"></span>`
+      + `<span>${esc(text)}</span>`
+      + (action ? `<button type="button" data-go-settings>${esc(action)}</button>` : "");
+
     if (!CONF) {
-      box.textContent = "純本機模式：資料只存在這台裝置的瀏覽器。";
-      return;
+      box.innerHTML = line("", "純本機模式：資料只存在這台裝置。");
+    } else if (!session()) {
+      box.innerHTML = line("", "資料只存在這台裝置", "登入以同步");
+    } else if (syncError) {
+      box.innerHTML = line("warn", `雲端同步失敗，稍後自動重試（${syncError}）`);
+    } else if (lastSync) {
+      box.innerHTML = line("ok",
+        `已同步 ${lastSync.toLocaleTimeString("zh-TW", { hour12: false })}`);
+    } else {
+      box.innerHTML = line("", "同步中…");
     }
-    if (!session()) {
-      box.textContent = "未登入：資料只存在這台裝置。登入後自動跨裝置同步，並可開啟 Apple Pay 自動記帳。";
-      return;
-    }
-    if (syncError) {
-      box.textContent = `雲端同步失敗（${syncError}），資料仍在本機，稍後會自動重試。`;
-      return;
-    }
-    box.textContent = lastSync
-      ? `已登入，雲端同步於 ${lastSync.toLocaleTimeString("zh-TW", { hour12: false })}`
-      : "已登入，同步中…";
+
+    const go = box.querySelector("[data-go-settings]");
+    if (go) go.addEventListener("click", () => showTab("settings"));
   }
 
   /* --------------------------------------------- 自動記帳（token 管理） -- */
@@ -1063,21 +1179,21 @@
       html += '<p>還沒有金鑰。按下面的按鈕產生一組，貼進 iOS 捷徑就能自動記帳。</p>';
     } else {
       html += tokens.map((t) =>
-        `<div class="exp-token-row"><code>${esc(t.token)}</code>` +
-        `<button type="button" class="exp-copy" data-copy="${esc(t.token)}">複製</button>` +
-        `<button type="button" class="exp-revoke" data-revoke="${esc(t.token)}">撤銷</button></div>`
+        `<div class="token-row"><code>${esc(t.token)}</code>` +
+        `<button type="button" class="mini-btn" data-copy="${esc(t.token)}">複製</button>` +
+        `<button type="button" class="mini-btn danger" data-revoke="${esc(t.token)}">撤銷</button></div>`
       ).join("");
       const first = tokens[0].token;
-      html += `<p class="exp-token-hint">捷徑「取得 URL 內容」的設定：URL 填 `
+      html += `<p class="note">捷徑「取得 URL 內容」的設定：URL 填 `
         + `<code>${esc(endpoint)}</code>、方法 POST、請求本文 JSON。</p>`
-        + `<p class="exp-token-hint">Apple Pay 自動記帳（「交易」自動化）的欄位——`
+        + `<p class="note">Apple Pay 自動記帳（「交易」自動化）的欄位——`
         + `<code>token</code> 填上面的金鑰，其餘選捷徑提供的變數：</p>`
-        + `<pre class="exp-json">{\n  "token": "${esc(first)}",\n  "amount": 快速指令輸入 › 金額,\n  "merchant": 快速指令輸入 › 商家,\n  "card": 快速指令輸入 › 卡片\n}</pre>`
-        + `<p class="exp-token-hint">快速記帳捷徑（LINE Pay、現金）的欄位——`
+        + `<pre class="json-block">{\n  "token": "${esc(first)}",\n  "amount": 快速指令輸入 › 金額,\n  "merchant": 快速指令輸入 › 商家,\n  "card": 快速指令輸入 › 卡片\n}</pre>`
+        + `<p class="note">快速記帳捷徑（LINE Pay、現金）的欄位——`
         + `金額與商家選「要求輸入」的結果：</p>`
-        + `<pre class="exp-json">{\n  "token": "${esc(first)}",\n  "amount": 要求輸入 › 金額,\n  "merchant": 要求輸入 › 商家,\n  "source": "manual",\n  "pay": "LINE Pay"\n}</pre>`;
+        + `<pre class="json-block">{\n  "token": "${esc(first)}",\n  "amount": 要求輸入 › 金額,\n  "merchant": 要求輸入 › 商家,\n  "source": "manual",\n  "pay": "LINE Pay"\n}</pre>`;
     }
-    html += '<button type="button" class="exp-gen" data-gen>產生新金鑰</button>';
+    html += '<button type="button" class="mini-btn" data-gen>產生新金鑰</button>';
     box.innerHTML = html;
 
     for (const btn of box.querySelectorAll("[data-copy]")) {
@@ -1114,10 +1230,71 @@
     });
   }
 
+  /* --------------------------------------------------- 分頁與彈出表單 -- */
+
+  // 分頁只是切換可見區塊——不換路由，因為加到主畫面的 PWA 沒有網址列，
+  // 使用者對「上一頁」的預期是關閉表單而不是回到上一個分頁。
+  const views = [...document.querySelectorAll("[data-view]")];
+  const tabs = [...document.querySelectorAll("[data-tab]")];
+
+  function showTab(name) {
+    for (const view of views) view.hidden = view.dataset.view !== name;
+    for (const tab of tabs) {
+      tab.setAttribute("aria-selected", String(tab.dataset.tab === name));
+    }
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+    if (name === "settings") renderTokens();
+  }
+  for (const tab of tabs) {
+    tab.addEventListener("click", () => showTab(tab.dataset.tab));
+  }
+
+  const sheet = document.getElementById("exp-sheet");
+  const scrim = document.getElementById("exp-scrim");
+
+  function openSheet(title) {
+    document.getElementById("exp-sheet-title").textContent = title || "記一筆";
+    sheet.hidden = false;
+    scrim.hidden = false;
+    document.body.style.overflow = "hidden";
+    // 手機上鍵盤會頂掉版面，所以不自動 focus 金額；使用者自己點
+  }
+  function closeSheet() {
+    sheet.hidden = true;
+    scrim.hidden = true;
+    document.body.style.overflow = "";
+    resetForm();
+  }
+
+  document.getElementById("exp-fab").addEventListener("click", () => {
+    resetForm();
+    openSheet("記一筆");
+  });
+  document.getElementById("exp-sheet-close").addEventListener("click", closeSheet);
+  scrim.addEventListener("click", closeSheet);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !sheet.hidden) closeSheet();
+  });
+
+  /* --------------------------------------------------------------- 主題 -- */
+
+  const themeBtn = document.getElementById("exp-theme");
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+      const root = document.documentElement;
+      const current = root.getAttribute("data-theme");
+      const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
+      const next = current ? (current === "dark" ? "light" : "dark")
+                           : (prefersDark ? "light" : "dark");
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("theme", next); } catch {}
+    });
+  }
+
   /* ----------------------------------------------------------------- 起動 -- */
 
   function render() {
-    renderSummary();
+    renderHome();
     renderBudget();
     renderList();
     renderStatus();
