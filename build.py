@@ -98,6 +98,15 @@ def main() -> int:
             print(f"   ✗ {name}", flush=True)
             traceback.print_exc()
 
+    # 「剛公布」狀態落地：每小時建置都寫一份，發送端跟上一輪比對，
+    # 有「新出現」的指標才推播——同一次發布只推一次。
+    import json as _json
+    import os as _os
+    fresh_state = (ctx.get("freshness") or {}).get("fresh") or {}
+    with open(_os.path.join(paths.DATA_DIR, "fresh_state.json"), "w",
+              encoding="utf-8") as fh:
+        _json.dump(fresh_state, fh, ensure_ascii=False, indent=1)
+
     print("== 3/6 規則引擎與情境 ==", flush=True)
     found = signals.evaluate(ctx)
     summary = signals.summarise(found)
