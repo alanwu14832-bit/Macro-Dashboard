@@ -92,6 +92,7 @@ LIST_VIEW = f"""
 <section class="view" id="view-list" data-view="list" hidden>
   <h1 class="view-title">明細</h1>
   <div id="exp-month-nav" class="month-nav"></div>
+  <div id="exp-gaps" class="gaps"></div>
   <div id="exp-list">{_skeleton(5)}</div>
 </section>
 """

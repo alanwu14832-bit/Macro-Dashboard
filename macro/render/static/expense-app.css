@@ -294,6 +294,53 @@ button, input, select { font-family: inherit; letter-spacing: inherit; }
   border: 1px solid var(--line); background: transparent; color: var(--ink-2);
   border-radius: 999px; padding: 6px 15px;
 }
+/* --------------------------------------------------------- 待補（未分類） -- */
+
+/* 這排不是一般的篩選器，是待辦清單：有洞才出現、補完就消失。
+   所以做得比篩選器安靜——沒有色塊、沒有陰影，只有一條髮絲框。 */
+.gaps { margin: 14px 0 4px; }
+.gaps:empty { display: none; }
+.gaps-head {
+  font-size: 0.7rem; letter-spacing: 0.18em; color: var(--ink-muted);
+  margin-bottom: 10px;
+}
+.gaps-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.gap-check {
+  display: inline-flex; align-items: center; gap: 9px; cursor: pointer;
+  font-size: 0.8rem; letter-spacing: 0.06em; color: var(--ink-2);
+  border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px;
+}
+.gap-check[data-on="true"] { border-color: var(--brand); color: var(--ink); }
+/* 數字就是「一眼看出」本身——沒有它，使用者得靠勾選才知道有幾筆要補 */
+.gap-count { color: var(--warning); }
+/* 這一項已經沒有洞了：留在原位（版面不跳），但明講沒事可做 */
+.gap-check[data-empty="true"] { opacity: 0.45; cursor: default; }
+.gap-check[data-empty="true"] .gap-count { color: var(--ink-muted); }
+
+.gap-check input {
+  appearance: none; -webkit-appearance: none;
+  width: 15px; height: 15px; margin: 0; flex: none; position: relative;
+  border: 1px solid var(--line-2); border-radius: 3px; background: transparent;
+}
+.gap-check input:checked { background: var(--brand); border-color: var(--brand); }
+.gap-check input:checked::after {
+  content: ""; position: absolute; left: 4.5px; top: 1px;
+  width: 4px; height: 8px; transform: rotate(45deg);
+  border: solid var(--brand-ink); border-width: 0 1.5px 1.5px 0;
+}
+.gap-check input:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.gap-note {
+  font-size: 0.76rem; color: var(--ink-muted);
+  margin: 18px 2px -4px;
+}
+
+/* 明細列裡缺掉的欄位：虛線底線＋暖色。實心徽章會讓整份列表
+   看起來像錯誤清單；這裡要的是「這格待補」，不是「這筆有問題」。 */
+.gap-mark {
+  font-style: normal; color: var(--warning);
+  border-bottom: 1px dashed currentColor;
+}
 
 .day-head {
   display: flex; justify-content: space-between; align-items: baseline;

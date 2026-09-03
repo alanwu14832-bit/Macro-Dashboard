@@ -745,11 +745,70 @@
     calendar: svg("M4 7.5a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 20 7.5v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5zM4 10.5h16M8.5 3.5v5M15.5 3.5v5"),
   };
 
+  /* ------------------------------------------------------------ 待補篩選 -- */
+
+  // 兩個「洞」：分類沒填、付款方式推不出來。這兩件事只能人工補
+  // （自動管道都會帶自己的標記），所以它們是待辦事項，不是一般的篩選條件。
+  const isCatGap = (it) => !it.category || it.category === "未分類";
+  const isPayGap = (it) => payMethod(it) === "未標付款方式";
+
+  // 勾選狀態不進 localStorage：這是「現在來清一輪」的暫時模式，
+  // 不是使用者對這個 App 的長期偏好，下次打開該回到看全部。
+  const gaps = { cat: false, pay: false };
+
+  // 兩個都勾＝「所有需要我處理的」，所以是聯集不是交集。
+  // 交集（同時缺兩樣）在真實資料裡幾乎是空集合，那個答案沒有人要。
+  const gapOn = () => gaps.cat || gaps.pay;
+  const gapHit = (it) => (gaps.cat && isCatGap(it)) || (gaps.pay && isPayGap(it));
+
+  function renderGaps(monthRows) {
+    const box = document.getElementById("exp-gaps");
+    if (!box) return;
+    const catN = monthRows.filter(isCatGap).length;
+    const payN = monthRows.filter(isPayGap).length;
+
+    // 沒有洞就整排收起來——它是待辦清單，沒事做的時候不該佔版面。
+    // 但正在篩選時一定要留著，否則補完最後一筆時勾選框會在手指下消失。
+    if (!catN && !payN && !gapOn()) { box.innerHTML = ""; return; }
+
+    // 數字歸零就停用——但勾著的絕對不能停用：補完最後一筆時，
+    // 使用者正需要把勾取消才回得去全部，停用它等於把人鎖在空畫面裡。
+    const check = (key, label, count) => {
+      const on = gaps[key];
+      const dim = !count && !on;
+      return `<label class="gap-check" data-on="${on}"${dim ? ' data-empty="true"' : ""}>`
+        + `<input type="checkbox" data-gap="${key}"${on ? " checked" : ""}`
+        + `${dim ? " disabled" : ""}>`
+        + `<span>${esc(label)}</span>`
+        + `<span class="gap-count">${count}</span></label>`;
+    };
+
+    box.innerHTML =
+      '<div class="gaps-head">未分類</div>'
+      + '<div class="gaps-row">'
+      + check("cat", "花費分類", catN)
+      + check("pay", "支付方式", payN)
+      + "</div>";
+
+    for (const input of box.querySelectorAll("[data-gap]")) {
+      input.addEventListener("change", () => {
+        gaps[input.dataset.gap] = input.checked;
+        renderList();
+      });
+    }
+  }
+
   function itemRow(it, compact) {
     const color = CAT_COLOR[it.category] || fallbackColor(it.category || "未分類");
     const name = (it.merchant || "").trim();
     const initial = name ? [...name][0] : "·";
-    const sub = [it.category || "未分類", rowPay(it)].filter(Boolean).join("・");
+    // 缺的欄位就地標成「待補」——要「一眼看出」，就不能等使用者去勾篩選；
+    // 用虛線底線而不是實心徽章，一排徽章會讓列表看起來像錯誤清單。
+    const catText = isCatGap(it)
+      ? '<em class="gap-mark">未分類</em>' : esc(it.category);
+    const payText = isPayGap(it)
+      ? '<em class="gap-mark">未標付款</em>' : esc(rowPay(it));
+    const sub = [catText, payText].filter(Boolean).join("・");
     // 備註如果只是「（凱基銀行）」這種卡名，上一行已經寫過了——
     // 同一件事寫兩行只會讓列表看起來很吵。
     let note = compact ? "" : (it.note || "").trim();
@@ -759,7 +818,7 @@
       + `<span class="row-main">`
       + `<span class="row-title">${esc(name || "（未填商家）")}`
       + (it.source === "applepay" ? '<span class="row-badge">Pay</span>' : "")
-      + `</span><span class="row-sub">${esc(sub)}</span>`
+      + `</span><span class="row-sub">${sub}</span>`
       + (note ? `<span class="row-note">${esc(note)}</span>` : "")
       + "</span>"
       + `<span class="row-amt">${esc(money(it.amount, it.currency))}</span>`
@@ -804,13 +863,25 @@
     }
     nav.querySelector("[data-csv]").addEventListener("click", exportCsv);
 
-    const rows = items.filter(inView)
+    const monthRows = items.filter(inView)
       .sort((a, b) => new Date(b.spent_at) - new Date(a.spent_at));
-    if (!rows.length) {
+    renderGaps(monthRows);
+
+    if (!monthRows.length) {
       box.innerHTML = '<div class="card"><div class="empty">'
         + `<div class="empty-mark" aria-hidden="true">${ICON.calendar}</div>`
         + '<div class="empty-title">這個月沒有紀錄</div>'
         + '<div class="empty-note">按下方的＋記一筆，或切到其他月份看看。</div>'
+        + "</div></div>";
+      return;
+    }
+
+    const rows = gapOn() ? monthRows.filter(gapHit) : monthRows;
+    if (!rows.length) {
+      box.innerHTML = '<div class="card"><div class="empty">'
+        + `<div class="empty-mark" aria-hidden="true">${ICON.receipt}</div>`
+        + '<div class="empty-title">這個月沒有待補的紀錄</div>'
+        + '<div class="empty-note">取消上面的勾選就能看回全部。</div>'
         + "</div></div>";
       return;
     }
@@ -824,7 +895,11 @@
       groups.get(key).push(it);
     }
 
-    let html = "";
+    // 篩選時日期小計只是「被篩出來那幾筆」的和，不是那天的總花費。
+    // 先用一行說清楚下面在看什麼，數字才不會被誤讀。
+    let html = gapOn()
+      ? `<p class="gap-note">篩選中：${rows.length} 筆待補（共 ${monthRows.length} 筆）</p>`
+      : "";
     for (const [day, dayRows] of groups) {
       const d = new Date(day + "T12:00:00");
       const dayTotal = dayRows
