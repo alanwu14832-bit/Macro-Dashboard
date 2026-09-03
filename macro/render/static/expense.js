@@ -25,13 +25,30 @@
   const TOMB_KEY = "exp-tomb";
 
   // 分類與顏色（對應 style.css 的 --series-*；灰色給未分類）
-  const CATEGORIES = ["餐飲", "超商", "超市", "交通", "網購", "訂閱與娛樂",
-                      "醫療", "居住與帳單", "教育", "其他", "未分類"];
+  const CATEGORIES = ["餐飲", "超商", "超市", "交通", "停車費", "相機", "吉他",
+                      "網購", "訂閱與娛樂", "醫療", "居住與帳單", "教育",
+                      "其他", "未分類"];
   const CAT_COLOR = {
     "餐飲": "var(--series-2)", "超商": "var(--series-4)", "超市": "var(--series-3)",
-    "交通": "var(--series-1)", "網購": "var(--series-5)", "訂閱與娛樂": "var(--series-7)",
+    "交通": "var(--series-1)", "停車費": "var(--series-6)",
+    "相機": "var(--series-7)", "吉他": "var(--series-8)",
+    "網購": "var(--series-5)", "訂閱與娛樂": "var(--series-7)",
     "醫療": "var(--series-8)", "居住與帳單": "var(--series-6)", "教育": "var(--series-3)",
     "其他": "var(--neutral)", "未分類": "var(--neutral)",
+  };
+
+  // 自訂分類：本機存一份，另外從既有紀錄裡撿（別台裝置加的自訂分類，
+  // 隨資料同步過來也要出現在 chips 裡）。
+  const CUSTOM_KEY = "exp-custom-cats";
+  const customCats = () => {
+    const stored = loadJson(CUSTOM_KEY, []);
+    const fromItems = items.map((it) => it.category)
+      .filter((cat) => cat && !CATEGORIES.includes(cat));
+    return [...new Set([...stored, ...fromItems])];
+  };
+  const addCustomCat = (name) => {
+    const stored = loadJson(CUSTOM_KEY, []);
+    if (!stored.includes(name)) saveJson(CUSTOM_KEY, [...stored, name]);
   };
 
   // 與 api/expense.js 的 CATEGORY_RULES 同一套規則——兩邊都改才會一致。
@@ -39,7 +56,10 @@
     [/7-?eleven|統一超商|全家|family\s*mart|萊爾富|hi-?life|ok\s*mart|超商/i, "超商"],
     [/全聯|pxmart|家樂福|carrefour|大潤發|愛買|costco|好市多|美廉社|超市|市場/i, "超市"],
     [/麥當勞|mcdonald|肯德基|kfc|摩斯|mos\s*burger|漢堡王|burger\s*king|必勝客|pizza|壽司|sushi|拉麵|火鍋|燒肉|食堂|餐廳|餐飲|小吃|便當|鍋貼|水餃|早餐|豆漿|茶|咖啡|coffee|starbucks|星巴克|路易莎|louisa|cama|85度|五十嵐|50嵐|清心|可不可|迷客夏|珍煮丹|得正|foodpanda|uber\s*eats/i, "餐飲"],
-    [/台鐵|高鐵|thsr|捷運|metro|悠遊|easycard|一卡通|ipass|客運|公車|uber(?!\s*eats)|計程|taxi|line\s*go|停車|parking|中油|cpc|台亞|全國加油|加油/i, "交通"],
+    [/停車|parking|路邊收費|嘟嘟房|times|udpark/i, "停車費"],
+    [/台鐵|高鐵|thsr|捷運|metro|悠遊|easycard|一卡通|ipass|客運|公車|uber(?!\s*eats)|計程|taxi|line\s*go|中油|cpc|台亞|全國加油|加油/i, "交通"],
+    [/相機|camera|鏡頭|canon|nikon|fujifilm|富士|leica|徠卡|gopro|dji|攝影|底片|沖掃/i, "相機"],
+    [/吉他|guitar|貝斯|bass|烏克麗麗|ukulele|效果器|音箱|樂器|弦|pick|移調夾|capo|slide|滑音管/i, "吉他"],
     [/藥局|藥妝|屈臣氏|watsons|康是美|cosmed|診所|醫院|牙醫|clinic|hospital|pharmacy/i, "醫療"],
     [/netflix|spotify|youtube|disney|apple\.com|apple\s*services|itunes|icloud|app\s*store|內購|google\s*(one|play|storage)|steam|nintendo|playstation|訂閱/i, "訂閱與娛樂"],
     [/蝦皮|shopee|momo|pchome|coupang|酷澎|淘寶|taobao|amazon|樂天|rakuten|露天/i, "網購"],
@@ -360,15 +380,26 @@
   const chipBox = document.getElementById("exp-chips");
 
   function renderChips(selected) {
-    chipBox.innerHTML = CATEGORIES.map((cat) =>
+    // 固定分類 + 自訂分類 +（不在清單裡的當前選擇，例如編輯舊紀錄時）
+    const all = [...CATEGORIES, ...customCats()];
+    if (selected && !all.includes(selected)) all.push(selected);
+    chipBox.innerHTML = all.map((cat) =>
       `<button type="button" class="exp-chip${cat === selected ? " on" : ""}" data-cat="${esc(cat)}">${esc(cat)}</button>`
-    ).join("");
+    ).join("") +
+      '<button type="button" class="exp-chip exp-chip-add" data-add-cat>＋自訂</button>';
     for (const chip of chipBox.querySelectorAll("[data-cat]")) {
       chip.addEventListener("click", () => {
         field("category").value = chip.dataset.cat;
         renderChips(chip.dataset.cat);
       });
     }
+    chipBox.querySelector("[data-add-cat]").addEventListener("click", () => {
+      const name = (prompt("新分類名稱（例：寵物、健身）") || "").trim().slice(0, 20);
+      if (!name) return;
+      if (![...CATEGORIES, ...customCats()].includes(name)) addCustomCat(name);
+      field("category").value = name;
+      renderChips(name);
+    });
   }
 
   const todayStr = () => {

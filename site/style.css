@@ -1162,3 +1162,7 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
   color: #fff; font-size: 0.9rem; font-weight: 700;
 }
 .exp-main { padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+
+/* 「＋自訂」分類 chip：虛線框，跟已存在的分類區隔 */
+.exp-chip-add { border-style: dashed; color: var(--ink-muted); }
+.exp-chip-add:hover { color: var(--ink); border-style: dashed; }
