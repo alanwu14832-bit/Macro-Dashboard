@@ -556,6 +556,16 @@ span.b-ok, span.b-none { color: var(--ink-muted); }
 }
 .chip-add { border-style: dashed; color: var(--ink-muted); }
 
+/* 第二層選擇（付款方式 → 哪一張卡）：縮排一點、標籤更小，
+   讓它讀起來是「上面那題的細節」，不是另一個獨立的欄位。 */
+.subfield {
+  margin-top: 14px; padding-left: 12px;
+  border-left: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.subfield[hidden] { display: none; }
+.subfield-label { font-size: 0.68rem; letter-spacing: 0.16em; color: var(--ink-muted); }
+
 .photo-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .photo-pick {
   cursor: pointer; font-size: 0.82rem; padding: 10px 18px; letter-spacing: 0.06em;

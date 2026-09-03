@@ -13,7 +13,7 @@
  *     amount    必填，數字或含幣別符號的字串（"NT$120.00" 也可）
  *     merchant  商家名稱（捷徑的「商家」變數）
  *     name      交易名稱（捷徑的「名稱」變數，商家空白時的備援）
- *     card      卡片名稱（記進備註，知道刷的是哪張卡）
+ *     card      卡片名稱（記進備註；有帶 pay 時會併成「刷卡（凱基銀行）」）
  *     currency  幣別，預設 TWD
  *     note      備註
  *     date      ISO 時間，預設現在
@@ -153,7 +153,11 @@ module.exports = async (req, res) => {
   const card = String(body.card || "").trim().slice(0, 80);
   // 付款方式：呼叫端明確給就用給的；Apple Pay 自動化沒給就從卡片名推。
   let pay = String(body.pay || "").trim().slice(0, 40);
-  if (!pay && source === "applepay") {
+  // 手動快速記帳也能指定卡片：pay:"刷卡" + card:"凱基銀行" → 「刷卡（凱基銀行）」，
+  // 跟前端表單與 Apple Pay 自動記帳存的是同一個格式。
+  if (pay && card && !/（.+）$/.test(pay)) {
+    pay = `${pay}（${card}）`.slice(0, 60);
+  } else if (!pay && source === "applepay") {
     pay = card ? `Apple Pay（${card}）` : "Apple Pay";
   }
   const currency = (String(body.currency || "TWD").trim().toUpperCase() || "TWD").slice(0, 8);

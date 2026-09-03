@@ -54,12 +54,42 @@
   // 付款方式：手動記帳預設現金（會手動記的多半是現金），可自訂。
   const PAY_METHODS = ["現金", "LINE Pay", "刷卡", "轉帳"];
   const CUSTOM_PAY_KEY = "exp-custom-pays";
+
+  // 卡片存成「刷卡（凱基銀行）」——跟 Apple Pay 自動記帳寫進來的
+  // 「Apple Pay（凱基銀行）」同一個格式。沿用既有慣例就不必動資料庫，
+  // 也不必為了一個欄位再寫一套同步退回邏輯。
+  const cardOf = (pay) => {
+    const m = String(pay || "").match(/^(.+)（(.+)）$/);
+    return m ? m[2] : "";
+  };
+  const baseMethod = (pay) => String(pay || "").replace(/（.+）$/, "");
+  const withCard = (base, card) => (card ? `${base}（${card}）` : base);
+
+  // 只有這兩種付款方式需要問「哪一張卡」：現金、轉帳、LINE Pay 自己就講完了。
+  // 收 Apple Pay 是為了讓捷徑抓錯卡名時能在編輯畫面改掉。
+  const CARD_METHODS = new Set(["刷卡", "Apple Pay"]);
+
   const customPays = () => {
     const stored = loadJson(CUSTOM_PAY_KEY, []);
-    const fromItems = items.map((it) => it.pay)
-      .filter((pay) => pay && !PAY_METHODS.includes(pay));
+    // 取 base：不然「刷卡（凱基銀行）」會被當成一個新的付款方式跑進 chips
+    const fromItems = items.map((it) => baseMethod(it.pay))
+      .filter((pay) => pay && !PAY_METHODS.includes(pay) && !/^Apple /.test(pay));
     return [...new Set([...stored, ...fromItems])];
   };
+  const CARD_KEY = "exp-cards";
+  const LAST_CARD_KEY = "exp-last-card";
+  const knownCards = () => {
+    const stored = loadJson(CARD_KEY, []);
+    const fromItems = items
+      .map((it) => cardOf(it.pay) || cardOf(payMethod(it)))
+      .filter(Boolean);
+    return [...new Set([...stored, ...fromItems])];
+  };
+  const addCard = (name) => {
+    const stored = loadJson(CARD_KEY, []);
+    if (!stored.includes(name)) saveJson(CARD_KEY, [...stored, name]);
+  };
+
   const addCustomPay = (name) => {
     const stored = loadJson(CUSTOM_PAY_KEY, []);
     if (!stored.includes(name)) saveJson(CUSTOM_PAY_KEY, [...stored, name]);
@@ -558,7 +588,7 @@
     if (it.source === "applepay") {
       const wrapped = note.match(/（([^）]+)）$/);
       const card = (wrapped ? wrapped[1] : note).trim();
-      return card ? `Apple Pay（${card}）` : "Apple Pay";
+      return withCard("Apple Pay", card);
     }
     if (/Apple 收據/.test(note)) return "Apple 帳號扣款";
     if (/foodpanda|蝦皮/.test(note)) return "線上付款";
@@ -574,24 +604,31 @@
     "未標付款方式": "var(--neutral)", "其他項目": "var(--neutral)",
   };
   function payColor(name) {
-    if (name.startsWith("Apple Pay")) return "var(--series-1)";
+    // 每張卡自己一個色槽。先前所有 Apple Pay 共用同一支藍，兩張卡在圓餅圖
+    // 上是同一個顏色——圖例分得出來、圖本身分不出來，那張圖就白畫了。
+    if (cardOf(name)) return fallbackColor(name);
     return PAY_COLOR[name] || fallbackColor(name);
   }
 
-  // 圖例只有一行寬度，「Apple Pay（凱基）」與「Apple Pay（國泰）」
-  // 會雙雙被截成「Apple Pa…」——把識別度最高的卡名放前面。
   function rowPay(it) {
     const name = payMethod(it);
     if (name === "未標付款方式") return "";
-    const card = name.match(/^Apple Pay（(.+)）$/);
-    if (card) return card[1];                 // 標題旁的 Pay 徽章已經說了是 Apple Pay
+    // 有卡就只寫卡名：一列裡「刷了哪張卡」才是資訊，
+    // 「刷卡」兩個字從卡名就推得出來，寫了只是佔掉會被截斷的寬度。
+    const card = cardOf(name);
+    if (card) return card;
     if (name === "Apple 帳號扣款") return "Apple 扣款";
     return name;
   }
 
+  // 圖例只有一行寬度，「Apple Pay（凱基）」與「刷卡（國泰世華）」
+  // 會雙雙被方式的字樣吃掉——把識別度最高的卡名放前面。
   function payLabel(name) {
-    const card = name.match(/^Apple Pay（(.+)）$/);
-    if (card) return `${card[1]}・Pay`;
+    const card = cardOf(name);
+    if (card) {
+      const base = baseMethod(name);
+      return `${card}・${base === "Apple Pay" ? "Pay" : base}`;
+    }
     if (name === "未標付款方式") return "未標註";
     return name;
   }
@@ -959,26 +996,74 @@
   const chipBox = document.getElementById("exp-chips");
   const payBox = document.getElementById("exp-pay-chips");
 
+  // 付款方式與卡片是同一個值的兩段（存成「刷卡（凱基銀行）」），
+  // 所以永遠一起寫、一起重畫，不會出現「選了卡但方式已經換掉」的中間狀態。
+  function setPay(base, card) {
+    const value = withCard(base, CARD_METHODS.has(base) ? card : "");
+    field("pay").value = value;
+    if (card) saveJson(LAST_CARD_KEY, card);
+    renderPayChips(value);
+  }
+
   function renderPayChips(selected) {
     if (!payBox) return;
+    const base = baseMethod(selected) || "現金";
+    const card = cardOf(selected);
+
     const all = [...PAY_METHODS, ...customPays()];
-    if (selected && !all.includes(selected)) all.push(selected);
+    if (base && !all.includes(base)) all.push(base);
     payBox.innerHTML = all.map((pay) =>
-      `<button type="button" class="chip${pay === selected ? " on" : ""}" data-pay="${esc(pay)}">${esc(pay)}</button>`
+      `<button type="button" class="chip${pay === base ? " on" : ""}" data-pay="${esc(pay)}">${esc(pay)}</button>`
     ).join("") +
       '<button type="button" class="chip chip-add" data-add-pay>＋自訂</button>';
+
     for (const chip of payBox.querySelectorAll("[data-pay]")) {
       chip.addEventListener("click", () => {
-        field("pay").value = chip.dataset.pay;
-        renderPayChips(chip.dataset.pay);
+        const next = chip.dataset.pay;
+        // 換到需要卡片的方式時，先帶上次刷的那張——多數人反覆刷同一張，
+        // 預選對了就是零次點擊，預選錯了也只是再點一下。
+        const keep = next === base ? card
+          : (knownCards().includes(loadJson(LAST_CARD_KEY, "")) ? loadJson(LAST_CARD_KEY, "") : "");
+        setPay(next, keep);
       });
     }
     payBox.querySelector("[data-add-pay]").addEventListener("click", () => {
       const name = (prompt("新付款方式（例：悠遊卡、街口）") || "").trim().slice(0, 20);
       if (!name) return;
       if (![...PAY_METHODS, ...customPays()].includes(name)) addCustomPay(name);
-      field("pay").value = name;
-      renderPayChips(name);
+      setPay(name, "");
+    });
+
+    renderCardChips(base, card);
+  }
+
+  // 卡片只在需要時才出現：現金、轉帳不會有「哪一張卡」這個問題，
+  // 永遠攤在那裡只是讓表單看起來比實際複雜。
+  function renderCardChips(base, card) {
+    const row = document.getElementById("exp-card-row");
+    const box = document.getElementById("exp-card-chips");
+    if (!row || !box) return;
+    if (!CARD_METHODS.has(base)) { row.hidden = true; box.innerHTML = ""; return; }
+    row.hidden = false;
+
+    const all = knownCards();
+    if (card && !all.includes(card)) all.push(card);
+    // 「未指定」放第一個：預選了上次那張卡之後，使用者要有辦法退回不指定。
+    box.innerHTML =
+      `<button type="button" class="chip${card ? "" : " on"}" data-card="">未指定</button>`
+      + all.map((name) =>
+          `<button type="button" class="chip${name === card ? " on" : ""}" data-card="${esc(name)}">${esc(name)}</button>`
+        ).join("")
+      + '<button type="button" class="chip chip-add" data-add-card>＋新增卡片</button>';
+
+    for (const chip of box.querySelectorAll("[data-card]")) {
+      chip.addEventListener("click", () => setPay(base, chip.dataset.card));
+    }
+    box.querySelector("[data-add-card]").addEventListener("click", () => {
+      const name = (prompt("卡片名稱（例：凱基銀行、國泰世華）") || "").trim().slice(0, 20);
+      if (!name) return;
+      addCard(name);
+      setPay(base, name);
     });
   }
 
@@ -1009,6 +1094,7 @@
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   };
+
 
   /* ------------------------------------------------------------ 照片欄位 -- */
 

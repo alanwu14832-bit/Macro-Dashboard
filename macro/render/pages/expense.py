@@ -218,6 +218,10 @@ SHEET = """
       <div class="field">
         <span>付款方式</span>
         <div id="exp-pay-chips" class="chips"></div>
+        <div id="exp-card-row" class="subfield" hidden>
+          <span class="subfield-label">哪一張卡</span>
+          <div id="exp-card-chips" class="chips"></div>
+        </div>
         <input name="pay" type="hidden" value="現金">
       </div>
       <div class="field">
