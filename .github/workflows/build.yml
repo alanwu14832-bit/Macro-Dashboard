@@ -45,6 +45,11 @@ jobs:
       - name: 測試
         run: python3 -m unittest discover -s tests
 
+      # 建置會覆寫 fresh_state.json，先留一份上一輪的做比對——
+      # 數據更新推播只在「這一輪才出現」的指標上觸發。
+      - name: 保留上一輪的公布狀態
+        run: cp data/fresh_state.json /tmp/prev_fresh.json 2>/dev/null || true
+
       # --ttl 3000（50 分鐘）：壓在每小時的排程間隔以下，讓每輪建置
       # 都真的重抓資料，而不是重用上一輪的快取。
       - name: 建置
@@ -67,7 +72,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site data/archive data/quotes_snapshot.json
+          git add site data/archive data/quotes_snapshot.json data/fresh_state.json
           if git diff --cached --quiet; then
             echo "沒有變更，跳過 commit"
           else
@@ -76,3 +81,15 @@ jobs:
             git pull --rebase --autostash origin main
             git push
           fi
+
+      # 有新公布的指標就推播到訂閱裝置（含期貨反應與相關新聞）。
+      # 推播失敗不影響建置——網站永遠優先。
+      - name: 數據更新推播
+        continue-on-error: true
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          PREV_STATE: /tmp/prev_fresh.json
+        run: |
+          pip install --quiet pywebpush
+          python3 tools/send_push.py --data-update

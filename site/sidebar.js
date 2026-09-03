@@ -114,4 +114,55 @@
       requestAnimationFrame(() => root.classList.add("entered"));
     });
   }
+
+  /* ------------------------------------------------------ 回到頂端 ------- */
+  const toTop = document.getElementById("to-top");
+  if (toTop) {
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      toTop.hidden = window.scrollY < 600;
+    };
+    window.addEventListener("scroll", () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    toTop.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: REDUCED.matches ? "auto" : "smooth" });
+    });
+    update();
+  }
+
+  /* ------------------------------------ 側欄捲動同步（看到哪亮到哪） ----- */
+  // 只針對目前頁展開的小標清單。用 scroll + rAF 而不是 IntersectionObserver：
+  // 要的是「最後一個越過頂端的區塊」這種單調狀態，不是可視比例。
+  const subLinks = [...document.querySelectorAll(".nav-details[open] .nav-sub a")]
+    .filter((a) => a.hash);
+  if (subLinks.length) {
+    const targets = subLinks
+      .map((a) => {
+        try { return [document.getElementById(a.hash.slice(1)), a]; }
+        catch { return [null, a]; }
+      })
+      .filter(([t]) => t);
+    let current = null;
+    let spyTick = false;
+    const spy = () => {
+      spyTick = false;
+      const line = window.scrollY + 120;   // topbar 高度 + 一點緩衝
+      let hit = null;
+      for (const [t, a] of targets) {
+        if (t.offsetTop <= line) hit = a;
+        else break;
+      }
+      if (hit !== current) {
+        current?.classList.remove("now");
+        hit?.classList.add("now");
+        current = hit;
+      }
+    };
+    window.addEventListener("scroll", () => {
+      if (!spyTick) { spyTick = true; requestAnimationFrame(spy); }
+    }, { passive: true });
+    spy();
+  }
 })();
