@@ -491,7 +491,7 @@
     if (!box) return;
     if (!rows.length) {
       box.innerHTML = '<div class="card"><div class="empty">'
-        + '<div class="empty-mark" aria-hidden="true">🧾</div>'
+        + `<div class="empty-mark" aria-hidden="true">${ICON.receipt}</div>`
         + '<div class="empty-title">這個月還沒有紀錄</div>'
         + '<div class="empty-note">按下方的＋記第一筆，或設定好自動記帳後刷一次 Apple Pay。</div>'
         + "</div></div>";
@@ -729,8 +729,9 @@
 
   /* ---------------------------------------------------------------- 明細 -- */
 
-  // 一列的樣子：分類色的圓角方塊當頭像（放商家首字）、商家＋分類/付款、
-  // 金額、操作。頭像讓長列表能靠形狀掃讀，不必逐行讀字。
+  // 一列的樣子：分類色的淡底圓形當頭像（放商家首字）、商家＋分類/付款、
+  // 金額、操作。頭像讓長列表能靠顏色掃讀，但用淡底而不是整塊填色——
+  // 一排實心色塊會蓋過宋體的調性，也會跟圓餅圖搶顏色的注意力。
   const svg = (d, extra) =>
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"'
     + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -740,6 +741,8 @@
                '<circle cx="12" cy="12.3" r="3.2"/>'),
     edit: svg("M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3M14.5 7.5l2 2"),
     del: svg("M6 6l12 12M18 6 6 18"),
+    receipt: svg("M6 3.5h12v17l-2.4-1.6-2.4 1.6-2.4-1.6-2.4 1.6-2.4-1.6zM9.5 8.5h5M9.5 12.5h5"),
+    calendar: svg("M4 7.5a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 20 7.5v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5zM4 10.5h16M8.5 3.5v5M15.5 3.5v5"),
   };
 
   function itemRow(it, compact) {
@@ -752,7 +755,7 @@
     let note = compact ? "" : (it.note || "").trim();
     if (note && sub.includes(note.replace(/^（|）$/g, ""))) note = "";
     return `<div class="row" data-id="${esc(it.id)}">`
-      + `<span class="row-avatar" style="background:${color}" aria-hidden="true">${esc(initial)}</span>`
+      + `<span class="row-avatar" style="color:${color}" aria-hidden="true">${esc(initial)}</span>`
       + `<span class="row-main">`
       + `<span class="row-title">${esc(name || "（未填商家）")}`
       + (it.source === "applepay" ? '<span class="row-badge">Pay</span>' : "")
@@ -805,9 +808,9 @@
       .sort((a, b) => new Date(b.spent_at) - new Date(a.spent_at));
     if (!rows.length) {
       box.innerHTML = '<div class="card"><div class="empty">'
-        + '<div class="empty-mark" aria-hidden="true">📅</div>'
+        + `<div class="empty-mark" aria-hidden="true">${ICON.calendar}</div>`
         + '<div class="empty-title">這個月沒有紀錄</div>'
-        + '<div class="empty-note">按右下角的＋記一筆，或切到其他月份看看。</div>'
+        + '<div class="empty-note">按下方的＋記一筆，或切到其他月份看看。</div>'
         + "</div></div>";
       return;
     }
@@ -853,7 +856,7 @@
     const overlay = document.createElement("div");
     overlay.className = "photo-modal";
     overlay.innerHTML = `<img alt="收據照片" src="${esc(src)}">`
-      + '<button type="button" class="photo-close" aria-label="關閉">✕</button>';
+      + `<button type="button" class="photo-close" aria-label="關閉">${ICON.del}</button>`;
     overlay.addEventListener("click", () => overlay.remove());
     document.body.appendChild(overlay);
   }

@@ -265,14 +265,17 @@ def render_page(*, standalone: bool = False) -> str:
 <title>記帳</title>
 <meta name="description" content="手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0b0e12" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f4f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12110f" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="{manifest}">
 <link rel="apple-touch-icon" href="{touch_icon}">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="記帳">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Serif:wght@400;600&display=swap">
 <link rel="stylesheet" href="/expense-app.css?v={version}">
 <link rel="icon" href="{favicon}">
 <script>{boot}</script>
@@ -282,7 +285,7 @@ def render_page(*, standalone: bool = False) -> str:
   <header class="topbar">
     <span class="brand"><span class="brand-mark" aria-hidden="true">$</span>記帳</span>
     <span class="topbar-spacer"></span>
-    <button type="button" class="icon-btn" id="exp-theme" aria-label="切換深淺色">◐</button>
+    <button type="button" class="icon-btn" id="exp-theme" aria-label="切換深淺色"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M12 3.6a8.4 8.4 0 0 0 0 16.8z" fill="currentColor"/></svg></button>
   </header>
 
   <main class="views" id="exp-views">
@@ -313,8 +316,8 @@ STANDALONE_MANIFEST = """{
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f4f5f7",
-  "theme_color": "#0e7a4f",
+  "background_color": "#f6f4f0",
+  "theme_color": "#33584a",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
@@ -325,7 +328,7 @@ STANDALONE_MANIFEST = """{
 
 # 極簡 service worker：只求可安裝與離線開啟。network-first——記帳資料在
 # localStorage/Supabase，殼過期沒有代價，舊殼才有。
-STANDALONE_SW = """const CACHE = "expense-static-v2";
+STANDALONE_SW = """const CACHE = "expense-static-v3";
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => {
   event.waitUntil(caches.keys()
@@ -336,6 +339,10 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
   if (url.pathname.startsWith("/api/")) return;
+  // 跨網域（Google Fonts）交給瀏覽器自己的 HTTP 快取：它們回的是 opaque
+  // response，存進 Cache Storage 也讀不回來用，只會佔空間。離線時字型
+  // 請求失敗會退回系統的宋體（iOS 是 Songti TC），版面不會壞。
+  if (url.origin !== self.location.origin) return;
   event.respondWith(
     fetch(event.request)
       .then((response) => {

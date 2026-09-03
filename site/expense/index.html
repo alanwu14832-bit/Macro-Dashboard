@@ -6,15 +6,18 @@
 <title>記帳</title>
 <meta name="description" content="手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0b0e12" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f4f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12110f" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="/expense-manifest.webmanifest">
 <link rel="apple-touch-icon" href="/expense-apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="記帳">
-<link rel="stylesheet" href="/expense-app.css?v=1788468115">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Serif:wght@400;600&display=swap">
+<link rel="stylesheet" href="/expense-app.css?v=1788468582">
 <link rel="icon" href="/expense-icon-192.png">
 <script>(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
@@ -23,7 +26,7 @@
   <header class="topbar">
     <span class="brand"><span class="brand-mark" aria-hidden="true">$</span>記帳</span>
     <span class="topbar-spacer"></span>
-    <button type="button" class="icon-btn" id="exp-theme" aria-label="切換深淺色">◐</button>
+    <button type="button" class="icon-btn" id="exp-theme" aria-label="切換深淺色"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M12 3.6a8.4 8.4 0 0 0 0 16.8z" fill="currentColor"/></svg></button>
   </header>
 
   <main class="views" id="exp-views">
@@ -196,8 +199,8 @@
 </div>
 
 <script>window.__SB={"url": "https://nwbfjoroqnhpymdtdbwu.supabase.co", "key": "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"}</script>
-<script src="/account.js?v=1788468115" defer></script>
-<script src="/expense.js?v=1788468115" defer></script>
+<script src="/account.js?v=1788468582" defer></script>
+<script src="/expense.js?v=1788468582" defer></script>
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
 </html>
