@@ -426,6 +426,31 @@ section { margin: 34px 0; scroll-margin-top: calc(var(--topbar-h) + 18px); }
 /* 推播開關開啟時給個明確的「on」狀態 */
 #push-toggle.on { color: var(--good); border-color: var(--good); }
 
+/* ------------------------------------------------------------ 回到頂端 --- */
+.to-top {
+  position: fixed; right: 18px; bottom: 18px; z-index: 90;
+  width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--surface); color: var(--ink-2);
+  border: 1px solid var(--border-strong); box-shadow: var(--shadow);
+  cursor: pointer; transition: color 120ms, transform 120ms;
+}
+.to-top svg { width: 18px; height: 18px; }
+.to-top:hover { color: var(--ink); transform: translateY(-2px); }
+.to-top:focus-visible { outline: 2px solid var(--series-1); outline-offset: 2px; }
+@media print { .to-top { display: none; } }
+
+/* 摺疊標題也要有鍵盤焦點框 */
+details.acc > summary:focus-visible,
+.nav-details > summary:focus-visible {
+  outline: 2px solid var(--series-1); outline-offset: -2px; border-radius: var(--radius-sm);
+}
+
+/* 尊重減少動態：平滑捲動也一併關掉 */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 /* ------------------------------------------------------------- signals ---- */
 .signal-list { display: flex; flex-direction: column; gap: 0; }
 .signal {
@@ -744,6 +769,11 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
   transition: background 130ms, color 130ms;
 }
 .nav-sub a:hover { background: var(--surface-sunken); color: var(--ink); }
+/* 捲動同步：目前讀到的區塊在側欄亮起來，左緣一道藍條指位 */
+.nav-sub a.now {
+  background: var(--surface-sunken); color: var(--ink);
+  box-shadow: inset 2px 0 0 var(--series-1);
+}
 /* 收合成純圖示時，小標與箭頭都藏起來 */
 :root.rail-collapsed .nav-sub,
 :root.rail-collapsed .nav-caret { display: none; }

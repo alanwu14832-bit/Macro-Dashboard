@@ -246,6 +246,12 @@ def page(*, title: str, path: str, body: str, lede: str = "",
     </main>
   </div>
 </div>
+<button type="button" class="to-top" id="to-top" hidden aria-label="回到頁首">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 19V5M5 12l7-7 7 7"/>
+  </svg>
+</button>
 {_supabase_config()}<script src="/sidebar.js?v={version}" defer></script>
 <script src="/chart.js?v={version}" defer></script>
 <script src="/account.js?v={version}" defer></script>
