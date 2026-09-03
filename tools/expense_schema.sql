@@ -32,6 +32,12 @@ create index if not exists expenses_user_spent_idx
 -- 已建過表的資料庫：補上後來新增的付款方式欄位（重跑無害）
 alter table public.expenses add column if not exists pay_method text not null default '';
 
+-- 收據照片：photo 存壓縮後的 data URL；has_photo 是產生欄位，
+-- 讓列表同步時不用把照片一起抓下來（照片只在點開那筆時才取）。
+alter table public.expenses add column if not exists photo text not null default '';
+alter table public.expenses add column if not exists has_photo boolean
+  generated always as (photo <> '') stored;
+
 alter table public.expenses enable row level security;
 
 drop policy if exists "expenses select own" on public.expenses;
@@ -71,4 +77,33 @@ create policy "tokens insert own" on public.expense_tokens
 
 drop policy if exists "tokens delete own" on public.expense_tokens;
 create policy "tokens delete own" on public.expense_tokens
+  for delete using (auth.uid() = user_id);
+
+-- ----------------------------------------------------------------------------
+-- 預算：每個分類一列；category 空字串那列是「每月總預算」。
+
+create table if not exists public.expense_budgets (
+  user_id    uuid not null references auth.users (id) on delete cascade,
+  category   text not null default '',
+  amount     numeric not null check (amount >= 0),
+  updated_at timestamptz not null default now(),
+  primary key (user_id, category)
+);
+
+alter table public.expense_budgets enable row level security;
+
+drop policy if exists "budgets select own" on public.expense_budgets;
+create policy "budgets select own" on public.expense_budgets
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "budgets insert own" on public.expense_budgets;
+create policy "budgets insert own" on public.expense_budgets
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "budgets update own" on public.expense_budgets;
+create policy "budgets update own" on public.expense_budgets
+  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists "budgets delete own" on public.expense_budgets;
+create policy "budgets delete own" on public.expense_budgets
   for delete using (auth.uid() = user_id);

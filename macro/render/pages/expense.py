@@ -34,6 +34,15 @@ def _section(anchor: str, title: str, body: str, *, note: str = "") -> str:
             f"{body}</section>")
 
 
+QUICK = """
+<div class="exp-quick">
+  <input id="exp-nl" type="text" autocomplete="off"
+         placeholder="一句話記帳：昨天 全家 120 現金">
+  <button type="button" id="exp-nl-go">解析</button>
+</div>
+<p id="exp-nl-hint" class="note">會拆出日期、商家、金額與付款方式，填進下面的表單讓你確認。</p>
+"""
+
 FORM = """
 <form id="exp-form" class="exp-form" autocomplete="off">
   <div class="exp-form-grid">
@@ -64,6 +73,16 @@ FORM = """
     <span>付款方式</span>
     <div id="exp-pay-chips" class="exp-chips"></div>
     <input name="pay" type="hidden" value="現金">
+  </div>
+  <div class="exp-field">
+    <span>收據照片（可空）</span>
+    <div class="exp-photo-row">
+      <label class="exp-ghost exp-photo-pick">
+        拍照或選圖
+        <input name="photo" type="file" accept="image/*" hidden>
+      </label>
+      <div id="exp-photo-preview" class="exp-photo-preview"></div>
+    </div>
   </div>
   <div class="exp-actions">
     <button type="submit" class="exp-primary" data-submit>記一筆</button>
@@ -146,8 +165,13 @@ def _body() -> str:
         note="金額統計以台幣計；外幣筆數會列出但不併入合計。"))
 
     parts.append(_section(
+        "budget", "預算",
+        f'<div id="exp-budget">{_skeleton(3)}</div>',
+        note="設每月總預算與分類預算；超支會標紅，接近上限標黃。"))
+
+    parts.append(_section(
         "add", "記一筆",
-        FORM,
+        QUICK + FORM,
         note="填商家後分類會自動猜（全聯→超市、星巴克→餐飲），猜錯點分類改掉。"))
 
     parts.append(_section(

@@ -86,6 +86,99 @@
     return "";
   };
 
+  /* ------------------------------------------------------- 自然語言解析 -- */
+
+  // 規則式解析，不呼叫任何 AI——記帳的句子結構固定（日期、商家、金額、
+  // 付款方式），規則比模型穩定、離線可用、零延遲。解析結果一律填回表單
+  // 讓使用者確認後才送出，猜錯的成本只是改一個欄位。
+  const REL_DAYS = { "今天": 0, "今日": 0, "昨天": -1, "昨日": -1, "前天": -2, "大前天": -3 };
+
+  function parseNatural(text) {
+    let rest = ` ${String(text).trim()} `;
+    const out = {};
+
+    // 日期：相對詞 → M/D 或 M月D日
+    for (const [word, offset] of Object.entries(REL_DAYS)) {
+      if (rest.includes(word)) {
+        const d = new Date();
+        d.setDate(d.getDate() + offset);
+        out.date = d;
+        rest = rest.replace(word, " ");
+        break;
+      }
+    }
+    if (!out.date) {
+      const md = rest.match(/(\d{1,2})\s*[\/月]\s*(\d{1,2})\s*日?/);
+      if (md) {
+        const today = new Date();
+        const d = new Date(today.getFullYear(), Number(md[1]) - 1, Number(md[2]), 12);
+        // 日期比今天晚很多 → 當作去年的（12 月底記 1 月的帳很少見）
+        if (d - today > 7 * 86400e3) d.setFullYear(d.getFullYear() - 1);
+        out.date = d;
+        rest = rest.replace(md[0], " ");
+      }
+    }
+
+    // 付款方式：先比對已知的（含自訂），命中就從字串移除
+    const known = [...PAY_METHODS, ...customPays(), "apple pay", "applepay",
+                   "悠遊卡", "一卡通", "街口", "信用卡"];
+    for (const name of known) {
+      const idx = rest.toLowerCase().indexOf(name.toLowerCase());
+      if (idx >= 0) {
+        const canonical = { "apple pay": "Apple Pay", "applepay": "Apple Pay",
+                            "信用卡": "刷卡" }[name.toLowerCase()] || name;
+        out.pay = canonical;
+        rest = rest.slice(0, idx) + " " + rest.slice(idx + name.length);
+        break;
+      }
+    }
+
+    // 金額：帶錢字樣的優先（120元、$120），否則取最後一個獨立數字
+    const withUnit = rest.match(/(?:\$|NT\$?)?\s*(\d+(?:\.\d+)?)\s*(?:元|塊|圓)/i);
+    if (withUnit) {
+      out.amount = Number(withUnit[1]);
+      rest = rest.replace(withUnit[0], " ");
+    } else {
+      const nums = [...rest.matchAll(/(?:\$|NT\$)?\s*(\d+(?:\.\d+)?)/gi)];
+      if (nums.length) {
+        const last = nums[nums.length - 1];
+        out.amount = Number(last[1]);
+        rest = rest.slice(0, last.index) + " " + rest.slice(last.index + last[0].length);
+      }
+    }
+
+    // 剩下的就是商家／品項；分類照既有規則猜
+    out.merchant = rest.replace(/\s+/g, " ").trim().slice(0, 120);
+    const guess = guessCategory(out.merchant);
+    if (guess) out.category = guess;
+    return out;
+  }
+
+  /* ------------------------------------------------------------ 照片壓縮 -- */
+
+  // 收據只要看得懂金額，不需要原始解析度：長邊縮到 1200、JPEG 0.55，
+  // 一張約 60–120KB。太大的圖同步會拖慢、也吃 localStorage。
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("讀取失敗"));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("不是有效的圖片"));
+        img.onload = () => {
+          const scale = Math.min(1, 1200 / Math.max(img.width, img.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.55));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   /* -------------------------------------------------------------- storage -- */
 
   const loadJson = (key, fallback) => {
@@ -103,6 +196,15 @@
     saveJson(ITEMS_KEY, items);
     saveJson(DIRTY_KEY, [...dirty]);
     saveJson(TOMB_KEY, [...tombs]);
+  };
+
+  // 預算：{ "": 每月總預算, "餐飲": 3000, … }。空字串鍵是總預算。
+  const BUDGET_KEY = "exp-budgets";
+  let budgets = loadJson(BUDGET_KEY, {});
+  let budgetsDirty = loadJson(BUDGET_KEY + "-dirty", false);
+  const persistBudgets = () => {
+    saveJson(BUDGET_KEY, budgets);
+    saveJson(BUDGET_KEY + "-dirty", budgetsDirty);
   };
 
   const uuid = () => (crypto.randomUUID
@@ -166,6 +268,9 @@
   // pay_method 欄位是後來加的：資料庫還沒跑 migration 時（400），
   // 自動退回不帶這個欄位的同步,付款方式先只存本機,不擋整個同步。
   let hasPayColumn = true;
+  // 照片同理：photo 欄位存 data URL，但列表同步只抓 has_photo（產生欄位），
+  // 照片本體等使用者點開那筆才取——否則每次同步都要拖幾 MB。
+  let hasPhotoColumn = true;
 
   async function syncNow() {
     if (!CONF || !session()) return;
@@ -177,16 +282,19 @@
           merchant: it.merchant, category: it.category, note: it.note,
           source: it.source, spent_at: it.spent_at,
           ...(hasPayColumn ? { pay_method: it.pay || "" } : {}),
+          ...(hasPhotoColumn && it.photo !== undefined ? { photo: it.photo || "" } : {}),
         }));
         if (rows.length) {
           try {
             await rest("POST", "/expenses?on_conflict=id", rows,
                        "resolution=merge-duplicates,return=minimal");
           } catch (error) {
-            if (!hasPayColumn || !/400/.test(String(error.message))) throw error;
-            hasPayColumn = false;          // 欄位不存在 → 去掉 pay_method 重推
+            if (!/400/.test(String(error.message))) throw error;
+            // 欄位不存在（migration 未跑）→ 去掉新欄位重推一次
+            hasPayColumn = false;
+            hasPhotoColumn = false;
             await rest("POST", "/expenses?on_conflict=id",
-                       rows.map(({ pay_method, ...rest_ }) => rest_),
+                       rows.map(({ pay_method, photo, ...rest_ }) => rest_),
                        "resolution=merge-duplicates,return=minimal");
           }
         }
@@ -203,19 +311,27 @@
       try {
         cloud = await rest("GET",
           "/expenses?select=" + baseSelect + (hasPayColumn ? ",pay_method" : "")
+          + (hasPhotoColumn ? ",has_photo" : "")
           + "&order=spent_at.desc&limit=5000");
       } catch (error) {
-        if (!hasPayColumn || !/400/.test(String(error.message))) throw error;
+        if (!/400/.test(String(error.message))) throw error;
         hasPayColumn = false;              // 欄位不存在 → 退回舊欄位集重試
+        hasPhotoColumn = false;
         cloud = await rest("GET",
           "/expenses?select=" + baseSelect + "&order=spent_at.desc&limit=5000");
       }
+      // 照片本體不隨列表下載：雲端有照片就記 hasPhoto，點開才抓。
+      // 本機還沒同步上去的照片（photo 有值）要保留，否則會被覆蓋掉。
+      const localPhotos = new Map(items.filter((it) => it.photo)
+        .map((it) => [it.id, it.photo]));
       items = cloud.map((row) => ({
         id: row.id, amount: Number(row.amount), currency: row.currency,
         merchant: row.merchant, category: row.category, note: row.note,
         source: row.source, spent_at: row.spent_at,
         pay: row.pay_method || "",
+        hasPhoto: !!row.has_photo || localPhotos.has(row.id),
       }));
+      await syncBudgets();
       lastSync = new Date();
       syncError = "";
       persist();
@@ -223,6 +339,32 @@
     } catch (error) {
       syncError = String(error.message || error);
       renderStatus();
+    }
+  }
+
+  // 預算資料量小（一個分類一列），改過就整份覆寫，不做逐列 diff。
+  let hasBudgetTable = true;
+  async function syncBudgets() {
+    if (!hasBudgetTable) return;
+    const uid = session().uid;
+    try {
+      if (budgetsDirty) {
+        const rows = Object.entries(budgets)
+          .filter(([, amount]) => Number(amount) > 0)
+          .map(([category, amount]) => ({ user_id: uid, category, amount }));
+        await rest("DELETE", "/expense_budgets?user_id=eq." + uid, null, "return=minimal");
+        if (rows.length) {
+          await rest("POST", "/expense_budgets", rows, "return=minimal");
+        }
+        budgetsDirty = false;
+      }
+      const cloud = await rest("GET", "/expense_budgets?select=category,amount");
+      budgets = Object.fromEntries(cloud.map((row) => [row.category, Number(row.amount)]));
+      persistBudgets();
+    } catch (error) {
+      // 資料表還沒建（migration 未跑）→ 預算先只存本機，不擋主同步
+      if (/40[04]/.test(String(error.message))) hasBudgetTable = false;
+      else throw error;
     }
   }
 
@@ -407,6 +549,85 @@
       `<div class="exp-legend">${legend}</div></div></div>`;
   }
 
+  /* ---------------------------------------------------------------- 預算 -- */
+
+  // 進度條顏色是狀態不是身份：安全→中性、接近上限→警示、超支→嚴重，
+  // 三者都配文字（剩餘／超支金額），不靠顏色單獨表意。
+  function budgetState(spent, limit) {
+    if (!limit) return "none";
+    const ratio = spent / limit;
+    if (ratio > 1) return "over";
+    if (ratio >= 0.85) return "warn";
+    return "ok";
+  }
+
+  function renderBudget() {
+    const box = document.getElementById("exp-budget");
+    if (!box) return;
+    const rows = items.filter(inView).filter((it) => it.currency === "TWD" || !it.currency);
+    const total = rows.reduce((sum, it) => sum + it.amount, 0);
+    const spentByCat = new Map();
+    for (const it of rows) {
+      const cat = it.category || "未分類";
+      spentByCat.set(cat, (spentByCat.get(cat) || 0) + it.amount);
+    }
+
+    const bar = (label, spent, limit) => {
+      const state = budgetState(spent, limit);
+      const pct = limit ? Math.min((spent / limit) * 100, 100) : 0;
+      const left = limit - spent;
+      const note = !limit ? "未設定"
+        : left >= 0 ? `剩 ${money(left, "TWD")}`
+        : `超支 ${money(-left, "TWD")}`;
+      return `<div class="exp-budget-row" data-budget-cat="${esc(label === "每月總預算" ? "" : label)}">` +
+        `<div class="exp-budget-head"><span class="exp-budget-name">${esc(label)}</span>` +
+        `<span class="exp-budget-note exp-b-${state}">${esc(note)}</span></div>` +
+        `<span class="exp-budget-bar"><i class="exp-b-${state}" style="width:${pct}%"></i></span>` +
+        `<div class="exp-budget-foot muted">${esc(money(spent, "TWD"))}` +
+        (limit ? ` / ${esc(money(limit, "TWD"))}` : "") +
+        `<button type="button" class="exp-budget-set" data-set-budget="${esc(label === "每月總預算" ? "" : label)}">` +
+        (limit ? "改預算" : "設預算") + `</button></div></div>`;
+    };
+
+    let html = bar("每月總預算", total, Number(budgets[""]) || 0);
+
+    // 有設分類預算的先列；其餘讓使用者從下拉新增
+    const catKeys = Object.keys(budgets).filter((k) => k && Number(budgets[k]) > 0)
+      .sort((a, b) => (spentByCat.get(b) || 0) - (spentByCat.get(a) || 0));
+    html += catKeys.map((cat) => bar(cat, spentByCat.get(cat) || 0, Number(budgets[cat]))).join("");
+
+    const available = [...new Set([...CATEGORIES, ...customCats()])]
+      .filter((cat) => !catKeys.includes(cat));
+    html += '<div class="exp-budget-add">'
+      + '<select id="exp-budget-pick"><option value="">＋ 為分類設預算…</option>'
+      + available.map((cat) => `<option value="${esc(cat)}">${esc(cat)}</option>`).join("")
+      + "</select></div>";
+    if (!hasBudgetTable) {
+      html += '<p class="note">預算目前只存在這台裝置：資料表尚未建立，'
+        + "到 Supabase 執行 expense_schema.sql 後就會跨裝置同步。</p>";
+    }
+    box.innerHTML = html;
+
+    const ask = (cat) => {
+      const label = cat || "每月總預算";
+      const current = Number(budgets[cat]) || "";
+      const input = prompt(`${label}的預算金額（留白或 0 取消預算）`, current);
+      if (input === null) return;
+      const amount = Math.abs(Number(String(input).replace(/[^0-9.]/g, "")));
+      if (amount > 0) budgets[cat] = amount;
+      else delete budgets[cat];
+      budgetsDirty = true;
+      persistBudgets();
+      renderBudget();
+      scheduleSync();
+    };
+    for (const btn of box.querySelectorAll("[data-set-budget]")) {
+      btn.addEventListener("click", () => ask(btn.dataset.setBudget));
+    }
+    const pick = box.querySelector("#exp-budget-pick");
+    if (pick) pick.addEventListener("change", () => { if (pick.value) ask(pick.value); });
+  }
+
   /* ---------------------------------------------------------------- 明細 -- */
 
   function renderList() {
@@ -465,7 +686,10 @@
           + (it.pay ? `｜${esc(it.pay)}` : "")
           + (it.note ? `｜${esc(it.note)}` : "") + `</span></span>`
           + `<span class="exp-amt">${esc(money(it.amount, it.currency))}</span>`
-          + `<span class="exp-ops"><button type="button" data-edit aria-label="編輯">改</button>`
+          + `<span class="exp-ops">`
+          + (it.photo || it.hasPhoto
+             ? '<button type="button" data-photo aria-label="看收據">📷</button>' : "")
+          + `<button type="button" data-edit aria-label="編輯">改</button>`
           + `<button type="button" data-del aria-label="刪除">刪</button></span></div>`;
       }
     }
@@ -475,7 +699,32 @@
       const id = row.dataset.id;
       row.querySelector("[data-edit]").addEventListener("click", () => startEdit(id));
       row.querySelector("[data-del]").addEventListener("click", () => removeItem(id));
+      const photoBtn = row.querySelector("[data-photo]");
+      if (photoBtn) photoBtn.addEventListener("click", () => showPhoto(id, photoBtn));
     }
+  }
+
+  // 照片本體不在列表資料裡：本機有就直接看，否則跟雲端要那一筆的 photo。
+  async function showPhoto(id, btn) {
+    const it = items.find((x) => x.id === id);
+    if (!it) return;
+    let src = it.photo;
+    if (!src) {
+      const before = btn.textContent;
+      btn.textContent = "…";
+      try {
+        const rows = await rest("GET", "/expenses?select=photo&id=eq." + encodeURIComponent(id));
+        src = rows[0] && rows[0].photo;
+      } catch {}
+      btn.textContent = before;
+      if (!src) { alert("讀不到這張收據（可能還沒同步上雲端）"); return; }
+    }
+    const overlay = document.createElement("div");
+    overlay.className = "exp-photo-modal";
+    overlay.innerHTML = `<img alt="收據照片" src="${esc(src)}">`
+      + '<button type="button" class="exp-photo-close" aria-label="關閉">✕</button>';
+    overlay.addEventListener("click", () => overlay.remove());
+    document.body.appendChild(overlay);
   }
 
   function exportCsv() {
@@ -552,9 +801,43 @@
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   };
 
+  /* ------------------------------------------------------------ 照片欄位 -- */
+
+  const photoBox = document.getElementById("exp-photo-preview");
+  let formPhoto = "";                      // 目前表單掛著的照片（data URL）
+
+  function renderPhotoPreview() {
+    if (!photoBox) return;
+    photoBox.innerHTML = formPhoto
+      ? `<img alt="收據預覽" src="${esc(formPhoto)}">`
+        + '<button type="button" class="exp-ghost" data-drop-photo>移除</button>'
+      : '<span class="muted">未附照片</span>';
+    const drop = photoBox.querySelector("[data-drop-photo]");
+    if (drop) drop.addEventListener("click", () => { formPhoto = ""; renderPhotoPreview(); });
+  }
+
+  const photoInput = form.querySelector('[name="photo"]');
+  if (photoInput) {
+    photoInput.addEventListener("change", async () => {
+      const file = photoInput.files && photoInput.files[0];
+      photoInput.value = "";               // 同一張圖再選一次也要能觸發
+      if (!file) return;
+      photoBox.innerHTML = '<span class="muted">壓縮中…</span>';
+      try {
+        formPhoto = await compressImage(file);
+      } catch (error) {
+        formPhoto = "";
+        alert("照片處理失敗：" + error.message);
+      }
+      renderPhotoPreview();
+    });
+  }
+
   function resetForm() {
     editingId = null;
     form.reset();
+    formPhoto = "";
+    renderPhotoPreview();
     field("date").value = todayStr();
     field("category").value = "未分類";
     renderChips("未分類");
@@ -577,6 +860,8 @@
     const pay = it.pay || payMethod(it);   // 舊紀錄沒存 pay 就帶推斷值
     field("pay").value = pay === "未標付款方式" ? "現金" : pay;
     renderPayChips(field("pay").value);
+    formPhoto = it.photo || "";            // 雲端照片不預載，編輯時不動它
+    renderPhotoPreview();
     form.querySelector("[data-submit]").textContent = "儲存修改";
     form.querySelector("[data-cancel]").hidden = false;
     form.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -628,6 +913,7 @@
         it.note = field("note").value.trim();
         it.pay = field("pay").value || "現金";
         it.spent_at = spentAt;
+        if (formPhoto) { it.photo = formPhoto; it.hasPhoto = true; }
         dirty.add(it.id);
       }
     } else {
@@ -638,6 +924,7 @@
         note: field("note").value.trim(),
         pay: field("pay").value || "現金",
         source: "manual", spent_at: spentAt,
+        ...(formPhoto ? { photo: formPhoto, hasPhoto: true } : {}),
       };
       items.unshift(it);
       dirty.add(it.id);
@@ -649,6 +936,49 @@
   });
 
   form.querySelector("[data-cancel]").addEventListener("click", resetForm);
+
+  /* ------------------------------------------------------ 一句話記帳 -- */
+
+  const nlInput = document.getElementById("exp-nl");
+  const nlHint = document.getElementById("exp-nl-hint");
+
+  function applyNatural() {
+    const raw = nlInput.value.trim();
+    if (!raw) return;
+    const parsed = parseNatural(raw);
+    if (!parsed.amount) {
+      nlHint.textContent = "找不到金額——句子裡要有數字，例如「昨天 全家 120 現金」。";
+      return;
+    }
+    field("amount").value = parsed.amount;
+    if (parsed.merchant) field("merchant").value = parsed.merchant;
+    if (parsed.date) {
+      const d = parsed.date;
+      field("date").value =
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+    const category = parsed.category || "未分類";
+    field("category").value = category;
+    renderChips(category);
+    const pay = parsed.pay || "現金";
+    field("pay").value = pay;
+    renderPayChips(pay);
+
+    const bits = [`${money(parsed.amount, "TWD")}`];
+    if (parsed.merchant) bits.push(parsed.merchant);
+    bits.push(category, pay);
+    if (parsed.date) bits.push(field("date").value);
+    nlHint.textContent = "已填入：" + bits.join("｜") + "——確認後按「記一筆」。";
+    nlInput.value = "";
+    field("amount").focus();
+  }
+
+  if (nlInput) {
+    document.getElementById("exp-nl-go").addEventListener("click", applyNatural);
+    nlInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") { event.preventDefault(); applyNatural(); }
+    });
+  }
 
   /* --------------------------------------------------------- 同步狀態列 -- */
 
@@ -766,6 +1096,7 @@
 
   function render() {
     renderSummary();
+    renderBudget();
     renderList();
     renderStatus();
   }

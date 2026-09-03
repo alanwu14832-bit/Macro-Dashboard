@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="記帳">
-<link rel="stylesheet" href="/style.css?v=1788437759">
+<link rel="stylesheet" href="/style.css?v=1788466463">
 <link rel="icon" href="/expense-icon-192.png">
 <script>
 (function(){var d=document.documentElement;try{
@@ -33,7 +33,14 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
       <h1>記帳</h1>
       <p class="lede">手動記一筆，或讓 iOS 捷徑在 Apple Pay 刷卡當下自動入帳；登入後跨裝置同步。</p>
     </header>
-<div id="exp-status" class="exp-status" role="status" aria-live="polite">載入中…</div><section id="summary"><div class="section-head"><h2>本月總覽</h2><p class="note">金額統計以台幣計；外幣筆數會列出但不併入合計。</p></div><div id="exp-summary"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></section><section id="add"><div class="section-head"><h2>記一筆</h2><p class="note">填商家後分類會自動猜（全聯→超市、星巴克→餐飲），猜錯點分類改掉。</p></div>
+<div id="exp-status" class="exp-status" role="status" aria-live="polite">載入中…</div><section id="summary"><div class="section-head"><h2>本月總覽</h2><p class="note">金額統計以台幣計；外幣筆數會列出但不併入合計。</p></div><div id="exp-summary"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></section><section id="budget"><div class="section-head"><h2>預算</h2><p class="note">設每月總預算與分類預算；超支會標紅，接近上限標黃。</p></div><div id="exp-budget"><div class="exp-skeleton" aria-hidden="true"><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span><span class="exp-sk-bar"></span></div></div></section><section id="add"><div class="section-head"><h2>記一筆</h2><p class="note">填商家後分類會自動猜（全聯→超市、星巴克→餐飲），猜錯點分類改掉。</p></div>
+<div class="exp-quick">
+  <input id="exp-nl" type="text" autocomplete="off"
+         placeholder="一句話記帳：昨天 全家 120 現金">
+  <button type="button" id="exp-nl-go">解析</button>
+</div>
+<p id="exp-nl-hint" class="note">會拆出日期、商家、金額與付款方式，填進下面的表單讓你確認。</p>
+
 <form id="exp-form" class="exp-form" autocomplete="off">
   <div class="exp-form-grid">
     <label class="exp-field exp-field-amt">
@@ -63,6 +70,16 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
     <span>付款方式</span>
     <div id="exp-pay-chips" class="exp-chips"></div>
     <input name="pay" type="hidden" value="現金">
+  </div>
+  <div class="exp-field">
+    <span>收據照片（可空）</span>
+    <div class="exp-photo-row">
+      <label class="exp-ghost exp-photo-pick">
+        拍照或選圖
+        <input name="photo" type="file" accept="image/*" hidden>
+      </label>
+      <div id="exp-photo-preview" class="exp-photo-preview"></div>
+    </div>
   </div>
   <div class="exp-actions">
     <button type="submit" class="exp-primary" data-submit>記一筆</button>
@@ -126,8 +143,8 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
   });
 })();
 </script>
-<script src="/account.js?v=1788437759" defer></script>
-<script src="/expense.js?v=1788437759" defer></script>
+<script src="/account.js?v=1788466463" defer></script>
+<script src="/expense.js?v=1788466463" defer></script>
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
 </html>
