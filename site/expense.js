@@ -256,7 +256,11 @@
     const response = await fetch(CONF.url + "/rest/v1" + path, {
       method, headers, body: body ? JSON.stringify(body) : undefined,
     });
-    if (!response.ok) throw new Error("HTTP " + response.status);
+    if (!response.ok) {
+      // 錯誤內文要帶出來：欄位缺失的退回邏輯靠它分辨少的是哪個欄位
+      const detail = await response.text().catch(() => "");
+      throw new Error("HTTP " + response.status + " " + detail.slice(0, 300));
+    }
     return method === "GET" ? response.json() : null;
   }
 
@@ -271,6 +275,23 @@
   // 照片同理：photo 欄位存 data URL，但列表同步只抓 has_photo（產生欄位），
   // 照片本體等使用者點開那筆才取——否則每次同步都要拖幾 MB。
   let hasPhotoColumn = true;
+
+  /** 從 PostgREST 的 400 錯誤挑出「哪個欄位不存在」，只關掉那一個。
+      回傳 true 代表這個錯誤已被辨識、呼叫端可以退回重試。 */
+  function dropMissingColumns(error) {
+    const message = String(error && error.message);
+    if (!/400/.test(message)) return false;
+    let matched = false;
+    if (/pay_method/.test(message)) { hasPayColumn = false; matched = true; }
+    if (/\bphoto\b|has_photo/.test(message)) { hasPhotoColumn = false; matched = true; }
+    if (!matched && /does not exist|42703|PGRST20[0-9]/.test(message)) {
+      // 認得出是欄位問題但認不出是哪個 → 保守地兩個都關
+      hasPayColumn = false;
+      hasPhotoColumn = false;
+      matched = true;
+    }
+    return matched;
+  }
 
   async function syncNow() {
     if (!CONF || !session()) return;
@@ -289,13 +310,14 @@
             await rest("POST", "/expenses?on_conflict=id", rows,
                        "resolution=merge-duplicates,return=minimal");
           } catch (error) {
-            if (!/400/.test(String(error.message))) throw error;
-            // 欄位不存在（migration 未跑）→ 去掉新欄位重推一次
-            hasPayColumn = false;
-            hasPhotoColumn = false;
-            await rest("POST", "/expenses?on_conflict=id",
-                       rows.map(({ pay_method, photo, ...rest_ }) => rest_),
-                       "resolution=merge-duplicates,return=minimal");
+            if (!dropMissingColumns(error)) throw error;
+            // 只拿掉真的不存在的欄位——某個欄位缺席不該連累另一個
+            await rest("POST", "/expenses?on_conflict=id", rows.map((row) => {
+              const copy = { ...row };
+              if (!hasPayColumn) delete copy.pay_method;
+              if (!hasPhotoColumn) delete copy.photo;
+              return copy;
+            }), "resolution=merge-duplicates,return=minimal");
           }
         }
         dirty.clear();
@@ -314,11 +336,11 @@
           + (hasPhotoColumn ? ",has_photo" : "")
           + "&order=spent_at.desc&limit=5000");
       } catch (error) {
-        if (!/400/.test(String(error.message))) throw error;
-        hasPayColumn = false;              // 欄位不存在 → 退回舊欄位集重試
-        hasPhotoColumn = false;
+        if (!dropMissingColumns(error)) throw error;
         cloud = await rest("GET",
-          "/expenses?select=" + baseSelect + "&order=spent_at.desc&limit=5000");
+          "/expenses?select=" + baseSelect + (hasPayColumn ? ",pay_method" : "")
+          + (hasPhotoColumn ? ",has_photo" : "")
+          + "&order=spent_at.desc&limit=5000");
       }
       // 照片本體不隨列表下載：雲端有照片就記 hasPhoto，點開才抓。
       // 本機還沒同步上去的照片（photo 有值）要保留，否則會被覆蓋掉。
