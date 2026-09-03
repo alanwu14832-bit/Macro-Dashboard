@@ -264,27 +264,115 @@
       `<div class="delta"><span class="muted">${esc(note)}</span></div></div>`).join("") +
       "</div>";
 
-    // 分類長條：金額由大到小，寬度相對最大分類
+    // 兩張甜甜圈圖：花費分類、支付方式。最多 6 片（前 5 大 + 其他項目），
+    // 圖例列出名稱、金額與佔比——身份靠文字，顏色只是輔助。
     const byCat = new Map();
     for (const it of rows) {
       byCat.set(it.category || "未分類",
                 (byCat.get(it.category || "未分類") || 0) + it.amount);
     }
-    const sorted = [...byCat.entries()].sort((a, b) => b[1] - a[1]);
-    const max = sorted.length ? sorted[0][1] : 0;
-    if (sorted.length) {
-      html += '<div class="exp-cats">' + sorted.map(([cat, amount]) => {
-        const width = max ? Math.max(2, (amount / max) * 100) : 0;
-        const share = total ? ((amount / total) * 100).toFixed(0) : 0;
-        return `<div class="exp-cat-row">` +
-          `<span class="exp-cat-name">${esc(cat)}</span>` +
-          `<span class="exp-cat-bar"><i style="width:${width}%;background:${CAT_COLOR[cat] || "var(--neutral)"}"></i></span>` +
-          `<span class="exp-cat-amt">${esc(money(amount, "TWD"))}<em class="muted"> ${share}%</em></span></div>`;
-      }).join("") + "</div>";
+    const byPay = new Map();
+    for (const it of rows) {
+      const method = payMethod(it);
+      byPay.set(method, (byPay.get(method) || 0) + it.amount);
+    }
+    if (byCat.size) {
+      html += '<div class="exp-pies">'
+        + donut("花費分類", byCat, (name) => CAT_COLOR[name] || fallbackColor(name))
+        + donut("支付方式", byPay, payColor)
+        + "</div>";
     } else {
       html += '<p class="muted">這個月還沒有任何紀錄。</p>';
     }
     box.innerHTML = html;
+  }
+
+  /* --------------------------------------------------------- 甜甜圈圖 -- */
+
+  // 從每筆紀錄推付款方式：Apple Pay 自動記帳的備註帶卡片名、
+  // 快速記帳標 LINE Pay、蝦皮貨到付款算現金、收據匯入是帳號扣款。
+  function payMethod(it) {
+    const note = it.note || "";
+    if (/line\s*pay/i.test(note)) return "LINE Pay";
+    if (/貨到付款|現金/.test(note)) return "現金／貨到付款";
+    if (it.source === "applepay") {
+      const wrapped = note.match(/（([^）]+)）$/);
+      const card = (wrapped ? wrapped[1] : note).trim();
+      return card ? `Apple Pay（${card}）` : "Apple Pay";
+    }
+    if (/Apple 收據/.test(note)) return "Apple 帳號扣款";
+    if (/foodpanda|蝦皮/.test(note)) return "線上付款";
+    return "未標付款方式";
+  }
+
+  // 付款方式的固定配色（顏色跟著身份走，不跟著排名走）；
+  // Apple Pay 的各張卡照名稱排序穩定分到剩下的色槽。
+  const PAY_COLOR = {
+    "LINE Pay": "var(--series-6)", "現金／貨到付款": "var(--series-4)",
+    "Apple 帳號扣款": "var(--series-7)", "線上付款": "var(--series-5)",
+    "未標付款方式": "var(--neutral)", "其他項目": "var(--neutral)",
+  };
+  const APPLE_SLOTS = ["var(--series-1)", "var(--series-2)",
+                       "var(--series-3)", "var(--series-8)"];
+  let appleCardOrder = [];
+  function payColor(name) {
+    if (PAY_COLOR[name]) return PAY_COLOR[name];
+    if (!appleCardOrder.includes(name)) {
+      appleCardOrder = [...appleCardOrder, name].sort((a, b) => a.localeCompare(b, "zh-Hant"));
+    }
+    return APPLE_SLOTS[appleCardOrder.indexOf(name) % APPLE_SLOTS.length];
+  }
+
+  // 自訂分類沒有固定色：拿名稱做穩定雜湊分到色槽，同名永遠同色。
+  function fallbackColor(name) {
+    let hash = 0;
+    for (const ch of String(name)) hash = (hash * 31 + ch.codePointAt(0)) >>> 0;
+    return `var(--series-${(hash % 8) + 1})`;
+  }
+
+  function donut(title, byName, colorOf) {
+    let entries = [...byName.entries()].sort((a, b) => b[1] - a[1]);
+    const total = entries.reduce((sum, [, amount]) => sum + amount, 0);
+    if (!total) return "";
+    if (entries.length > 6) {
+      const rest = entries.slice(5).reduce((sum, [, amount]) => sum + amount, 0);
+      entries = [...entries.slice(0, 5), ["其他項目", rest]];
+    }
+
+    const R = 52, W = 20, SIZE = 150, C = 2 * Math.PI * R;
+    const gap = entries.length > 1 ? 2 : 0;     // 片與片之間 2px 的底色間隔
+    let offset = 0;
+    const slices = entries.map(([name, amount]) => {
+      const len = (amount / total) * C;
+      const dash = Math.max(len - gap, 0.5);
+      const color = name === "其他項目" ? "var(--neutral)" : colorOf(name);
+      const pct = ((amount / total) * 100).toFixed(0);
+      const circle =
+        `<circle r="${R}" cx="${SIZE / 2}" cy="${SIZE / 2}" fill="none"` +
+        ` stroke="${color}" stroke-width="${W}"` +
+        ` stroke-dasharray="${dash} ${C - dash}" stroke-dashoffset="${-offset}">` +
+        `<title>${esc(name)}：${esc(money(amount, "TWD"))}（${pct}%）</title></circle>`;
+      offset += len;
+      return circle;
+    }).join("");
+
+    const legend = entries.map(([name, amount]) => {
+      const color = name === "其他項目" ? "var(--neutral)" : colorOf(name);
+      const pct = ((amount / total) * 100).toFixed(0);
+      return `<div class="exp-legend-row">` +
+        `<span class="exp-dot" style="background:${color}" aria-hidden="true"></span>` +
+        `<span class="exp-legend-name">${esc(name)}</span>` +
+        `<span class="exp-legend-amt">${esc(money(amount, "TWD"))}<em class="muted"> ${pct}%</em></span></div>`;
+    }).join("");
+
+    return `<div class="exp-pie"><h3>${esc(title)}</h3>` +
+      `<div class="exp-pie-body">` +
+      `<svg viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}" role="img" aria-label="${esc(title)}">` +
+      `<g transform="rotate(-90 ${SIZE / 2} ${SIZE / 2})">${slices}</g>` +
+      `<text x="${SIZE / 2}" y="${SIZE / 2 - 4}" text-anchor="middle" class="exp-pie-total">${esc(money(total, "TWD"))}</text>` +
+      `<text x="${SIZE / 2}" y="${SIZE / 2 + 14}" text-anchor="middle" class="exp-pie-sub">合計</text>` +
+      `</svg>` +
+      `<div class="exp-legend">${legend}</div></div></div>`;
   }
 
   /* ---------------------------------------------------------------- 明細 -- */

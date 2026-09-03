@@ -1166,3 +1166,28 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
 /* 「＋自訂」分類 chip：虛線框，跟已存在的分類區隔 */
 .exp-chip-add { border-style: dashed; color: var(--ink-muted); }
 .exp-chip-add:hover { color: var(--ink); border-style: dashed; }
+
+/* 甜甜圈圖（本月總覽） */
+.exp-pies {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px; margin-top: 16px;
+}
+.exp-pie {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow);
+}
+.exp-pie h3 { font-size: 0.92rem; margin: 0 0 10px; }
+.exp-pie-body { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.exp-pie svg { flex: none; }
+.exp-pie-total { font-size: 15px; font-weight: 650; fill: var(--ink); }
+.exp-pie-sub { font-size: 10px; fill: var(--ink-muted); }
+.exp-legend { flex: 1; min-width: 140px; display: flex; flex-direction: column; gap: 6px; }
+.exp-legend-row {
+  display: flex; align-items: center; gap: 8px; font-size: 0.84rem; min-width: 0;
+}
+.exp-legend-name {
+  color: var(--ink-2); overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; flex: 1;
+}
+.exp-legend-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.exp-legend-amt em { font-style: normal; font-size: 0.86em; }
