@@ -20,6 +20,7 @@ create table if not exists public.expenses (
   merchant   text not null default '',
   category   text not null default '未分類',
   note       text not null default '',
+  pay_method text not null default '',
   source     text not null default 'manual' check (source in ('manual', 'applepay')),
   spent_at   timestamptz not null default now(),
   created_at timestamptz not null default now()
@@ -27,6 +28,9 @@ create table if not exists public.expenses (
 
 create index if not exists expenses_user_spent_idx
   on public.expenses (user_id, spent_at desc);
+
+-- 已建過表的資料庫：補上後來新增的付款方式欄位（重跑無害）
+alter table public.expenses add column if not exists pay_method text not null default '';
 
 alter table public.expenses enable row level security;
 

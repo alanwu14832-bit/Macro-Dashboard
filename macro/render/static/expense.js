@@ -51,6 +51,20 @@
     if (!stored.includes(name)) saveJson(CUSTOM_KEY, [...stored, name]);
   };
 
+  // 付款方式：手動記帳預設現金（會手動記的多半是現金），可自訂。
+  const PAY_METHODS = ["現金", "LINE Pay", "刷卡", "轉帳"];
+  const CUSTOM_PAY_KEY = "exp-custom-pays";
+  const customPays = () => {
+    const stored = loadJson(CUSTOM_PAY_KEY, []);
+    const fromItems = items.map((it) => it.pay)
+      .filter((pay) => pay && !PAY_METHODS.includes(pay));
+    return [...new Set([...stored, ...fromItems])];
+  };
+  const addCustomPay = (name) => {
+    const stored = loadJson(CUSTOM_PAY_KEY, []);
+    if (!stored.includes(name)) saveJson(CUSTOM_PAY_KEY, [...stored, name]);
+  };
+
   // 與 api/expense.js 的 CATEGORY_RULES 同一套規則——兩邊都改才會一致。
   const CATEGORY_RULES = [
     [/7-?eleven|統一超商|全家|family\s*mart|萊爾富|hi-?life|ok\s*mart|超商/i, "超商"],
@@ -149,6 +163,9 @@
   let syncTimer = null;
   let lastSync = null;   // Date | null
   let syncError = "";
+  // pay_method 欄位是後來加的：資料庫還沒跑 migration 時（400），
+  // 自動退回不帶這個欄位的同步,付款方式先只存本機,不擋整個同步。
+  let hasPayColumn = true;
 
   async function syncNow() {
     if (!CONF || !session()) return;
@@ -159,10 +176,19 @@
           id: it.id, user_id: uid, amount: it.amount, currency: it.currency,
           merchant: it.merchant, category: it.category, note: it.note,
           source: it.source, spent_at: it.spent_at,
+          ...(hasPayColumn ? { pay_method: it.pay || "" } : {}),
         }));
         if (rows.length) {
-          await rest("POST", "/expenses?on_conflict=id", rows,
-                     "resolution=merge-duplicates,return=minimal");
+          try {
+            await rest("POST", "/expenses?on_conflict=id", rows,
+                       "resolution=merge-duplicates,return=minimal");
+          } catch (error) {
+            if (!hasPayColumn || !/400/.test(String(error.message))) throw error;
+            hasPayColumn = false;          // 欄位不存在 → 去掉 pay_method 重推
+            await rest("POST", "/expenses?on_conflict=id",
+                       rows.map(({ pay_method, ...rest_ }) => rest_),
+                       "resolution=merge-duplicates,return=minimal");
+          }
         }
         dirty.clear();
       }
@@ -172,13 +198,23 @@
                    "return=minimal");
         tombs.clear();
       }
-      const cloud = await rest("GET",
-        "/expenses?select=id,amount,currency,merchant,category,note,source,spent_at"
-        + "&order=spent_at.desc&limit=5000");
+      const baseSelect = "id,amount,currency,merchant,category,note,source,spent_at";
+      let cloud;
+      try {
+        cloud = await rest("GET",
+          "/expenses?select=" + baseSelect + (hasPayColumn ? ",pay_method" : "")
+          + "&order=spent_at.desc&limit=5000");
+      } catch (error) {
+        if (!hasPayColumn || !/400/.test(String(error.message))) throw error;
+        hasPayColumn = false;              // 欄位不存在 → 退回舊欄位集重試
+        cloud = await rest("GET",
+          "/expenses?select=" + baseSelect + "&order=spent_at.desc&limit=5000");
+      }
       items = cloud.map((row) => ({
         id: row.id, amount: Number(row.amount), currency: row.currency,
         merchant: row.merchant, category: row.category, note: row.note,
         source: row.source, spent_at: row.spent_at,
+        pay: row.pay_method || "",
       }));
       lastSync = new Date();
       syncError = "";
@@ -292,9 +328,10 @@
   // 從每筆紀錄推付款方式：Apple Pay 自動記帳的備註帶卡片名、
   // 快速記帳標 LINE Pay、蝦皮貨到付款算現金、收據匯入是帳號扣款。
   function payMethod(it) {
+    if (it.pay) return it.pay;             // 明確標了就用標的（表單或 API 的 pay 欄位）
     const note = it.note || "";
     if (/line\s*pay/i.test(note)) return "LINE Pay";
-    if (/貨到付款|現金/.test(note)) return "現金／貨到付款";
+    if (/貨到付款|現金/.test(note)) return "現金";
     if (it.source === "applepay") {
       const wrapped = note.match(/（([^）]+)）$/);
       const card = (wrapped ? wrapped[1] : note).trim();
@@ -308,19 +345,14 @@
   // 付款方式的固定配色（顏色跟著身份走，不跟著排名走）；
   // Apple Pay 的各張卡照名稱排序穩定分到剩下的色槽。
   const PAY_COLOR = {
-    "LINE Pay": "var(--series-6)", "現金／貨到付款": "var(--series-4)",
+    "LINE Pay": "var(--series-6)", "現金": "var(--series-4)",
+    "刷卡": "var(--series-2)", "轉帳": "var(--series-3)",
     "Apple 帳號扣款": "var(--series-7)", "線上付款": "var(--series-5)",
     "未標付款方式": "var(--neutral)", "其他項目": "var(--neutral)",
   };
-  const APPLE_SLOTS = ["var(--series-1)", "var(--series-2)",
-                       "var(--series-3)", "var(--series-8)"];
-  let appleCardOrder = [];
   function payColor(name) {
-    if (PAY_COLOR[name]) return PAY_COLOR[name];
-    if (!appleCardOrder.includes(name)) {
-      appleCardOrder = [...appleCardOrder, name].sort((a, b) => a.localeCompare(b, "zh-Hant"));
-    }
-    return APPLE_SLOTS[appleCardOrder.indexOf(name) % APPLE_SLOTS.length];
+    if (name.startsWith("Apple Pay")) return "var(--series-1)";
+    return PAY_COLOR[name] || fallbackColor(name);
   }
 
   // 自訂分類沒有固定色：拿名稱做穩定雜湊分到色槽，同名永遠同色。
@@ -430,6 +462,7 @@
           + `<span class="exp-main"><span class="exp-merchant">${esc(it.merchant || "（未填商家）")}</span>`
           + `<span class="exp-sub muted">${esc(it.category || "未分類")}`
           + (it.source === "applepay" ? '<span class="exp-badge"> Pay</span>' : "")
+          + (it.pay ? `｜${esc(it.pay)}` : "")
           + (it.note ? `｜${esc(it.note)}` : "") + `</span></span>`
           + `<span class="exp-amt">${esc(money(it.amount, it.currency))}</span>`
           + `<span class="exp-ops"><button type="button" data-edit aria-label="編輯">改</button>`
@@ -449,10 +482,10 @@
     const rows = items.filter(inView)
       .sort((a, b) => new Date(a.spent_at) - new Date(b.spent_at));
     const escape = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-    const lines = ["date,amount,currency,merchant,category,note,source"];
+    const lines = ["date,amount,currency,merchant,category,pay,note,source"];
     for (const it of rows) {
       lines.push([it.spent_at, it.amount, it.currency, it.merchant,
-                  it.category, it.note, it.source].map(escape).join(","));
+                  it.category, it.pay || "", it.note, it.source].map(escape).join(","));
     }
     const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv" });
     const a = document.createElement("a");
@@ -466,6 +499,30 @@
 
   const field = (name) => form.querySelector(`[name="${name}"]`);
   const chipBox = document.getElementById("exp-chips");
+  const payBox = document.getElementById("exp-pay-chips");
+
+  function renderPayChips(selected) {
+    if (!payBox) return;
+    const all = [...PAY_METHODS, ...customPays()];
+    if (selected && !all.includes(selected)) all.push(selected);
+    payBox.innerHTML = all.map((pay) =>
+      `<button type="button" class="exp-chip${pay === selected ? " on" : ""}" data-pay="${esc(pay)}">${esc(pay)}</button>`
+    ).join("") +
+      '<button type="button" class="exp-chip exp-chip-add" data-add-pay>＋自訂</button>';
+    for (const chip of payBox.querySelectorAll("[data-pay]")) {
+      chip.addEventListener("click", () => {
+        field("pay").value = chip.dataset.pay;
+        renderPayChips(chip.dataset.pay);
+      });
+    }
+    payBox.querySelector("[data-add-pay]").addEventListener("click", () => {
+      const name = (prompt("新付款方式（例：悠遊卡、街口）") || "").trim().slice(0, 20);
+      if (!name) return;
+      if (![...PAY_METHODS, ...customPays()].includes(name)) addCustomPay(name);
+      field("pay").value = name;
+      renderPayChips(name);
+    });
+  }
 
   function renderChips(selected) {
     // 固定分類 + 自訂分類 +（不在清單裡的當前選擇，例如編輯舊紀錄時）
@@ -501,6 +558,8 @@
     field("date").value = todayStr();
     field("category").value = "未分類";
     renderChips("未分類");
+    field("pay").value = "現金";       // 手動記的多半是現金——自動管道都有自己的標記
+    renderPayChips("現金");
     form.querySelector("[data-submit]").textContent = "記一筆";
     form.querySelector("[data-cancel]").hidden = true;
   }
@@ -515,6 +574,9 @@
     field("category").value = it.category || "未分類";
     field("date").value = it.spent_at.slice(0, 10);
     renderChips(it.category || "未分類");
+    const pay = it.pay || payMethod(it);   // 舊紀錄沒存 pay 就帶推斷值
+    field("pay").value = pay === "未標付款方式" ? "現金" : pay;
+    renderPayChips(field("pay").value);
     form.querySelector("[data-submit]").textContent = "儲存修改";
     form.querySelector("[data-cancel]").hidden = false;
     form.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -564,6 +626,7 @@
         it.merchant = field("merchant").value.trim();
         it.category = field("category").value || "未分類";
         it.note = field("note").value.trim();
+        it.pay = field("pay").value || "現金";
         it.spent_at = spentAt;
         dirty.add(it.id);
       }
@@ -573,6 +636,7 @@
         merchant: field("merchant").value.trim(),
         category: field("category").value || "未分類",
         note: field("note").value.trim(),
+        pay: field("pay").value || "現金",
         source: "manual", spent_at: spentAt,
       };
       items.unshift(it);
@@ -659,7 +723,7 @@
         + `<pre class="exp-json">{\n  "token": "${esc(first)}",\n  "amount": 快速指令輸入 › 金額,\n  "merchant": 快速指令輸入 › 商家,\n  "card": 快速指令輸入 › 卡片\n}</pre>`
         + `<p class="exp-token-hint">快速記帳捷徑（LINE Pay、現金）的欄位——`
         + `金額與商家選「要求輸入」的結果：</p>`
-        + `<pre class="exp-json">{\n  "token": "${esc(first)}",\n  "amount": 要求輸入 › 金額,\n  "merchant": 要求輸入 › 商家,\n  "source": "manual",\n  "note": "LINE Pay"\n}</pre>`;
+        + `<pre class="exp-json">{\n  "token": "${esc(first)}",\n  "amount": 要求輸入 › 金額,\n  "merchant": 要求輸入 › 商家,\n  "source": "manual",\n  "pay": "LINE Pay"\n}</pre>`;
     }
     html += '<button type="button" class="exp-gen" data-gen>產生新金鑰</button>';
     box.innerHTML = html;

@@ -60,6 +60,11 @@ FORM = """
     <div id="exp-chips" class="exp-chips"></div>
     <input name="category" type="hidden" value="未分類">
   </div>
+  <div class="exp-field">
+    <span>付款方式</span>
+    <div id="exp-pay-chips" class="exp-chips"></div>
+    <input name="pay" type="hidden" value="現金">
+  </div>
   <div class="exp-actions">
     <button type="submit" class="exp-primary" data-submit>記一筆</button>
     <button type="button" class="exp-ghost" data-cancel hidden>取消編輯</button>

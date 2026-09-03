@@ -151,6 +151,11 @@ module.exports = async (req, res) => {
   const source = body.source === "manual" ? "manual" : "applepay";
   const merchant = String(body.merchant || body.name || "").trim().slice(0, 120);
   const card = String(body.card || "").trim().slice(0, 80);
+  // 付款方式：呼叫端明確給就用給的；Apple Pay 自動化沒給就從卡片名推。
+  let pay = String(body.pay || "").trim().slice(0, 40);
+  if (!pay && source === "applepay") {
+    pay = card ? `Apple Pay（${card}）` : "Apple Pay";
+  }
   const currency = (String(body.currency || "TWD").trim().toUpperCase() || "TWD").slice(0, 8);
   let note = String(body.note || "").trim().slice(0, 300);
   if (card) note = note ? `${note}（${card}）` : card;
@@ -214,12 +219,23 @@ module.exports = async (req, res) => {
     note,
     source,
     spent_at: spentAt.toISOString(),
+    ...(pay ? { pay_method: pay } : {}),
   };
-  const insertResp = await sb("/expenses?select=id,category", {
+  let insertResp = await sb("/expenses?select=id,category", {
     method: "POST",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify(row),
   });
+  // pay_method 欄位是後加的：資料庫還沒跑 migration 時退回舊欄位集，
+  // 自動記帳不因此中斷（付款方式先缺，migration 跑完就會有）。
+  if (!insertResp.ok && insertResp.status === 400 && row.pay_method) {
+    delete row.pay_method;
+    insertResp = await sb("/expenses?select=id,category", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(row),
+    });
+  }
   if (!insertResp.ok) {
     const detail = await insertResp.text().catch(() => "");
     return res.status(502).json({
