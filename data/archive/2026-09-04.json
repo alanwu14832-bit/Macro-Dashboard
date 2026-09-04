@@ -1,6 +1,6 @@
 {
  "date": "2026-09-04",
- "generated_at": "2026-09-04T12:58:49",
+ "generated_at": "2026-09-04T13:56:58",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -19,19 +19,11 @@
    "module": "物價"
   },
   {
-   "key": "payrolls_below_breakeven",
-   "headline": "三月均非農低於損益兩平，撐不住現有失業率",
-   "direction": "dovish",
-   "severity": "high",
-   "evidence": "三月均 +2.0 萬人，損益兩平約 8.3 萬人",
-   "module": "就業"
-  },
-  {
    "key": "unemployment_falling_for_wrong_reason",
    "headline": "失業率下降來自勞動力萎縮，不是就業改善",
    "direction": "dovish",
    "severity": "high",
-   "evidence": "人口月增 +14.1 萬、勞動力月增 -10.7 萬；黃金年齡就業率 12 個月 -0.3 個百分點",
+   "evidence": "人口月增 +13.6 萬、勞動力月增 -5.3 萬；黃金年齡就業率 12 個月 +0.0 個百分點",
    "module": "就業"
   },
   {
@@ -49,6 +41,14 @@
    "severity": "medium",
    "evidence": "核心 2.5%，剔除極端值均值 2.8%",
    "module": "物價"
+  },
+  {
+   "key": "payrolls_below_breakeven",
+   "headline": "三月均非農低於損益兩平，撐不住現有失業率",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "三月均 +7.1 萬人，損益兩平約 8.0 萬人",
+   "module": "就業"
   },
   {
    "key": "quits_collapsed",
@@ -95,7 +95,7 @@
    "headline": "初值近一年呈系統性下修，實質動能弱於初值",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "近 11 個月有 64% 遭下修，平均修正 -4.1 萬人",
+   "evidence": "近 10 個月有 60% 遭下修，平均修正 -2.2 萬人",
    "module": "就業"
   },
   {
@@ -113,27 +113,35 @@
    "severity": "low",
    "evidence": "高收益利差 2.66%，十年百分位 5%",
    "module": "利率"
+  },
+  {
+   "key": "volatility_complacent",
+   "headline": "波動率處於低檔，市場對總經風險定價不足",
+   "direction": "neutral",
+   "severity": "low",
+   "evidence": "VIX 14.3",
+   "module": "市場"
   }
  ],
  "summary": {
-  "total": 14,
+  "total": 15,
   "hawkish": 5,
   "dovish": 7,
-  "neutral": 2,
-  "score": -6,
+  "neutral": 3,
+  "score": -5,
   "tilt": "偏降息"
  },
  "scenario": {
-  "name": "停滯性通膨",
-  "employment": "弱",
+  "name": "通膨未解",
+  "employment": "中",
   "inflation": "高",
   "regime": "通膨優先",
   "lean": "hawkish"
  },
  "readings": {
-  "payrolls_latest": -23.0,
-  "payrolls_3m": 20.0,
-  "breakeven": 83.26981016666666,
+  "payrolls_latest": 162.0,
+  "payrolls_3m": 71.33333333333333,
+  "breakeven": 80.24272666666666,
   "unemployment": 4.1,
   "core_cpi": 2.4782661559973107,
   "core_pce": 3.3441430040338282,
@@ -141,11 +149,11 @@
   "ten_year": 4.79,
   "real_ten_year": 2.45,
   "curve_10_2": 0.40000000000000036,
-  "recession_gauge": 39.56048596844406,
-  "composite_labor": -7.78629934225103
+  "recession_gauge": 39.407120253276986,
+  "composite_labor": -5.358123170275
  },
  "as_of": {
-  "labor": "2026-07-01",
+  "labor": "2026-08-01",
   "inflation": "2026-07-01",
   "rates": "2026-09-02"
  }
