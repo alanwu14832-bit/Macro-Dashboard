@@ -14,3 +14,6 @@ __pycache__/
 .DS_Store
 .venv/
 data/secrets/
+
+# 記帳獨立部署的建置產物——正式家在 alanwu14832-bit/expense-app repo
+standalone/

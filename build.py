@@ -209,11 +209,15 @@ def main() -> int:
         if verbose:
             print(f"   ✓ {path}", flush=True)
 
-    # 記帳是獨立的 PWA（自己的外殼與 manifest），不進側欄、不包儀表板版型
+    # 記帳是獨立的 PWA（自己的外殼與 manifest），不進側欄、不包儀表板版型。
+    # 同一份程式出兩個部署：/expense/（掛儀表板網域）與 standalone/——
+    # 後者是給獨立 repo（alanwu14832-bit/expense-app，自己的網域）同步用的
+    # 建置產物，不進版控（.gitignore），要更新那邊時把內容推過去。
     try:
         written.append(layout.write_page("/expense/", expense_page.render_page()))
+        expense_page.write_standalone(paths.ROOT_DIR)
         if verbose:
-            print("   ✓ /expense/（獨立 App）", flush=True)
+            print("   ✓ /expense/ 與 standalone/（獨立 App）", flush=True)
     except Exception:
         print("   ✗ /expense/", flush=True)
         traceback.print_exc()

@@ -1,0 +1,683 @@
+/* ============================================================================
+   記帳 App — 專屬設計系統（簡約質感）
+   跟總經儀表板完全分家：那邊是資訊密度優先的儀表板，這裡是單手操作的 App。
+
+   佈局骨架：頂欄（薄）＋ 可捲動的分頁內容 ＋ 底部分頁列（中央記帳鈕）。
+   記帳表單走底部彈出（sheet），因為「記一筆」是打斷式任務——做完就回到
+   原本在看的地方，不該把人推離當前脈絡。
+
+   字：中文用思源宋體（Noto Serif TC 是它的開源發行版）。宋體的橫細豎粗
+   讓數字與中文並排時有版面感，這是這個 App 想要的調性。數字另外把
+   Noto Serif（拉丁）排在前面——它有等寬數字（tabular figures），
+   金額欄才能對齊；思源宋體的拉丁數字不保證有這個特性。
+   兩種字都只載 400 與 600 兩個字重，載入量才不會失控。
+
+   色與形：紙一般的暖白底、墨色字、一支收斂的墨綠當主色。
+   沒有漸層、沒有投影，層次靠髮絲線與留白。分類色整組降飽和度——
+   螢光色在宋體旁邊會顯得吵，而且紅色只留給超支與警示。
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* 表面：三層——頁面底、卡片、卡片內的凹陷區 */
+  --page:      #f6f4f0;
+  --surface:   #fdfcfa;
+  --sunken:    #efece6;
+  --elevated:  #fdfcfa;
+
+  /* 墨色 */
+  --ink:       #1b1a17;
+  --ink-2:     #4a463f;
+  --ink-muted: #8d887e;
+  --line:      rgba(27, 26, 23, 0.10);
+  --line-2:    rgba(27, 26, 23, 0.20);
+
+  /* 主色：收斂的墨綠（記帳＝金錢，但不喊叫） */
+  --brand:      #33584a;
+  --brand-ink:  #fdfcfa;
+  --brand-soft: rgba(51, 88, 74, 0.09);
+
+  /* 狀態 */
+  --good:     #3d6b57;
+  --warning:  #a8802e;
+  --critical: #a55450;
+
+  /* 分類色：降飽和的一組，跟宋體的調性一致 */
+  --series-1: #4a6b8a;  --series-2: #b26a4a;  --series-3: #5d8a6a;
+  --series-4: #bd9450;  --series-5: #a8768c;  --series-6: #3d6b57;
+  --series-7: #6b6392;  --series-8: #a55450;
+  --series-9: #4e848c;  --series-10: #8a7154;
+  --neutral:  #a39d92;
+
+  --r-sm: 6px;
+  --r:    10px;
+  --r-lg: 14px;
+  --shadow-sheet: 0 -8px 40px rgba(27, 26, 23, 0.14);
+
+  /* 思源宋體。系統後備：macOS/iOS 有 Songti TC，Windows 有新細明體。 */
+  --serif: "Noto Serif TC", "Source Han Serif TC", "Source Han Serif TW",
+           "Songti TC", "Songti SC", "STSong", "PMingLiU", serif;
+  /* 數字：Noto Serif（拉丁）有等寬數字，排在最前面讓金額欄對得齊 */
+  --num:   "Noto Serif", "Noto Serif TC", "Source Han Serif TC",
+           "Songti TC", "STSong", serif;
+
+  --tabbar-h: 60px;
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page:     #12110f;
+    --surface:  #1a1917;
+    --sunken:   #232220;
+    --elevated: #1c1b19;
+    --ink:      #f2efe9;
+    --ink-2:    #c2bcb2;
+    --ink-muted:#8b857a;
+    --line:     rgba(255, 255, 255, 0.09);
+    --line-2:   rgba(255, 255, 255, 0.18);
+    --brand:      #8fb8a5;
+    --brand-ink:  #12110f;
+    --brand-soft: rgba(143, 184, 165, 0.14);
+    --good:     #7fb69c;
+    --warning:  #cfa855;
+    --critical: #d4837e;
+    --series-1: #7fa3c4;  --series-2: #d99672;  --series-3: #8bbd9b;
+    --series-4: #dcbb7c;  --series-5: #cfa0b6;  --series-6: #6fa88e;
+    --series-7: #9d95c4;  --series-8: #d4837e;
+    --series-9: #7fb6be;  --series-10: #bda17e;
+    --neutral:  #857f75;
+    --shadow-sheet: 0 -8px 40px rgba(0, 0, 0, 0.6);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page:     #12110f;
+  --surface:  #1a1917;
+  --sunken:   #232220;
+  --elevated: #1c1b19;
+  --ink:      #f2efe9;
+  --ink-2:    #c2bcb2;
+  --ink-muted:#8b857a;
+  --line:     rgba(255, 255, 255, 0.09);
+  --line-2:   rgba(255, 255, 255, 0.18);
+  --brand:      #8fb8a5;
+  --brand-ink:  #12110f;
+  --brand-soft: rgba(143, 184, 165, 0.14);
+  --good:     #7fb69c;
+  --warning:  #cfa855;
+  --critical: #d4837e;
+  --series-1: #7fa3c4;  --series-2: #d99672;  --series-3: #8bbd9b;
+  --series-4: #dcbb7c;  --series-5: #cfa0b6;  --series-6: #6fa88e;
+  --series-7: #9d95c4;  --series-8: #d4837e;
+  --series-9: #7fb6be;  --series-10: #bda17e;
+  --neutral:  #857f75;
+  --shadow-sheet: 0 -8px 40px rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.75;              /* 宋體要比黑體更鬆才好讀 */
+  letter-spacing: 0.02em;         /* 宋體小字擠在一起會糊 */
+  color: var(--ink);
+  background: var(--page);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+button, input, select { font-family: inherit; letter-spacing: inherit; }
+.muted { color: var(--ink-muted); }
+.num, .hero-amount, .hero-stat-value, .legend-amt, .row-amt, .day-head,
+.budget-note, .budget-foot, .pie-total, .field-amount input {
+  font-family: var(--num); font-variant-numeric: tabular-nums;
+}
+
+/* 小字標籤：字距拉開、不用粗體。質感來自留白與字距，不是來自加粗。 */
+.eyebrow {
+  font-size: 0.7rem; letter-spacing: 0.18em; color: var(--ink-muted);
+  font-weight: 400;
+}
+
+/* ------------------------------------------------------------------ 外殼 -- */
+
+.app-shell { min-height: 100dvh; display: flex; flex-direction: column; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 10px;
+  padding: calc(12px + env(safe-area-inset-top)) 20px 12px;
+  background: color-mix(in srgb, var(--page) 90%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.02rem; font-weight: 600; letter-spacing: 0.22em;
+}
+.brand-mark {                      /* 髮絲圈，不是填色方塊 */
+  width: 25px; height: 25px; border-radius: 50%; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--brand); color: var(--brand);
+  font-family: var(--num); font-size: 0.76rem; letter-spacing: 0;
+}
+.topbar-spacer { flex: 1; }
+.icon-btn {
+  width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); background: transparent; color: var(--ink-2);
+  font-size: 0.9rem; padding: 0;
+}
+.icon-btn svg { width: 17px; height: 17px; }
+.icon-btn:active { transform: scale(0.94); }
+
+.views {
+  flex: 1;
+  padding: 4px 20px calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom));
+  max-width: 620px; width: 100%; margin: 0 auto;
+}
+.view { animation: view-in 0.3s var(--ease); }
+.view[hidden] { display: none; }
+@keyframes view-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .view { animation: none; } }
+
+.view-title {
+  font-size: 1.5rem; font-weight: 400; letter-spacing: 0.1em;
+  margin: 14px 0 20px;
+}
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 20px 18px; margin-bottom: 16px;
+}
+.card-title {
+  font-size: 0.7rem; font-weight: 400; letter-spacing: 0.18em;
+  color: var(--ink-muted); margin: 0 0 16px;
+}
+
+/* -------------------------------------------------------------- Hero 區 -- */
+
+/* 不做成卡片：一張撞色漸層卡是「儀表板小工具」的語彙。
+   簡約的作法是讓數字自己站在紙上，用一條髮絲線收邊。 */
+.hero { padding: 22px 2px 0; margin-bottom: 18px; }
+.hero-label { font-size: 0.7rem; letter-spacing: 0.18em; color: var(--ink-muted); }
+.hero-amount {
+  font-size: 3.1rem; font-weight: 400; letter-spacing: -0.01em;
+  line-height: 1.15; margin: 10px 0 8px; color: var(--ink);
+}
+.hero-delta {
+  display: inline-block; font-size: 0.8rem; color: var(--ink-muted);
+}
+.hero-foot {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  margin-top: 20px; padding: 14px 0 0; border-top: 1px solid var(--line);
+}
+.hero-stat-label { font-size: 0.68rem; letter-spacing: 0.12em; color: var(--ink-muted); }
+.hero-stat-value { font-size: 1.05rem; font-weight: 400; margin-top: 2px; }
+
+/* 同步狀態是背景資訊，不是內容：一行、灰字、需要處理時才給可按的樣子。 */
+.status-pill {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 0.74rem; color: var(--ink-muted);
+  padding: 0 2px; margin-bottom: 18px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.status-pill:empty { display: none; }
+.status-pill .status-dot {
+  width: 5px; height: 5px; border-radius: 50%; flex: none;
+  background: var(--neutral);
+}
+.status-pill .status-dot.ok { background: var(--good); }
+.status-pill .status-dot.warn { background: var(--warning); }
+.status-pill button {
+  border: none; background: none; padding: 0 0 0 2px; cursor: pointer;
+  color: var(--ink-2); font: inherit; letter-spacing: inherit;
+  text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-thickness: 1px; text-decoration-color: var(--line-2);
+}
+
+/* -------------------------------------------------------------- 甜甜圈圖 -- */
+
+/* 分段切換：兩張圖是同一筆錢的兩個切面，共用一張卡。
+   底線式而不是膠囊式——膠囊在這套語彙裡太重。 */
+.seg {
+  display: flex; gap: 24px; margin-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+.seg-btn {
+  padding: 0 0 10px; cursor: pointer; border: none; background: none;
+  font: inherit; font-size: 0.85rem; letter-spacing: 0.08em;
+  color: var(--ink-muted); position: relative;
+  transition: color 0.2s var(--ease);
+}
+.seg-btn[aria-selected="true"] { color: var(--ink); }
+.seg-btn[aria-selected="true"]::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 1px; background: var(--ink);
+}
+
+.pie-body { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.pie-body svg { flex: none; }
+.pie-total { font-size: 15px; font-weight: 400; fill: var(--ink); }
+.pie-sub { font-size: 9px; fill: var(--ink-muted); letter-spacing: 0.1em; }
+.legend { align-self: stretch; display: flex; flex-direction: column; }
+.legend-row {
+  display: flex; align-items: center; gap: 11px; font-size: 0.85rem;
+  min-width: 0; padding: 9px 0; border-bottom: 1px solid var(--line);
+}
+.legend-row:last-child { border-bottom: none; }
+.dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.legend-name { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.legend-amt { white-space: nowrap; }
+.legend-amt em { font-style: normal; font-size: 0.82em; color: var(--ink-muted); }
+
+/* ------------------------------------------------------------------ 明細 -- */
+
+.month-nav {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+}
+.month-btn {
+  width: 32px; height: 32px; border-radius: 50%; cursor: pointer; flex: none;
+  border: 1px solid var(--line); background: transparent;
+  color: var(--ink-2); font-size: 0.9rem; line-height: 1; padding: 0;
+}
+.month-btn:active { transform: scale(0.94); }
+.month-label { font-size: 1.02rem; letter-spacing: 0.08em; }
+.pill-btn {
+  margin-left: auto; cursor: pointer; font-size: 0.76rem; letter-spacing: 0.08em;
+  border: 1px solid var(--line); background: transparent; color: var(--ink-2);
+  border-radius: 999px; padding: 6px 15px;
+}
+/* --------------------------------------------------------- 待補（未分類） -- */
+
+/* 這排不是一般的篩選器，是待辦清單：有洞才出現、補完就消失。
+   所以做得比篩選器安靜——沒有色塊、沒有陰影，只有一條髮絲框。 */
+.gaps { margin: 14px 0 4px; }
+.gaps:empty { display: none; }
+.gaps-head {
+  font-size: 0.7rem; letter-spacing: 0.18em; color: var(--ink-muted);
+  margin-bottom: 10px;
+}
+.gaps-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.gap-check {
+  display: inline-flex; align-items: center; gap: 9px; cursor: pointer;
+  font-size: 0.8rem; letter-spacing: 0.06em; color: var(--ink-2);
+  border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px;
+}
+.gap-check[data-on="true"] { border-color: var(--brand); color: var(--ink); }
+/* 數字就是「一眼看出」本身——沒有它，使用者得靠勾選才知道有幾筆要補 */
+.gap-count { color: var(--warning); }
+/* 這一項已經沒有洞了：留在原位（版面不跳），但明講沒事可做 */
+.gap-check[data-empty="true"] { opacity: 0.45; cursor: default; }
+.gap-check[data-empty="true"] .gap-count { color: var(--ink-muted); }
+
+.gap-check input {
+  appearance: none; -webkit-appearance: none;
+  width: 15px; height: 15px; margin: 0; flex: none; position: relative;
+  border: 1px solid var(--line-2); border-radius: 3px; background: transparent;
+}
+.gap-check input:checked { background: var(--brand); border-color: var(--brand); }
+.gap-check input:checked::after {
+  content: ""; position: absolute; left: 4.5px; top: 1px;
+  width: 4px; height: 8px; transform: rotate(45deg);
+  border: solid var(--brand-ink); border-width: 0 1.5px 1.5px 0;
+}
+.gap-check input:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.gap-note {
+  font-size: 0.76rem; color: var(--ink-muted);
+  margin: 18px 2px -4px;
+}
+
+/* 明細列裡缺掉的欄位：虛線底線＋暖色。實心徽章會讓整份列表
+   看起來像錯誤清單；這裡要的是「這格待補」，不是「這筆有問題」。 */
+.gap-mark {
+  font-style: normal; color: var(--warning);
+  border-bottom: 1px dashed currentColor;
+}
+
+.day-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 0.72rem; color: var(--ink-muted); letter-spacing: 0.08em;
+  padding: 26px 2px 10px;
+}
+.rows {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); overflow: hidden;
+}
+/* 卡片裡的列表不自己再畫一次外框——兩層圓角框只會讓版面看起來猶豫。
+   讓列貼齊卡片邊緣，分隔線自己就夠了。 */
+.card .rows {
+  background: transparent; border: none; border-radius: 0;
+  margin: 0 -18px -20px;
+}
+.card .rows .row { padding-left: 18px; padding-right: 18px; }
+.row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 15px 16px; border-bottom: 1px solid var(--line);
+}
+.rows .row:last-child { border-bottom: none; }
+/* 頭像用淡色底＋同色文字，不是整塊填色。整排實心方塊在宋體旁邊太吵，
+   而且會跟圓餅圖搶顏色的注意力。 */
+.row-avatar {
+  width: 34px; height: 34px; border-radius: 50%; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; letter-spacing: 0;
+  background: color-mix(in srgb, currentColor 13%, transparent);
+}
+.row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.row-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-sub {
+  font-size: 0.74rem; color: var(--ink-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* 備註自己一行：跟分類擠在一行時兩邊都被切掉，兩行都讀不到。 */
+.row-note {
+  font-size: 0.73rem; color: var(--ink-muted); opacity: 0.8;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.row-badge {
+  display: inline-block; font-size: 0.62rem; letter-spacing: 0.08em;
+  color: var(--ink-muted); border: 1px solid var(--line-2);
+  border-radius: 3px; padding: 0 5px; margin-left: 7px;
+  vertical-align: 1px;
+}
+.row-amt { white-space: nowrap; }
+.row-ops { display: flex; gap: 2px; flex: none; }
+.row-ops button {
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: none; color: var(--ink-muted);
+}
+.row-ops button svg { width: 15px; height: 15px; }
+.row-ops button:active { background: var(--sunken); }
+
+/* --------------------------------------------------------------- 空狀態 -- */
+
+.empty { text-align: center; padding: 40px 20px 30px; color: var(--ink-muted); }
+.empty-mark { color: var(--line-2); margin-bottom: 16px; }
+.empty-mark svg { width: 44px; height: 44px; }
+.empty-title { color: var(--ink-2); margin-bottom: 6px; letter-spacing: 0.08em; }
+.empty-note { font-size: 0.84rem; line-height: 1.9; }
+
+/* ------------------------------------------------------------------ 預算 -- */
+
+.budget-row { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.budget-row:last-of-type { border-bottom: none; }
+.budget-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+.budget-name { letter-spacing: 0.06em; }
+.budget-note { font-size: 0.8rem; }
+/* 進度條做細：3px 的線比 8px 的膠囊安靜，資訊量一樣 */
+.budget-bar { display: block; height: 3px; background: var(--sunken); overflow: hidden; }
+.budget-bar i { display: block; height: 100%; transition: width 0.5s var(--ease); }
+.budget-foot {
+  display: flex; align-items: center; gap: 8px; margin-top: 10px;
+  font-size: 0.76rem; color: var(--ink-muted);
+}
+.budget-set {
+  margin-left: auto; cursor: pointer; font-size: 0.74rem; letter-spacing: 0.08em;
+  border: 1px solid var(--line); background: transparent;
+  color: var(--ink-2); border-radius: 999px; padding: 4px 13px;
+}
+i.b-ok { background: var(--brand); }
+i.b-warn { background: var(--warning); }
+i.b-over { background: var(--critical); }
+i.b-none { background: var(--neutral); }
+span.b-warn { color: var(--warning); }
+span.b-over { color: var(--critical); }
+span.b-ok, span.b-none { color: var(--ink-muted); }
+.budget-pick {
+  width: 100%; margin-top: 16px; cursor: pointer;
+  font-size: 0.84rem; color: var(--ink-muted); letter-spacing: 0.06em;
+  background: transparent; border: 1px dashed var(--line-2);
+  border-radius: var(--r-sm); padding: 12px;
+}
+
+/* ------------------------------------------------------------ 底部分頁列 -- */
+
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 35;
+  display: flex; padding-bottom: env(safe-area-inset-bottom);
+  background: color-mix(in srgb, var(--page) 92%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--line);
+}
+.tab {
+  flex: 1; height: var(--tabbar-h); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px; background: none; border: none; padding: 0;
+  color: var(--ink-muted); font-size: 0.66rem; letter-spacing: 0.1em;
+}
+.tab svg { width: 20px; height: 20px; stroke-width: 1.2; }
+.tab[aria-selected="true"] { color: var(--ink); }
+.tab:active svg { transform: scale(0.92); }
+
+/* 中央的記帳鈕：分頁列的一格，按鈕本身略往上凸。
+   浮動在內容上的按鈕會永遠壓住某段文字，那是缺陷不是風格。 */
+.tab-add {
+  flex: 1; height: var(--tabbar-h); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; padding: 0;
+}
+.tab-add-btn {
+  width: 46px; height: 46px; border-radius: 50%; margin-top: -14px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--brand); color: var(--brand-ink);
+  border: 4px solid var(--page);
+  transition: transform 0.18s var(--ease);
+}
+.tab-add-btn svg { width: 19px; height: 19px; }
+.tab-add:active .tab-add-btn { transform: scale(0.9); }
+
+/* ------------------------------------------------------- 底部彈出表單 -- */
+
+.scrim {
+  position: fixed; inset: 0; z-index: 45;
+  background: rgba(27, 26, 23, 0.4);
+  animation: fade-in 0.24s var(--ease);
+}
+@keyframes fade-in { from { opacity: 0; } }
+
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--elevated);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: var(--shadow-sheet);
+  padding: 8px 20px calc(24px + env(safe-area-inset-bottom));
+  animation: sheet-up 0.34s var(--ease);
+}
+.sheet-inner { max-width: 620px; margin: 0 auto; }
+@keyframes sheet-up { from { transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) {
+  .sheet { animation: none; } .scrim { animation: none; }
+}
+.sheet-grip {
+  width: 32px; height: 3px; border-radius: 999px;
+  background: var(--line-2); margin: 5px auto 18px;
+}
+.sheet-head { display: flex; align-items: center; margin-bottom: 20px; }
+.sheet-title { font-size: 1.15rem; letter-spacing: 0.12em; }
+.sheet-close {
+  margin-left: auto; cursor: pointer; font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  border: none; background: none; color: var(--ink-muted); padding: 6px;
+}
+
+/* --------------------------------------------------------------- 表單 -- */
+
+.quick { display: flex; gap: 8px; margin-bottom: 10px; }
+.quick input {
+  flex: 1; min-width: 0; font-size: 16px;   /* 16px 以下 iOS 會自動放大 */
+  color: var(--ink); background: transparent;
+  border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 12px 13px;
+}
+.quick input:focus { outline: none; border-color: var(--brand); }
+.quick button {
+  flex: none; cursor: pointer; font-size: 0.86rem; letter-spacing: 0.08em;
+  background: transparent; color: var(--ink-2);
+  border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 0 18px;
+}
+.quick-hint { font-size: 0.76rem; color: var(--ink-muted); margin: 0 0 22px; }
+
+.field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; min-width: 0; }
+.field > span { font-size: 0.7rem; letter-spacing: 0.16em; color: var(--ink-muted); }
+/* 輸入框用底線而不是填色方塊——表單看起來像一張稿紙，不像一個後台 */
+.field input[type="text"], .field input[type="number"], .field input[type="date"] {
+  font-size: 16px; color: var(--ink); background: transparent;
+  border: none; border-bottom: 1px solid var(--line-2); border-radius: 0;
+  padding: 8px 2px; width: 100%; min-width: 0;
+}
+.field input:focus { outline: none; border-bottom-color: var(--brand); }
+.field input::placeholder { color: var(--ink-muted); opacity: 0.6; }
+.field-amount input {
+  font-size: 34px; font-weight: 400; letter-spacing: -0.01em;
+  padding: 4px 2px 8px;
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.form-grid .field-amount, .form-grid .field-wide { grid-column: 1 / -1; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  cursor: pointer; font-size: 0.82rem; padding: 7px 15px; letter-spacing: 0.04em;
+  border-radius: 999px; border: 1px solid var(--line);
+  background: transparent; color: var(--ink-2);
+}
+.chip:active { transform: scale(0.95); }
+.chip.on {
+  background: var(--brand); border-color: var(--brand); color: var(--brand-ink);
+}
+.chip-add { border-style: dashed; color: var(--ink-muted); }
+
+/* 第二層選擇（付款方式 → 哪一張卡）：縮排一點、標籤更小，
+   讓它讀起來是「上面那題的細節」，不是另一個獨立的欄位。 */
+.subfield {
+  margin-top: 14px; padding-left: 12px;
+  border-left: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.subfield[hidden] { display: none; }
+.subfield-label { font-size: 0.68rem; letter-spacing: 0.16em; color: var(--ink-muted); }
+
+.photo-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.photo-pick {
+  cursor: pointer; font-size: 0.82rem; padding: 10px 18px; letter-spacing: 0.06em;
+  border-radius: var(--r-sm); border: 1px dashed var(--line-2);
+  background: transparent; color: var(--ink-2);
+}
+.photo-preview { display: flex; align-items: center; gap: 12px; font-size: 0.78rem; color: var(--ink-muted); }
+.photo-preview img {
+  width: 50px; height: 50px; object-fit: cover;
+  border-radius: var(--r-sm); border: 1px solid var(--line);
+}
+
+.actions { display: flex; gap: 10px; margin-top: 10px; }
+.btn-primary {
+  flex: 1; cursor: pointer; font-size: 0.98rem; letter-spacing: 0.14em;
+  background: var(--brand); color: var(--brand-ink);
+  border: none; border-radius: var(--r-sm); padding: 16px;
+}
+.btn-primary:active { opacity: 0.88; }
+.btn-ghost {
+  cursor: pointer; font-size: 0.88rem; letter-spacing: 0.08em;
+  background: transparent; color: var(--ink-2);
+  border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 16px 22px;
+}
+
+/* --------------------------------------------------------------- 設定頁 -- */
+
+.setting-group { margin-bottom: 16px; }
+.setting-group h3 { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.1em; margin: 0 0 12px; }
+.setting-group p { font-size: 0.86rem; color: var(--ink-2); margin: 0 0 12px; }
+.setting-group .note { font-size: 0.8rem; color: var(--ink-muted); }
+.steps { margin: 0; padding-left: 1.3em; font-size: 0.85rem; color: var(--ink-2); }
+.steps li { margin-bottom: 10px; }
+.token-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; min-width: 0; }
+.token-row code {
+  flex: 1; min-width: 0; font-size: 0.72rem; letter-spacing: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: var(--sunken); border-radius: var(--r-sm); padding: 8px 10px;
+}
+.mini-btn {
+  cursor: pointer; font-size: 0.76rem; flex: none; letter-spacing: 0.06em;
+  border: 1px solid var(--line); background: transparent;
+  color: var(--ink-2); border-radius: 999px; padding: 6px 14px;
+}
+.mini-btn.danger:active { color: var(--critical); border-color: var(--critical); }
+.json-block {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem; line-height: 1.7; letter-spacing: 0;
+  background: var(--sunken);
+  border-radius: var(--r-sm); padding: 14px; overflow-x: auto; margin: 10px 0 0;
+}
+
+/* 帳號區（account.js 產生的標記） */
+.acct { font-size: 0.86rem; }
+.acct-in { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.acct-mail { letter-spacing: 0; }
+.acct-note { font-size: 0.78rem; color: var(--ink-muted); }
+.acct-link {
+  cursor: pointer; color: var(--ink-2); background: none;
+  border: none; padding: 0; font-size: 0.84rem;
+  text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-color: var(--line-2);
+}
+.acct-form { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.acct-form input {
+  font-size: 16px; color: var(--ink); background: transparent;
+  border: none; border-bottom: 1px solid var(--line-2); border-radius: 0;
+  padding: 8px 2px;
+}
+.acct-form input:focus { outline: none; border-bottom-color: var(--brand); }
+.acct-form button {
+  cursor: pointer; font-size: 0.9rem; letter-spacing: 0.12em;
+  background: var(--brand); color: var(--brand-ink);
+  border: none; border-radius: var(--r-sm); padding: 14px;
+}
+.acct-form button[data-acct="up"] {
+  background: transparent; color: var(--ink-2); border: 1px solid var(--line-2);
+}
+.wl-msg { font-size: 0.8rem; color: var(--ink-muted); }
+
+/* --------------------------------------------------------- 照片全螢幕 -- */
+
+.photo-modal {
+  position: fixed; inset: 0; z-index: 60; cursor: zoom-out;
+  background: rgba(18, 17, 15, 0.94);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  animation: fade-in 0.2s var(--ease);
+}
+.photo-modal img { max-width: 100%; max-height: 100%; border-radius: var(--r-sm); }
+.photo-close {
+  position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 16px;
+  cursor: pointer; font-size: 1rem; line-height: 1;
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: transparent; color: #fff;
+}
+
+/* ------------------------------------------------------------ 載入骨架 -- */
+
+.skeleton { display: flex; flex-direction: column; gap: 12px; }
+.sk-bar {
+  height: 13px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--sunken) 25%, var(--line) 50%, var(--sunken) 75%);
+  background-size: 200% 100%; animation: shimmer 1.6s ease infinite;
+}
+.sk-bar:nth-child(2) { width: 80%; }
+.sk-bar:nth-child(3) { width: 62%; }
+.sk-bar:nth-child(4) { width: 44%; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .sk-bar { animation: none; } }
+
+@media (min-width: 620px) {
+  .views { padding-left: 24px; padding-right: 24px; }
+  .hero-amount { font-size: 3.6rem; }
+}
