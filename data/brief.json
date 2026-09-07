@@ -1,0 +1,29 @@
+{
+ "date": "2026-09-07",
+ "generated_at": "2026-09-07T16:55:00+08:00",
+ "sections": [
+  {"key": "macro", "title": "總經數據與事件", "items": [
+   {"headline": "美國 8 月非農 +16.2 萬遠超預期，10 年期一度觸及 4.80% 三年新高", "detail": "失業率 4.1%；期貨定價 9/16 升息 60%、12/9 51%——就業太強反而推升升息預期", "source": "Reuters／WSJ"},
+   {"headline": "OPEC+ 決議 10 月維持產量不變，油價收月線最強一個月", "detail": "WTI 91.48、近一月 +11.6%；美國勞動節汽油價創同期新高，能源仍是通膨端最大變數", "source": "Reuters／CNBC，4 家"},
+   {"headline": "日本疑似賣美債支應史上最大規模匯市干預，日銀 9 月升息機率升溫", "detail": "USD/JPY 159.97；賣美債是長端供給壓力的新來源，南韓 CPI 也重回 3% 以上", "source": "Bloomberg／Japan Times／WSJ"},
+   {"headline": "中國 8 月原油進口續弱，與油價創高並存", "detail": "這波漲勢是供給與地緣驅動、不是需求，對通膨的性質判讀不同", "source": "Reuters"}
+  ]},
+  {"key": "company", "title": "公司新聞", "items": [
+   {"headline": "Amazon 貨機衝出邁阿密跑道，5 死 5 傷", "detail": "Amazon Air 營運事故，看 FAA 調查是否波及機隊與物流時程", "source": "8 家同報"},
+   {"headline": "Jaguar Land Rover 傳裁員數千人，英國政府拒絕紓困", "detail": "歐洲車廠成本壓力具體化", "source": "Reuters／Guardian"},
+   {"headline": "SoftBank 發行 1 兆日圓零售債，Pilbara Minerals 靠鋰價 +121% 創營收新高", "detail": "日本信用市場需求回溫；鋰價反彈得到業績確認", "source": "Japan Times／Kalkine"},
+   {"headline": "Ingenia 拒絕 Warburg Pincus 14 億美元收購提案", "detail": "", "source": "MarketWatch"}
+  ]},
+  {"key": "geo", "title": "地緣政治", "items": [
+   {"headline": "德國薩克森-安哈特邦選舉極右 AfD 拿下第一，Merz 政府受重擊", "detail": "傳導：歐元區政治風險溢酬，對歐元與德債利差不利", "source": "FT／Reuters／BBC，4 家"},
+   {"headline": "美伊互攻油輪、荷姆茲通行量降至 5 月以來最低，能源部長稱核協議「可能永遠談不成」", "detail": "傳導：直接對應油價創高；海軍將守荷姆茲", "source": "Iran International／gCaptain／ABC"},
+   {"headline": "Kushner、Witkoff 見完普丁後首訪基輔；Zelensky 預期戰事打進冬天", "detail": "傳導：沒有停火溢酬可以定價", "source": "Guardian／NPR／BBC"},
+   {"headline": "以色列空襲南黎巴嫩 7 死；解放軍新一輪繞台巡邏、北韓新驅逐艦納入核體系", "detail": "傳導：亞太避險情緒，台股盤面暫無反應", "source": "Reuters／gCaptain／SCMP"}
+  ]},
+  {"key": "taiwan", "title": "台灣", "items": [
+   {"headline": "加權指數週五 +1.51% 收 46,551、站回 5 日線，AI 硬體供應鏈為主軸", "detail": "散熱、MLCC、代工同步走強", "source": "中央社／鉅亨"},
+   {"headline": "8 月外銷訂單約 600 億美元、年增近 20%，全年出口有望創高", "detail": "AI 伺服器、GPU 零組件、先進封裝需求續強", "source": "經濟部"}
+  ]}
+ ],
+ "synthesis": "油價創高＋OPEC+ 不增產＋荷姆茲流量最低，正是「通膨未解／通膨優先」這一格站得住的原因；非農反彈與升息定價則解釋就業從「弱」回到「中」。日本賣美債是新的長端變數，還沒進訊號。"
+}

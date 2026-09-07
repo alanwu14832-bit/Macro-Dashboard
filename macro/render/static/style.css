@@ -836,6 +836,19 @@ footer.site p { margin: 0 auto 6px; max-width: var(--measure); }
 }
 .digest-text { font-size: 0.9rem; line-height: 1.5; }
 .digest-text a { text-decoration: none; }
+
+/* 整理過的要聞：四類、headline 為主 */
+.bf-group { margin-bottom: 14px; }
+.bf-k { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; color: var(--ink-muted); margin-bottom: 4px; }
+.bf-list { list-style: none; margin: 0; padding: 0; }
+.bf-list li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+.bf-list li:last-child { border-bottom: 0; }
+.bf-h { display: block; font-size: 0.92rem; font-weight: 600; line-height: 1.5; }
+.bf-h a { text-decoration: none; }
+.bf-h a:hover { text-decoration: underline; }
+.bf-m { display: block; font-size: 0.8rem; color: var(--ink-2); line-height: 1.5; margin-top: 1px; }
+.bf-syn { font-size: 0.88rem; color: var(--ink-2); margin: 12px 0 0; line-height: 1.65; }
+.bf-syn strong { color: var(--ink); }
 .digest-text a:hover { text-decoration: underline; }
 .digest-data {
   display: block; font-size: 0.78rem; color: var(--ink-muted);

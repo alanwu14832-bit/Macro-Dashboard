@@ -280,8 +280,42 @@ def _related_reading(headline: str, ctx: dict) -> str:
     return "；".join(out[:2])
 
 
+def _curated_brief(brief: dict) -> str:
+    """整理過的要聞：四類、中文 headline、一行說明與來源。"""
+    groups = []
+    for sec in brief["sections"]:
+        if not sec["items"]:
+            continue
+        items = []
+        for it in sec["items"]:
+            head = esc(it["headline"])
+            if it["link"]:
+                head = (f'<a href="{esc(it["link"])}" target="_blank" '
+                        f'rel="noopener noreferrer">{head}</a>')
+            meta = "　".join(x for x in (esc(it["detail"]), esc(it["source"])) if x)
+            items.append(f'<li><span class="bf-h">{head}</span>'
+                         + (f'<span class="bf-m">{meta}</span>' if meta else "") + '</li>')
+        groups.append(f'<div class="bf-group"><div class="bf-k">{esc(sec["title"])}</div>'
+                      f'<ul class="bf-list">{"".join(items)}</ul></div>')
+    synthesis = (f'<p class="bf-syn"><strong>與本期判斷的交集</strong>　{esc(brief["synthesis"])}</p>'
+                 if brief.get("synthesis") else "")
+    stamp = brief["date"].isoformat()
+    return ("".join(groups) + synthesis
+            + f'<p class="mc-foot-note">整理於 {esc(stamp)}，由排程任務讀完 64 個來源後寫成；'
+              f'<a href="/news/">看原始的今日焦點與分類 →</a></p>')
+
+
 def market_brief(ctx: dict, *, limit: int = 6) -> str:
-    """今日資本市場要聞：多家同報優先，每則旁邊放本站對應的讀數。"""
+    """今日資本市場要聞。
+
+    有整理過的 data/brief.json 就用它（中文 headline、四類）；沒有或過期時
+    退回關鍵字挑出的原始標題，並在頁面上明講這是未整理的版本。
+    """
+    from ... import brief as brief_module
+    curated = brief_module.load()
+    if curated:
+        return _curated_brief(curated)
+
     news = ctx.get("news") or {}
     if not news.get("available"):
         return ('<p class="muted">新聞來源這一輪抓不到，'
@@ -322,7 +356,9 @@ def market_brief(ctx: dict, *, limit: int = 6) -> str:
                      f'<span class="digest-text">{title}'
                      + (f'<span class="digest-data">{reading}</span>' if reading else "")
                      + '</span></div>')
-    return (f'<div class="digest">{"".join(items)}</div>'
+    return ('<p class="muted" style="font-size:.82rem;margin-bottom:8px">'
+            '尚未整理：以下是關鍵字挑出的原始標題，整理版由排程任務每天寫入。</p>'
+            f'<div class="digest">{"".join(items)}</div>'
             '<p class="mc-foot-note"><a href="/news/">看今日焦點全表與分類 →</a></p>')
 
 
@@ -519,7 +555,7 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
         "today", "今日更新與要聞",
         f'<div class="today-grid"><div><h3>今日更新的數據</h3>{today_updates_block(ctx)}</div>'
         f'<div><h3>今日資本市場要聞</h3>{market_brief(ctx)}</div></div>',
-        note="新數據以台北時間為準，要聞多家同報排前面；灰字是本站對應的讀數"))
+        note="新數據以台北時間為準；要聞由排程任務每日讀完全部來源後整理成四類"))
 
     # ---- 1 就業、2 通膨（雙目標，同一套視覺語言）----
     body.append(cards.employment(ctx, scenario))
