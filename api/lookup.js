@@ -2,7 +2,7 @@
  * 掃描用的查詢代理 — GET /api/lookup
  *
  *   ?ban=12345678     賣方統編 → 公司／商業名稱（財政部商工登記公開資料）
- *   ?code=4710088…    商品條碼（EAN/UPC）→ 品名（Open Food Facts）
+ *   ?code=4710088…    商品條碼（EAN/UPC）→ 品名、品牌、容量、小圖（Open Food Facts）
  *
  * 為什麼要一層代理：電子發票的 QR 只有賣方統編、沒有店名，而商工登記的
  * 開放資料 API 沒開 CORS；前端的 CSP 也只放行自己與 Supabase。兩個來源
@@ -45,18 +45,28 @@ async function sellerName(ban) {
   return null;
 }
 
-/** 商品條碼 → 「品牌 品名」。 */
-async function productName(code) {
+/** 商品條碼 → 品名、品牌、容量、小圖。品名是「品牌 品名」，直接能填商家欄。 */
+async function productInfo(code) {
   const payload = await fetchJson(
-    OFF + encodeURIComponent(code) + ".json?fields=product_name,product_name_zh,brands",
+    OFF + encodeURIComponent(code)
+      + ".json?fields=product_name,product_name_zh,brands,quantity,image_front_small_url",
     { "User-Agent": "expense-app/1.0 (personal expense tracker)" },
   ).catch(() => null);
   const product = payload && payload.product;
   if (!product) return null;
-  const name = product.product_name_zh || product.product_name || "";
+  const name = String(product.product_name_zh || product.product_name || "").trim();
   const brand = String(product.brands || "").split(",")[0].trim();
   const full = [brand, name].filter(Boolean).join(" ").trim();
-  return full || null;
+  if (!full) return null;
+  // 圖只收 OFF 自己的圖床——前端 CSP 只放行那個網域
+  const image = String(product.image_front_small_url || "");
+  return {
+    name: full,
+    product: name || null,
+    brand: brand || null,
+    quantity: String(product.quantity || "").trim() || null,
+    image: /^https:\/\/images\.openfoodfacts\.org\//.test(image) ? image : null,
+  };
 }
 
 module.exports = async (req, res) => {
@@ -67,17 +77,18 @@ module.exports = async (req, res) => {
   const ban = String(req.query.ban || "").trim();
   const code = String(req.query.code || "").trim();
 
-  let name = null;
+  let info = null;
   if (/^\d{8}$/.test(ban)) {
-    name = await sellerName(ban);
+    const name = await sellerName(ban);
+    info = name ? { name } : null;
   } else if (/^\d{8,14}$/.test(code)) {
-    name = await productName(code);
+    info = await productInfo(code);
   } else {
     return res.status(400).json({ error: "ban 要 8 位數字，或 code 要 8–14 位數字" });
   }
 
   res.setHeader("Cache-Control",
-    name ? "public, s-maxage=86400, stale-while-revalidate=604800"
+    info ? "public, s-maxage=86400, stale-while-revalidate=604800"
          : "public, s-maxage=3600");
-  return res.status(200).json({ name });
+  return res.status(200).json(info || { name: null });
 };

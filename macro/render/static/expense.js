@@ -1136,6 +1136,7 @@
     form.reset();
     formPhoto = "";
     formScan = null;
+    renderProduct(null);
     renderPhotoPreview();
     field("date").value = todayStr();
     field("category").value = "未分類";
@@ -1333,10 +1334,11 @@
     };
   }
 
-  // 「御飯糰、拿鐵×2…等 5 項」——備註只有一行寬，全列會被截掉。
+  // 「御飯糰 35、拿鐵×2 90…等 5 項」——備註只有一行寬，全列會被截掉；
+  // 完整的品項表在確認卡上。
   function describeItems(items, max = 4) {
     const shown = items.slice(0, max)
-      .map((it) => it.name + (it.qty > 1 ? `×${it.qty}` : ""));
+      .map((it) => it.name + (it.qty > 1 ? `×${it.qty}` : "") + (it.price ? ` ${it.price}` : ""));
     let text = shown.join("、");
     if (items.length > max) text += `…等 ${items.length} 項`;
     return text;
@@ -1357,16 +1359,67 @@
     if (guess) { field("category").value = guess; renderChips(guess); }
   }
 
+  // 回 { name, product, brand, quantity, image }；失敗或查無回空物件
   async function lookup(params) {
     try {
       const response = await fetch("/api/lookup?" + params,
                                    { signal: AbortSignal.timeout(8000) });
-      if (!response.ok) return "";
+      if (!response.ok) return {};
       const payload = await response.json();
-      return String(payload.name || "").trim();
+      return payload && payload.name ? payload : {};
     } catch {
-      return "";
+      return {};
     }
+  }
+
+  // 掃到商品時的確認卡：小圖、品名、品牌與容量——讓人一眼確認掃對了東西，
+  // 而不是看著商家欄的一串字猜。
+  const productBox = document.getElementById("exp-product");
+  function renderProduct(info) {
+    if (!productBox) return;
+    if (!info || !info.name) {
+      productBox.hidden = true;
+      productBox.innerHTML = "";
+      return;
+    }
+    const sub = [info.brand, info.quantity].filter(Boolean).join("・");
+    const src = "Open Food Facts" + (info.price ? `・上次 ${money(info.price, "TWD")}` : "");
+    productBox.className = "product-card";
+    productBox.innerHTML =
+      (info.image
+        ? `<img class="product-img" alt="" src="${esc(info.image)}">`
+        : '<span class="product-img product-img-empty" aria-hidden="true">—</span>')
+      + '<span class="product-main">'
+      + `<span class="product-name">${esc(info.product || info.name)}</span>`
+      + (sub ? `<span class="product-sub">${esc(sub)}</span>` : "")
+      + `<span class="product-src">${esc(src)}</span></span>`;
+    productBox.hidden = false;
+  }
+  const noteFor = (code, quantity) => `條碼 ${code}` + (quantity ? `｜${quantity}` : "");
+  const fmtInvoice = (number) => number.slice(0, 2) + "-" + number.slice(2);
+
+  // 發票品項卡：品名、數量、單價一列一列，總計在底下——掃了什麼、
+  // 各多少錢直接看得到，不用去備註裡找。
+  function renderInvoiceItems(inv) {
+    if (!productBox) return;
+    const row = (name, qty, price, cls) =>
+      `<span class="inv-row${cls ? " " + cls : ""}"><span class="inv-name">${esc(name)}</span>`
+      + `<span class="inv-qty">${qty > 1 ? "×" + esc(qty) : ""}</span>`
+      + `<span class="inv-price">${esc(money(price, "TWD"))}</span></span>`;
+    const shown = inv.items.slice(0, 8).map((it) => row(it.name, it.qty, it.price, "")).join("");
+    const notes = [];
+    if (inv.items.length > 8) notes.push(`…等 ${inv.items.length} 項`);
+    if (inv.itemCount > inv.items.length) {
+      notes.push(`這顆 QR 只載了 ${inv.items.length}／${inv.itemCount} 項，掃右邊那顆可補齊`);
+    }
+    productBox.className = "product-card inv-card";
+    productBox.innerHTML =
+      `<span class="inv-head"><span>發票 ${esc(fmtInvoice(inv.number))}</span>`
+      + `<span>${esc(dateOf(inv.date))}</span></span>`
+      + shown
+      + notes.map((text) => `<span class="inv-more">${esc(text)}</span>`).join("")
+      + row("總計", 1, inv.total, "inv-total");
+    productBox.hidden = false;
   }
 
   function applyInvoice(inv) {
@@ -1375,7 +1428,8 @@
     field("amount").value = inv.total;
     field("date").value = dateOf(inv.date);
     const itemText = describeItems(inv.items);
-    field("note").value = `發票 ${inv.number}${itemText ? "｜" + itemText : ""}`.slice(0, 300);
+    field("note").value = `發票 ${fmtInvoice(inv.number)}${itemText ? "｜" + itemText : ""}`.slice(0, 300);
+    renderInvoiceItems(inv);
 
     const sellers = loadJson(SELLER_KEY, {});
     const known = sellers[inv.seller] || "";
@@ -1386,7 +1440,7 @@
     // 同一張發票記過就直說；同天同金額的紀錄也提一下——Apple Pay 自動
     // 記帳可能已經先記了這筆，發票只是它的明細。正在編輯的那筆不算。
     const others = items.filter((it) => it.id !== editingId);
-    const dup = others.find((it) => (it.note || "").includes(inv.number));
+    const dup = others.find((it) => (it.note || "").replace("-", "").includes(inv.number));
     const sameDay = !dup && others.find((it) =>
       it.amount === inv.total && it.spent_at.slice(0, 10) === field("date").value);
     const summary = `已填入：${money(inv.total, "TWD")}｜${field("date").value}`
@@ -1403,8 +1457,8 @@
     if (known) return;
 
     // 店名非同步補：查到時表單還是這張發票、商家又還空著才填
-    lookup("ban=" + inv.seller).then((name) => {
-      const tidy = tidySeller(name);
+    lookup("ban=" + inv.seller).then((info) => {
+      const tidy = tidySeller(info.name);
       if (!tidy) {
         if (formScan && formScan.number === inv.number && !dup) {
           nlHint.textContent = summary + "。查不到賣方名稱，商家請自己填。";
@@ -1423,24 +1477,29 @@
   async function applyBarcode(code) {
     resetFormKeepPay();
     formScan = { kind: "barcode", code };
-    field("note").value = `條碼 ${code}`;
     const known = loadJson(PRODUCT_KEY, {})[code];
     if (known) {
       field("merchant").value = known.name;
       if (known.price) field("amount").value = known.price;
+      field("note").value = noteFor(code, known.quantity);
+      renderProduct(known);
       guessInto(known.name);
       nlHint.textContent = `已填入上次的「${known.name}」`
         + (known.price ? `${money(known.price, "TWD")}` : "")
         + "——價格不同就改。";
       return;
     }
+    field("note").value = noteFor(code);
     nlHint.textContent = "查詢商品中…";
-    const name = await lookup("code=" + code);
+    const info = await lookup("code=" + code);
     if (!formScan || formScan.code !== code) return;   // 表單已經換了
-    if (name) {
-      field("merchant").value = name;
-      guessInto(name);
-      nlHint.textContent = `已填入「${name}」——補上金額。這個條碼下次掃就會自動帶入這次的價格。`;
+    if (info.name) {
+      formScan.info = info;                  // 存檔時連品牌、容量、圖一起記住
+      field("merchant").value = info.name;
+      field("note").value = noteFor(code, info.quantity);
+      renderProduct(info);
+      guessInto(info.name);
+      nlHint.textContent = `已填入「${info.name}」——補上金額。這個條碼下次掃就會自動帶入這次的價格。`;
       field("amount").focus();
     } else {
       nlHint.textContent = "資料庫沒有這個商品——填上名稱與金額，下次掃同一個條碼就自動帶入。";
@@ -1455,13 +1514,19 @@
     const name = field("merchant").value.trim();
     const price = Math.abs(Number(field("amount").value)) || 0;
     if (!name) return;
-    saveJson(PRODUCT_KEY, { ...loadJson(PRODUCT_KEY, {}),
-                            [formScan.code]: { name, price, at: Date.now() } });
+    const all = loadJson(PRODUCT_KEY, {});
+    const info = formScan.info || all[formScan.code] || {};
+    saveJson(PRODUCT_KEY, { ...all, [formScan.code]: {
+      name, price, at: Date.now(),
+      product: info.product || null, brand: info.brand || null,
+      quantity: info.quantity || null, image: info.image || null,
+    } });
   }
 
   // 掃描結果填進表單前先清掉上一次的內容，但付款方式留著——它是使用者
   // 剛點的，發票與條碼都不知道這件事。
   function resetFormKeepPay() {
+    renderProduct(null);
     if (editingId) return;                   // 編輯中不動既有欄位
     const pay = field("pay").value;
     field("amount").value = "";

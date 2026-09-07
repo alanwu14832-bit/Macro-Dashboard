@@ -163,9 +163,10 @@ SETTINGS_VIEW = f"""
   <div class="card setting-group">
     <h3>掃描發票與條碼</h3>
     <p>記一筆的表單裡按右上的掃描鈕。對準<strong>電子發票左邊那顆 QR</strong>，
-       金額、日期與品項一次填好，店名由賣方統編查出；再對準右邊那顆可補齊
-       其餘品項。商品條碼會帶入品名（公開資料庫，涵蓋不全），記過一次之後
-       同一個條碼會自動帶入上次的價格。</p>
+       總計、日期與每一項的品名、數量、單價直接列出來，店名由賣方統編查出；
+       再對準右邊那顆可補齊其餘品項。商品條碼會帶入品名、品牌、容量與小圖
+       讓你確認（Open Food Facts，台灣商品涵蓋不全）；條碼本身沒有價格，
+       記過一次之後同一個條碼會自動帶入上次付的價格。</p>
     <p class="note">第一次會詢問相機權限；不想開相機也能「從相簿選圖」辨識。
        發票裡沒有付款方式，記得順手點一下。</p>
   </div>
@@ -205,6 +206,7 @@ SHEET = """
       </button>
     </div>
     <p id="exp-nl-hint" class="quick-hint">一句話會拆出日期、商家、金額與付款方式；掃描鈕可掃發票 QR 或商品條碼。都填進下面讓你確認。</p>
+    <div id="exp-product" class="product-card" hidden></div>
 
     <form id="exp-form" autocomplete="off">
       <div class="form-grid">

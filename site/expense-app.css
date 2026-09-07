@@ -530,6 +530,42 @@ span.b-ok, span.b-none { color: var(--ink-muted); }
 .quick-scan svg { width: 20px; height: 20px; }
 .quick-scan:active { transform: scale(0.95); }
 
+/* 掃描結果的確認卡，緊貼在提示字下面、兩條髮絲線框起來——讀起來是
+   「查到／解出的東西」，不是另一個要填的欄位。
+   商品條碼：小圖＋品名＋品牌容量。發票：品項一列一列，總計在底下。 */
+.product-card {
+  display: flex; align-items: center; gap: 12px;
+  margin: -10px 0 22px; padding: 10px 0;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.product-card[hidden] { display: none; }
+.product-img {
+  width: 52px; height: 52px; flex: none; object-fit: contain;
+  border-radius: var(--r-sm); background: var(--sunken);
+}
+.product-img-empty {
+  display: flex; align-items: center; justify-content: center; color: var(--ink-muted);
+}
+.product-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.product-name {
+  font-size: 0.92rem; color: var(--ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.product-sub { font-size: 0.78rem; color: var(--ink-2); }
+.product-src { font-size: 0.68rem; letter-spacing: 0.08em; color: var(--ink-muted); }
+
+.inv-card { flex-direction: column; align-items: stretch; gap: 5px; }
+.inv-head {
+  display: flex; justify-content: space-between; margin-bottom: 3px;
+  font-size: 0.68rem; letter-spacing: 0.1em; color: var(--ink-muted);
+}
+.inv-row { display: flex; gap: 10px; font-size: 0.86rem; color: var(--ink-2); }
+.inv-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inv-qty { flex: none; color: var(--ink-muted); }
+.inv-price { flex: none; font-variant-numeric: tabular-nums; }
+.inv-total { margin-top: 3px; padding-top: 7px; border-top: 1px solid var(--line); color: var(--ink); }
+.inv-more { font-size: 0.74rem; color: var(--ink-muted); }
+
 .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; min-width: 0; }
 .field > span { font-size: 0.7rem; letter-spacing: 0.16em; color: var(--ink-muted); }
 /* 輸入框用底線而不是填色方塊——表單看起來像一張稿紙，不像一個後台 */
