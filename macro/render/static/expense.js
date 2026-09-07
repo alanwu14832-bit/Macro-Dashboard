@@ -8,6 +8,8 @@
  *     「推髒資料 → 推刪除 → 拉全量覆蓋」：手機與電腦都能記，最後以雲端為準。
  *   - Apple Pay 自動記帳：iOS 捷徑的「交易」自動化 POST 到 /api/expense，
  *     寫進同一張表；這頁每分鐘拉一次，刷完卡回來看就有了。
+ *   - 掃描：電子發票的 QR 直接解出金額、日期、品項與賣方統編；商品條碼
+ *     查品名並記住上次價格。解碼在裝置上做，只有店名／品名查詢打 /api/lookup。
  *
  * session 直接共用 account.js 的 sb-session（同一個 localStorage key），
  * 過期時自己 refresh 並存回去——兩支腳本誰先刷新，另一支都拿得到新 token。
@@ -1100,6 +1102,7 @@
 
   const photoBox = document.getElementById("exp-photo-preview");
   let formPhoto = "";                      // 目前表單掛著的照片（data URL）
+  let formScan = null;                     // 表單內容來自掃描時：{ kind, number|code }
 
   function renderPhotoPreview() {
     if (!photoBox) return;
@@ -1132,6 +1135,7 @@
     editingId = null;
     form.reset();
     formPhoto = "";
+    formScan = null;
     renderPhotoPreview();
     field("date").value = todayStr();
     field("category").value = "未分類";
@@ -1223,6 +1227,7 @@
       items.unshift(it);
       dirty.add(it.id);
     }
+    rememberProduct();
     persist();
     closeSheet();
     render();
@@ -1273,6 +1278,346 @@
       if (event.key === "Enter") { event.preventDefault(); applyNatural(); }
     });
   }
+
+  /* --------------------------------------------------- 掃描：發票與條碼 -- */
+
+  // 電子發票證明聯左邊那顆 QR：前 77 字是固定欄位——字軌號碼(10)、民國
+  // 日期(7)、隨機碼(4)、銷售額(8, 十六進位)、總計(8, 十六進位)、買方統編(8)、
+  // 賣方統編(8)、驗證碼(24)——之後以冒號分隔：營業人自用區、總品目數、
+  // 本碼品目數、編碼（0 Big5／1 UTF-8／2 Base64），再來是「品名:數量:單價」
+  // 重複。右邊那顆以 ** 開頭，只有品項。QR 裡沒有店名（只有統編）也沒有
+  // 付款方式，這兩樣分別靠 /api/lookup 查與使用者點一下。
+  const INVOICE_HEAD = /^([A-Z]{2}\d{8})(\d{3})(\d{2})(\d{2})\d{4}([0-9A-Fa-f]{8})([0-9A-Fa-f]{8})\d{8}(\d{8}).{24}(.*)$/s;
+  const SELLER_KEY = "exp-sellers";     // 統編 → 店名（同一家店第二次起免查）
+  const PRODUCT_KEY = "exp-products";   // 條碼 → { name, price }（第二次掃自動帶價）
+
+  function decodeItems(parts, encoding) {
+    let fields = parts;
+    if (encoding === "2") {
+      // Base64：整段品項是一個 token，解開後才是冒號分隔
+      try {
+        const bytes = Uint8Array.from(atob(parts.join("").replace(/\s/g, "")),
+                                      (c) => c.charCodeAt(0));
+        fields = new TextDecoder("utf-8").decode(bytes).split(":");
+      } catch { /* 不是合法 Base64 就當純文字 */ }
+    }
+    const items = [];
+    for (let i = 0; i + 2 < fields.length; i += 3) {
+      const name = fields[i].trim();
+      const qty = Number(fields[i + 1]);
+      const price = Number(fields[i + 2]);
+      if (!name || !Number.isFinite(qty)) continue;
+      items.push({ name, qty, price: Number.isFinite(price) ? price : 0 });
+    }
+    return items;
+  }
+
+  function parseInvoice(text) {
+    const raw = String(text || "").trim();
+    if (raw.startsWith("**")) {
+      return { side: "right", parts: raw.slice(2).split(":") };
+    }
+    const m = raw.match(INVOICE_HEAD);
+    if (!m) return null;
+    const [, number, y, mo, d, sales, total, seller, rest] = m;
+    const month = Number(mo), day = Number(d);
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    const parts = rest.startsWith(":") ? rest.slice(1).split(":") : [];
+    const encoding = (parts[3] || "1").trim();
+    return {
+      side: "left", number, seller, encoding,
+      date: new Date(Number(y) + 1911, month - 1, day, 12),
+      total: parseInt(total, 16), sales: parseInt(sales, 16),
+      items: decodeItems(parts.slice(4), encoding),
+      itemCount: Number(parts[1]) || 0,
+    };
+  }
+
+  // 「御飯糰、拿鐵×2…等 5 項」——備註只有一行寬，全列會被截掉。
+  function describeItems(items, max = 4) {
+    const shown = items.slice(0, max)
+      .map((it) => it.name + (it.qty > 1 ? `×${it.qty}` : ""));
+    let text = shown.join("、");
+    if (items.length > max) text += `…等 ${items.length} 項`;
+    return text;
+  }
+
+  // 商工登記的名稱是「統一超商股份有限公司」，備註與圖例都放不下——
+  // 去掉組織型態後綴，留下大家叫它的名字。
+  const tidySeller = (name) =>
+    String(name || "").replace(/(股份)?有限公司$|企業社$|商行$|工作室$|事業$/, "").trim();
+
+  const dateOf = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+  // 分類還是未分類時才照關鍵字猜——使用者已經點過的不動
+  function guessInto(text) {
+    if (field("category").value !== "未分類") return;
+    const guess = guessCategory(text);
+    if (guess) { field("category").value = guess; renderChips(guess); }
+  }
+
+  async function lookup(params) {
+    try {
+      const response = await fetch("/api/lookup?" + params,
+                                   { signal: AbortSignal.timeout(8000) });
+      if (!response.ok) return "";
+      const payload = await response.json();
+      return String(payload.name || "").trim();
+    } catch {
+      return "";
+    }
+  }
+
+  function applyInvoice(inv) {
+    resetFormKeepPay();
+    formScan = { kind: "invoice", number: inv.number };
+    field("amount").value = inv.total;
+    field("date").value = dateOf(inv.date);
+    const itemText = describeItems(inv.items);
+    field("note").value = `發票 ${inv.number}${itemText ? "｜" + itemText : ""}`.slice(0, 300);
+
+    const sellers = loadJson(SELLER_KEY, {});
+    const known = sellers[inv.seller] || "";
+    // 編輯既有紀錄時，查不到店名就別把人家填好的商家清掉
+    if (known || !editingId) field("merchant").value = known;
+    guessInto([known, ...inv.items.map((it) => it.name)].join(" "));
+
+    // 同一張發票記過就直說；同天同金額的紀錄也提一下——Apple Pay 自動
+    // 記帳可能已經先記了這筆，發票只是它的明細。正在編輯的那筆不算。
+    const others = items.filter((it) => it.id !== editingId);
+    const dup = others.find((it) => (it.note || "").includes(inv.number));
+    const sameDay = !dup && others.find((it) =>
+      it.amount === inv.total && it.spent_at.slice(0, 10) === field("date").value);
+    const summary = `已填入：${money(inv.total, "TWD")}｜${field("date").value}`
+      + (inv.items.length ? `｜${inv.items.length} 項` : "");
+    if (dup) {
+      nlHint.textContent = `這張發票已經記過（${dup.spent_at.slice(5, 10).replace("-", "/")} `
+        + `${dup.merchant || "未填商家"} ${money(dup.amount, "TWD")}）——再按「記一筆」會變成兩筆。`;
+    } else if (sameDay) {
+      nlHint.textContent = summary + `。同一天已有一筆同金額（${sameDay.merchant || "未填商家"}，`
+        + `${payMethod(sameDay)}）——若是同一筆消費，改編輯那筆就好。`;
+    } else {
+      nlHint.textContent = summary + "——確認付款方式後按「記一筆」。";
+    }
+    if (known) return;
+
+    // 店名非同步補：查到時表單還是這張發票、商家又還空著才填
+    lookup("ban=" + inv.seller).then((name) => {
+      const tidy = tidySeller(name);
+      if (!tidy) {
+        if (formScan && formScan.number === inv.number && !dup) {
+          nlHint.textContent = summary + "。查不到賣方名稱，商家請自己填。";
+        }
+        return;
+      }
+      saveJson(SELLER_KEY, { ...loadJson(SELLER_KEY, {}), [inv.seller]: tidy });
+      if (!formScan || formScan.number !== inv.number) return;
+      if (!field("merchant").value.trim()) {
+        field("merchant").value = tidy;
+        guessInto([tidy, ...inv.items.map((it) => it.name)].join(" "));
+      }
+    });
+  }
+
+  async function applyBarcode(code) {
+    resetFormKeepPay();
+    formScan = { kind: "barcode", code };
+    field("note").value = `條碼 ${code}`;
+    const known = loadJson(PRODUCT_KEY, {})[code];
+    if (known) {
+      field("merchant").value = known.name;
+      if (known.price) field("amount").value = known.price;
+      guessInto(known.name);
+      nlHint.textContent = `已填入上次的「${known.name}」`
+        + (known.price ? `${money(known.price, "TWD")}` : "")
+        + "——價格不同就改。";
+      return;
+    }
+    nlHint.textContent = "查詢商品中…";
+    const name = await lookup("code=" + code);
+    if (!formScan || formScan.code !== code) return;   // 表單已經換了
+    if (name) {
+      field("merchant").value = name;
+      guessInto(name);
+      nlHint.textContent = `已填入「${name}」——補上金額。這個條碼下次掃就會自動帶入這次的價格。`;
+      field("amount").focus();
+    } else {
+      nlHint.textContent = "資料庫沒有這個商品——填上名稱與金額，下次掃同一個條碼就自動帶入。";
+      field("merchant").focus();
+    }
+  }
+
+  // 記過的商品：條碼 → 名稱與這次的價格。條碼本身不含價格（價格是店家
+  // 定的，不在商品上），只能記住你上次付的。
+  function rememberProduct() {
+    if (!formScan || formScan.kind !== "barcode") return;
+    const name = field("merchant").value.trim();
+    const price = Math.abs(Number(field("amount").value)) || 0;
+    if (!name) return;
+    saveJson(PRODUCT_KEY, { ...loadJson(PRODUCT_KEY, {}),
+                            [formScan.code]: { name, price, at: Date.now() } });
+  }
+
+  // 掃描結果填進表單前先清掉上一次的內容，但付款方式留著——它是使用者
+  // 剛點的，發票與條碼都不知道這件事。
+  function resetFormKeepPay() {
+    if (editingId) return;                   // 編輯中不動既有欄位
+    const pay = field("pay").value;
+    field("amount").value = "";
+    field("merchant").value = "";
+    field("note").value = "";
+    field("date").value = todayStr();
+    field("category").value = "未分類";
+    renderChips("未分類");
+    field("pay").value = pay;
+  }
+
+  /* 取景器：html5-qrcode 包了 getUserMedia、iOS 的 playsinline 細節與
+     ZXing 解碼；瀏覽器有原生 BarcodeDetector 時它會優先用。庫本身
+     370KB，所以按了掃描才載入，載過一次 service worker 就快取住了。 */
+  const scanner = document.getElementById("exp-scanner");
+  const scanView = document.getElementById("exp-scan-view");
+  const scanHint = document.getElementById("exp-scan-hint");
+  const scanFile = document.getElementById("exp-scan-file");
+  const torchBtn = document.getElementById("exp-scan-torch");
+  let reader = null;
+  let scanning = false;
+  let torchOn = false;
+  let lastScan = { text: "", at: 0 };
+  let rightParts = null;                    // 先掃到右邊那顆時暫存的品項
+
+  function loadScanLib() {
+    if (window.Html5Qrcode) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "/html5-qrcode.min.js?v=2.3.8";
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("掃描元件載入失敗——離線時要先連過一次網路。"));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function ensureReader() {
+    await loadScanLib();
+    if (!reader) {
+      const F = window.Html5QrcodeSupportedFormats;
+      reader = new window.Html5Qrcode(scanView.id, {
+        formatsToSupport: [F.QR_CODE, F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.CODE_128, F.CODE_39],
+        useBarCodeDetectorIfSupported: true,
+        verbose: false,
+      });
+    }
+    return reader;
+  }
+
+  function cameraMessage(error) {
+    const name = error && error.name;
+    if (name === "NotAllowedError" || /permission|denied/i.test(String(error))) {
+      return "沒有相機權限——到 iPhone 設定 › Safari › 相機 選「允許」（加到主畫面的 App 在設定裡有自己的一項），或改用「從相簿選圖」。";
+    }
+    if (name === "NotFoundError" || /no camera|not found|devices/i.test(String(error))) {
+      return "找不到相機——改用「從相簿選圖」。";
+    }
+    return (error && error.message ? error.message : String(error)) + "——或改用「從相簿選圖」。";
+  }
+
+  async function openScanner() {
+    scanner.hidden = false;
+    rightParts = null;
+    lastScan = { text: "", at: 0 };
+    torchOn = false;
+    torchBtn.hidden = true;
+    scanHint.textContent = "對準發票左邊那顆 QR code，或商品條碼";
+    try {
+      const r = await ensureReader();
+      await r.start({ facingMode: "environment" }, {
+        fps: 10,
+        // 橫長的框：QR 與一維條碼都放得進去
+        qrbox: (w, h) => {
+          const base = Math.min(w, h);
+          return { width: Math.round(base * 0.86), height: Math.round(base * 0.6) };
+        },
+      }, (text) => handleScan(text), () => {});
+      scanning = true;
+      try {
+        const caps = r.getRunningTrackCapabilities();
+        if (caps && caps.torch) torchBtn.hidden = false;
+      } catch {}
+    } catch (error) {
+      scanHint.textContent = cameraMessage(error);
+    }
+  }
+
+  function closeScanner() {
+    scanner.hidden = true;
+    lastScan = { text: "", at: 0 };          // 去重只針對取景器連續解碼
+    if (reader && scanning) {
+      scanning = false;
+      reader.stop().then(() => reader.clear()).catch(() => {});
+    }
+  }
+
+  function handleScan(text) {
+    const now = Date.now();
+    if (text === lastScan.text && now - lastScan.at < 2500) return;  // 同一顆連續解到
+    lastScan = { text, at: now };
+
+    const inv = parseInvoice(text);
+    if (inv && inv.side === "right") {
+      rightParts = inv.parts;
+      scanHint.textContent = "這是右邊那顆（只有品項）——再對準左邊那顆，金額和日期在那裡。";
+      return;
+    }
+    if (inv) {
+      if (rightParts) inv.items = inv.items.concat(decodeItems(rightParts, inv.encoding));
+      rightParts = null;
+      closeScanner();
+      applyInvoice(inv);
+      return;
+    }
+    if (/^\d{8}$|^\d{12,14}$/.test(text)) {
+      closeScanner();
+      applyBarcode(text);
+      return;
+    }
+    scanHint.textContent = "看不懂這個條碼——發票要掃左邊那顆 QR，商品掃包裝上的黑白條碼。";
+  }
+
+  document.getElementById("exp-scan").addEventListener("click", openScanner);
+  document.getElementById("exp-scan-close").addEventListener("click", closeScanner);
+
+  scanFile.addEventListener("change", async () => {
+    const file = scanFile.files && scanFile.files[0];
+    scanFile.value = "";
+    if (!file) return;
+    scanHint.textContent = "辨識中…";
+    try {
+      const r = await ensureReader();
+      if (scanning) { scanning = false; await r.stop(); }
+      const text = await r.scanFile(file, false);
+      handleScan(text);
+    } catch {
+      scanHint.textContent = "照片裡找不到條碼——拍近一點、避開反光，或直接手動輸入。";
+    }
+  });
+
+  torchBtn.addEventListener("click", async () => {
+    if (!reader || !scanning) return;
+    torchOn = !torchOn;
+    try {
+      await reader.applyVideoConstraints({ advanced: [{ torch: torchOn }] });
+      torchBtn.textContent = torchOn ? "關閉手電筒" : "手電筒";
+    } catch {
+      torchBtn.hidden = true;
+    }
+  });
+
+  // 給捷徑或測試用的入口：把解碼後的字串丟進來，走同一條路
+  document.addEventListener("exp:scan", (event) => {
+    const detail = event.detail || {};
+    if (typeof detail.text === "string") handleScan(detail.text);
+  });
 
   /* --------------------------------------------------------- 同步狀態列 -- */
 
@@ -1424,6 +1769,7 @@
     // 手機上鍵盤會頂掉版面，所以不自動 focus 金額；使用者自己點
   }
   function closeSheet() {
+    closeScanner();
     sheet.hidden = true;
     scrim.hidden = true;
     document.body.style.overflow = "";
@@ -1437,7 +1783,9 @@
   document.getElementById("exp-sheet-close").addEventListener("click", closeSheet);
   scrim.addEventListener("click", closeSheet);
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !sheet.hidden) closeSheet();
+    if (event.key !== "Escape") return;
+    if (!scanner.hidden) closeScanner();      // 先關取景器，表單留著
+    else if (!sheet.hidden) closeSheet();
   });
 
   /* --------------------------------------------------------------- 主題 -- */

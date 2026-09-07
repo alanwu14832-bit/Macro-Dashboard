@@ -526,6 +526,9 @@ span.b-ok, span.b-none { color: var(--ink-muted); }
   border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 0 18px;
 }
 .quick-hint { font-size: 0.76rem; color: var(--ink-muted); margin: 0 0 22px; }
+.quick-scan { padding: 0 13px; display: flex; align-items: center; }
+.quick-scan svg { width: 20px; height: 20px; }
+.quick-scan:active { transform: scale(0.95); }
 
 .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; min-width: 0; }
 .field > span { font-size: 0.7rem; letter-spacing: 0.16em; color: var(--ink-muted); }
@@ -662,6 +665,45 @@ span.b-ok, span.b-none { color: var(--ink-muted); }
   border: 1px solid rgba(255, 255, 255, 0.28);
   background: transparent; color: #fff;
 }
+
+/* --------------------------------------------------------- 掃描全螢幕 -- */
+
+/* 取景器永遠是深色——相機畫面本身就是暗的，白框圍著它會像一個彈窗
+   而不是一個相機。這一層不跟主題走。 */
+.scanner {
+  position: fixed; inset: 0; z-index: 70;
+  background: #12110f; color: #f2efe9;
+  display: flex; flex-direction: column;
+  padding: calc(12px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));
+  animation: fade-in 0.2s var(--ease);
+}
+.scanner[hidden] { display: none; }
+.scanner-head { display: flex; align-items: center; margin-bottom: 14px; }
+.scanner-title { font-size: 1.05rem; letter-spacing: 0.14em; }
+.scanner-close {
+  margin-left: auto; cursor: pointer; font-size: 0.82rem; letter-spacing: 0.08em;
+  border: none; background: none; color: rgba(242, 239, 233, 0.7); padding: 6px;
+}
+.scanner-view {
+  position: relative; flex: 1; min-height: 0; overflow: hidden;
+  border-radius: var(--r); background: #000;
+  display: flex; align-items: center; justify-content: center;
+}
+.scanner-view video, .scanner-view img, .scanner-view canvas {
+  max-width: 100%; max-height: 100%;
+}
+.scanner-hint {
+  font-size: 0.82rem; line-height: 1.5; text-align: center;
+  color: rgba(242, 239, 233, 0.75); margin: 14px 0; min-height: 2.5em;
+}
+.scanner-foot { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.scanner-pick {
+  cursor: pointer; font-size: 0.84rem; letter-spacing: 0.08em;
+  padding: 11px 20px; border-radius: 999px;
+  border: 1px solid rgba(242, 239, 233, 0.3); background: transparent; color: #f2efe9;
+}
+.scanner-pick:active { background: rgba(242, 239, 233, 0.1); }
+@media (prefers-reduced-motion: reduce) { .scanner { animation: none; } }
 
 /* ------------------------------------------------------------ 載入骨架 -- */
 

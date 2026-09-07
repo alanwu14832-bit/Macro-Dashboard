@@ -161,6 +161,16 @@ SETTINGS_VIEW = f"""
   </div>
 
   <div class="card setting-group">
+    <h3>掃描發票與條碼</h3>
+    <p>記一筆的表單裡按右上的掃描鈕。對準<strong>電子發票左邊那顆 QR</strong>，
+       金額、日期與品項一次填好，店名由賣方統編查出；再對準右邊那顆可補齊
+       其餘品項。商品條碼會帶入品名（公開資料庫，涵蓋不全），記過一次之後
+       同一個條碼會自動帶入上次的價格。</p>
+    <p class="note">第一次會詢問相機權限；不想開相機也能「從相簿選圖」辨識。
+       發票裡沒有付款方式，記得順手點一下。</p>
+  </div>
+
+  <div class="card setting-group">
     <h3>資料存在哪</h3>
     <p><strong>沒登入：</strong>只存在這台裝置的瀏覽器，不離開你的手機。
        清瀏覽器資料會清掉，記得先匯出 CSV。</p>
@@ -187,8 +197,14 @@ SHEET = """
       <input id="exp-nl" type="text" autocomplete="off"
              placeholder="一句話記帳：昨天 全家 120 現金">
       <button type="button" id="exp-nl-go">解析</button>
+      <button type="button" id="exp-scan" class="quick-scan" aria-label="掃描發票或商品條碼" title="掃描發票或商品條碼">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M6.5 12h11"/>
+        </svg>
+      </button>
     </div>
-    <p id="exp-nl-hint" class="quick-hint">會拆出日期、商家、金額與付款方式，填進下面讓你確認。</p>
+    <p id="exp-nl-hint" class="quick-hint">一句話會拆出日期、商家、金額與付款方式；掃描鈕可掃發票 QR 或商品條碼。都填進下面讓你確認。</p>
 
     <form id="exp-form" autocomplete="off">
       <div class="form-grid">
@@ -238,6 +254,20 @@ SHEET = """
         <button type="button" class="btn-ghost" data-cancel hidden>取消</button>
       </div>
     </form>
+  </div>
+</div>
+<div class="scanner" id="exp-scanner" role="dialog" aria-modal="true" aria-label="掃描" hidden>
+  <div class="scanner-head">
+    <span class="scanner-title">掃描</span>
+    <button type="button" class="scanner-close" id="exp-scan-close">關閉</button>
+  </div>
+  <div class="scanner-view" id="exp-scan-view"></div>
+  <p class="scanner-hint" id="exp-scan-hint" role="status" aria-live="polite">對準發票左邊那顆 QR code，或商品條碼</p>
+  <div class="scanner-foot">
+    <label class="scanner-pick">從相簿選圖
+      <input id="exp-scan-file" type="file" accept="image/*" hidden>
+    </label>
+    <button type="button" class="scanner-pick" id="exp-scan-torch" hidden>手電筒</button>
   </div>
 </div>
 """
@@ -384,6 +414,7 @@ def write_standalone(root_dir: str) -> None:
         "expense-app.css": "expense-app.css",
         "account.js": "account.js",
         "expense.js": "expense.js",
+        "html5-qrcode.min.js": "html5-qrcode.min.js",
         "expense-icon-192.png": "icon-192.png",
         "expense-icon-512.png": "icon-512.png",
         "expense-icon-maskable-512.png": "icon-maskable-512.png",
@@ -396,5 +427,6 @@ def write_standalone(root_dir: str) -> None:
     # API 也複製一份：Root Directory 設 standalone 的專案看不到上層的 api/
     api_dir = os.path.join(root_dir, "standalone", "api")
     os.makedirs(api_dir, exist_ok=True)
-    shutil.copy2(os.path.join(paths.ROOT_DIR, "api", "expense.js"),
-                 os.path.join(api_dir, "expense.js"))
+    for name in ("expense.js", "lookup.js"):
+        shutil.copy2(os.path.join(paths.ROOT_DIR, "api", name),
+                     os.path.join(api_dir, name))
