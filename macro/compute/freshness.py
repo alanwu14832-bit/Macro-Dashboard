@@ -9,11 +9,19 @@ FRED 的 series/release 端點給出序列屬於哪個發布，release/dates 給
 """
 from __future__ import annotations
 
+import json
+import os
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
+from .. import paths
 from ..data import Bundle
 from ..http import build_url, get_json
 from ..sources import fred
+
+TAIPEI = ZoneInfo("Asia/Taipei")
+# 上一輪建置看到的每檔序列資料日期。build.py 每輪寫回。
+STATE_FILE = os.path.join(paths.DATA_DIR, "series_dates.json")
 
 # 值得放上檯面的發布。順序＝呈現順序。
 TRACKED = [
@@ -72,6 +80,50 @@ def _parse_updated(raw: str) -> datetime | None:
         return None
 
 
+def load_state() -> dict:
+    try:
+        with open(STATE_FILE, encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception:
+        return {}
+
+
+def observed_updates(bundle: Bundle, state: dict, today: date) -> tuple[list[dict], dict]:
+    """哪些序列的資料日期比上一輪建置往前推了。
+
+    FRED 的 last_updated 要逐檔多打一次 API，全站 199 檔每小時做一次太浪費；
+    資料日期本身就在手上——跟上一輪記下的比，推進了就是這一輪才到的新數據。
+    第一次看到的日期一起記下來，同一天內每小時建置都會持續標示，而不是
+    只亮一個小時。沒有上一輪（第一次建置）時全部都「新」沒有意義，不標。
+    """
+    stamp = today.isoformat()
+    updates: list[dict] = []
+    new_state: dict = {}
+    for series_id, series in bundle.series.items():
+        if not series or series.last_date is None:
+            continue
+        last = series.last_date.isoformat()
+        prev = state.get(series_id) or {}
+        if not state:
+            seen = None
+        elif prev.get("date") != last:
+            seen = stamp
+        else:
+            seen = prev.get("seen")
+        new_state[series_id] = {"date": last, "seen": seen}
+        if seen != stamp:
+            continue
+        before = series.at(-2)
+        updates.append({
+            "id": series_id, "name": series.label or series_id,
+            "unit": series.unit, "frequency": series.frequency,
+            "date": series.last_date, "value": series.last, "prev": before,
+            "change": (series.last - before) if before is not None else None,
+        })
+    updates.sort(key=lambda u: u["name"])
+    return updates, new_state
+
+
 def compute(bundle: Bundle) -> dict:
     today = date.today()
     rows = []
@@ -124,10 +176,20 @@ def compute(bundle: Bundle) -> dict:
              if r["updated_days"] is not None and r["updated_days"] <= 1
              and r["frequency"] != "d"}
 
+    # 台北日期：使用者在台灣看，「今天」就該是台灣的今天；雲端建置跑在 UTC。
+    today_taipei = datetime.now(TAIPEI).date()
+    updates, series_state = observed_updates(bundle, load_state(), today_taipei)
+
     return {
         "rows": rows,
         "imminent": imminent,
         "fresh": fresh,
+        "today": {
+            "date": today_taipei,
+            "periodic": [u for u in updates if u["frequency"] != "d"],
+            "daily": [u for u in updates if u["frequency"] == "d"],
+        },
+        "series_state": series_state,
         "external": EXTERNAL,
         "generated": datetime.now(),
         "next_up": rows[0] if rows else None,

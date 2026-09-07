@@ -72,7 +72,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site data/archive data/quotes_snapshot.json data/fresh_state.json
+          git add site data/archive data/quotes_snapshot.json data/fresh_state.json \
+                  data/series_dates.json data/fedfunds_snapshot.json
           if git diff --cached --quiet; then
             echo "沒有變更，跳過 commit"
           else

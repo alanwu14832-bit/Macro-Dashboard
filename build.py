@@ -17,9 +17,9 @@ import traceback
 from datetime import date, datetime
 
 from macro import archive, data, paths
-from macro.compute import (commodities, debt, equities, freshness, growth,
-                           inflation, labor, market, news, rates, scenario,
-                           signals, world)
+from macro.compute import (commodities, debt, equities, fedfunds, freshness,
+                           growth, inflation, labor, market, news, rates,
+                           scenario, signals, world)
 from macro.render import api, layout
 from macro.render.pages import (archive as archive_page,
                                 expense as expense_page,
@@ -37,7 +37,7 @@ from macro.render.pages import (archive as archive_page,
 
 MODULES = [
     ("labor", labor), ("inflation", inflation), ("rates", rates),
-    ("debt", debt), ("growth", growth), ("market", market), ("world", world),
+    ("fedfunds", fedfunds), ("debt", debt), ("growth", growth), ("market", market), ("world", world),
     ("commodities", commodities), ("equities", equities),
     ("news", news), ("freshness", freshness),
 ]
@@ -106,6 +106,11 @@ def main() -> int:
     with open(_os.path.join(paths.DATA_DIR, "fresh_state.json"), "w",
               encoding="utf-8") as fh:
         _json.dump(fresh_state, fh, ensure_ascii=False, indent=1)
+    # 每檔序列的資料日期：下一輪拿來判斷「今天到了哪些新數據」。
+    series_state = (ctx.get("freshness") or {}).get("series_state")
+    if series_state:
+        with open(freshness.STATE_FILE, "w", encoding="utf-8") as fh:
+            _json.dump(series_state, fh, ensure_ascii=False, indent=0, sort_keys=True)
 
     print("== 3/6 規則引擎與情境 ==", flush=True)
     found = signals.evaluate(ctx)
@@ -129,7 +134,7 @@ def main() -> int:
     print("== 5/6 產生頁面 ==", flush=True)
     updated = taipei_stamp()
     pages = [
-        ("/", "總覽", "美國總經儀表板",
+        ("/", "總覽", "",
          "把勞動、通膨、利率、債務、成長、全球與市場七個面向，收斂成一個可追蹤的判斷。",
          lambda: overview.render(ctx, found, summary, scenario_data, diff,
                                  reading_changes, updated)),

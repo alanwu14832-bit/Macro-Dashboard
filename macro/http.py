@@ -114,7 +114,8 @@ def _write_cache(path: str, url: str, body: str) -> None:
 
 
 def get(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
-        retries: int = 4, timeout: int = 30, allow_stale: bool = True) -> str:
+        retries: int = 4, timeout: int = 30, allow_stale: bool = True,
+        headers: dict | None = None) -> str:
     """Fetch `url` as text, preferring a cache entry younger than `ttl` seconds.
 
     On repeated failure, falls back to a stale cache entry when one exists so a
@@ -147,7 +148,8 @@ def get(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
     for attempt in range(retries):
         _throttle(host)
         request = urllib.request.Request(
-            url, headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"})
+            url, headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip",
+                          **(headers or {})})
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 raw = response.read()

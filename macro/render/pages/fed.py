@@ -99,6 +99,62 @@ def _statement_block(st: dict) -> str:
         note="逐句比對，不做語意評分——同一份聲明永遠得到同一個結果")
 
 
+def _prob_cell(p25: float, p50: float, word: str) -> str:
+    bits = []
+    if p25 >= 0.005:
+        bits.append(f"{word} 25 bp {p25:.0%}")
+    if p50 >= 0.005:
+        bits.append(f"{word} 50 bp+ {p50:.0%}")
+    return "、".join(bits) or "—"
+
+
+def _futures_block(ff: dict) -> str:
+    """每次 FOMC 的升降息機率——FedWatch 的算法，原料是公開的期貨報價。"""
+    if not ff.get("available"):
+        return section(
+            "futures", "期貨隱含升降息機率",
+            f'<p class="muted">{esc(ff.get("reason") or "這一輪拿不到聯邦基金期貨報價")}。'
+            f'上方「2 年期 vs 政策利率」仍可讀整段路徑的方向。</p>',
+            terms=["fed_funds_futures"])
+
+    rows = []
+    for r in ff["rows"]:
+        p = r["probs"]
+        hike = _prob_cell(p["hike25"], p["hike50"], "升")
+        hold = f'{r["p_hold"]:.0%}'
+        cut = _prob_cell(p["cut25"], p["cut50"], "降")
+        top = max(("hike", r["p_hike"]), ("hold", r["p_hold"]), ("cut", r["p_cut"]),
+                  key=lambda t: t[1])[0]
+        cells = {"hike": hike, "hold": hold, "cut": cut}
+        cells[top] = f"<strong>{cells[top]}</strong>"
+        rows.append([esc(r["label"]), pct(r["after"], 2),
+                     fmt(r["cumulative_bp"], 0, suffix=" bp", signed=True),
+                     cells["hike"], cells["hold"], cells["cut"]])
+
+    monthly = [[esc(m["ym"]), f'<code>{esc(m["symbol"])}</code>', fmt(m["price"], 3),
+                pct(m["implied"], 3),
+                esc((m.get("quoted_at") or "—")[:16].replace("T", " "))
+                + ("（存檔）" if m.get("stale") else "")]
+               for m in ff["monthly"]]
+
+    stale_note = ("　報價取自存檔，這一輪沒抓到新價。" if ff.get("stale") else "")
+    body = (
+        callout(f'<strong>{esc(ff["summary"])}</strong>；起點是 EFFR '
+                f'{pct(ff["effr"], 2)}（{zh_date(ff.get("effr_date"), freq="d")}）。'
+                f'{stale_note}', key=True)
+        + table(["會議", "會後隱含利率", "相對今日", "升息", "不變", "降息"], rows,
+                foot="每列是「這次會議」的邊際機率，隱含利率是累計路徑。粗體是該次最可能的結果。")
+        + accordion("各月合約報價與隱含平均利率",
+                    table(["合約月", "代號", "價格", "隱含平均 EFFR", "報價時間"], monthly))
+        + '<p class="muted" style="margin-top:10px">CME FedWatch 的頁面禁止程式抓取，'
+          '這裡用同一批 30 天聯邦基金期貨（ZQ）的公開報價、同一套算法自己算，'
+          '差異通常在幾個百分點內。遠月合約成交量薄，一年以外的數字當方向看。</p>'
+    )
+    return section("futures", "期貨隱含升降息機率", body,
+                   note="來源：CME 30 天聯邦基金期貨公開報價；會議日期取聯準會行事曆",
+                   terms=["fed_funds_futures"])
+
+
 def render(ctx: dict, signals: list[dict]) -> str:
     d = ctx["rates"]
     stance = d["stance"]
@@ -126,6 +182,8 @@ def render(ctx: dict, signals: list[dict]) -> str:
     body.append(section("numbers", "政策立場",
                         f'<div class="grid grid-4">{"".join(tiles)}</div>',
                         terms=["fed_funds", "real_policy_rate"]))
+
+    body.append(_futures_block(ctx.get("fedfunds") or {}))
 
     body.append(_statement_block(d.get("statement") or {}))
 

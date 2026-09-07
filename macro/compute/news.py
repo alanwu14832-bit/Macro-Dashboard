@@ -70,6 +70,18 @@ MACRO_TERMS = {
     "budget deficit", "credit", "default", "stimulus", "central bank",
 }
 
+# 「今日資本市場要聞」比總經那一區寬：股市、油金、匯率、加密資產、
+# 台灣供應鏈都算。刻意不放 'market'、'ai' 這種太泛的字——'job market'、
+# 'black market' 都會命中。
+MARKET_TERMS = {
+    "stock", "share", "wall street", "s&p", "nasdaq", "dow", "equity",
+    "equities", "ipo", "earning", "rally", "selloff", "sell-off", "investor",
+    "futures", "oil", "brent", "gasoline", "gold", "silver", "copper",
+    "euro", "rupee", "currency", "currencies", "forex", "intervention",
+    "bitcoin", "crypto", "ethereum", "taiwan", "tsmc", "chip", "semiconductor",
+    "nvidia", "bank", "hedge fund", "private credit", "treasuries", "treasurys",
+}
+
 STOPWORDS = {
     "the", "and", "for", "with", "from", "that", "this", "have", "has",
     "was", "were", "will", "would", "could", "should", "says", "say", "said",
@@ -235,6 +247,16 @@ def _is_macro(title: str) -> bool:
     # 用字界而不是子字串：'fed' 不該命中 'federal case'、'credit' 不該
     # 命中 'credited'。刑事新聞混進財金摘要就是子字串比對的產物。
     return bool(_MACRO_RE.search(lowered))
+
+
+_MARKET_RE = re.compile(
+    r"\b(" + "|".join(re.escape(t) + "s?" for t in
+                      sorted(MARKET_TERMS, key=len, reverse=True)) + r")\b")
+
+
+def _is_market(title: str) -> bool:
+    """總經關鍵字或資本市場關鍵字任一命中。"""
+    return _is_macro(title) or bool(_MARKET_RE.search(title.lower()))
 
 
 def _select(catalogue: dict[str, list[dict]]) -> list[tuple[str, str, dict]]:

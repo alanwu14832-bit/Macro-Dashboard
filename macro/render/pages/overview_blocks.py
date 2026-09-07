@@ -85,8 +85,8 @@ def rate_structure(ctx: dict) -> str:
     return section(
         "rates", "公債利率",
         f'<div class="grid grid-4">{"".join(tiles)}</div>'
-        + callout(f'<strong>曲線</strong>：{move}<br><strong>驅動</strong>：{driver}')
-        + callout(credit_verdict)
+        + callout(f'<strong>曲線</strong>：{move}<br><strong>驅動</strong>：{driver}'
+                  f'<br><strong>信用</strong>：{credit_verdict}')
         + accordion("市場定價表、長端拆解與信用利差",
                     pricing_map
                     + '<h3 class="fd-h">殖利率上升是成長還是通膨？</h3>'
@@ -378,11 +378,6 @@ def market_pricing(ctx: dict) -> str:
     if lines:
         parts.append(callout("<br>".join(lines)))
 
-    events = _events(ctx)
-    if events:
-        parts.append('<h3 class="fd-h">當日重大事件</h3>')
-        parts.append(f'<div class="digest">{events}</div>')
-
     parts.append('<p class="mc-foot-note">'
                  '<a href="/equities/">看完整美股與國際 →</a>　'
                  '<a href="/tw/">看完整台股 →</a>　'
@@ -429,25 +424,6 @@ def _rotation(sectors: list[dict]) -> dict:
     if ranked:
         bits.append(f'領漲 {esc(ranked[0]["name"])}、領跌 {esc(ranked[-1]["name"])}')
     return {"ranked": ranked, "verdict": "；".join(bits) + "。" if bits else ""}
-
-
-def _events(ctx: dict) -> str:
-    """當日重大事件：多家媒體同報的財金新聞。"""
-    from ...compute.news import _headline, _is_macro
-    news = ctx.get("news") or {}
-    if not news.get("available"):
-        return ""
-    items = []
-    for c in (news.get("clusters") or [])[:14]:
-        if not _is_macro(c["headline"]):
-            continue
-        items.append(f'<div class="digest-item">'
-                     f'<span class="digest-n">{c["count"]} 家</span>'
-                     f'<span class="digest-text">{esc(_headline(c["headline"]))}</span>'
-                     f'</div>')
-        if len(items) >= 4:
-            break
-    return "".join(items)
 
 
 # --------------------------------------------- 6 對股市的含義（機械對照） --
@@ -575,12 +551,9 @@ def watchlist(ctx: dict, fomc: dict | None) -> str:
     ]
     return section(
         "watchlist", "今日觀察清單",
-        table(["類型", "事件", "時間", "為什麼要盯"], table_rows)
-        + callout("<strong>沒有市場共識預期欄位</strong>：consensus 只有付費"
-                  "供應商提供。市場交易的是意外（surprise），沒有共識就算不出"
-                  "意外——這是本站目前最大的資料缺口，與其塞一個假的數字，"
-                  "不如把缺口標明。"),
-        note="數據取自 FRED 發布行事曆、標售取自 TreasuryDirect、財報取自 Finnhub")
+        table(["類型", "事件", "時間", "為什麼要盯"], table_rows),
+        note="數據取自 FRED 發布行事曆、標售取自 TreasuryDirect、財報取自 Finnhub；"
+             "沒有市場共識欄位（付費資料），見講義")
 
 
 def _when_label(days: int) -> str:
@@ -627,7 +600,7 @@ def fed_stance(ctx: dict, scenario: dict, fomc: dict | None) -> str:
     if stance.get("market_implies"):
         tiles.append(stat("市場定價", esc(stance["market_implies"].replace("市場定價", "")),
                           delta=f'2 年期減政策利率 {fmt(stance.get("market_gap"), 2, suffix=" pp", signed=True)}',
-                          direction=None, asof="短端公債隱含，非 CME FedWatch"))
+                          direction=None, asof="2 年期公債隱含的整段路徑"))
     if fomc:
         tiles.append(stat("下次 FOMC",
                           f'{fomc["date"].month}/{fomc["date"].day}',
@@ -635,6 +608,16 @@ def fed_stance(ctx: dict, scenario: dict, fomc: dict | None) -> str:
                           asof="決策日（聲明與記者會）"))
 
     parts = [f'<div class="grid grid-4">{"".join(tiles)}</div>'] if tiles else []
+
+    # 期貨定價：單次會議的機率。2 年期那格看整段路徑，這裡看下一兩場會議。
+    futures = ctx.get("fedfunds") or {}
+    if futures.get("available"):
+        bits = [f'{esc(r["label"])} {esc(r["headline"])}' for r in futures["rows"][:2]]
+        parts.append(callout(
+            "<strong>期貨定價</strong>：" + "、".join(bits)
+            + f'；{esc(futures["summary"])}'
+            + ("（報價為存檔，非本輪即時）" if futures.get("stale") else "")
+            + '　<a href="/fed/#futures">看每次會議的機率表 →</a>'))
 
     # 上次聲明：只放結論，逐句 diff 在聯準會頁
     if statement:

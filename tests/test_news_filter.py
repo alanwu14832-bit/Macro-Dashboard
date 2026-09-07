@@ -26,3 +26,20 @@ class TestPlural(unittest.TestCase):
     def test_tariffs(self):
         import macro.compute.news as n
         self.assertTrue(n._is_macro("Countries dodge tariffs, White House says"))
+
+
+class TestIsMarket(unittest.TestCase):
+    def test_market_terms(self):
+        from macro.compute.news import _is_market
+        self.assertTrue(_is_market("Stocks rally as Nasdaq hits record"))
+        self.assertTrue(_is_market("Japan likely sold Treasurys to fund yen intervention"))
+        self.assertTrue(_is_market("TSMC shares jump on AI chip demand"))
+
+    def test_macro_still_counts(self):
+        from macro.compute.news import _is_market
+        self.assertTrue(_is_market("Fed signals a rate cut in September"))
+
+    def test_unrelated(self):
+        from macro.compute.news import _is_market
+        self.assertFalse(_is_market("Five dead in Amazon cargo plane crash at Miami airport"))
+        self.assertFalse(_is_market("Job market for teachers tightens"))
