@@ -13,10 +13,16 @@
  *     amount    必填，數字或含幣別符號的字串（"NT$120.00" 也可）
  *     merchant  商家名稱（捷徑的「商家」變數）
  *     name      交易名稱（捷徑的「名稱」變數，商家空白時的備援）
- *     card      卡片名稱（記進備註，知道刷的是哪張卡）
+ *     card      卡片名稱（記進備註；有帶 pay 時會併成「刷卡（凱基銀行）」）
  *     currency  幣別，預設 TWD
  *     note      備註
  *     date      ISO 時間，預設現在
+ *     source    "applepay"（預設）或 "manual"——快速記帳捷徑
+ *               （LINE Pay、現金）傳 manual，這種是人主動按的，
+ *               不做兩分鐘去重（連買兩杯一樣的飲料是真的兩筆）
+ *     dedupe_hours  1–72 的整數。設了就做跨管道去重：spent_at 前後這個
+ *               小時數內已有「同金額」的任何紀錄（不分來源）就跳過。
+ *               給郵件收據匯入用——同一筆消費可能已被 Apple Pay 記過
  *
  * 需要的環境變數（Vercel Project Settings）：
  *   SUPABASE_SERVICE_ROLE_KEY   Supabase 的 service role key。沒設回 503。
@@ -35,10 +41,13 @@ const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const CATEGORY_RULES = [
   [/7-?eleven|統一超商|全家|family\s*mart|萊爾富|hi-?life|ok\s*mart|超商/i, "超商"],
   [/全聯|pxmart|家樂福|carrefour|大潤發|愛買|costco|好市多|美廉社|超市|市場/i, "超市"],
-  [/麥當勞|mcdonald|肯德基|kfc|摩斯|mos\s*burger|漢堡王|burger\s*king|必勝客|pizza|壽司|sushi|拉麵|火鍋|燒肉|食堂|餐廳|餐飲|小吃|便當|鍋貼|水餃|早餐|豆漿|茶|咖啡|coffee|starbucks|星巴克|路易莎|louisa|cama|85度|foodpanda|uber\s*eats/i, "餐飲"],
-  [/台鐵|高鐵|thsr|捷運|metro|悠遊|easycard|一卡通|ipass|客運|公車|uber(?!\s*eats)|計程|taxi|line\s*go|停車|parking|中油|cpc|台亞|全國加油|加油/i, "交通"],
+  [/麥當勞|mcdonald|肯德基|kfc|摩斯|mos\s*burger|漢堡王|burger\s*king|必勝客|pizza|壽司|sushi|拉麵|火鍋|燒肉|食堂|餐廳|餐飲|小吃|便當|鍋貼|水餃|早餐|豆漿|茶|咖啡|coffee|starbucks|星巴克|路易莎|louisa|cama|85度|五十嵐|50嵐|清心|可不可|迷客夏|珍煮丹|得正|foodpanda|uber\s*eats/i, "餐飲"],
+  [/停車|parking|路邊收費|嘟嘟房|times|udpark/i, "停車費"],
+  [/台鐵|高鐵|thsr|捷運|metro|悠遊|easycard|一卡通|ipass|客運|公車|uber(?!\s*eats)|計程|taxi|line\s*go|中油|cpc|台亞|全國加油|加油/i, "交通"],
+  [/相機|camera|鏡頭|canon|nikon|fujifilm|富士|leica|徠卡|gopro|dji|攝影|底片|沖掃/i, "相機"],
+  [/吉他|guitar|貝斯|bass|烏克麗麗|ukulele|效果器|音箱|樂器|弦|pick|移調夾|capo|slide|滑音管/i, "吉他"],
   [/藥局|藥妝|屈臣氏|watsons|康是美|cosmed|診所|醫院|牙醫|藥師|clinic|hospital|pharmacy/i, "醫療"],
-  [/netflix|spotify|youtube|disney|apple\.com|apple\s*services|itunes|icloud|google\s*(one|play|storage)|steam|nintendo|playstation|game|訂閱/i, "訂閱與娛樂"],
+  [/netflix|spotify|youtube|disney|apple\.com|apple\s*services|itunes|icloud|app\s*store|內購|google\s*(one|play|storage)|steam|nintendo|playstation|game|訂閱/i, "訂閱與娛樂"],
   [/蝦皮|shopee|momo|pchome|coupang|酷澎|淘寶|taobao|amazon|樂天|rakuten|yahoo|露天/i, "網購"],
   [/電費|台電|水費|自來水|瓦斯|天然氣|電信|中華電信|cht|台灣大|遠傳|fetnet|房租|租金|管理費/i, "居住與帳單"],
 ];
@@ -139,8 +148,18 @@ module.exports = async (req, res) => {
   }
   const userId = tokenRows[0].user_id;
 
+  const source = body.source === "manual" ? "manual" : "applepay";
   const merchant = String(body.merchant || body.name || "").trim().slice(0, 120);
   const card = String(body.card || "").trim().slice(0, 80);
+  // 付款方式：呼叫端明確給就用給的；Apple Pay 自動化沒給就從卡片名推。
+  let pay = String(body.pay || "").trim().slice(0, 40);
+  // 手動快速記帳也能指定卡片：pay:"刷卡" + card:"凱基銀行" → 「刷卡（凱基銀行）」，
+  // 跟前端表單與 Apple Pay 自動記帳存的是同一個格式。
+  if (pay && card && !/（.+）$/.test(pay)) {
+    pay = `${pay}（${card}）`.slice(0, 60);
+  } else if (!pay && source === "applepay") {
+    pay = card ? `Apple Pay（${card}）` : "Apple Pay";
+  }
   const currency = (String(body.currency || "TWD").trim().toUpperCase() || "TWD").slice(0, 8);
   let note = String(body.note || "").trim().slice(0, 300);
   if (card) note = note ? `${note}（${card}）` : card;
@@ -151,21 +170,47 @@ module.exports = async (req, res) => {
     if (!Number.isNaN(parsed.getTime())) spentAt = parsed;
   }
 
-  // 去重：捷徑偶爾會對同一筆交易觸發兩次。同人同商家同金額、
+  // 跨管道去重（郵件收據匯入用）：同一筆消費可能已被 Apple Pay 自動化
+  // 或手動記過。呼叫端設 dedupe_hours，窗內已有同金額（不分來源、不分
+  // 商家——兩邊的商家字串幾乎不會一樣）就跳過。
+  const dedupeHours = Number(body.dedupe_hours);
+  if (Number.isFinite(dedupeHours) && dedupeHours >= 1) {
+    const hours = Math.min(dedupeHours, 72);
+    const from = new Date(spentAt.getTime() - hours * 3600_000).toISOString();
+    const to = new Date(spentAt.getTime() + hours * 3600_000).toISOString();
+    const crossResp = await sb(
+      "/expenses?select=id&user_id=eq." + userId
+      + "&amount=eq." + amount
+      + "&spent_at=gte." + encodeURIComponent(from)
+      + "&spent_at=lte." + encodeURIComponent(to)
+      + "&limit=1",
+      { method: "GET" });
+    if (crossResp.ok) {
+      const rows = await crossResp.json();
+      if (rows.length) {
+        return res.status(200).json({ ok: true, duplicate: true, id: rows[0].id });
+      }
+    }
+  }
+
+  // 去重：交易自動化偶爾會對同一筆刷卡觸發兩次。同人同商家同金額、
   // 兩分鐘內已有一筆，就當同一筆，回 ok 但不重複入帳。
-  const windowStart = new Date(spentAt.getTime() - 2 * 60 * 1000).toISOString();
-  const dupResp = await sb(
-    "/expenses?select=id&user_id=eq." + userId
-    + "&amount=eq." + amount
-    + "&merchant=eq." + encodeURIComponent(merchant)
-    + "&source=eq.applepay"
-    + "&spent_at=gte." + encodeURIComponent(windowStart)
-    + "&limit=1",
-    { method: "GET" });
-  if (dupResp.ok) {
-    const dupRows = await dupResp.json();
-    if (dupRows.length) {
-      return res.status(200).json({ ok: true, duplicate: true, id: dupRows[0].id });
+  // 只對 applepay 做——手動快速記帳是人按的，連兩筆一樣的是真的兩筆。
+  if (source === "applepay") {
+    const windowStart = new Date(spentAt.getTime() - 2 * 60 * 1000).toISOString();
+    const dupResp = await sb(
+      "/expenses?select=id&user_id=eq." + userId
+      + "&amount=eq." + amount
+      + "&merchant=eq." + encodeURIComponent(merchant)
+      + "&source=eq.applepay"
+      + "&spent_at=gte." + encodeURIComponent(windowStart)
+      + "&limit=1",
+      { method: "GET" });
+    if (dupResp.ok) {
+      const dupRows = await dupResp.json();
+      if (dupRows.length) {
+        return res.status(200).json({ ok: true, duplicate: true, id: dupRows[0].id });
+      }
     }
   }
 
@@ -176,14 +221,25 @@ module.exports = async (req, res) => {
     merchant,
     category: guessCategory(merchant + " " + note),
     note,
-    source: "applepay",
+    source,
     spent_at: spentAt.toISOString(),
+    ...(pay ? { pay_method: pay } : {}),
   };
-  const insertResp = await sb("/expenses?select=id,category", {
+  let insertResp = await sb("/expenses?select=id,category", {
     method: "POST",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify(row),
   });
+  // pay_method 欄位是後加的：資料庫還沒跑 migration 時退回舊欄位集，
+  // 自動記帳不因此中斷（付款方式先缺，migration 跑完就會有）。
+  if (!insertResp.ok && insertResp.status === 400 && row.pay_method) {
+    delete row.pay_method;
+    insertResp = await sb("/expenses?select=id,category", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(row),
+    });
+  }
   if (!insertResp.ok) {
     const detail = await insertResp.text().catch(() => "");
     return res.status(502).json({

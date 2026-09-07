@@ -161,6 +161,17 @@ Supabase 帳號與 `/api/expense`），但 `/expense/` 有自己的外殼（沒�
 （全聯→超市、星巴克→餐飲……規則在 `api/expense.js` 與 `expense.js` 各一份，
 兩邊要一起改），兩分鐘內同商家同金額視為重複觸發、不重複入帳。
 
+**掃描發票與條碼。** 記一筆的表單裡有掃描鈕（`html5-qrcode`，按了才載入）。
+電子發票左邊那顆 QR 的前 77 字是固定欄位：字軌號碼、民國日期、銷售額與總計
+（十六進位）、買賣方統編；之後是品項。解碼在裝置上做，一掃就把總計、日期填進表單，
+品項、數量、單價列成確認卡；店名不在 QR 裡（只有統編），由 `/api/lookup?ban=` 查財政部商工
+登記的公開資料補上，查過的統編存本機。右邊那顆 QR 只有其餘品項，先掃到會暫存、
+等左邊那顆一起合併。商品條碼（EAN/UPC）走 `/api/lookup?code=` 查 Open Food Facts
+帶品名、品牌、容量與小圖（表單裡顯示確認卡；圖直接取自 OFF 圖床，CSP 放行
+那個網域）——涵蓋不全，而且條碼本身沒有價格，所以記過一次後同一個條碼會自動帶入
+上次付的價格。兩種查詢都是公開資料、不需要金鑰；`/api/lookup` 存在是因為前端
+CSP 只放行自己與 Supabase，且商工登記 API 沒開 CORS。
+
 **儲存與同步。** 與自選清單同一套哲學：localStorage 優先（沒登入全功能可用、
 資料不離開裝置），登入後同步到 Supabase（RLS 隔離），頁面開著每分鐘拉一次，
 刷完卡回來看就有了。可匯出 CSV。
@@ -197,6 +208,7 @@ api/
   quotes.js                 報價代理（證交所 MIS + Finnhub）
   series.js                 FRED 序列代理，給 /explore/ 用
   expense.js                自動記帳收單（iOS 捷徑 → Supabase）
+  lookup.js                 掃描用查詢：統編 → 店名、商品條碼 → 品名
 tools/expense_schema.sql    記帳資料表與 RLS（在 Supabase 執行一次）
 vercel.json                 Vercel 設定：只 serve site/，不在雲端 build
 .github/workflows/build.yml 每天兩次建置，產出 commit 回 repo
