@@ -263,12 +263,16 @@ SHEET = """
     <span class="scanner-title">掃描</span>
     <button type="button" class="scanner-close" id="exp-scan-close">關閉</button>
   </div>
-  <div class="scanner-view" id="exp-scan-view"></div>
+  <div class="scanner-view" id="exp-scan-view">
+    <video id="exp-scan-video" playsinline muted autoplay></video>
+    <div class="scan-box" id="exp-scan-box" aria-hidden="true"></div>
+  </div>
   <p class="scanner-hint" id="exp-scan-hint" role="status" aria-live="polite">對準發票左邊那顆 QR code，或商品條碼</p>
   <div class="scanner-foot">
     <label class="scanner-pick">從相簿選圖
       <input id="exp-scan-file" type="file" accept="image/*" hidden>
     </label>
+    <button type="button" class="scanner-pick" id="exp-scan-zoom" hidden>放大</button>
     <button type="button" class="scanner-pick" id="exp-scan-torch" hidden>手電筒</button>
   </div>
 </div>
@@ -416,7 +420,7 @@ def write_standalone(root_dir: str) -> None:
         "expense-app.css": "expense-app.css",
         "account.js": "account.js",
         "expense.js": "expense.js",
-        "html5-qrcode.min.js": "html5-qrcode.min.js",
+        "zxing.min.js": "zxing.min.js",
         "expense-icon-192.png": "icon-192.png",
         "expense-icon-512.png": "icon-512.png",
         "expense-icon-maskable-512.png": "icon-maskable-512.png",

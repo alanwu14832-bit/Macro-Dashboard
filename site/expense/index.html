@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Serif:wght@400;600&display=swap">
-<link rel="stylesheet" href="/expense-app.css?v=1788768778">
+<link rel="stylesheet" href="/expense-app.css?v=1788770452">
 <link rel="icon" href="/expense-icon-192.png">
 <script>(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
@@ -225,19 +225,23 @@
     <span class="scanner-title">掃描</span>
     <button type="button" class="scanner-close" id="exp-scan-close">關閉</button>
   </div>
-  <div class="scanner-view" id="exp-scan-view"></div>
+  <div class="scanner-view" id="exp-scan-view">
+    <video id="exp-scan-video" playsinline muted autoplay></video>
+    <div class="scan-box" id="exp-scan-box" aria-hidden="true"></div>
+  </div>
   <p class="scanner-hint" id="exp-scan-hint" role="status" aria-live="polite">對準發票左邊那顆 QR code，或商品條碼</p>
   <div class="scanner-foot">
     <label class="scanner-pick">從相簿選圖
       <input id="exp-scan-file" type="file" accept="image/*" hidden>
     </label>
+    <button type="button" class="scanner-pick" id="exp-scan-zoom" hidden>放大</button>
     <button type="button" class="scanner-pick" id="exp-scan-torch" hidden>手電筒</button>
   </div>
 </div>
 
 <script>window.__SB={"url": "https://nwbfjoroqnhpymdtdbwu.supabase.co", "key": "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"}</script>
-<script src="/account.js?v=1788768778" defer></script>
-<script src="/expense.js?v=1788768778" defer></script>
+<script src="/account.js?v=1788770452" defer></script>
+<script src="/expense.js?v=1788770452" defer></script>
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
 </html>

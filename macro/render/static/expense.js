@@ -9,7 +9,8 @@
  *   - Apple Pay 自動記帳：iOS 捷徑的「交易」自動化 POST 到 /api/expense，
  *     寫進同一張表；這頁每分鐘拉一次，刷完卡回來看就有了。
  *   - 掃描：電子發票的 QR 直接解出金額、日期、品項與賣方統編；商品條碼
- *     查品名並記住上次價格。解碼在裝置上做，只有店名／品名查詢打 /api/lookup。
+ *     查品名並記住上次價格。解碼在裝置上做（原生 BarcodeDetector 或 ZXing，
+ *     以串流原生解析度解），只有店名／品名查詢打 /api/lookup。
  *
  * session 直接共用 account.js 的 sb-session（同一個 localStorage key），
  * 過期時自己 refresh 並存回去——兩支腳本誰先刷新，另一支都拿得到新 token。
@@ -1383,7 +1384,8 @@
       return;
     }
     const sub = [info.brand, info.quantity].filter(Boolean).join("・");
-    const src = "Open Food Facts" + (info.price ? `・上次 ${money(info.price, "TWD")}` : "");
+    const src = (info.source || "Open Food Facts")
+      + (info.price ? `・上次 ${money(info.price, "TWD")}` : "");
     productBox.className = "product-card";
     productBox.innerHTML =
       (info.image
@@ -1520,6 +1522,7 @@
       name, price, at: Date.now(),
       product: info.product || null, brand: info.brand || null,
       quantity: info.quantity || null, image: info.image || null,
+      source: info.source || null,
     } });
   }
 
@@ -1538,42 +1541,116 @@
     field("pay").value = pay;
   }
 
-  /* 取景器：html5-qrcode 包了 getUserMedia、iOS 的 playsinline 細節與
-     ZXing 解碼；瀏覽器有原生 BarcodeDetector 時它會優先用。庫本身
-     370KB，所以按了掃描才載入，載過一次 service worker 就快取住了。 */
+  /* 取景器：自己拿 getUserMedia 的串流，每 120ms 把框內那一塊以「原生解析度」
+     畫到 canvas 交給 ZXing 解碼。不用現成的掃描元件是因為它們把影像縮到
+     螢幕尺寸才解——手機螢幕 390px 寬，發票上一公分多、五十幾個模組的 QR
+     縮完一格剩不到一個像素，永遠解不開。瀏覽器有原生 BarcodeDetector
+     （Android Chrome）就用它，iOS 走 ZXing（340KB，按了掃描才載入，
+     載過一次 service worker 就快取住了）。 */
   const scanner = document.getElementById("exp-scanner");
   const scanView = document.getElementById("exp-scan-view");
+  const scanVideo = document.getElementById("exp-scan-video");
+  const scanBox = document.getElementById("exp-scan-box");
   const scanHint = document.getElementById("exp-scan-hint");
   const scanFile = document.getElementById("exp-scan-file");
   const torchBtn = document.getElementById("exp-scan-torch");
-  let reader = null;
+  const zoomBtn = document.getElementById("exp-scan-zoom");
+  const SCAN_LIB = "/zxing.min.js?v=0.21.3";
+  const FORMATS = ["QR_CODE", "EAN_13", "EAN_8", "UPC_A", "UPC_E", "CODE_128", "CODE_39"];
+  const NATIVE_FORMATS = ["qr_code", "ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39"];
+  let core = null;                          // ZXing MultiFormatReader
+  let detector = null;                      // 原生 BarcodeDetector（有的話）
+  let stream = null;
+  let track = null;
+  let loopTimer = null;
+  let stuckTimer = null;                    // 掃很久沒讀到 → 換提示
   let scanning = false;
   let torchOn = false;
+  let zoomLevel = 1;
+  let zoomMax = 1;
   let lastScan = { text: "", at: 0 };
   let rightParts = null;                    // 先掃到右邊那顆時暫存的品項
+  const workCanvas = document.createElement("canvas");
 
   function loadScanLib() {
-    if (window.Html5Qrcode) return Promise.resolve();
+    if (window.ZXing) return Promise.resolve();
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "/html5-qrcode.min.js?v=2.3.8";
+      script.src = SCAN_LIB;
       script.onload = resolve;
       script.onerror = () => reject(new Error("掃描元件載入失敗——離線時要先連過一次網路。"));
       document.head.appendChild(script);
     });
   }
 
-  async function ensureReader() {
-    await loadScanLib();
-    if (!reader) {
-      const F = window.Html5QrcodeSupportedFormats;
-      reader = new window.Html5Qrcode(scanView.id, {
-        formatsToSupport: [F.QR_CODE, F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.CODE_128, F.CODE_39],
-        useBarCodeDetectorIfSupported: true,
-        verbose: false,
-      });
+  async function ensureDecoder() {
+    if (!detector && !core && "BarcodeDetector" in window) {
+      try {
+        const supported = await window.BarcodeDetector.getSupportedFormats();
+        const want = NATIVE_FORMATS.filter((f) => supported.includes(f));
+        if (want.includes("qr_code")) detector = new window.BarcodeDetector({ formats: want });
+      } catch { detector = null; }
     }
-    return reader;
+    if (detector) return;
+    await loadScanLib();
+    if (!core) {
+      const Z = window.ZXing;
+      const hints = new Map();
+      hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, FORMATS.map((f) => Z.BarcodeFormat[f]));
+      hints.set(Z.DecodeHintType.TRY_HARDER, true);
+      core = new Z.MultiFormatReader();
+      core.setHints(hints);
+    }
+  }
+
+  // canvas → 條碼內容；解不到回 null（ZXing 用例外表示「這格沒有」）
+  async function decodeCanvas(canvas) {
+    if (detector) {
+      try {
+        const found = await detector.detect(canvas);
+        return found.length ? found[0].rawValue : null;
+      } catch { return null; }
+    }
+    const Z = window.ZXing;
+    try {
+      const source = new Z.HTMLCanvasElementLuminanceSource(canvas);
+      return core.decode(new Z.BinaryBitmap(new Z.HybridBinarizer(source))).getText();
+    } catch { return null; }
+  }
+
+  // 框：取景器裡置中的橫長矩形，QR 與一維條碼都放得進去。回傳顯示座標。
+  function layoutBox() {
+    const W = scanView.clientWidth, H = scanView.clientHeight;
+    const base = Math.min(W, H);
+    const w = Math.round(base * 0.86), h = Math.round(base * 0.6);
+    scanBox.style.width = w + "px";
+    scanBox.style.height = h + "px";
+    return { W, H, x: (W - w) / 2, y: (H - h) / 2, w, h };
+  }
+
+  // 顯示座標 → 串流座標。video 用 object-fit: cover，多出來的兩邊被裁掉。
+  function sourceRect(box) {
+    const vw = scanVideo.videoWidth, vh = scanVideo.videoHeight;
+    const scale = Math.max(box.W / vw, box.H / vh);
+    const offX = (vw - box.W / scale) / 2, offY = (vh - box.H / scale) / 2;
+    const sx = Math.max(0, Math.round(offX + box.x / scale));
+    const sy = Math.max(0, Math.round(offY + box.y / scale));
+    return { sx, sy, sw: Math.min(vw - sx, Math.round(box.w / scale)),
+             sh: Math.min(vh - sy, Math.round(box.h / scale)) };
+  }
+
+  async function scanLoop() {
+    if (!scanning) return;
+    if (scanVideo.readyState >= 2 && scanVideo.videoWidth) {
+      const r = sourceRect(layoutBox());
+      workCanvas.width = r.sw;
+      workCanvas.height = r.sh;
+      workCanvas.getContext("2d", { willReadFrequently: true })
+        .drawImage(scanVideo, r.sx, r.sy, r.sw, r.sh, 0, 0, r.sw, r.sh);
+      const text = await decodeCanvas(workCanvas);
+      if (text) handleScan(text);
+    }
+    if (scanning) loopTimer = setTimeout(scanLoop, 120);
   }
 
   function cameraMessage(error) {
@@ -1581,7 +1658,8 @@
     if (name === "NotAllowedError" || /permission|denied/i.test(String(error))) {
       return "沒有相機權限——到 iPhone 設定 › Safari › 相機 選「允許」（加到主畫面的 App 在設定裡有自己的一項），或改用「從相簿選圖」。";
     }
-    if (name === "NotFoundError" || /no camera|not found|devices/i.test(String(error))) {
+    if (name === "NotFoundError" || name === "OverconstrainedError"
+        || /no camera|not found|devices|getUserMedia/i.test(String(error))) {
       return "找不到相機——改用「從相簿選圖」。";
     }
     return (error && error.message ? error.message : String(error)) + "——或改用「從相簿選圖」。";
@@ -1592,23 +1670,43 @@
     rightParts = null;
     lastScan = { text: "", at: 0 };
     torchOn = false;
+    zoomLevel = 1;
     torchBtn.hidden = true;
+    zoomBtn.hidden = true;
     scanHint.textContent = "對準發票左邊那顆 QR code，或商品條碼";
+    layoutBox();
     try {
-      const r = await ensureReader();
-      await r.start({ facingMode: "environment" }, {
-        fps: 10,
-        // 橫長的框：QR 與一維條碼都放得進去
-        qrbox: (w, h) => {
-          const base = Math.min(w, h);
-          return { width: Math.round(base * 0.86), height: Math.round(base * 0.6) };
-        },
-      }, (text) => handleScan(text), () => {});
+      await ensureDecoder();
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("這個瀏覽器不開放相機");
+      }
+      // 沒指定解析度時 iOS 只給 640×480，發票的 QR 每格不到兩個像素；
+      // 要到 1080p 才有四、五個像素可用。
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
+      });
+      track = stream.getVideoTracks()[0];
+      scanVideo.srcObject = stream;
+      await scanVideo.play().catch(() => {});
       scanning = true;
       try {
-        const caps = r.getRunningTrackCapabilities();
-        if (caps && caps.torch) torchBtn.hidden = false;
+        const caps = track.getCapabilities ? track.getCapabilities() : {};
+        if (caps.torch) torchBtn.hidden = false;
+        // 數位變焦：把小 QR 放大到夠解，不必把手機貼到紙上（貼太近對不到焦）
+        if (caps.zoom && caps.zoom.max > 1) {
+          zoomMax = Math.min(caps.zoom.max, 4);
+          zoomBtn.hidden = false;
+          zoomBtn.textContent = "放大";
+        }
       } catch {}
+      loopTimer = setTimeout(scanLoop, 250);
+      clearTimeout(stuckTimer);
+      stuckTimer = setTimeout(() => {
+        if (!scanning || scanner.hidden) return;
+        scanHint.textContent = "還沒讀到？把 QR 放進框裡、靠到約 10 公分讓它佔框的一半；"
+          + "反光就稍微斜一點" + (zoomBtn.hidden ? "。" : "，或按「放大」。");
+      }, 7000);
     } catch (error) {
       scanHint.textContent = cameraMessage(error);
     }
@@ -1617,16 +1715,20 @@
   function closeScanner() {
     scanner.hidden = true;
     lastScan = { text: "", at: 0 };          // 去重只針對取景器連續解碼
-    if (reader && scanning) {
-      scanning = false;
-      reader.stop().then(() => reader.clear()).catch(() => {});
-    }
+    clearTimeout(stuckTimer);
+    clearTimeout(loopTimer);
+    scanning = false;
+    if (stream) for (const t of stream.getTracks()) t.stop();
+    stream = null;
+    track = null;
+    scanVideo.srcObject = null;
   }
 
   function handleScan(text) {
     const now = Date.now();
     if (text === lastScan.text && now - lastScan.at < 2500) return;  // 同一顆連續解到
     lastScan = { text, at: now };
+    clearTimeout(stuckTimer);
 
     const inv = parseInvoice(text);
     if (inv && inv.side === "right") {
@@ -1649,6 +1751,38 @@
     scanHint.textContent = "看不懂這個條碼——發票要掃左邊那顆 QR，商品掃包裝上的黑白條碼。";
   }
 
+  // 相簿照片：先原尺寸（上限 2400）、不行再縮到 1200——太大太小都可能失手
+  async function decodeFile(file) {
+    await ensureDecoder();
+    const image = await loadImage(file);
+    const w = image.naturalWidth || image.width, h = image.naturalHeight || image.height;
+    const longest = Math.max(w, h);
+    const caps = [Math.min(longest, 2400)];
+    if (longest > 1200) caps.push(1200);
+    for (const cap of caps) {
+      const scale = cap / longest;
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(w * scale);
+      canvas.height = Math.round(h * scale);
+      canvas.getContext("2d", { willReadFrequently: true })
+        .drawImage(image, 0, 0, canvas.width, canvas.height);
+      const text = await decodeCanvas(canvas);
+      if (text) return text;
+    }
+    return null;
+  }
+
+  function loadImage(file) {
+    if (window.createImageBitmap) return createImageBitmap(file);
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("不是有效的圖片")); };
+      img.src = url;
+    });
+  }
+
   document.getElementById("exp-scan").addEventListener("click", openScanner);
   document.getElementById("exp-scan-close").addEventListener("click", closeScanner);
 
@@ -1658,20 +1792,31 @@
     if (!file) return;
     scanHint.textContent = "辨識中…";
     try {
-      const r = await ensureReader();
-      if (scanning) { scanning = false; await r.stop(); }
-      const text = await r.scanFile(file, false);
-      handleScan(text);
+      const text = await decodeFile(file);
+      if (text) handleScan(text);
+      else scanHint.textContent = "照片裡找不到條碼——拍近一點、避開反光，或直接手動輸入。";
+    } catch (error) {
+      scanHint.textContent = "照片讀不進來：" + (error && error.message ? error.message : error);
+    }
+  });
+
+  zoomBtn.addEventListener("click", async () => {
+    if (!track) return;
+    // 1× → 2× → 3× → 回 1×（以相機能力為上限）
+    zoomLevel = zoomLevel + 1 > zoomMax ? 1 : zoomLevel + 1;
+    try {
+      await track.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
+      zoomBtn.textContent = zoomLevel > 1 ? `${zoomLevel}×` : "放大";
     } catch {
-      scanHint.textContent = "照片裡找不到條碼——拍近一點、避開反光，或直接手動輸入。";
+      zoomBtn.hidden = true;
     }
   });
 
   torchBtn.addEventListener("click", async () => {
-    if (!reader || !scanning) return;
+    if (!track) return;
     torchOn = !torchOn;
     try {
-      await reader.applyVideoConstraints({ advanced: [{ torch: torchOn }] });
+      await track.applyConstraints({ advanced: [{ torch: torchOn }] });
       torchBtn.textContent = torchOn ? "關閉手電筒" : "手電筒";
     } catch {
       torchBtn.hidden = true;
