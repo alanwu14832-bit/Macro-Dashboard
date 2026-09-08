@@ -1,6 +1,6 @@
 {
  "date": "2026-09-08",
- "generated_at": "2026-09-08T20:56:52",
+ "generated_at": "2026-09-08T21:55:18",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -103,7 +103,7 @@
    "headline": "期限溢酬偏高，長端在要求額外補償",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "期限溢酬（近似）+1.03 個百分點",
+   "evidence": "期限溢酬（近似）+1.05 個百分點",
    "module": "利率"
   },
   {
@@ -141,7 +141,7 @@
   "ten_year": 4.78,
   "real_ten_year": 2.43,
   "curve_10_2": 0.41000000000000014,
-  "recession_gauge": 39.47282310087082,
+  "recession_gauge": 39.53462187009684,
   "composite_labor": -5.358123170275
  },
  "as_of": {
