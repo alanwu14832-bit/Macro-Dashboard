@@ -392,8 +392,8 @@
 "seen": null
 },
 "GVZCLS": {
-"date": "2026-09-03",
-"seen": null
+"date": "2026-09-04",
+"seen": "2026-09-08"
 },
 "HOUST": {
 "date": "2026-07-01",
@@ -548,8 +548,8 @@
 "seen": null
 },
 "OVXCLS": {
-"date": "2026-09-03",
-"seen": null
+"date": "2026-09-04",
+"seen": "2026-09-08"
 },
 "PALLFNFINDEXM": {
 "date": "2026-07-01",
@@ -780,12 +780,12 @@
 "seen": null
 },
 "VIXCLS": {
-"date": "2026-09-03",
-"seen": null
+"date": "2026-09-07",
+"seen": "2026-09-08"
 },
 "VXNCLS": {
-"date": "2026-09-03",
-"seen": null
+"date": "2026-09-04",
+"seen": "2026-09-08"
 },
 "WALCL": {
 "date": "2026-09-02",

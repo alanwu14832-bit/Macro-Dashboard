@@ -1,6 +1,6 @@
 {
  "date": "2026-09-08",
- "generated_at": "2026-09-08T13:04:21",
+ "generated_at": "2026-09-08T14:03:15",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -113,21 +113,13 @@
    "severity": "low",
    "evidence": "高收益利差 2.65%，十年百分位 4%",
    "module": "利率"
-  },
-  {
-   "key": "volatility_complacent",
-   "headline": "波動率處於低檔，市場對總經風險定價不足",
-   "direction": "neutral",
-   "severity": "low",
-   "evidence": "VIX 14.3",
-   "module": "市場"
   }
  ],
  "summary": {
-  "total": 15,
+  "total": 14,
   "hawkish": 5,
   "dovish": 7,
-  "neutral": 3,
+  "neutral": 2,
   "score": -5,
   "tilt": "偏降息"
  },
