@@ -48,10 +48,10 @@
   "source": "Fincept / yfinance"
  },
  "ZQU26.CBT": {
-  "price": 96.3,
-  "quoted_at": "2026-09-07T23:05+08:00",
-  "saved_at": "2026-09-07T23:05:09",
-  "source": "Fincept / yfinance"
+  "price": 96.3025,
+  "quoted_at": "2026-09-08T22:03+00:00",
+  "saved_at": "2026-09-08T23:53:16",
+  "source": "Yahoo Finance"
  },
  "ZQV26.CBT": {
   "price": 96.21,
