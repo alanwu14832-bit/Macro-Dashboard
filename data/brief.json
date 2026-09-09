@@ -1,34 +1,34 @@
 {
- "date": "2026-09-08",
- "generated_at": "2026-09-08T22:30:00+08:00",
+ "date": "2026-09-09",
+ "generated_at": "2026-09-09T08:50:30+08:00",
  "sections": [
   {
    "key": "macro",
    "title": "總經數據與事件",
    "items": [
     {
-     "headline": "布蘭特原油衝上 98 美元、逼近 100，胡塞攻擊沙烏地能源設施點燃供給恐慌",
-     "detail": "儀表板 WTI 91.48 美元、近一月 +11.6%，能源佔 CPI 約 6.2%；這正是「油價上行推升未來一至兩月 CPI」那條升息訊號的即時佐證。",
-     "source": "CNBC／Reuters／OilPrice，3 家",
-     "link": "https://www.cnbc.com/2026/09/08/oil-prices-today-brent-wti-hormuz-iran-war.html"
-    },
-    {
-     "headline": "OPEC 8 月產量因衝突干擾沙烏地出口而下滑，中國買盤同時回溫",
-     "detail": "供給減、需求增同時發生，代表這波漲勢不是需求過熱，而是供給衝擊——對通膨是成本推動、對成長是負面，政策上比需求型通膨更難處理。",
-     "source": "Bloomberg／OilPrice",
+     "headline": "布蘭特逼近 100 美元，美伊互擊把油價推成本期最大的通膨上檔風險",
+     "detail": "儀表板 WTI 91.48 美元、布蘭特 96.02，近一月 +11.6%；美軍擊毀五艘伊朗油輪、伊朗原油出口同步崩跌，供給面缺口比昨日更明確。這是「油價上行推升未來一至兩月 CPI」那條升息訊號的即時佐證。",
+     "source": "CNBC／Financial Times／OilPrice，3 家",
      "link": ""
     },
     {
-     "headline": "加拿大對美報復性關稅正式生效，川普號召抵制龐巴迪",
-     "detail": "關稅回到核心商品通膨的上檔風險名單；瑞士藥廠執行長也警告學名藥關稅「最後是病人付」。",
+     "headline": "加拿大對 200 億美元美國商品的報復性關稅生效，美方同日禁運加國乳製品、酒類與機車並對部分商品課 50%",
+     "detail": "白宮一口氣發布五道公告調整加國商品範圍；乳品、起司、汽車與家電雙向被打，核心商品通膨的上檔風險再加一層，且這是政策自己製造的成本推動。",
      "source": "CBS／CNBC／Guardian／NPR／Reuters，5 家",
-     "link": "https://www.cbsnews.com/video/canada-matches-trump-steep-us-tariffs-in-ongoing-trade-war/"
+     "link": ""
     },
     {
-     "headline": "英國央行總裁警告油價「可能更高」，油價推升殖利率疑慮、華爾街收黑",
-     "detail": "儀表板 10 年期 4.77%、實質 2.42%（近三月 +0.30 個百分點），期貨定價 9/16 FOMC 升息機率 51%；能源已經開始被央行當成通膨上檔風險在講。",
-     "source": "Guardian／Reuters／Yahoo Finance",
-     "link": "https://www.theguardian.com/business/live/2026/sep/08/oil-price-approaches-100-a-barrel-saudi-attacks-bank-of-england-latest-news-updates"
+     "headline": "期貨定價 9/16 FOMC 升息機率升到 60%，10 年期同步走高到 4.78%",
+     "detail": "昨日整理時還是 51%，一天內跳升 9 個百分點；10 年期 4.78%、實質 2.43%（近三月 +0.23 個百分點，其中實質貢獻 +0.24），殖利率上行來自實質利率而非通膨補償，對估值的壓力更直接。",
+     "source": "儀表板讀數（FRED、CME 期貨）",
+     "link": ""
+    },
+    {
+     "headline": "避險基金加碼燃料部位，美國成品油供給缺口擴大",
+     "detail": "投機部位往能源集中，代表市場把這波當成會持續的供給衝擊，不是一次性跳動；對通膨是成本推動、對成長是負面，比需求型通膨更難用利率處理。",
+     "source": "OilPrice",
+     "link": ""
     }
    ]
   },
@@ -37,28 +37,16 @@
    "title": "公司新聞",
    "items": [
     {
-     "headline": "OpenAI 與輝達投資的 Firmus 簽多年期馬來西亞資料中心運算合約",
-     "detail": "AI 算力外擴到東南亞，牽動的是電力、機櫃與伺服器供應鏈，不只是晶片。",
-     "source": "Reuters／Yahoo Finance，2 家",
-     "link": "https://finance.yahoo.com/technology/ai/articles/openai-signs-multi-compute-deal-140329941.html"
+     "headline": "龐巴迪股價因美加貿易戰升溫重挫，川普點名下一波目標",
+     "detail": "美加航太供應鏈高度整合，關稅打到的是零組件跨境往返的次數，不是單一成品；這條也是關稅從總經敘事落到個股定價的第一個明確案例。",
+     "source": "MarketWatch／NRK，2 家",
+     "link": ""
     },
     {
-     "headline": "高通發給亞馬遜 40 億美元認股權證，綁定 AI 基礎設施合作",
-     "detail": "用股權換長約，等於把 AWS 的資料中心採購鎖進高通的產品線，是雲端業者與晶片商綁定加深的又一例。",
-     "source": "CNBC",
-     "link": "https://www.cnbc.com/2026/09/08/qualcomm-amazon-data-center-infrastructure-deal.html"
-    },
-    {
-     "headline": "IREN 因 ERCOT 有條件核准 2GW Sweetwater 園區大漲 7%，Applied Digital 同步 +6%",
-     "detail": "資料中心的瓶頸已經從晶片轉到併網容量，電力核准變成股價催化劑。",
-     "source": "Yahoo Finance",
-     "link": "https://finance.yahoo.com/markets/stocks/articles/iren-surges-7-conditional-ercot-141059348.html"
-    },
-    {
-     "headline": "「大賣空」Michael Burry 公開避開 AI、改押被殺過頭的舊經濟股",
-     "detail": "AI 交易擁擠度開始出現對作聲量，可對照儀表板「信用利差十年低檔、風險幾乎沒被定價」那條訊號。",
-     "source": "Yahoo Finance",
-     "link": "https://finance.yahoo.com/markets/stocks/articles/big-short-billionaire-goes-long-140530623.html"
+     "headline": "OpenAI 宣稱的數學突破遭同業提出競爭性主張",
+     "detail": "AI 能力宣稱開始被公開質疑，對照儀表板「信用利差在十年低檔、風險幾乎沒被定價」那條訊號，AI 交易的擁擠度值得留意。",
+     "source": "Financial Times",
+     "link": ""
     }
    ]
   },
@@ -67,28 +55,28 @@
    "title": "地緣政治",
    "items": [
     {
-     "headline": "胡塞武裝襲擊沙烏地城市與能源設施、73 人受傷，沙烏地誓言反擊",
-     "detail": "傳導：直接打到油價與荷姆茲風險溢酬——中東戰事從葉門—以色列擴大到沙烏地本土，是這波原油定價的核心變數。",
-     "source": "NPR／Reuters／SCMP／BBC，4 家",
-     "link": "https://www.theguardian.com/world/2026/sep/08/houthi-strike-saudi-arabia-oil-facilities-middle-east-war-iran"
-    },
-    {
-     "headline": "南韓派調查團赴荷姆茲海峽評估通行狀況，油輪回流蘇伊士運河",
-     "detail": "傳導：東亞能源進口國開始做斷供準備，運費與戰爭險保費上升會再疊一層輸入性通膨。",
-     "source": "SCMP／Reuters／OilPrice",
+     "headline": "美軍擊毀五艘伊朗油輪，回應伊朗對美艦的飛彈攻擊；伊朗則擄獲一具美軍水下無人載具",
+     "detail": "傳導：油價與荷姆茲風險溢酬。美伊從代理人衝突升級為直接交火，且雙方都已有實體損失，戰事外溢到航運與保險的機率上升。",
+     "source": "Guardian／Iran International／PBS NewsHour／CENTCOM，4 家",
      "link": ""
     },
     {
-     "headline": "英國宣布制裁以色列屯墾區、擴大對伊朗制裁，美方警告有經濟後果",
-     "detail": "傳導：英美貿易摩擦與制裁風險升溫；同日以軍空襲南黎巴嫩村莊造成 12 死，衝突面沒有收斂跡象。",
-     "source": "CNBC／Guardian／BBC／PBS",
-     "link": "https://www.cnbc.com/2026/09/08/uk-israel-sanctions-miliband-florida-trump.html"
+     "headline": "胡塞成功打擊後，沙烏地僅存的能源輸出命脈受威脅",
+     "detail": "傳導：油價供給端。若沙烏地出口再受損，OPEC 的閒置產能無法補上缺口，這是布蘭特敢往 100 美元試的結構性理由。",
+     "source": "The War Zone／Foreign Policy",
+     "link": ""
     },
     {
-     "headline": "匈牙利驅逐 10 名俄國外交官、俄方揚言「痛擊」回應；俄朝首條跨境公路通車",
-     "detail": "傳導：歐洲天然氣價已創三年新高，歐俄關係再惡化會讓補庫成本更高；俄朝陸路連結則墊高東北亞地緣風險。",
-     "source": "Guardian／SCMP／AP／gCaptain",
-     "link": "https://www.theguardian.com/world/live/2026/sep/08/ukraine-russia-war-zelesnkyy-putin-ruslan-kravchenko-prosecutor-general-germany-france-europe-latest-news-updates"
+     "headline": "南韓派調查團赴荷姆茲海峽評估通行狀況，油輪改道蘇伊士",
+     "detail": "傳導：運費與戰爭險保費。東亞能源進口國開始做斷供準備，航程拉長會再疊一層輸入性通膨到台日韓。",
+     "source": "Reuters／SCMP／Iran International，3 家",
+     "link": ""
+    },
+    {
+     "headline": "英國禁止與以色列屯墾區貿易並擴大對伊朗制裁；德國電網破壞案逮捕嫌犯",
+     "detail": "傳導：能源與供應鏈。制裁範圍擴大會壓縮原油與金屬的合規供給來源；歐洲電網遭破壞則直接推高本已在三年高點的歐洲能源成本。",
+     "source": "AP／NPR／BBC／PBS，4 家",
+     "link": ""
     }
    ]
   },
@@ -98,12 +86,12 @@
    "items": [
     {
      "headline": "無",
-     "detail": "今日 63 個來源中沒有台股、台積電或出口相關且值得記錄的條目。",
+     "detail": "今日 63 個成功抓取的來源中，沒有台股、台積電或出口相關且值得記錄的條目。",
      "source": "",
      "link": ""
     }
    ]
   }
  ],
- "synthesis": "與本期判斷的交集：油價逼近 100 美元加上加拿大關稅生效，等於同時強化「油價推升未來一至兩月 CPI」與「漲勢全面性」兩條升息訊號——訊號合計雖仍偏降息 7:5，但那是就業面的弱，通膨端反而在惡化，通膨優先的政策重心因此更站得住。"
+ "synthesis": "與本期判斷的交集：油價逼近 100 美元、加拿大關稅雙向生效、期貨隱含 9/16 升息機率一天內從 51% 跳到 60%，三件事指向同一個方向——訊號合計雖仍 7:5 偏降息，但那是就業面的弱（三月均非農 +7.1 萬人低於損益兩平 8.0 萬），通膨端反而在惡化，通膨優先的政策重心因此比昨天更站得住。"
 }
