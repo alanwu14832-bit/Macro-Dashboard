@@ -1,6 +1,6 @@
 {
  "date": "2026-09-10",
- "generated_at": "2026-09-10T17:55:43",
+ "generated_at": "2026-09-10T18:57:55",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -31,7 +31,7 @@
    "headline": "油價上行，未來一至兩月推升總體 CPI",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "WTI 近一月 +9.0%，能源佔 CPI 約 6.2%",
+   "evidence": "WTI 近一月 +11.3%，能源佔 CPI 約 6.2%",
    "module": "物價"
   },
   {
