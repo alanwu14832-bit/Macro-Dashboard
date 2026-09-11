@@ -1,6 +1,6 @@
 {
  "date": "2026-09-11",
- "generated_at": "2026-09-11T14:58:03",
+ "generated_at": "2026-09-11T15:56:35",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -24,14 +24,6 @@
    "direction": "hawkish",
    "severity": "medium",
    "evidence": "WTI 近一月 +11.3%，能源佔 CPI 約 6.2%",
-   "module": "物價"
-  },
-  {
-   "key": "inflation_broad",
-   "headline": "剔除極端值後通膨不比核心低，漲勢是全面性的",
-   "direction": "hawkish",
-   "severity": "medium",
-   "evidence": "核心 2.4%，剔除極端值均值 2.8%",
    "module": "物價"
   },
   {
@@ -116,11 +108,11 @@
   }
  ],
  "summary": {
-  "total": 14,
-  "hawkish": 5,
+  "total": 13,
+  "hawkish": 4,
   "dovish": 7,
   "neutral": 2,
-  "score": -4,
+  "score": -6,
   "tilt": "偏降息"
  },
  "scenario": {
