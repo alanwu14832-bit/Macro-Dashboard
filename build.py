@@ -16,12 +16,13 @@ import time
 import traceback
 from datetime import date, datetime
 
-from macro import archive, data, paths
+from macro import archive, data, deepdive, paths
 from macro.compute import (commodities, debt, equities, fedfunds, freshness,
                            growth, inflation, labor, market, news, rates,
                            scenario, signals, world)
 from macro.render import api, layout
 from macro.render.pages import (archive as archive_page,
+                                deepdive as deepdive_page,
                                 expense as expense_page,
                                 guide as guide_page,
                                 commodities as commodities_page,
@@ -133,6 +134,13 @@ def main() -> int:
 
     print("== 5/6 產生頁面 ==", flush=True)
     updated = taipei_stamp()
+
+    # 深度專題的報告寫在另一個專案目錄（deep-dive/reports/），先鏡像進
+    # data/deep-dive/ 再讀——雲端建置只看得到 repo 裡的檔案。
+    synced = deepdive.sync()
+    reports = deepdive.load_all()
+    if verbose and synced:
+        print(f"   深度專題同步 {len(synced)} 個檔案", flush=True)
     pages = [
         ("/", "總覽", "",
          "把勞動、通膨、利率、債務、成長、全球與市場七個面向，收斂成一個可追蹤的判斷。",
@@ -174,6 +182,10 @@ def main() -> int:
         ("/scenario/", "情境與部位", "情境與部位",
          "九宮格定位、三種政策重心、轉換門檻與部位對照。",
          lambda: scenario_page.render(ctx, scenario_data, summary)),
+        ("/deep-dive/", "深度專題", "資本市場深度專題",
+         "每天一篇的產業與個股研究：結論先行、論點展開、量化佐證，"
+         "以及反方觀點與證偽條件。",
+         lambda: deepdive_page.render_index(reports)),
         ("/explore/", "自選比較", "自選比較",
          "從 196 檔序列自選最多 4 個比較，轉換方式與區間隨你調，資料即時取自 FRED。",
          lambda: explore_page.render(ctx)),
@@ -213,6 +225,30 @@ def main() -> int:
         written.append(target)
         if verbose:
             print(f"   ✓ {path}", flush=True)
+
+    # 深度專題的文章頁。側欄用 nav_path 停在 /deep-dive/，讀者在文章裡
+    # 仍看得到自己在哪一區；區塊目錄也沿用索引頁的，文章自己的大綱在內文裡。
+    for position, report in enumerate(reports):
+        try:
+            article = layout.page(
+                title=report["title"], path=report["path"],
+                nav_path="/deep-dive/",
+                body=deepdive_page.render_article(
+                    report,
+                    newer=reports[position - 1] if position else None,
+                    older=reports[position + 1] if position + 1 < len(reports) else None),
+                heading=report["title"],
+                # 不放 lede：結論先行就在下面第一段，頁首再放一次是同一段
+                # 文字連出現兩遍。摘要留給 <meta description>。
+                lede="", updated=updated,
+                description=report.get("summary", ""), sections=section_map)
+            written.append(layout.write_page(report["path"], article))
+        except Exception:
+            print(f'   ✗ {report["path"]}', flush=True)
+            traceback.print_exc()
+            failures.append(report["path"])
+    if verbose and reports:
+        print(f"   ✓ /deep-dive/ 文章 {len(reports)} 篇", flush=True)
 
     # 記帳是獨立的 PWA（自己的外殼與 manifest），不進側欄、不包儀表板版型。
     # 同一份程式出兩個部署：/expense/（掛儀表板網域）與 standalone/——

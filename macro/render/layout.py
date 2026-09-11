@@ -35,9 +35,10 @@ ICONS = {
     "freshness": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2",
     "archive": "M3 7h18v13H3zM3 3h18v4H3zM9 12h6",
     "explore": "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.35-4.35M8 11h6M11 8v6",
+    "deepdive": "M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M14 3l5 5M14 3v5h5M8 9h3M8 13h4M16 14a3 3 0 1 0 0 6 3 3 0 0 0 0-6M21 21l-2.2-2.2",
 }
 
-# (href, label, icon, group). Grouping is what makes 14 items scannable.
+# (href, label, icon, group). Grouping is what makes 15 items scannable.
 NAV = [
     ("/", "總覽", "overview", None),
 
@@ -54,6 +55,7 @@ NAV = [
     ("/tw/", "台股", "twstock", "全球與市場"),
     ("/market/", "市場面", "market", "全球與市場"),
 
+    ("/deep-dive/", "深度專題", "deepdive", "判讀與紀錄"),
     ("/explore/", "自選比較", "explore", "判讀與紀錄"),
     ("/scenario/", "情境與部位", "scenario", "判讀與紀錄"),
     ("/freshness/", "資料新鮮度", "freshness", "判讀與紀錄"),
@@ -185,7 +187,13 @@ def extract_sections(body: str) -> list[tuple[str, str, int]]:
 
 def page(*, title: str, path: str, body: str, lede: str = "",
          heading: str = "", updated: str = "", description: str = "",
-         sections: dict[str, list[tuple[str, str]]] | None = None) -> str:
+         sections: dict[str, list[tuple[str, str]]] | None = None,
+         nav_path: str = "") -> str:
+    """nav_path：側欄要標成「目前頁」的那一項。
+
+    深度專題的文章頁各有各的網址，但在側欄裡應該仍然是「深度專題」亮著，
+    否則讀者一點進文章，側欄就整個失去位置感。
+    """
     version = asset_version()
 
     head_block = ""
@@ -218,7 +226,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 <body>
 <a class="skip" href="#content">跳到主要內容</a>
 <div class="app">
-{_sidebar(path, sections)}
+{_sidebar(nav_path or path, sections)}
   <div class="shell">
     <header class="topbar">
       <button type="button" class="icon-btn drawer-btn" id="rail-open"

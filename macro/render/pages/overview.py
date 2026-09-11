@@ -600,7 +600,7 @@ def module_nav() -> str:
     links = [("/labor/", "勞動市場"), ("/inflation/", "通膨"),
              ("/fed/", "聯準會與利率"), ("/debt/", "長端與債務"),
              ("/growth/", "成長與信用"), ("/market/", "市場面"),
-             ("/scenario/", "情境與部位")]
+             ("/scenario/", "情境與部位"), ("/deep-dive/", "深度專題")]
     items = "　·　".join(f'<a href="{h}">{esc(t)}</a>' for h, t in links)
     return section("modules", "看更詳細的模組",
                    f'<p class="mc-foot-note" style="font-size:.88rem">{items}</p>')
