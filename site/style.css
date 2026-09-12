@@ -308,11 +308,21 @@ small { font-size: 0.82em; }
     transform: translateX(-100%);
     transition: transform 260ms var(--ease);
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.28);
+    /* 垂直捲動交給瀏覽器原生處理，水平方向留給我們的拖曳辨識器 */
+    touch-action: pan-y;
   }
     /* 用 translateX(0) 而不是 none：兩端都是同一種 transform 函式，
      過渡才會被當成同型別插值，某些引擎在 none 這一端會直接卡住 */
   :root.drawer-open .rail { transform: translateX(0); }
   :root.drawer-open .rail-scrim { opacity: 1; }
+
+  /* JS 接手後由彈簧逐帧驅動 transform／opacity：CSS 過渡必須讓開，
+     否則兩套時間軸互相追，手指放開的瞬間會看到「彈一下又被拉回」。
+     沒有 JS 的情況下上面的 CSS 過渡仍然是可用的退路。 */
+  :root.rail-js .rail,
+  :root.rail-js .rail-scrim { transition: none; }
+  .nav { overscroll-behavior: contain; }   /* 抽屜捲到底不要帶動背後的頁面 */
+  .rail-scrim { touch-action: none; }
 
   /* 抽屜永遠是展開樣式，桌機的收合狀態不該滲進來 */
   :root.rail-collapsed .nav-label,
@@ -459,6 +469,28 @@ section:not(.sub-section) > .section-head h2::before {
 
 /* 推播開關開啟時給個明確的「on」狀態 */
 #push-toggle.on { color: var(--good); border-color: var(--good); }
+
+/* ================================================ 按壓回饋與手勢細節 ==== */
+/* 回饋要發生在 pointerdown，不是放開才亮——:active 在指標按下當帧就成立。
+   iOS 預設的灰色點擊高亮會蓋掉我們自己的回饋，而且它慢半拍，關掉。 */
+a, button, summary, .module-link, .nav-item {
+  -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:active, .to-top:active { transform: scale(0.96); }
+.icon-btn, .to-top { transition: color 120ms, border-color 120ms, background 120ms, transform 70ms var(--ease); }
+.nav-item:active { background: var(--surface-sunken); color: var(--ink); }
+details.acc > summary:active { color: var(--ink); }
+.module-link:active { transform: scale(0.994); }
+.module-link { transition: border-color 120ms, transform 70ms var(--ease); }
+
+/* 深淺色切換：整頁調色盤瞬間翻面很刺眼，有支援就走交叉淡入。
+   減少動態時直接跳，不做過場。 */
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 200ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-btn:active, .to-top:active, .module-link:active { transform: none; }
+}
 
 /* ------------------------------------------------------------ 回到頂端 --- */
 .to-top {

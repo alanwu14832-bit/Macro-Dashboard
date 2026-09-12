@@ -37,17 +37,182 @@
     else setTimeout(done, 280);
   }
 
+  /* ------------------------------------- 彈簧：可攔截、會接手當下的速度 -- */
+  // 為什麼不是 CSS transition：過渡一開始就把時間與曲線綁死，手指再碰它
+  // 只能從頭播一次。彈簧是狀態機——任何一帧都能用「現在的位置＋現在的
+  // 速度」接手，這是抽屜可以被半路抓住、反向拖回去的前提。
+  function runSpring(from, to, v0, { damping, response }, onFrame, onEnd) {
+    let x = from, v = v0, last = performance.now(), raf = 0, alive = true;
+    const w = (2 * Math.PI) / response;
+    const k = w * w, c = 2 * damping * w;     // 質量取 1
+    const step = (now) => {
+      let dt = Math.min((now - last) / 1000, 0.064);  // 切回前景的大 dt 會炸開
+      last = now;
+      while (dt > 0) {                        // 固定小步長積分才數值穩定
+        const h = Math.min(dt, 1 / 240);
+        dt -= h;
+        v += (-k * (x - to) - c * v) * h;
+        x += v * h;
+      }
+      if (Math.abs(x - to) < 0.4 && Math.abs(v) < 24) {
+        x = to; v = 0; alive = false;
+        onFrame(x); if (onEnd) onEnd();
+        return;
+      }
+      onFrame(x);
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return {
+      cancel() { alive = false; cancelAnimationFrame(raf); },
+      get x() { return x; },
+      get v() { return v; },
+      get alive() { return alive; },
+    };
+  }
+
   /* ------------------------------------------------------ 行動版抽屜 ----- */
-  function setDrawer(open) {
-    root.classList.toggle("drawer-open", open);
-    if (scrim) scrim.hidden = !open;
-    if (opener) opener.setAttribute("aria-expanded", String(open));
-    document.body.style.overflow = open ? "hidden" : "";
-    if (open) {
-      const first = rail?.querySelector(".nav-item");
-      first?.focus({ preventScroll: true });
+  // 位置模型：x = 0 全開，x = -W 全關，單位 px。整段動態都由這一個數字
+  // 驅動 transform 與遮罩透明度，所以「拖到一半放手」跟「按鈕開關」走的
+  // 是同一條路徑（spatial consistency），不會有兩種不同的動法。
+  const DRAWER = { damping: 1.0, response: 0.3 };        // 臨界阻尼：不回彈
+  const FLICK = { damping: 0.82, response: 0.3 };        // 有動量才允許微彈
+  const PROJECT = 0.45;   // 秒：用放手速度投射停止點
+  const FLICK_V = 480;    // px/s 以上算甩動，方向直接定案
+  const HYST = 10;        // px：超過才認定這是水平手勢
+
+  let anim = null, x = null, W = 0, suppressClick = false;
+
+  const railWidth = () => (rail ? rail.getBoundingClientRect().width : 300);
+  const isOpen = () => root.classList.contains("drawer-open");
+  const focusFirst = () =>
+    rail?.querySelector(".nav-item")?.focus({ preventScroll: true });
+
+  function paint(nx) {
+    x = nx;
+    if (rail) rail.style.transform = `translate3d(${nx.toFixed(2)}px,0,0)`;
+    if (scrim) {
+      const t = 1 + nx / W;                  // 遮罩跟著位置走，不是自己計時
+      scrim.style.opacity = String(Math.max(0, Math.min(1, t)));
     }
   }
+
+  function clearInline() {
+    if (anim) anim.cancel();
+    anim = null; x = null;
+    if (rail) rail.style.transform = "";
+    if (scrim) scrim.style.opacity = "";
+  }
+
+  function setDrawer(open, velocity) {
+    const wasOpen = isOpen();
+    root.classList.toggle("drawer-open", open);
+    if (opener) opener.setAttribute("aria-expanded", String(open));
+    document.body.style.overflow = open ? "hidden" : "";
+
+    if (!MOBILE.matches) {                   // 桌機沒有抽屜，交還給 CSS
+      clearInline();
+      if (scrim) scrim.hidden = !open;
+      return;
+    }
+
+    W = railWidth();
+    if (scrim) scrim.hidden = false;         // 動畫期間要在場才收得到點擊
+    if (x === null) x = wasOpen ? 0 : -W;
+
+    const to = open ? 0 : -W;
+    const v0 = velocity !== undefined ? velocity
+             : (anim && anim.alive ? anim.v : 0);
+    if (anim) anim.cancel();
+
+    if (REDUCED.matches) {                   // 減少動態：直接到位，狀態照舊
+      paint(to);
+      if (!open && scrim) scrim.hidden = true;
+      if (open) focusFirst();
+      return;
+    }
+    anim = runSpring(x, to, v0,
+                     Math.abs(v0) > FLICK_V ? FLICK : DRAWER, paint,
+                     () => { if (!isOpen() && scrim) scrim.hidden = true; });
+    if (open) focusFirst();
+  }
+
+  /* ------------------------------- 拖曳關閉：1:1 跟手，放手接續當前速度 -- */
+  // 橡皮筋：拖過全開位置後位移遞減趨緩，而不是撞到一道看不見的牆。
+  const rubber = (over, dim) => (1 - 1 / (over / (dim * 0.55) + 1)) * dim * 0.55;
+
+  let drag = null;
+
+  function velocityOf(d) {
+    if (d.samples.length < 2) return 0;
+    const [t0, x0] = d.samples[0];
+    const [t1, x1] = d.samples[d.samples.length - 1];
+    const dt = t1 - t0;
+    return dt > 8 ? ((x1 - x0) / dt) * 1000 : 0;   // px/s
+  }
+
+  function onDown(event) {
+    if (!MOBILE.matches || !isOpen() || event.button) return;
+    W = railWidth();
+    if (x === null) x = 0;
+    drag = { id: event.pointerId, sx: event.clientX, sy: event.clientY,
+             base: x, claimed: false, samples: [], el: event.currentTarget };
+  }
+
+  function onMove(event) {
+    if (!drag || event.pointerId !== drag.id) return;
+    const dx = event.clientX - drag.sx;
+    const dy = event.clientY - drag.sy;
+    if (!drag.claimed) {
+      // 平行辨識：水平與垂直同時候選，誰先超過門檻誰贏，輸的直接取消。
+      if (Math.abs(dx) < HYST && Math.abs(dy) < HYST) return;
+      if (Math.abs(dx) <= Math.abs(dy)) { drag = null; return; }
+      drag.claimed = true;
+      if (anim) { anim.cancel(); anim = null; }   // 半路攔截飛行中的彈簧
+      try { drag.el.setPointerCapture(drag.id); } catch (e) { /* 滑鼠即可 */ }
+    }
+    event.preventDefault();
+    let nx = drag.base + dx;
+    if (nx > 0) nx = rubber(nx, W);          // 往右拖過頭：橡皮筋
+    if (nx < -W) nx = -W;                    // 往左不必，關到底就是關
+    drag.samples.push([performance.now(), nx]);
+    if (drag.samples.length > 4) drag.samples.shift();
+    paint(nx);
+  }
+
+  function onUp(event) {
+    if (!drag || event.pointerId !== drag.id) return;
+    const d = drag;
+    drag = null;
+    if (!d.claimed) return;                  // 只是點一下，交給 click 處理
+    suppressClick = true;                    // 別讓這次拖曳尾隨一個 click
+    requestAnimationFrame(() => { suppressClick = false; });
+    const v = velocityOf(d);
+    // 動量投射：用速度推算停止點再決定去哪一端，而不是看放手瞬間的位置。
+    // 慢慢拖到 40% 會關回去，快速甩一下即使只移動 20% 也會關。
+    const open = Math.abs(v) > FLICK_V ? v > 0 : (x + v * PROJECT) > -W / 2;
+    setDrawer(open, v);
+  }
+
+  // 頁面被切到背景時 rAF 會被瀏覽器凍結，彈簧就停在半空——iOS 上把 APP
+  // 切走再切回來很常見。沒人在看就不要跑動畫：直接讓它到位。
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && anim && anim.alive) {
+      anim.cancel();
+      anim = null;
+      paint(isOpen() ? 0 : -W);
+      if (!isOpen() && scrim) scrim.hidden = true;
+    }
+  });
+
+  [rail, scrim].forEach((el) => {
+    if (!el) return;
+    el.addEventListener("pointerdown", onDown);
+    el.addEventListener("pointermove", onMove, { passive: false });
+    el.addEventListener("pointerup", onUp);
+    el.addEventListener("pointercancel", onUp);
+  });
+  root.classList.add("rail-js");              // 通知 CSS：過渡讓開，JS 接手
 
   toggle?.addEventListener("click", () => {
     if (MOBILE.matches) setDrawer(false);
@@ -55,7 +220,9 @@
   });
 
   opener?.addEventListener("click", () => setDrawer(true));
-  scrim?.addEventListener("click", () => setDrawer(false));
+  scrim?.addEventListener("click", () => {
+    if (!suppressClick) setDrawer(false);
+  });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && root.classList.contains("drawer-open")) {
@@ -69,8 +236,9 @@
     }
   });
 
-  // 點選單項目就關抽屜（行動版）
+  // 點選單項目就關抽屜（行動版）。剛拖曳過就不算點擊。
   rail?.addEventListener("click", (event) => {
+    if (suppressClick) { event.preventDefault(); return; }
     if (event.target.closest(".nav-item") && MOBILE.matches) setDrawer(false);
   });
 
@@ -89,16 +257,25 @@
         current === "dark" ? "淺色" : current === "light" ? "深色" : "主題";
     };
     label();
+    const applyTheme = (next) => {
+      root.setAttribute("data-theme", next);
+      store("theme", next);
+      label();
+      document.dispatchEvent(new Event("themechange"));
+    };
     themeButton.addEventListener("click", () => {
       const current = root.getAttribute("data-theme");
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       const next = current
         ? (current === "dark" ? "light" : "dark")
         : (prefersDark ? "light" : "dark");
-      root.setAttribute("data-theme", next);
-      store("theme", next);
-      label();
-      document.dispatchEvent(new Event("themechange"));
+      // 整頁調色盤瞬間翻面很刺眼。有 View Transition 就交叉淡入，
+      // 沒有（或使用者要求減少動態）就照舊瞬間切換——兩邊都是對的結果。
+      if (!REDUCED.matches && document.startViewTransition) {
+        document.startViewTransition(() => applyTheme(next));
+      } else {
+        applyTheme(next);
+      }
     });
   }
 
@@ -146,12 +323,18 @@
       .filter(([t]) => t);
     let current = null;
     let spyTick = false;
+    // 位置先量好存起來：在 scroll 處理器裡讀 offsetTop 會每帧強迫版面重算，
+    // 那正是捲動掉帧的典型來源。摺疊展開或換尺寸才需要重量。
+    let marks = [];
+    const measure = () => {
+      marks = targets.map(([node, link]) => [node.offsetTop, link]);
+    };
     const spy = () => {
       spyTick = false;
       const line = window.scrollY + 120;   // topbar 高度 + 一點緩衝
       let hit = null;
-      for (const [t, a] of targets) {
-        if (t.offsetTop <= line) hit = a;
+      for (const [top, link] of marks) {
+        if (top <= line) hit = link;
         else break;
       }
       if (hit !== current) {
@@ -160,9 +343,15 @@
         current = hit;
       }
     };
+    const remeasure = () => { measure(); spy(); };
+    measure();
     window.addEventListener("scroll", () => {
       if (!spyTick) { spyTick = true; requestAnimationFrame(spy); }
     }, { passive: true });
+    window.addEventListener("resize", remeasure);
+    document.addEventListener("layoutchange", remeasure);
+    // <details> 的 toggle 不冒泡，用捕獲階段收；展開會把後面的區塊往下推。
+    document.addEventListener("toggle", remeasure, true);
     spy();
   }
 })();
