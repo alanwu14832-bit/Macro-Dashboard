@@ -2,13 +2,5 @@
  "CPIAUCSL": {
   "name": "CPI",
   "date": "2026-09-11"
- },
- "ICSA": {
-  "name": "初領失業金",
-  "date": "2026-09-10"
- },
- "PPIFIS": {
-  "name": "PPI",
-  "date": "2026-09-10"
  }
 }
