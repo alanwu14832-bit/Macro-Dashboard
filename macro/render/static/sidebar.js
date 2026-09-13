@@ -438,21 +438,20 @@
   if (trust && trust.dataset.build) {
     const built = new Date(trust.dataset.build);
     const next = trust.querySelector("[data-trust-next]");
+    // 不承諾「下次建置還有幾分鐘」：排程掛在 GitHub Actions 上，而公開 repo
+    // 的 schedule 只是 best-effort——實測會被延後 2 到 6 小時、分鐘數隨機。
+    // 照 cron 推算出來的倒數會是一句漂亮的謊話。只說資料多舊，那個我知道。
     const paint = () => {
       const ageMin = (Date.now() - built.getTime()) / 60000;
-      // 排程是每小時 45 分；算出下一次建置還有多久
-      const now = new Date();
-      const due = new Date(now);
-      due.setMinutes(45, 0, 0);
-      if (due <= now) due.setHours(due.getHours() + 1);
-      const wait = Math.max(1, Math.round((due - now) / 60000));
-      // 超過 100 分鐘代表至少漏掉一輪建置——說出來，不要假裝正常。
-      const stale = ageMin > 100;
+      const stale = ageMin > 360;            // 超過 6 小時才算真的落後
       trust.classList.toggle("stale", stale);
       if (!next) return;
-      next.textContent = stale
-        ? `· 這是 ${built.getHours()}:${String(built.getMinutes()).padStart(2, "0")} 的快取，已超過一輪未更新`
-        : `· 下次建置約 ${wait} 分後`;
+      let age;
+      if (ageMin < 2) age = "剛剛";
+      else if (ageMin < 60) age = `${Math.round(ageMin)} 分鐘前`;
+      else if (ageMin < 60 * 36) age = `${Math.round(ageMin / 60)} 小時前`;
+      else age = `${Math.round(ageMin / 1440)} 天前`;
+      next.textContent = stale ? `· ${age}，已超過 6 小時未重建` : `· ${age}`;
     };
     paint();
     setInterval(paint, 60000);

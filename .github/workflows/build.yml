@@ -1,13 +1,16 @@
 name: 建置儀表板
 
-# 排程用 UTC，每小時 :45 跑一次——來源一公布，最多一小時上站。
-# :45 對齊美國 8:30am ET（UTC 12:30/13:30）的數據發布時點。
-# 總經資料源本身一天最多動一次，比每小時更密只是空轉。
-#
-# 刻意不掛 push 觸發：這個 workflow 自己會 commit 回 repo，掛 push 會無限迴圈。
+# 排程用 UTC，每小時 :45 排一次，:45 對齊美國 8:30am ET 的數據發布時點。
+# 但要誠實記著：GitHub 對公開 repo 的 schedule 只是 best-effort，實測間隔是
+# 2–6 小時、分鐘數隨機。所以頁面上不承諾「下次建置還有幾分鐘」，只說資料多舊。
 on:
   schedule:
     - cron: "45 * * * *"
+  # 排程實測會被 GitHub 大量延後：公開 repo 的 schedule 在繁忙時段會被丟棄，
+  # 「每小時」實際上是每 2–6 小時、分鐘數隨機。所以再掛一個 push 觸發，
+  # 讓程式改動可以馬上上站，而不是等排程臨幸。
+  push:
+    branches: [main]
   workflow_dispatch:          # 也可以在 Actions 頁面手動按
 
 concurrency:
@@ -19,6 +22,12 @@ permissions:
 
 jobs:
   build:
+    # 這個 workflow 自己會把 site/ commit 回來。沒有這道門檻，那個 commit
+    # 會再觸發一次 build，而每次建置的報價快照都會變動所以一定有東西可 commit
+    # ——無限迴圈。作者是 bot 就不跑。
+    if: >-
+      github.event_name != 'push' ||
+      github.event.head_commit.author.name != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
