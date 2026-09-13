@@ -14,7 +14,8 @@
   const scrim = document.getElementById("rail-scrim");
   const toggle = document.getElementById("rail-toggle");
   const opener = document.getElementById("rail-open");
-  const MOBILE = window.matchMedia("(max-width: 959px)");
+  // 767：iPad 直向（768pt）保留側邊 rail，分頁列只在手機出現。兩者永不共存。
+  const MOBILE = window.matchMedia("(max-width: 767px)");
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   const store = (key, value) => {
@@ -191,6 +192,10 @@
     // 動量投射：用速度推算停止點再決定去哪一端，而不是看放手瞬間的位置。
     // 慢慢拖到 40% 會關回去，快速甩一下即使只移動 20% 也會關。
     const open = Math.abs(v) > FLICK_V ? v > 0 : (x + v * PROJECT) > -W / 2;
+    // 拖曳關閉也要把 history 退回去，否則返回鍵會多出一格空按。先清旗標
+    // 再 back()，popstate 就會看到 pushed=false 而不重複關一次——這裡要
+    // 立刻用帶速度的 setDrawer 接手，速度交接不能讓給 popstate。
+    if (!open && pushed) { pushed = false; history.back(); }
     setDrawer(open, v);
   }
 
@@ -214,19 +219,50 @@
   });
   root.classList.add("rail-js");              // 通知 CSS：過渡讓開，JS 接手
 
+  /* ------------------------------------------- 抽屜的返回鍵契約 --------- */
+  // 開抽屜要推一筆 history entry，否則 iOS 的系統邊緣返回手勢會在抽屜開著
+  // 的狀態下把整個 app 導走——使用者以為自己在關抽屜，結果離開了頁面。
+  // 推了之後所有「關閉」動作一律走 history.back()，讓 popstate 成為唯一的
+  // 關閉路徑，狀態與歷史永遠一致。
+  let pushed = false;
+  let pendingHref = null;
+
+  function openDrawer() {
+    if (!pushed) {
+      try { history.pushState({ drawer: true }, ""); pushed = true; } catch (e) { /* 無痕 */ }
+    }
+    setDrawer(true);
+  }
+
+  function closeDrawer() {
+    if (pushed) history.back();   // → popstate 收尾
+    else setDrawer(false);
+  }
+
+  window.addEventListener("popstate", () => {
+    if (!pushed) return;
+    pushed = false;
+    setDrawer(false);
+    if (pendingHref) {            // 從抽屜點連結：先退掉抽屜那一格再走
+      const href = pendingHref;
+      pendingHref = null;
+      location.href = href;
+    }
+  });
+
   toggle?.addEventListener("click", () => {
-    if (MOBILE.matches) setDrawer(false);
+    if (MOBILE.matches) closeDrawer();
     else setCollapsed(!root.classList.contains("rail-collapsed"));
   });
 
-  opener?.addEventListener("click", () => setDrawer(true));
+  opener?.addEventListener("click", () => openDrawer());
   scrim?.addEventListener("click", () => {
-    if (!suppressClick) setDrawer(false);
+    if (!suppressClick) closeDrawer();
   });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && root.classList.contains("drawer-open")) {
-      setDrawer(false);
+      closeDrawer();
       opener?.focus();
     }
     // 跟大多數側邊欄一致的快捷鍵
@@ -239,12 +275,25 @@
   // 點選單項目就關抽屜（行動版）。剛拖曳過就不算點擊。
   rail?.addEventListener("click", (event) => {
     if (suppressClick) { event.preventDefault(); return; }
-    if (event.target.closest(".nav-item") && MOBILE.matches) setDrawer(false);
+    const link = event.target.closest(".nav-item");
+    if (!link || !MOBILE.matches) return;
+    if (pushed && link.href) {
+      // 攔下來先退掉抽屜那筆 history，再由 popstate 導航——否則從 B 頁
+      // 按返回會回到「A 頁但抽屜是開的」那一格，白按一次。
+      event.preventDefault();
+      pendingHref = link.href;
+      closeDrawer();
+      return;
+    }
+    setDrawer(false);
   });
 
   // 換到桌機尺寸時把抽屜狀態清掉，避免殘留 overflow:hidden
   MOBILE.addEventListener("change", (event) => {
-    if (!event.matches) setDrawer(false);
+    if (!event.matches) {
+      if (pushed) { pushed = false; history.back(); }
+      setDrawer(false);
+    }
     document.dispatchEvent(new Event("layoutchange"));
   });
 
@@ -289,6 +338,125 @@
     });
     requestAnimationFrame(() => {
       requestAnimationFrame(() => root.classList.add("entered"));
+    });
+    // 保險絲：頁面在背景分頁載入時 rAF 會被凍結，內容就停在 opacity:0。
+    // 進場動畫失敗的代價不該是「整頁空白」，所以逾時就直接顯示。
+    setTimeout(() => root.classList.add("entered"), 600);
+  }
+
+  /* -------------------------------------------------- 底部分頁列 -------- */
+  const tabbar = document.querySelector(".tabbar");
+  if (tabbar) {
+    const here = location.pathname.replace(/index\.html$/, "");
+    const roots = [...tabbar.querySelectorAll(".tab")].map((t) => t.dataset.tab);
+    const owned = roots.includes(here);
+
+    // 從某個分頁點進去的頁面，要維持那個分頁高亮——靜態站每頁都是重新
+    // 載入，所以歸屬得自己記。伺服器端的預設是「非分頁路徑一律歸尋找」，
+    // 這裡把它修正成使用者實際的來路。
+    try {
+      if (owned) {
+        sessionStorage.setItem("tab-owner", here);
+      } else {
+        const owner = sessionStorage.getItem("tab-owner");
+        if (owner && roots.includes(owner)) {
+          tabbar.querySelectorAll(".tab").forEach((t) => {
+            if (t.dataset.tab === owner) t.setAttribute("aria-current", "page");
+            else t.removeAttribute("aria-current");
+          });
+        }
+      }
+    } catch (e) { /* 無痕模式：維持伺服器端的預設 */ }
+
+    // 重按當前分頁＝回到頂端（iOS 的標準行為）
+    tabbar.addEventListener("click", (event) => {
+      const tab = event.target.closest(".tab");
+      if (!tab || tab.dataset.tab !== here) return;
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: REDUCED.matches ? "auto" : "smooth" });
+    });
+  }
+
+  /* ------------------------------- 最近看過（尋找頁的復原路徑）---------- */
+  // 靜態多頁站沒有 per-tab 的導覽堆疊，切分頁就掉深度。這份紀錄是唯一
+  // 真實的復原路徑，所以每一頁都要記，而不是只在尋找頁記。
+  const RECENT_KEY = "recent-pages";
+  try {
+    const title = (document.querySelector(".topbar-title") || {}).textContent;
+    const path = location.pathname.replace(/index\.html$/, "");
+    if (title && path !== "/find/") {
+      const list = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]")
+        .filter((r) => r && r.path !== path);
+      list.unshift({ path, title: title.trim() });
+      localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 8)));
+    }
+  } catch (e) { /* 無痕模式：尋找頁就不顯示最近看過 */ }
+
+  const recentBox = document.querySelector("[data-recent]");
+  if (recentBox) {
+    let recent = [];
+    try { recent = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]"); } catch (e) { /* noop */ }
+    if (recent.length) {
+      document.getElementById("recent-list").innerHTML = recent.slice(0, 5).map(
+        (r) => `<a class="find-row" href="${r.path}"><span>${
+          r.title.replace(/[<>&]/g, "")}</span>`
+          + '<span class="find-go" aria-hidden="true">›</span></a>').join("");
+      recentBox.hidden = false;
+    }
+  }
+
+  /* ------------------------------------------- 尋找頁的名稱過濾 --------- */
+  const findInput = document.getElementById("find-search");
+  if (findInput) {
+    const rows = [...document.querySelectorAll("[data-find]")];
+    const groups = [...document.querySelectorAll("[data-find-group]")];
+    const none = document.getElementById("find-none");
+    findInput.addEventListener("input", () => {
+      const q = findInput.value.trim().toLowerCase();
+      let hits = 0;
+      rows.forEach((row) => {
+        const show = !q || row.dataset.find.toLowerCase().includes(q);
+        row.hidden = !show;
+        if (show) hits += 1;
+      });
+      // 整組都被濾掉就連標題一起收起來，不要留下空標題
+      groups.forEach((g) => {
+        g.hidden = ![...g.querySelectorAll("[data-find]")].some((r) => !r.hidden);
+      });
+      if (none) none.hidden = hits > 0;
+    });
+  }
+
+  /* ------------------------------------------- 重新載入與信任列 --------- */
+  // standalone 模式沒有瀏覽器的重新載入鍵，所以這顆按鈕是功能需求。
+  document.getElementById("reload-btn")?.addEventListener("click", (event) => {
+    event.currentTarget.setAttribute("aria-disabled", "true");
+    location.reload();
+  });
+
+  const trust = document.querySelector(".trust");
+  if (trust && trust.dataset.build) {
+    const built = new Date(trust.dataset.build);
+    const next = trust.querySelector("[data-trust-next]");
+    // 不承諾「下次建置還有幾分鐘」：排程掛在 GitHub Actions 上，而公開 repo
+    // 的 schedule 只是 best-effort——實測會被延後 2 到 6 小時、分鐘數隨機。
+    // 照 cron 推算出來的倒數會是一句漂亮的謊話。只說資料多舊，那個我知道。
+    const paint = () => {
+      const ageMin = (Date.now() - built.getTime()) / 60000;
+      const stale = ageMin > 360;            // 超過 6 小時才算真的落後
+      trust.classList.toggle("stale", stale);
+      if (!next) return;
+      let age;
+      if (ageMin < 2) age = "剛剛";
+      else if (ageMin < 60) age = `${Math.round(ageMin)} 分鐘前`;
+      else if (ageMin < 60 * 36) age = `${Math.round(ageMin / 60)} 小時前`;
+      else age = `${Math.round(ageMin / 1440)} 天前`;
+      next.textContent = stale ? `· ${age}，已超過 6 小時未重建` : `· ${age}`;
+    };
+    paint();
+    setInterval(paint, 60000);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) paint();   // 切回前景先對時，別顯示陳年倒數
     });
   }
 
