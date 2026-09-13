@@ -1564,3 +1564,69 @@ footer.site {
 /* 錨點跳轉的落點也要把變高的 topbar 算進去，否則標題會被蓋住 */
 html { scroll-padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 18px); }
 section { scroll-margin-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 18px); }
+
+/* ==========================================================================
+   變動卡堆（總覽最上面）與信任列
+   設計規格第 1 階段：每天打開來九成的像素跟昨天一樣，唯一有價值的問題是
+   「這一眼跟上一眼之間變了什麼」。看不到答案，這一頁就只是昨天再看一次。
+   ========================================================================== */
+.chg-stack {
+  display: grid; gap: 1px; background: var(--border);
+  border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+}
+.chg-row {
+  display: grid; grid-template-columns: 22px minmax(0, 1fr) 14px;
+  gap: 10px; align-items: start;
+  background: var(--surface); padding: 12px 14px;
+  text-decoration: none; color: inherit;
+  transition: background 120ms;
+}
+.chg-row:hover { background: var(--surface-sunken); }
+.chg-sev { font-size: 0.9rem; line-height: 1.5; text-align: center; }
+/* 形狀是主要通道、顏色只是補強——色盲與灰階列印都還讀得出輕重 */
+.chg-sev.sev-high   { color: var(--critical); }
+.chg-sev.sev-medium { color: var(--warning); }
+.chg-sev.sev-low    { color: var(--ink-muted); }
+.chg-body { display: grid; gap: 2px; min-width: 0; }
+.chg-tag {
+  font-size: 0.68rem; letter-spacing: .06em; color: var(--ink-muted);
+  font-weight: 600;
+}
+.chg-title {
+  font-size: 0.94rem; font-weight: 620; line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.chg-detail { font-size: 0.82rem; color: var(--ink-2); line-height: 1.55; }
+.chg-go { color: var(--ink-muted); font-size: 0.95rem; line-height: 1.5; }
+.chg-more {
+  display: inline-block; margin-top: 10px; font-size: 0.86rem;
+  text-decoration: none; color: var(--series-1);
+}
+.chg-none {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 13px 15px;
+  font-size: 0.9rem; color: var(--ink-2);
+}
+.chg-scope {
+  margin: 10px 0 0; font-size: 0.78rem; color: var(--ink-muted); line-height: 1.6;
+}
+
+/* 信任列：這一頁每個數字的可信度都由它決定，所以它不能只活在桌機的
+   topbar 角落（.topbar-meta 在手機上是 display:none）。 */
+.trust {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 0 18px; padding: 9px 13px;
+  background: var(--surface-sunken); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem; color: var(--ink-2); text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+.trust:hover { color: var(--ink); }
+.trust-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex: none;
+  background: var(--delta-up);
+}
+.trust-next { color: var(--ink-muted); }
+.trust-go { margin-left: auto; color: var(--ink-muted); }
+.trust.stale { background: var(--hawkish-wash); border-color: var(--hawkish); color: var(--ink); }
+.trust.stale .trust-dot { background: var(--hawkish); }

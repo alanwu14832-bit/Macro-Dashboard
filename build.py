@@ -16,9 +16,9 @@ import os
 import sys
 import time
 import traceback
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime
 
-from macro import archive, data, deepdive, paths
+from macro import archive, clock, data, deepdive, paths
 from macro.compute import (commodities, debt, equities, fedfunds, freshness,
                            growth, inflation, labor, market, news, rates,
                            scenario, signals, world)
@@ -46,18 +46,8 @@ MODULES = [
 ]
 
 
-# 建置在 GitHub Actions 上跑，runner 的時區是 UTC——naive 的 datetime.now()
-# 會把 UTC 時間標成「台北」，線上頁面的最後更新時間因此整整差 8 小時。
-# 時區寫死而不是讀環境變數：台北不實施日光節約，這個偏移永遠成立。
-TAIPEI = timezone(timedelta(hours=8))
-
-
-def taipei_now() -> datetime:
-    return datetime.now(TAIPEI)
-
-
 def taipei_stamp() -> str:
-    return "最後更新 " + taipei_now().strftime("%Y-%m-%d %H:%M")
+    return clock.stamp()
 
 
 def main() -> int:
@@ -155,7 +145,7 @@ def main() -> int:
         ("/", "總覽", "",
          "把勞動、通膨、利率、債務、成長、全球與市場七個面向，收斂成一個可追蹤的判斷。",
          lambda: overview.render(ctx, found, summary, scenario_data, diff,
-                                 reading_changes, updated)),
+                                 reading_changes, updated, prior=prior)),
         ("/labor/", "勞動市場", "勞動市場",
          "損益兩平、初值修正追蹤、行業別拆解與綜合強弱指數。",
          lambda: labor_page.render(ctx, found)),
@@ -280,7 +270,7 @@ def main() -> int:
     stats = api.write_series(bundle)
     # build_id 優先用 commit SHA（雲端建置才有），本機退回時間戳：
     # 前端只需要它「每次建置都不同」，不需要它有語意。
-    stamp = taipei_now()
+    stamp = clock.now()
     build_id = (os.environ.get("GITHUB_SHA", "")[:7]
                 or stamp.strftime("%Y%m%d-%H%M"))
     api.write_readings(ctx, found, summary, scenario_data,

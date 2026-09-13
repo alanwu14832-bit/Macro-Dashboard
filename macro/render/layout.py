@@ -146,6 +146,26 @@ def _sidebar(path: str, sections: dict[str, list[tuple[str, str]]] | None = None
   <div class="rail-scrim" id="rail-scrim" hidden></div>"""
 
 
+def _trust_row(updated: str) -> str:
+    """常駐信任列：這一頁每個數字的可信度都由它決定。
+
+    桌機的 .topbar-meta 在手機上是 display:none，所以行動版現在根本看不到
+    資料多新——那正是「我不知道這是不是最新的」這個痛點的一半。時間戳同時
+    給機器可讀的 datetime（帶 +08:00），JS 用它算下一次建置與過期判定。
+    """
+    from .. import clock
+    stamp = clock.now()
+    iso = stamp.isoformat(timespec="minutes")
+    shown = updated.replace("最後更新 ", "")
+    label = f'最後更新 {stamp.strftime("%m 月 %d 日 %H 時 %M 分")} 台北時間，開啟資料狀態'
+    return (f'<a class="trust" href="/freshness/" data-build="{esc(iso)}" '
+            f'aria-label="{esc(label)}">'
+            f'<span class="trust-dot" aria-hidden="true"></span>'
+            f'<span>最後更新 <time datetime="{esc(iso)}">{esc(shown)}</time> 台北</span>'
+            f'<span class="trust-next" data-trust-next></span>'
+            f'<span class="trust-go" aria-hidden="true">›</span></a>')
+
+
 def _supabase_config() -> str:
     """帳號功能的前端設定。沒填就輸出空字串，account.js 會自動休眠。"""
     if not (SUPABASE_URL and SUPABASE_ANON_KEY):
@@ -237,12 +257,19 @@ def page(*, title: str, path: str, body: str, lede: str = "",
       <div class="topbar-title">{esc(title)}</div>
       <a class="topbar-guide" href="/guide/">使用講義</a>
       <div class="topbar-meta">{esc(updated)}</div>
+      <button type="button" class="icon-btn" id="reload-btn" aria-label="重新載入">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+             style="width:17px;height:17px">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+      </button>
       <button type="button" class="icon-btn" id="push-toggle" hidden
               aria-label="每日財經推播" aria-pressed="false">通知</button>
       <button type="button" class="icon-btn" id="theme-toggle" aria-label="切換深淺色">主題</button>
     </header>
     <main class="content" id="content">
       <div class="wrap">
+{_trust_row(updated)}
 {head_block}
 {body}
       </div>

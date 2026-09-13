@@ -9,9 +9,9 @@ from ...fomc import next_meeting
 from . import mandate_cards as cards
 from . import overview_blocks as blocks
 from ..common import checks_block, legend_note, signals_block
-from ..html import (accordion, callout, delta_span, direction_label,
-                    direction_class, esc, fmt, kv, new_badge, pct, section,
-                    stat, table, tag, thousands_to_wan, zh_date)
+from ..html import (SEV_GLYPH, SEV_TEXT, accordion, callout, delta_span,
+                    direction_label, direction_class, esc, fmt, kv, new_badge,
+                    pct, section, stat, table, tag, thousands_to_wan, zh_date)
 
 LEAN_COLOR = {"hawkish": "var(--hawkish)", "dovish": "var(--dovish)",
               "neutral": "var(--neutral)"}
@@ -529,10 +529,123 @@ def changes_block(diff: dict, reading_changes: list[dict]) -> str:
     return "".join(parts)
 
 
+def _change_items(diff: dict, reading_changes: list[dict],
+                  scenario: dict, prior: dict | None) -> list[dict]:
+    """把「跟上次建置相比變了什麼」收成一份排好序的清單。
+
+    排序是判斷的輕重，不是時間：換格（九宮格位置變了）永遠排第一，因為它
+    代表整套判斷的前提改變；其次是新觸發的嚴重訊號、再其次是跨過門檻的讀數。
+    「不再觸發」排最後——訊號消失通常不是新資訊，是舊資訊退場。
+    """
+    items: list[dict] = []
+
+    was = (prior or {}).get("scenario") or {}
+    for key, cur_key, label in (("employment", "employment_label", "就業"),
+                                ("inflation", "inflation_label", "通膨"),
+                                ("regime", "regime_label", "政策重心")):
+        old, new = was.get(key), scenario.get(cur_key)
+        if old and new and old != new:
+            items.append({
+                "rank": 0, "sev": "high", "tag": "換格",
+                "title": f"{label}　{old} → {new}",
+                "detail": "九宮格位置改變，底下的訊號與部位對照都跟著重算。",
+            })
+
+    for signal in diff.get("added") or []:
+        sev = signal.get("severity") or "low"
+        items.append({
+            "rank": 1 if sev == "high" else 2, "sev": sev, "tag": "新增訊號",
+            "title": signal.get("headline") or "",
+            "detail": signal.get("evidence") or signal.get("why") or "",
+        })
+
+    for change in reading_changes:
+        unit = change.get("unit") or ""
+        items.append({
+            "rank": 3, "sev": "medium", "tag": "讀數變動",
+            "title": (f'{change["name"]}　{fmt(change["was"], 2)}'
+                      f' → {fmt(change["now"], 2)}{unit}'),
+            "detail": "",
+            "delta": delta_span(change.get("change"), 2, suffix=unit),
+        })
+
+    for signal in diff.get("removed") or []:
+        items.append({
+            "rank": 4, "sev": "low", "tag": "不再觸發",
+            "title": signal.get("headline") or "", "detail": "",
+        })
+
+    items.sort(key=lambda i: (i["rank"], {"high": 0, "medium": 1}.get(i["sev"], 2)))
+    return items
+
+
+CHANGE_SCOPE = ("偵測範圍：九宮格的三個位置、規則訊號的增減、8 項關鍵讀數。"
+                "曲線形狀、市場廣度、法人連續性不在偵測範圍內。")
+
+
+def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
+                scenario: dict, prior: dict | None, *, shown: int = 5) -> str:
+    """總覽最上面的變動卡堆。
+
+    放在判斷之上是刻意的：每天打開來，九成的像素跟昨天一樣，唯一有價值的
+    問題是「這一眼跟上一眼之間變了什麼」。看不到答案的話，這一頁就只是
+    昨天的頁面再看一次。
+
+    來源是伺服器端算好、直接烘進 HTML 的建置比對——service worker 的快取
+    騙不了它，離線打開也仍然為真。
+    """
+    if diff.get("first_run"):
+        return section("changes", "與上次建置相比",
+                       '<p class="muted">這是第一次建置，還沒有可以比對的上一期。</p>')
+
+    items = _change_items(diff, reading_changes, scenario, prior)
+    if not items:
+        nxt = ((ctx.get("freshness") or {}).get("imminent") or [None])[0]
+        tail = ""
+        if nxt:
+            tail = (f'　下一筆公布：{esc(nxt["name"])}'
+                    f'（{_when(nxt.get("days_away"))}）')
+        return section(
+            "changes", "與上次建置相比",
+            f'<div class="chg-none">判斷與關鍵讀數都沒有變動。{tail}</div>'
+            f'<p class="chg-scope">{esc(CHANGE_SCOPE)}</p>')
+
+    rows = []
+    for item in items[:shown]:
+        sev = item["sev"]
+        detail = item.get("detail") or ""
+        extra = item.get("delta") or ""
+        rows.append(
+            f'<a class="chg-row" href="#changed">'
+            f'<span class="chg-sev sev-{esc(sev)}" title="{esc(SEV_TEXT.get(sev, ""))}">'
+            f'{SEV_GLYPH.get(sev, "●")}'
+            f'<span class="sr-only">{esc(SEV_TEXT.get(sev, ""))}</span></span>'
+            f'<span class="chg-body">'
+            f'<span class="chg-tag">{esc(item["tag"])}</span>'
+            f'<span class="chg-title">{esc(item["title"])}{(" " + extra) if extra else ""}</span>'
+            + (f'<span class="chg-detail">{esc(detail)}</span>' if detail else "")
+            + f'</span><span class="chg-go" aria-hidden="true">›</span></a>')
+
+    more = ""
+    if len(items) > shown:
+        more = (f'<a class="chg-more" href="#changed">'
+                f'看全部 {len(items)} 項變動　›</a>')
+
+    return section(
+        "changes", "與上次建置相比",
+        f'<div class="chg-stack">{"".join(rows)}</div>{more}'
+        f'<p class="chg-scope">{esc(CHANGE_SCOPE)}</p>',
+        note=f"共 {len(items)} 項")
+
+
 def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
-           diff: dict, reading_changes: list[dict], updated: str) -> str:
+           diff: dict, reading_changes: list[dict], updated: str,
+           prior: dict | None = None) -> str:
     lean = scenario["lean"]
     body = []
+
+    # ---- 變動：排在判斷之上（設計規格第 1 階段）----
+    body.append(changes_top(ctx, diff, reading_changes, scenario, prior))
 
     # ---- 判斷 ----
     body.append(

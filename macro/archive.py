@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import date, datetime
+from datetime import date
 
-from . import paths
+from . import clock, paths
 
 
 def _snapshot_path(day: date) -> str:
@@ -25,8 +25,8 @@ def build_snapshot(ctx: dict, signals: list[dict], summary: dict,
     growth = ctx.get("growth") or {}
 
     return {
-        "date": date.today().isoformat(),
-        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "date": clock.today().isoformat(),
+        "generated_at": clock.now().isoformat(timespec="seconds"),
         "signals": [{k: s[k] for k in ("key", "headline", "direction", "severity",
                                        "evidence", "module")} for s in signals],
         "summary": summary,
@@ -85,7 +85,7 @@ def load_all() -> list[dict]:
 
 def previous(before: date | None = None) -> dict | None:
     """最近一次「與今天不同」的快照 — 用來做期間比對。"""
-    before = before or date.today()
+    before = before or clock.today()
     snapshots = [s for s in load_all() if s.get("date") < before.isoformat()]
     return snapshots[-1] if snapshots else None
 

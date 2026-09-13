@@ -340,6 +340,40 @@
     });
   }
 
+  /* ------------------------------------------- 重新載入與信任列 --------- */
+  // standalone 模式沒有瀏覽器的重新載入鍵，所以這顆按鈕是功能需求。
+  document.getElementById("reload-btn")?.addEventListener("click", (event) => {
+    event.currentTarget.setAttribute("aria-disabled", "true");
+    location.reload();
+  });
+
+  const trust = document.querySelector(".trust");
+  if (trust && trust.dataset.build) {
+    const built = new Date(trust.dataset.build);
+    const next = trust.querySelector("[data-trust-next]");
+    const paint = () => {
+      const ageMin = (Date.now() - built.getTime()) / 60000;
+      // 排程是每小時 45 分；算出下一次建置還有多久
+      const now = new Date();
+      const due = new Date(now);
+      due.setMinutes(45, 0, 0);
+      if (due <= now) due.setHours(due.getHours() + 1);
+      const wait = Math.max(1, Math.round((due - now) / 60000));
+      // 超過 100 分鐘代表至少漏掉一輪建置——說出來，不要假裝正常。
+      const stale = ageMin > 100;
+      trust.classList.toggle("stale", stale);
+      if (!next) return;
+      next.textContent = stale
+        ? `· 這是 ${built.getHours()}:${String(built.getMinutes()).padStart(2, "0")} 的快取，已超過一輪未更新`
+        : `· 下次建置約 ${wait} 分後`;
+    };
+    paint();
+    setInterval(paint, 60000);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) paint();   // 切回前景先對時，別顯示陳年倒數
+    });
+  }
+
   /* ------------------------------------------------------ 回到頂端 ------- */
   const toTop = document.getElementById("to-top");
   if (toTop) {
