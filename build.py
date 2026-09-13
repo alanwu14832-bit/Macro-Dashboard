@@ -11,10 +11,12 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
 import sys
 import time
 import traceback
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 
 from macro import archive, data, deepdive, paths
 from macro.compute import (commodities, debt, equities, fedfunds, freshness,
@@ -44,8 +46,18 @@ MODULES = [
 ]
 
 
+# 建置在 GitHub Actions 上跑，runner 的時區是 UTC——naive 的 datetime.now()
+# 會把 UTC 時間標成「台北」，線上頁面的最後更新時間因此整整差 8 小時。
+# 時區寫死而不是讀環境變數：台北不實施日光節約，這個偏移永遠成立。
+TAIPEI = timezone(timedelta(hours=8))
+
+
+def taipei_now() -> datetime:
+    return datetime.now(TAIPEI)
+
+
 def taipei_stamp() -> str:
-    return "最後更新 " + datetime.now().strftime("%Y-%m-%d %H:%M")
+    return "最後更新 " + taipei_now().strftime("%Y-%m-%d %H:%M")
 
 
 def main() -> int:
@@ -101,17 +113,15 @@ def main() -> int:
 
     # 「剛公布」狀態落地：每小時建置都寫一份，發送端跟上一輪比對，
     # 有「新出現」的指標才推播——同一次發布只推一次。
-    import json as _json
-    import os as _os
     fresh_state = (ctx.get("freshness") or {}).get("fresh") or {}
-    with open(_os.path.join(paths.DATA_DIR, "fresh_state.json"), "w",
+    with open(os.path.join(paths.DATA_DIR, "fresh_state.json"), "w",
               encoding="utf-8") as fh:
-        _json.dump(fresh_state, fh, ensure_ascii=False, indent=1)
+        json.dump(fresh_state, fh, ensure_ascii=False, indent=1)
     # 每檔序列的資料日期：下一輪拿來判斷「今天到了哪些新數據」。
     series_state = (ctx.get("freshness") or {}).get("series_state")
     if series_state:
         with open(freshness.STATE_FILE, "w", encoding="utf-8") as fh:
-            _json.dump(series_state, fh, ensure_ascii=False, indent=0, sort_keys=True)
+            json.dump(series_state, fh, ensure_ascii=False, indent=0, sort_keys=True)
 
     print("== 3/6 規則引擎與情境 ==", flush=True)
     found = signals.evaluate(ctx)
@@ -268,7 +278,13 @@ def main() -> int:
 
     print("== 6/6 輸出 JSON API ==", flush=True)
     stats = api.write_series(bundle)
-    api.write_readings(ctx, found, summary, scenario_data)
+    # build_id 優先用 commit SHA（雲端建置才有），本機退回時間戳：
+    # 前端只需要它「每次建置都不同」，不需要它有語意。
+    stamp = taipei_now()
+    build_id = (os.environ.get("GITHUB_SHA", "")[:7]
+                or stamp.strftime("%Y%m%d-%H%M"))
+    api.write_readings(ctx, found, summary, scenario_data,
+                       generated_at=stamp, build_id=build_id)
     print(f"   {stats['count']} 檔序列，共 {stats['bytes'] / 1024 / 1024:.1f} MB", flush=True)
 
     elapsed = time.time() - started

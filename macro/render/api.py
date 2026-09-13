@@ -88,17 +88,43 @@ def write_series(bundle: Bundle) -> dict:
     return {"count": len(entries), "bytes": total_bytes}
 
 
+def _iso(value) -> str | None:
+    """日期／時間一律輸出 ISO 字串；其餘型別回 None（json 不吃 date）。"""
+    return value.isoformat() if hasattr(value, "isoformat") else None
+
+
 def write_readings(ctx: dict, signals: list[dict], summary: dict,
-                   scenario_data: dict) -> int:
+                   scenario_data: dict, *, generated_at=None,
+                   build_id: str = "") -> int:
     """目前判斷的機器可讀版本。
 
     給前端（以及任何想接這個站的人）一個不必解析 HTML 就能拿到結論的出口。
+
+    generated_at／build_id／as_of 是「自上次查看變了什麼」的前提：前端要能
+    分辨「這份判斷是這次建置算的」與「這是 service worker 給我的舊快取」，
+    否則離線時會把陳年結論當成今天的結論報給使用者。時間帶 +08:00 偏移，
+    不留 naive 字串。
     """
     labor = ctx.get("labor") or {}
     inflation = ctx.get("inflation") or {}
     rates = ctx.get("rates") or {}
+    debt = ctx.get("debt") or {}
+    growth = ctx.get("growth") or {}
+    market = ctx.get("market") or {}
 
     return _write(os.path.join(DATA_OUT, "state.json"), {
+        "generated_at": _iso(generated_at),
+        "build_id": build_id or None,
+        "as_of": {
+            "labor": _iso(labor.get("as_of")),
+            "inflation": _iso(inflation.get("as_of")),
+            "pce": _iso(inflation.get("pce_as_of") or inflation.get("as_of")),
+            "ppi": _iso((inflation.get("ppi") or {}).get("as_of")),
+            "rates": _iso(rates.get("as_of")),
+            "debt": _iso(debt.get("as_of")),
+            "growth": _iso(growth.get("as_of")),
+            "market": _iso(market.get("as_of")),
+        },
         "scenario": {
             "name": scenario_data.get("name"),
             "employment": scenario_data.get("employment_label"),

@@ -117,7 +117,9 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-t
 body {
   margin: 0;
   font-family: var(--sans);
-  font-size: 15px;
+  /* rem 而不是 px：字級要跟著 html 的根字級走，根字級才跟得上系統設定。
+     預設 16px 根字級下仍是 15px，版面不變。 */
+  font-size: 0.9375rem;
   line-height: 1.7;
   color: var(--ink);
   background: var(--page);
@@ -1492,3 +1494,73 @@ span.exp-b-none, span.exp-b-ok { color: var(--ink-muted); }
   .dd-nav { grid-template-columns: minmax(0, 1fr); }
   .dd-nav-next { text-align: left; }
 }
+
+
+/* ==========================================================================
+   安全區、觸控命中框與系統字級
+   （設計規格第 0 階段：畫面上看不出差別，但後面每一個版面決定都靠它）
+   ========================================================================== */
+
+/* viewport-fit=cover 讓內容延伸到瀏海與 home indicator 之下，所以每個貼邊
+   元件都得自己讓開。沒有 cover 時 env() 全部解析為 0，下面的宣告是無害的
+   ——這也是為什麼不加 cover 的話，安全區程式碼寫得再完整都不會生效。 */
+.topbar {
+  height: calc(var(--topbar-h) + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
+  padding-left: max(22px, env(safe-area-inset-left));
+  padding-right: max(22px, env(safe-area-inset-right));
+}
+.rail {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.to-top {
+  right: max(18px, calc(env(safe-area-inset-right) + 8px));
+  bottom: max(18px, calc(env(safe-area-inset-bottom) + 8px));
+}
+footer.site {
+  padding-bottom: calc(44px + env(safe-area-inset-bottom));
+  padding-left: max(22px, env(safe-area-inset-left));
+  padding-right: max(22px, env(safe-area-inset-right));
+}
+
+@media (max-width: 959px) {
+  .topbar {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+  .content .wrap {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+}
+
+/* 命中框只在觸控裝置放大到 44pt：滑鼠指標的精度不需要，桌機側欄 18 項
+   全部撐到 44px 只會把密度浪費掉。pointer: coarse 正好切在這條線上。 */
+@media (pointer: coarse) {
+  .nav-item { min-height: 44px; }
+  .nav-sub a { min-height: 44px; display: flex; align-items: center; }
+  .icon-btn {
+    min-height: 44px; min-width: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .topbar-guide { min-height: 44px; display: inline-flex; align-items: center; }
+  .rail-toggle { min-height: 44px; min-width: 44px; }
+  .to-top { width: 48px; height: 48px; }
+  details.acc > summary,
+  .nav-details > summary { min-height: 44px; display: flex; align-items: center; }
+}
+
+/* iOS 的系統 body 字級——跟著「顯示與亮度 › 文字大小」與輔助使用的放大
+   字級走，所以全站以 rem 衍生的字級會一起縮放。其他平台這條宣告無效、
+   整段被丟掉，維持瀏覽器預設值。
+   誠實說明：這是「跟隨系統 body 字體樣式 + 頁面縮放」，不是原生 Dynamic
+   Type 對等——網頁拿不到 UIFontMetrics，也沒有 per-text-style 的級距。 */
+@supports (font: -apple-system-body) {
+  html { font: -apple-system-body; }
+  body { font-family: var(--sans); line-height: 1.7; }
+}
+
+/* 錨點跳轉的落點也要把變高的 topbar 算進去，否則標題會被蓋住 */
+html { scroll-padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 18px); }
+section { scroll-margin-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 18px); }
