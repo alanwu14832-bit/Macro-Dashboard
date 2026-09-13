@@ -324,6 +324,17 @@ def page(*, title: str, path: str, body: str, lede: str = "",
   </div>
 {_tabbar(path)}
 </div>
+<dialog class="sheet" id="rule-sheet" aria-labelledby="rule-title">
+  <div class="sheet-grab" aria-hidden="true"></div>
+  <div class="sheet-head">
+    <span class="sheet-eyebrow" id="rule-mod"></span>
+    <button type="button" class="icon-btn" data-sheet-close aria-label="關閉">關閉</button>
+  </div>
+  <h2 class="sheet-title" id="rule-title"></h2>
+  <div class="sheet-body" id="rule-body"></div>
+  <p class="sheet-foot">判定由固定規則產生，門檻寫死在程式裡，不隨行情調整。
+    同一份資料每次執行都會得到同一個結果。<a href="/scenario/">看全部規則與換檔門檻 →</a></p>
+</dialog>
 <button type="button" class="to-top" id="to-top" hidden aria-label="回到頁首">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

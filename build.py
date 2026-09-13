@@ -230,6 +230,17 @@ def main() -> int:
     section_map = {path: layout.extract_sections(body)
                    for path, body in bodies.items()}
 
+    # 尋找頁要列出全站的區塊錨點，所以它必須在 section_map 算好之後才渲染。
+    # 這是兩段式建置的第三段：先全部渲染、抽出錨點、再讓索引頁重畫一次。
+    try:
+        bodies["/find/"] = find_page.render(ctx, section_map=section_map,
+                                            reports=reports)
+        section_map["/find/"] = layout.extract_sections(bodies["/find/"])
+    except Exception:
+        print("   ✗ /find/ 索引", flush=True)
+        traceback.print_exc()
+        failures.append("/find/ 索引")
+
     written = []
     for path, title, heading, lede, render_fn in pages:
         if path not in bodies:

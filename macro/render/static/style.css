@@ -1704,3 +1704,89 @@ section { scroll-margin-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 1
     min-width: 0;
   }
 }
+
+/* 搜尋結果列：標題與脈絡（哪一頁／哪一組／序列代號）同列 */
+.find-t { font-weight: 550; }
+.find-c { color: var(--ink-muted); font-size: 0.78rem; margin-left: 10px; }
+.find-more { padding: 8px 2px 0; font-size: 0.78rem; color: var(--ink-muted); }
+#find-hits .find-group:first-child { margin-top: 14px; }
+
+/* ==========================================================================
+   規則卡：手機是底部 sheet，寬螢幕（≥1024px）是右側 inspector
+   同一份內容、同一個 <dialog>，差別只在呈現容器——這樣就不必維護兩套。
+   ========================================================================== */
+.sig-card {
+  /* 整張卡可點之後它是 <button>，要把按鈕的預設外觀清掉 */
+  width: 100%; text-align: left; font: inherit; color: inherit;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.sig-card:hover { border-color: var(--border-strong); }
+.sig-card:focus-visible { outline: 2px solid var(--series-1); outline-offset: 2px; }
+.sig-open { margin-left: auto; color: var(--ink-muted); }
+.sig-sev { display: flex; align-items: center; gap: 6px; }
+
+.sheet {
+  border: 0; padding: 0; color: var(--ink); background: var(--surface);
+  max-height: 86vh; overflow: auto;
+}
+.sheet::backdrop { background: rgba(0, 0, 0, 0.45); }
+.sheet-grab { display: none; }
+.sheet-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px 0;
+}
+.sheet-eyebrow {
+  font-size: 0.72rem; letter-spacing: .08em; color: var(--ink-muted); font-weight: 600;
+}
+.sheet-head .icon-btn { margin-left: auto; }
+.sheet-title { font-size: 1.12rem; line-height: 1.45; margin: 8px 0 0; padding: 0 18px; }
+.sheet-body { padding: 12px 18px 0; }
+.sheet-row { display: grid; gap: 3px; padding: 11px 0; border-top: 1px solid var(--border); }
+.sheet-k { font-size: 0.72rem; letter-spacing: .06em; color: var(--ink-muted); font-weight: 600; }
+.sheet-v { font-size: 0.92rem; color: var(--ink-2); line-height: 1.6; }
+.sheet-v.num { font-variant-numeric: tabular-nums; color: var(--ink); }
+.sheet-foot {
+  margin: 14px 0 0; padding: 12px 18px calc(18px + env(safe-area-inset-bottom));
+  background: var(--surface-sunken); font-size: 0.78rem; color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+/* 手機：從底部升起的 sheet，寬度貼滿、上緣圓角、有抓握條 */
+@media (max-width: 1023px) {
+  .sheet {
+    width: 100%; max-width: 100%;
+    margin: auto auto 0; border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.28);
+  }
+  .sheet-grab {
+    display: block; width: 38px; height: 4px; border-radius: 2px;
+    background: var(--border-strong); margin: 9px auto 0;
+  }
+}
+
+/* 寬螢幕：右側 inspector。用 show() 開（非 modal），所以背後的頁面仍可閱讀、
+   可捲動——規則卡要能跟它解釋的那張圖並存，這正是 iPad 上的重點。 */
+@media (min-width: 1024px) {
+  .sheet {
+    position: fixed; inset: auto 18px 18px auto; top: calc(var(--topbar-h) + 18px);
+    width: 360px; max-height: none;
+    border: 1px solid var(--border-strong); border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet[open] { animation: sheet-in 260ms cubic-bezier(0.32, 0.72, 0, 1); }
+  @keyframes sheet-in {
+    from { transform: translateY(12px); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
+}
+
+/* Inspector 打開時內容讓出寬度，而不是被蓋住——規則卡要能跟它解釋的那張
+   圖並排看，這正是寬螢幕上開 inspector 而不是 modal 的全部理由。 */
+@media (min-width: 1024px) {
+  :root.inspector-open .content { padding-right: 396px; }
+  .content { transition: padding-right 220ms var(--ease); }
+}
+@media (prefers-reduced-motion: reduce) { .content { transition: none; } }

@@ -161,8 +161,15 @@ def signal_card(signal: dict) -> str:
     """
     sev = signal.get("severity", "low")
     direction = signal.get("direction", "neutral")
+    # 整張卡可點：開規則卡（手機是 sheet、寬螢幕是右側 inspector）。
+    # 資料掛在 data- 上而不是另外抓一份 JSON——這張卡已經有全部欄位了，
+    # 再去 fetch 一次只會多一個會失敗的環節。
+    payload = attr_json({k: signal.get(k) for k in
+                         ("key", "headline", "why", "evidence",
+                          "direction", "severity", "module")})
     return (
-        f'<div class="sig-card sev-{esc(sev)}">'
+        f'<button type="button" class="sig-card sev-{esc(sev)}" '
+        f'data-rule="{payload}" aria-haspopup="dialog">'
         f'<div class="sig-top">'
         f'<span class="sig-mod">{esc(signal.get("module", ""))}</span>'
         f'{tag(direction)}</div>'
@@ -171,8 +178,9 @@ def signal_card(signal: dict) -> str:
         + (f'<div class="sig-evi">{esc(signal["evidence"])}</div>'
            if signal.get("evidence") else "")
         + f'<div class="sig-sev" title="{esc(SEV_TEXT.get(sev, ""))}">'
-          f'{SEV_GLYPH.get(sev, "●")} {esc(SEV_TEXT.get(sev, ""))}</div>'
-        f'</div>')
+          f'{SEV_GLYPH.get(sev, "●")} {esc(SEV_TEXT.get(sev, ""))}'
+          f'<span class="sig-open" aria-hidden="true">看規則 ›</span></div>'
+        f'</button>')
 
 
 CHECK_GLYPH = {"alert": "▲", "watch": "◆", "normal": "●"}

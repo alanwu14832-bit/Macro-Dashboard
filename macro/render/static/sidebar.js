@@ -402,28 +402,144 @@
           r.title.replace(/[<>&]/g, "")}</span>`
           + '<span class="find-go" aria-hidden="true">›</span></a>').join("");
       recentBox.hidden = false;
+      recentBox.dataset.has = "1";
     }
   }
 
-  /* ------------------------------------------- 尋找頁的名稱過濾 --------- */
+  /* ----------------------------------------------- 尋找頁的全站搜尋 ----- */
   const findInput = document.getElementById("find-search");
   if (findInput) {
-    const rows = [...document.querySelectorAll("[data-find]")];
-    const groups = [...document.querySelectorAll("[data-find-group]")];
+    const raw = document.getElementById("find-index");
+    let index = [];
+    try { index = JSON.parse(raw ? raw.textContent : "[]"); } catch (e) { /* noop */ }
+    const KIND = { page: "頁面", section: "區塊", series: "序列",
+                   term: "名詞", deep: "深度專題" };
+    const ORDER = ["page", "section", "series", "term", "deep"];
+    const PER_KIND = 8;              // 每類最多幾筆——一次看得完才叫搜尋結果
+    const results = document.getElementById("find-results");
     const none = document.getElementById("find-none");
-    findInput.addEventListener("input", () => {
+    const browse = [...document.querySelectorAll("[data-find-group]")]
+      .map((g) => g.closest("section")).filter(Boolean);
+    const recentBlock = document.querySelector("[data-recent]");
+    const esc = (s) => String(s).replace(/[<>&"]/g,
+      (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+
+    let box = document.getElementById("find-hits");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "find-hits";
+      results.appendChild(box);
+    }
+
+    const run = () => {
       const q = findInput.value.trim().toLowerCase();
-      let hits = 0;
-      rows.forEach((row) => {
-        const show = !q || row.dataset.find.toLowerCase().includes(q);
-        row.hidden = !show;
-        if (show) hits += 1;
+      // 空字串＝回到瀏覽模式：目錄與最近看過回來，搜尋結果收起
+      browse.forEach((s) => { s.hidden = !!q; });
+      if (recentBlock && recentBlock.dataset.has === "1") recentBlock.hidden = !!q;
+      box.innerHTML = "";
+      if (none) none.hidden = true;
+      if (!q) return;
+
+      const hits = index.filter((e) =>
+        e.t.toLowerCase().includes(q) || (e.c || "").toLowerCase().includes(q));
+      if (!hits.length) {
+        if (none) none.hidden = false;
+        return;
+      }
+      const chunks = [];
+      ORDER.forEach((kind) => {
+        const group = hits.filter((h) => h.k === kind);
+        if (!group.length) return;
+        const shown = group.slice(0, PER_KIND).map((h) =>
+          `<a class="find-row" href="${esc(h.u)}"><span class="find-t">${esc(h.t)}</span>`
+          + `<span class="find-c">${esc(h.c || "")}</span>`
+          + '<span class="find-go" aria-hidden="true">›</span></a>').join("");
+        const more = group.length > PER_KIND
+          ? `<div class="find-more">另有 ${group.length - PER_KIND} 筆${KIND[kind]}未列出</div>`
+          : "";
+        chunks.push(`<div class="find-group"><h3>${KIND[kind]}　${group.length}</h3>`
+                    + `<div class="find-list">${shown}</div>${more}</div>`);
       });
-      // 整組都被濾掉就連標題一起收起來，不要留下空標題
-      groups.forEach((g) => {
-        g.hidden = ![...g.querySelectorAll("[data-find]")].some((r) => !r.hidden);
-      });
-      if (none) none.hidden = hits > 0;
+      box.innerHTML = chunks.join("");
+    };
+
+    findInput.addEventListener("input", run);
+    run();
+  }
+
+  /* ------------------------------------------------------ 規則卡 -------- */
+  // 手機用 showModal() 當底部 sheet；≥1024px 用 show()（非 modal）當右側
+  // inspector——規則卡必須能跟它解釋的那張圖並存，modal 會讓背後整頁 inert。
+  const sheet = document.getElementById("rule-sheet");
+  if (sheet) {
+    const WIDE = window.matchMedia("(min-width: 1024px)");
+    const title = document.getElementById("rule-title");
+    const mod = document.getElementById("rule-mod");
+    const bodyBox = document.getElementById("rule-body");
+    const DIR = { hawkish: "利升息", dovish: "利降息", neutral: "中性" };
+    const SEV = { high: "▲ 嚴重", medium: "◆ 留意", low: "● 參考" };
+    let sheetPushed = false;
+
+    const row = (k, v, num) => v
+      ? `<div class="sheet-row"><div class="sheet-k">${k}</div>`
+        + `<div class="sheet-v${num ? " num" : ""}">${String(v).replace(/[<>&]/g, "")}</div></div>`
+      : "";
+
+    function openSheet(rule) {
+      title.textContent = rule.headline || "";
+      mod.textContent = rule.module || "規則";
+      bodyBox.innerHTML =
+        row("為什麼重要", rule.why)
+        + row("這條規則引用的數字", rule.evidence, true)
+        + row("方向", DIR[rule.direction] || "中性")
+        + row("嚴重度", SEV[rule.severity] || "● 參考")
+        + row("規則代號", rule.key);
+      if (sheet.open) sheet.close();
+      if (WIDE.matches) {
+        sheet.show();
+        // 內容讓出寬度，圖表重新量一次——不然它會以為自己還是原本那麼寬
+        root.classList.add("inspector-open");
+        setTimeout(() => document.dispatchEvent(new Event("layoutchange")), 240);
+      } else {
+        sheet.showModal();
+      }
+      if (!sheetPushed) {
+        try { history.pushState({ sheet: true }, ""); sheetPushed = true; } catch (e) { /* 無痕 */ }
+      }
+    }
+
+    function closeSheet() {
+      if (sheetPushed) history.back();       // → popstate 收尾，與抽屜同一套契約
+      else if (sheet.open) sheet.close();
+    }
+
+    window.addEventListener("popstate", () => {
+      if (!sheetPushed) return;
+      sheetPushed = false;
+      if (sheet.open) sheet.close();
+    });
+
+    document.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-rule]");
+      if (card) {
+        try { openSheet(JSON.parse(card.dataset.rule)); } catch (e) { /* 壞資料就不開 */ }
+        return;
+      }
+      if (event.target.closest("[data-sheet-close]")) closeSheet();
+    });
+
+    // Esc 由 <dialog> 自己處理，但它只會 close 不會退 history——接起來
+    sheet.addEventListener("close", () => {
+      root.classList.remove("inspector-open");
+      document.dispatchEvent(new Event("layoutchange"));
+      if (sheetPushed) { sheetPushed = false; history.back(); }
+    });
+    // 非 modal 的 inspector 沒有 backdrop，點外面要自己關
+    document.addEventListener("pointerdown", (event) => {
+      if (!sheet.open || !WIDE.matches) return;
+      if (!sheet.contains(event.target) && !event.target.closest("[data-rule]")) {
+        closeSheet();
+      }
     });
   }
 
