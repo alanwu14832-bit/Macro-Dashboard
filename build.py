@@ -20,6 +20,7 @@ from datetime import date, datetime
 
 from macro import archive, clock, data, deepdive, paths
 from macro.compute import (commodities, debt, equities, fedfunds, freshness,
+                           reaction,
                            growth, inflation, labor, market, news, rates,
                            scenario, signals, world)
 from macro.render import api, layout
@@ -37,6 +38,7 @@ from macro.render.pages import (archive as archive_page,
                                 inflation as inflation_page, labor as labor_page,
                                 market as market_page, news as news_page,
                                 overview,
+                                release as release_page,
                                 scenario as scenario_page, world as world_page)
 
 MODULES = [
@@ -104,6 +106,13 @@ def main() -> int:
 
     # 「剛公布」狀態落地：每小時建置都寫一份，發送端跟上一輪比對，
     # 有「新出現」的指標才推播——同一次發布只推一次。
+    # 市場反應：發布落點頁要用，推播也用同一個函式（macro/compute/reaction.py）
+    try:
+        ctx["reaction"] = reaction.snapshot()
+    except Exception:
+        ctx["reaction"] = None
+        print("   ✗ reaction（期貨報價抓不到，落點頁會說明沒量到）", flush=True)
+
     fresh_state = (ctx.get("freshness") or {}).get("fresh") or {}
     with open(os.path.join(paths.DATA_DIR, "fresh_state.json"), "w",
               encoding="utf-8") as fh:
@@ -193,6 +202,9 @@ def main() -> int:
         ("/freshness/", "資料新鮮度", "資料新鮮度",
          "每個指標多新、下次什麼時候更新，以及為什麼總經資料沒有即時可言。",
          lambda: freshness_page.render(ctx)),
+        ("/release/", "發布與反應", "發布與反應",
+         "一個數字公布之後只需要看一次的那一頁：讀數、門檻距離、市場反應。",
+         lambda: release_page.render_index(ctx)),
         ("/find/", "尋找", "尋找",
          "打字前先瀏覽：最近看過的頁面，以及按分組排好的全部目的地。",
          lambda: find_page.render(ctx)),
@@ -253,6 +265,29 @@ def main() -> int:
             failures.append(report["path"])
     if verbose and reports:
         print(f"   ✓ /deep-dive/ 文章 {len(reports)} 篇", flush=True)
+
+    # 每個追蹤指標一頁發布落點。推播直接打開它，所以它必須是真路由、
+    # 伺服器端渲染、離線可讀——不是一張 sheet，也不是總覽上的一個錨點。
+    release_written = 0
+    for series_id in release_page.SPECS:
+        try:
+            body = release_page.render_one(ctx, series_id, scenario=scenario_data,
+                                           prior_snapshot=prior)
+            name = next((label for sid, label, _m, _r in freshness.TRACKED
+                         if sid == series_id), series_id)
+            html = layout.page(
+                title=f"{name}　發布與反應", path=f"/release/{series_id}/",
+                nav_path="/release/", body=body, heading=f"{name}　發布與反應",
+                lede=f"{name} 這一期的讀數、它跨過哪些寫死的門檻，以及期貨在這段時間動了多少。",
+                updated=updated, description=f"{name} 的發布落點", sections=section_map)
+            written.append(layout.write_page(f"/release/{series_id}/", html))
+            release_written += 1
+        except Exception:
+            print(f"   ✗ /release/{series_id}/", flush=True)
+            traceback.print_exc()
+            failures.append(f"/release/{series_id}/")
+    if verbose and release_written:
+        print(f"   ✓ /release/ 落點 {release_written} 頁", flush=True)
 
     # 記帳是獨立的 PWA（自己的外殼與 manifest），不進側欄、不包儀表板版型。
     # 同一份程式出兩個部署：/expense/（掛儀表板網域）與 standalone/——

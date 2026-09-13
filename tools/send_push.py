@@ -23,7 +23,8 @@ import urllib.request
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from macro.compute import news  # noqa: E402  （path 調整要在前面）
+from macro.compute import news, reaction  # noqa: E402  （path 調整要在前面）
+from macro.render.pages.release import SPECS as RELEASE_ROUTES  # noqa: E402
 
 SUPABASE_URL = "https://nwbfjoroqnhpymdtdbwu.supabase.co"  # 公開常數，同 layout.py
 SITE = "https://macro-dashboard-aaalan1.vercel.app"
@@ -127,31 +128,9 @@ NEWS_KEYWORDS = {
     "DRTSCILM": ["放款標準", "SLOOS"],
 }
 
-# 市場反應的觀察標的：美股與債市對總經數據的第一反應。
-FUTURES = [
-    ("ES=F", "S&P 期貨"),
-    ("NQ=F", "那斯達克期貨"),
-    ("ZN=F", "10年債期貨"),
-]
-
-
-def _futures_reaction() -> str:
-    """期貨即時漲跌。Yahoo 公開行情端點，抓不到就略過該檔。"""
-    bits = []
-    for symbol, label in FUTURES:
-        try:
-            request = urllib.request.Request(
-                "https://query1.finance.yahoo.com/v8/finance/chart/"
-                + urllib.parse.quote(symbol) + "?range=1d&interval=15m",
-                headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(request, timeout=12) as response:
-                meta = json.load(response)["chart"]["result"][0]["meta"]
-            change = (meta["regularMarketPrice"] - meta["chartPreviousClose"]) \
-                / meta["chartPreviousClose"] * 100
-            bits.append(f"{label} {change:+.2f}%")
-        except Exception:
-            continue
-    return "、".join(bits)
+# 市場反應的計算搬到 macro/compute/reaction.py，頁面與推播共用同一個函式：
+# 兩份各自抓、各自算，遲早會在同一個時刻給出兩個不同的數字，而使用者是先看
+# 推播再點進頁面的，那個矛盾百分之百會被看見。
 
 
 def _related_headline(new_ids: list[str]) -> str | None:
@@ -202,18 +181,22 @@ def compose_data_update() -> dict | None:
 
     names = "、".join(current[sid]["name"] for sid in new_ids)
     lines = []
-    reaction = _futures_reaction()
-    if reaction:
-        lines.append("市場反應：" + reaction)
+    moves = reaction.summary_line(reaction.snapshot())
+    if moves:
+        lines.append("市場反應：" + moves)
     headline = _related_headline(new_ids)
     if headline:
         lines.append("相關新聞：" + headline)
-    lines.append("點開看讀數與判定變化")
+    lines.append("點開看讀數、門檻距離與市場反應")
+
+    # 落點是那個指標自己的發布頁，不是首頁——通知點開就該直接到那個數字，
+    # 而不是丟到總覽讓人自己找。多個同時公布時帶第一個。
+    landing = f"/release/{new_ids[0]}/" if new_ids[0] in RELEASE_ROUTES else "/release/"
 
     return {
         "title": f"數據更新：{names}",
         "body": "\n".join(lines),
-        "url": "/",
+        "url": landing,
         "tag": "data-update",   # 與每日新聞不同 tag，不互相覆蓋
     }
 
