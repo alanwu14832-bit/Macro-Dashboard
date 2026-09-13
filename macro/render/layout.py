@@ -35,6 +35,7 @@ ICONS = {
     "freshness": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2",
     "archive": "M3 7h18v13H3zM3 3h18v4H3zM9 12h6",
     "explore": "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.35-4.35M8 11h6M11 8v6",
+    "search": "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.35-4.35",
     "deepdive": "M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M14 3l5 5M14 3v5h5M8 9h3M8 13h4M16 14a3 3 0 1 0 0 6 3 3 0 0 0 0-6M21 21l-2.2-2.2",
 }
 
@@ -60,6 +61,7 @@ NAV = [
     ("/scenario/", "情境與部位", "scenario", "判讀與紀錄"),
     ("/freshness/", "資料新鮮度", "freshness", "判讀與紀錄"),
     ("/guide/", "使用講義", "guide", "判讀與紀錄"),
+    ("/find/", "尋找", "search", "判讀與紀錄"),
     ("/archive/", "存檔", "archive", "判讀與紀錄"),
 ]
 
@@ -144,6 +146,46 @@ def _sidebar(path: str, sections: dict[str, list[tuple[str, str]]] | None = None
     <nav class="nav" aria-label="主選單">{"".join(items)}</nav>
   </aside>
   <div class="rail-scrim" id="rail-scrim" hidden></div>"""
+
+
+# 四個分頁。這是行動版的主要導覽，桌機（≥768px）則維持 18 項側邊 rail，
+# 兩者永不共存。刻意用真 <a> 與 aria-current="page" 而不是 role="tablist"：
+# 這是文件導覽，不是頁內分頁；tablist 會讓螢幕閱讀器宣告成同一份文件裡的
+# 分頁切換，而每一次點擊其實是整頁載入。
+TABS = [
+    ("/", "今日", "tab-today"),
+    ("/scenario/", "判定", "tab-verdict"),
+    ("/tw/", "台股", "tab-tw"),
+    ("/find/", "尋找", "tab-find"),
+]
+
+TAB_ICONS = {
+    "tab-today": "M4 5h13v14H4zM17 9h3v8a2 2 0 0 1-3 2M7 9h7M7 13h7M7 17h4",
+    "tab-verdict": "M3 3h18v18H3zM9 3v18M15 3v18M3 9h18M3 15h18",
+    "tab-tw": "M4 20v-6M9 20V9M14 20v-8M19 20V5M4 9l5-4 5 3 5-4",
+    "tab-find": "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.35-4.35",
+}
+
+
+def _tabbar(path: str) -> str:
+    """行動版底部分頁列。
+
+    歸屬規則：三個分頁各自擁有自己的路徑，其餘 18 個目的地一律歸「尋找」
+    ——因為那正是瀏覽它們的入口。從「今日」點進去的頁面要維持「今日」
+    高亮，靠 JS 讀 sessionStorage 修正，伺服器端只給這個靜態預設。
+    """
+    items = []
+    owned = {href for href, _, _ in TABS}
+    for href, label, icon in TABS:
+        current = href == path or (href == "/find/" and path not in owned)
+        items.append(
+            f'<a class="tab" href="{esc(href)}" data-tab="{esc(href)}"'
+            + (' aria-current="page"' if current else "")
+            + f'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+              f'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" '
+              f'aria-hidden="true"><path d="{TAB_ICONS[icon]}"/></svg>'
+              f'<span>{esc(label)}</span></a>')
+    return (f'<nav class="tabbar" aria-label="主要分頁">{"".join(items)}</nav>')
 
 
 def _trust_row(updated: str) -> str:
@@ -280,6 +322,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
       </footer>
     </main>
   </div>
+{_tabbar(path)}
 </div>
 <button type="button" class="to-top" id="to-top" hidden aria-label="回到頁首">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

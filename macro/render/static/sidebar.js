@@ -14,7 +14,8 @@
   const scrim = document.getElementById("rail-scrim");
   const toggle = document.getElementById("rail-toggle");
   const opener = document.getElementById("rail-open");
-  const MOBILE = window.matchMedia("(max-width: 959px)");
+  // 767：iPad 直向（768pt）保留側邊 rail，分頁列只在手機出現。兩者永不共存。
+  const MOBILE = window.matchMedia("(max-width: 767px)");
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   const store = (key, value) => {
@@ -337,6 +338,92 @@
     });
     requestAnimationFrame(() => {
       requestAnimationFrame(() => root.classList.add("entered"));
+    });
+    // 保險絲：頁面在背景分頁載入時 rAF 會被凍結，內容就停在 opacity:0。
+    // 進場動畫失敗的代價不該是「整頁空白」，所以逾時就直接顯示。
+    setTimeout(() => root.classList.add("entered"), 600);
+  }
+
+  /* -------------------------------------------------- 底部分頁列 -------- */
+  const tabbar = document.querySelector(".tabbar");
+  if (tabbar) {
+    const here = location.pathname.replace(/index\.html$/, "");
+    const roots = [...tabbar.querySelectorAll(".tab")].map((t) => t.dataset.tab);
+    const owned = roots.includes(here);
+
+    // 從某個分頁點進去的頁面，要維持那個分頁高亮——靜態站每頁都是重新
+    // 載入，所以歸屬得自己記。伺服器端的預設是「非分頁路徑一律歸尋找」，
+    // 這裡把它修正成使用者實際的來路。
+    try {
+      if (owned) {
+        sessionStorage.setItem("tab-owner", here);
+      } else {
+        const owner = sessionStorage.getItem("tab-owner");
+        if (owner && roots.includes(owner)) {
+          tabbar.querySelectorAll(".tab").forEach((t) => {
+            if (t.dataset.tab === owner) t.setAttribute("aria-current", "page");
+            else t.removeAttribute("aria-current");
+          });
+        }
+      }
+    } catch (e) { /* 無痕模式：維持伺服器端的預設 */ }
+
+    // 重按當前分頁＝回到頂端（iOS 的標準行為）
+    tabbar.addEventListener("click", (event) => {
+      const tab = event.target.closest(".tab");
+      if (!tab || tab.dataset.tab !== here) return;
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: REDUCED.matches ? "auto" : "smooth" });
+    });
+  }
+
+  /* ------------------------------- 最近看過（尋找頁的復原路徑）---------- */
+  // 靜態多頁站沒有 per-tab 的導覽堆疊，切分頁就掉深度。這份紀錄是唯一
+  // 真實的復原路徑，所以每一頁都要記，而不是只在尋找頁記。
+  const RECENT_KEY = "recent-pages";
+  try {
+    const title = (document.querySelector(".topbar-title") || {}).textContent;
+    const path = location.pathname.replace(/index\.html$/, "");
+    if (title && path !== "/find/") {
+      const list = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]")
+        .filter((r) => r && r.path !== path);
+      list.unshift({ path, title: title.trim() });
+      localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 8)));
+    }
+  } catch (e) { /* 無痕模式：尋找頁就不顯示最近看過 */ }
+
+  const recentBox = document.querySelector("[data-recent]");
+  if (recentBox) {
+    let recent = [];
+    try { recent = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]"); } catch (e) { /* noop */ }
+    if (recent.length) {
+      document.getElementById("recent-list").innerHTML = recent.slice(0, 5).map(
+        (r) => `<a class="find-row" href="${r.path}"><span>${
+          r.title.replace(/[<>&]/g, "")}</span>`
+          + '<span class="find-go" aria-hidden="true">›</span></a>').join("");
+      recentBox.hidden = false;
+    }
+  }
+
+  /* ------------------------------------------- 尋找頁的名稱過濾 --------- */
+  const findInput = document.getElementById("find-search");
+  if (findInput) {
+    const rows = [...document.querySelectorAll("[data-find]")];
+    const groups = [...document.querySelectorAll("[data-find-group]")];
+    const none = document.getElementById("find-none");
+    findInput.addEventListener("input", () => {
+      const q = findInput.value.trim().toLowerCase();
+      let hits = 0;
+      rows.forEach((row) => {
+        const show = !q || row.dataset.find.toLowerCase().includes(q);
+        row.hidden = !show;
+        if (show) hits += 1;
+      });
+      // 整組都被濾掉就連標題一起收起來，不要留下空標題
+      groups.forEach((g) => {
+        g.hidden = ![...g.querySelectorAll("[data-find]")].some((r) => !r.hidden);
+      });
+      if (none) none.hidden = hits > 0;
     });
   }
 
