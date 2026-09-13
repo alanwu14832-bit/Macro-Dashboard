@@ -386,7 +386,7 @@ def market_pricing(ctx: dict) -> str:
     if not parts:
         return ""
     return section("market", "市場定價", "".join(parts),
-                   note="指數為建置快照，台股為即時；板塊輪動判定由固定規則產生")
+                   note="美股為收盤價，台股為盤中即時；板塊輪動由固定規則判定")
 
 
 # 類股 ETF 的宏觀屬性。判定 risk-on/off 與循環／防禦要靠這個分類。
@@ -552,8 +552,7 @@ def watchlist(ctx: dict, fomc: dict | None) -> str:
     return section(
         "watchlist", "今日觀察清單",
         table(["類型", "事件", "時間", "為什麼要盯"], table_rows),
-        note="數據取自 FRED 發布行事曆、標售取自 TreasuryDirect、財報取自 Finnhub；"
-             "沒有市場共識欄位（付費資料），見講義")
+        note="沒有市場共識欄位——那是付費資料，本站不做推估")
 
 
 def _when_label(days: int) -> str:
@@ -718,4 +717,4 @@ def commodities_block(ctx: dict) -> str:
              '<a href="/commodities/">看貴金屬、能源、工業金屬與農產全表 →</a>　'
              '<a href="/tw/#tw-heat">看台股族群熱力圖 →</a></p>')
     return section("commodities", "商品與傳導", body,
-                   note="商品為建置快照；族群漲跌幅取自台股熱力圖")
+                   note="商品為收盤價；族群漲跌幅為盤中即時")

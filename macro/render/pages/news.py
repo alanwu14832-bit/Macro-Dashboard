@@ -145,7 +145,7 @@ def render(ctx: dict) -> str:
                 note="多家獨立媒體在同一個時間窗內報導同一件事，依交集家數排序。")
         + section("macro", "與總經相關",
                   _items_block(data.get("macro", []), limit=16, show_category=True),
-                  note="標題命中聯準會、通膨、關稅、公債、就業、油價等本站在追的主題。")
+                  note="標題命中聯準會、通膨、關稅、公債、就業、油價等總經主題。")
         + section("categories", "依分類",
                   category_blocks or '<p class="muted">沒有分類資料。</p>',
                   note="分類沿用 WorldMonitor 的目錄結構，每類取最新 8 則。")

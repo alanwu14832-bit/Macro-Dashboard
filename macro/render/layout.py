@@ -36,6 +36,7 @@ ICONS = {
     "archive": "M3 7h18v13H3zM3 3h18v4H3zM9 12h6",
     "explore": "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.35-4.35M8 11h6M11 8v6",
     "search": "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.35-4.35",
+    "sources": "M12 3l8 4v6c0 4-3.4 7.2-8 8-4.6-.8-8-4-8-8V7zM9 12l2 2 4-4",
     "deepdive": "M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M14 3l5 5M14 3v5h5M8 9h3M8 13h4M16 14a3 3 0 1 0 0 6 3 3 0 0 0 0-6M21 21l-2.2-2.2",
 }
 
@@ -62,6 +63,7 @@ NAV = [
     ("/freshness/", "資料新鮮度", "freshness", "判讀與紀錄"),
     ("/guide/", "使用講義", "guide", "判讀與紀錄"),
     ("/find/", "尋找", "search", "判讀與紀錄"),
+    ("/sources/", "資料來源", "sources", "判讀與紀錄"),
     ("/archive/", "存檔", "archive", "判讀與紀錄"),
 ]
 
@@ -316,9 +318,8 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 {body}
       </div>
       <footer class="site">
-        <p>資料來源：FRED（BLS、BEA、DOL、Treasury、Federal Reserve、EIA、IMF 原始資料）、OECD SDMX、ECB Data Portal、行政院主計總處、LBMA、證交所、Finnhub。新聞來源目錄取自 <a href="https://github.com/koala73/worldmonitor" target="_blank" rel="noopener noreferrer">WorldMonitor</a>（AGPL-3.0），新聞內容版權屬各原始媒體。</p>
-        <p>所有量化判定由固定規則產生，同一份資料每次執行結果一致。指標定義與門檻見各區塊底部的名詞說明。</p>
-        <p>本站為個人資料整理，不構成投資建議。{esc(updated)}</p>
+        <p class="foot-main">所有判定由固定規則產生，同一份資料每次執行結果一致。<a href="/sources/">資料來源與判斷方法</a></p>
+        <p class="foot-fine">個人資料整理，不構成投資建議。{esc(updated)}</p>
       </footer>
     </main>
   </div>

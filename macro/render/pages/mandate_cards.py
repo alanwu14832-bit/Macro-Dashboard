@@ -52,12 +52,12 @@ def _drawer(bundle, group_key: str, label: str) -> str:
                 if series is not None and series.last_date else "—")
         rows.append([
             f'<a href="/explore/?id={esc(series_id)}">{esc(name)}</a>',
-            f'<code>{esc(series_id)}</code>', latest, asof,
+            latest, asof,
             {"d": "日", "w": "週", "m": "月", "q": "季", "a": "年"}.get(freq, freq)])
     if not rows:
         return ""
     return accordion(f"{label}：全部 {len(rows)} 檔指標",
-                     table(["指標", "序列代號", "最新值", "資料日期", "頻率"], rows))
+                     table(["指標", "最新值", "資料日期", "頻率"], rows))
 
 
 # ------------------------------------------------------------------ 就業 --

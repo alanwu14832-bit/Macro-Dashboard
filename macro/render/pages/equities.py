@@ -415,7 +415,7 @@ def render_tw(ctx: dict) -> str:
             + callout("樣本是本站追蹤的一百多檔族群代表股，不是全市場統計。"
                       "指數漲但下跌家數多，代表漲勢集中在少數權值股——"
                       "這種分歧比指數本身更值得注意。"),
-            note="建置快照統計，非即時"))
+            note="收盤統計，非盤中即時"))
 
     inst = tw.get("institutional") or {}
     marg = tw.get("margin") or {}

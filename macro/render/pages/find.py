@@ -109,7 +109,7 @@ def render(ctx: dict | None = None, section_map: dict | None = None,
         + '<script type="application/json" id="find-index">'
         + json.dumps(index, ensure_ascii=False, separators=(",", ":"))
         + '</script>',
-        note=f"索引範圍：{scope}。索引烘在這一頁裡，離線一樣搜得到"))
+        note=f"可搜尋：{scope}。離線也能搜"))
 
     # 最近看過：由 JS 從 localStorage 填，沒有紀錄就整塊不出現
     body.append(

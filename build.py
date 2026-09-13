@@ -39,6 +39,7 @@ from macro.render.pages import (archive as archive_page,
                                 market as market_page, news as news_page,
                                 overview,
                                 release as release_page,
+                                sources as sources_page,
                                 scenario as scenario_page, world as world_page)
 
 MODULES = [
@@ -208,6 +209,9 @@ def main() -> int:
         ("/find/", "尋找", "尋找",
          "打字前先瀏覽：最近看過的頁面，以及按分組排好的全部目的地。",
          lambda: find_page.render(ctx)),
+        ("/sources/", "資料來源", "資料來源",
+         "數字從哪裡來、判斷怎麼產生，以及我們拿不到什麼。",
+         lambda: sources_page.render(ctx)),
         ("/guide/", "使用講義", "使用講義",
          "這個網站怎麼用、每個指標在說什麼、升與降各意味著什麼。",
          lambda: guide_page.render(ctx)),

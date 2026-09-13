@@ -175,9 +175,8 @@ def render_one(ctx: dict, sid: str, *, scenario: dict,
         f'<div class="chips">'
         f'<span class="chip">前期 {fmt(reading["prior"], digits, suffix=unit)}</span>'
         f'<span class="chip">變動 {fmt(reading["change"], digits + 1, suffix=unit, signed=True)}</span>'
-        f'<span class="chip">FRED <code>{esc(sid)}</code></span>'
         f'</div>'
-        f'<p class="summary">這個數字進到本站的哪裡：{esc(spec["feeds"])}。</p>'
+        f'<p class="summary">這個數字用在哪裡：{esc(spec["feeds"])}。</p>'
         + (f'<p class="muted" style="margin:6px 0 0">{esc(spec["note"])}</p>'
            if spec.get("note") else "")
         + '</div>'

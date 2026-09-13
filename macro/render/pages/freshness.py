@@ -74,7 +74,7 @@ def render(ctx: dict) -> str:
             ["日", "公債殖利率、匯率、股價、信用利差", "每個交易日收盤後更新一次"],
         ])
         + callout(
-            "整站 196 檔序列裡，更新最快的就是日頻那一組，而 FRED 的日資料也是"
+            "更新最快的是日頻那一組，而日資料也是"
             "<strong>收盤後隔天才發布</strong>。所以就算每分鐘重建，九成的數字"
             "一個月才會動一次。<br><br>"
             "與其追求無意義的重整頻率，本站的做法是：<strong>把每個數字的新鮮度"
@@ -85,13 +85,13 @@ def render(ctx: dict) -> str:
     # ---- 非 FRED 來源 ----
     ext_rows = [[esc(name), esc(what), esc(cadence)] for name, what, cadence in d["external"]]
     body.append(section(
-        "external", "非 FRED 來源",
+        "external", "其他資料來源",
         table(["來源", "提供什麼", "更新節奏"], ext_rows,
               foot="這些來源沒有公開的發布行事曆，本站以資料本身的日期為準。"),
-        note="這些來源在各自頁面上都標有 as-of 日期"))
+        note="這些來源沒有公開的發布行事曆，以資料本身的日期為準"))
 
     body.append(callout(
-        f'本頁產生於 {d["generated"].strftime("%Y-%m-%d %H:%M")}。'
-        f'本站每天重建，發布密集的日子會多跑幾次。'))
+        f'這一頁的內容產生於 {d["generated"].strftime("%Y-%m-%d %H:%M")}（台北）。'
+        f'<a href="/sources/">看完整的資料來源與更新節奏</a>'))
 
     return "".join(body)

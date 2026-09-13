@@ -418,23 +418,23 @@ def indicator_drawers(ctx: dict) -> str:
                     if series is not None and series.last_date else "—")
             rows.append([
                 f'<a href="/explore/?id={esc(series_id)}">{esc(name)}</a>',
-                f'<code>{esc(series_id)}</code>', latest, asof,
+                latest, asof,
                 {"d": "日", "w": "週", "m": "月", "q": "季", "a": "年"}.get(freq, freq),
             ])
         if not rows:
             continue
         drawers.append(accordion(
             f"{label}：全部 {len(rows)} 檔指標",
-            table(["指標", "序列代號", "最新值", "資料日期", "頻率"], rows)))
+            table(["指標", "最新值", "資料日期", "頻率"], rows)))
 
     if not drawers:
         return ""
     return section(
         "indicators", "全部指標",
         "".join(drawers)
-        + '<p class="muted" style="margin-top:10px">點指標名稱會到自選比較頁，'
-          '可以跟其他序列疊圖。資料直接取自 FRED，本站只做轉換與判定。</p>',
-        note="依 FRED 序列代號分組，加新序列會自動出現在這裡")
+        + '<p class="muted" style="margin-top:10px">點指標名稱可以到自選比較頁，'
+          '跟其他指標疊在同一張圖上看。</p>',
+        note="點指標名稱可疊圖比較")
 
 
 def module_cards(ctx: dict, signals: list[dict]) -> str:
