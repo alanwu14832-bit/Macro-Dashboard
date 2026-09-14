@@ -35,8 +35,13 @@ def _json_default(obj):
 
 # ---------------------------------------------------------------- formatting -
 
+# 「沒有資料」跟「資料是空的」不准長得一樣：破折號帶上 class 與 title，
+# 才能在樣式層跟真正的讀數分開，也才能在滑過去時說出原因。
+NA = '<span class="na" title="當期無資料">—</span>'
+
+
 def fmt(value, digits: int = 1, *, prefix: str = "", suffix: str = "",
-        signed: bool = False, dash: str = "—") -> str:
+        signed: bool = False, dash: str = NA) -> str:
     if value is None:
         return dash
     try:
@@ -374,4 +379,8 @@ def delta_span(value, digits: int = 1, *, suffix: str = "", good_is_up: bool = T
         return '<span class="muted">—</span>'
     good = (value > 0) if good_is_up else (value < 0)
     cls = "pos" if good else ("neg" if value else "muted")
+    # 這裡的結果會被 esc()，所以要純文字的破折號——傳預設的 NA 會把標記跳脫成
+    # 看得見的 &lt;span&gt;
+    if value is None:
+        return f'<span class="na" title="當期無資料">—</span>'
     return f'<span class="{cls} num">{esc(fmt(value, digits, suffix=suffix, signed=True))}</span>'

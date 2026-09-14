@@ -105,9 +105,16 @@
       name.className = "tt-name";
       name.textContent = r.name;
       const val = document.createElement("span");
-      val.className = "tt-val";
+      // 實測值永遠是這一行裡最黑的字；沿用前值與無資料降一階，一眼分得出來
+      val.className = r.muted ? "tt-val tt-soft" : "tt-val";
       val.textContent = r.value;
       row.append(key, name, val);
+      if (r.note) {
+        const note = document.createElement("span");
+        note.className = "tt-note";
+        note.textContent = r.note;
+        row.appendChild(note);
+      }
       t.appendChild(row);
     }
     t.dataset.open = "true";
@@ -347,20 +354,60 @@
                        "data-bar": up ? "up" : "down" }, svg);
         }
       } else {
-        const line = pts.map(([d, v], i) => `${i ? "L" : "M"}${X(d).toFixed(2)} ${Yv(v).toFixed(2)}`).join(" ");
+        // 缺口不連線。原本是把 null 濾掉之後直接一路連過去，讀者看到的是一條
+        // 不存在的趨勢——而「資料缺口誠實標明」是這個站的硬約束之一。
+        // 做法：依 null 切成連續段，段內畫實線，段與段之間用虛線橋接並標明。
+        const segs = [];
+        let cur = [];
+        for (const [d, v] of data[si]) {
+          if (v === null || v === undefined) {
+            if (cur.length) segs.push(cur);
+            cur = [];
+          } else {
+            cur.push([d, v]);
+          }
+        }
+        if (cur.length) segs.push(cur);
+
+        const draw = (seg) =>
+          seg.map(([d, v], i) => `${i ? "L" : "M"}${X(d).toFixed(2)} ${Yv(v).toFixed(2)}`).join(" ");
+
         if (spec.type === "area") {
           const base = Yv(Math.max(lo, Math.min(hi, 0)));
+          for (const seg of segs) {
+            if (seg.length < 2) continue;   // 填色只在連續段內做
+            el("path", {
+              d: `${draw(seg)} L${X(seg[seg.length - 1][0]).toFixed(2)} ${base} L${X(seg[0][0]).toFixed(2)} ${base} Z`,
+              fill: color, "fill-opacity": 0.1, "data-fade": "",
+            }, svg);
+          }
+        }
+
+        // 橋接虛線：不掛 data-line，否則描邊進場的 dashoffset 會蓋掉 dasharray
+        for (let i = 1; i < segs.length; i++) {
+          const a = segs[i - 1][segs[i - 1].length - 1], b = segs[i][0];
           el("path", {
-            d: `${line} L${X(pts[pts.length - 1][0]).toFixed(2)} ${base} L${X(pts[0][0]).toFixed(2)} ${base} Z`,
-            fill: color, "fill-opacity": 0.1, "data-fade": "",
+            d: `M${X(a[0]).toFixed(2)} ${Yv(a[1]).toFixed(2)} L${X(b[0]).toFixed(2)} ${Yv(b[1]).toFixed(2)}`,
+            fill: "none", stroke: color, "stroke-width": 2, "stroke-opacity": 0.55,
+            "stroke-dasharray": "3 3", "data-gap": "",
           }, svg);
         }
-        el("path", {
-          d: line, fill: "none", stroke: color, "stroke-width": 2,
-          "stroke-linejoin": "round", "stroke-linecap": "round",
-          "stroke-dasharray": s.dashed ? "5 4" : null,
-          "data-line": s.dashed ? null : "",
-        }, svg);
+
+        for (const seg of segs) {
+          if (seg.length < 2) {
+            // 孤立的單點也要看得見，不然它會整個消失
+            el("circle", { cx: X(seg[0][0]), cy: Yv(seg[0][1]), r: 2.5,
+                           fill: color, "data-fade": "" }, svg);
+            continue;
+          }
+          el("path", {
+            d: draw(seg), fill: "none", stroke: color, "stroke-width": 2,
+            "stroke-linejoin": "round", "stroke-linecap": "round",
+            "stroke-dasharray": s.dashed ? "5 4" : null,
+            "data-line": s.dashed ? null : "",
+          }, svg);
+        }
+        if (segs.length > 1) svg.setAttribute("data-has-gap", "");
 
         // end marker with a 2px surface ring, plus a direct end-label
         const [ld, lv] = pts[pts.length - 1];
@@ -400,12 +447,16 @@
       if (!series.length) return own;
       const first = series[0][0], last = series[series.length - 1][0];
       const filled = new Map();
-      let carried = null;
+      let carried = null, carriedFrom = null;
       for (const d of dates) {
         if (d < first || d > last) continue;
         const v = own.get(d);
-        if (v !== undefined && v !== null) carried = v;
-        if (carried !== null) filled.set(d, carried);
+        if (v !== undefined && v !== null) { carried = v; carriedFrom = d; }
+        // 沿用前值要標記出來：補值跟實測值在畫面上長得一樣，等於在最需要
+        // 精確的那一刻說謊。
+        if (carried !== null) {
+          filled.set(d, { v: carried, carried: carriedFrom !== d, from: carriedFrom });
+        }
       }
       return filled;
     });
@@ -424,18 +475,27 @@
 
       const rows = [];
       spec.series.forEach((s, si) => {
-        const v = lookup[si].get(d);
+        const hit = lookup[si].get(d);
         const dot = dots[si];
-        if (v === undefined || v === null) { if (dot) dot.setAttribute("opacity", 0); return; }
+        if (hit === undefined) {
+          if (dot) dot.setAttribute("opacity", 0);
+          // 該序列這一期沒有資料要說出來，不是整列消失
+          rows.push({ name: s.name, color: seriesColor(s.color, si),
+                      value: "—", note: "當期無資料", muted: true });
+          return;
+        }
+        const v = hit.v;
         // 柱狀序列不放圓點，折線序列才放
         if (dot && !isBar && s.kind !== "bar") {
           dot.setAttribute("cx", px); dot.setAttribute("cy", Yof(v, si));
-          dot.setAttribute("opacity", 1);
+          dot.setAttribute("opacity", hit.carried ? 0.45 : 1);
         }
         rows.push({ name: s.name, color: seriesColor(s.color, si),
                     value: s.axis === "right"
                       ? fmtVal(v, { digits: 0, suffix: spec.rightSuffix || "" })
-                      : fmtVal(v, spec) });
+                      : fmtVal(v, spec),
+                    note: hit.carried ? `沿用 ${hit.from}` : "",
+                    muted: hit.carried });
       });
       if (rows.length) {
         showTip(svg, cx, rect.top + (evt.clientY ? 0 : 0) + rect.height * 0.35, fmtDate(d, spec.freq), rows);
@@ -579,13 +639,13 @@
       if (!length || !Number.isFinite(length)) return;
       path.style.strokeDasharray = `${length}`;
       path.style.strokeDashoffset = `${length}`;
-      path.style.transition = `stroke-dashoffset 820ms cubic-bezier(.4,0,.2,1) ${index * 110}ms`;
+      path.style.transition = `stroke-dashoffset 420ms cubic-bezier(.4,0,.2,1) ${Math.min(index, 3) * 60}ms`;
       requestAnimationFrame(() => { path.style.strokeDashoffset = "0"; });
       // 動畫結束後把 dash 屬性拿掉，否則虛線樣式的序列會被蓋掉
       setTimeout(() => {
         path.style.strokeDasharray = "";
         path.style.transition = "";
-      }, 900 + index * 110);
+      }, 900 + Math.min(index, 3) * 60);
     });
 
     bars.forEach((bar, index) => {
@@ -597,7 +657,7 @@
         ? "scaleY" : "scaleX";
       bar.style.transform = `${axis}(0)`;
       bar.style.transition =
-        `transform 560ms cubic-bezier(.34,1.2,.64,1) ${Math.min(index * 26, 420)}ms`;
+        `transform 560ms var(--spring-soft, cubic-bezier(0.33,0.12,0.15,1)) ${Math.min(index * 26, 420)}ms`;
       requestAnimationFrame(() => { bar.style.transform = ""; });
     });
 
