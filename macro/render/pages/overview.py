@@ -258,9 +258,7 @@ def market_brief(ctx: dict, *, limit: int = 6) -> str:
             title = (f'<a href="{esc(link)}" target="_blank" rel="noopener noreferrer">'
                      f'{title}</a>')
         items.append(f'<div class="digest-item"><span class="digest-n">{count} 家</span>'
-                     f'<span class="digest-text">{title}'
-                     + (f'<span class="digest-data"></span>' if reading else "")
-                     + '</span></div>')
+                     f'<span class="digest-text">{title}</span></div>')
     return ('<p class="muted" style="font-size:.82rem;margin-bottom:8px">'
             '尚未整理：以下是關鍵字挑出的原始標題，整理版由排程任務每天寫入。</p>'
             f'<div class="digest">{"".join(items)}</div>'
