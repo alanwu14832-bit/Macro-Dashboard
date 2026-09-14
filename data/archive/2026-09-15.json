@@ -1,6 +1,6 @@
 {
  "date": "2026-09-15",
- "generated_at": "2026-09-15T02:36:15+08:00",
+ "generated_at": "2026-09-15T05:07:58+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -25,6 +25,14 @@
    "severity": "high",
    "evidence": "人口月增 +13.6 萬、勞動力月增 -5.3 萬；黃金年齡就業率 12 個月 +0.0 個百分點",
    "module": "就業"
+  },
+  {
+   "key": "debt_dynamics_adverse",
+   "headline": "實質利率高於實質成長，債務比會自動累積",
+   "direction": "hawkish",
+   "severity": "medium",
+   "evidence": "r−g 為 +0.5 個百分點，債務佔 GDP 123%",
+   "module": "債務"
   },
   {
    "key": "energy_upside",
@@ -63,7 +71,7 @@
    "headline": "10年實質利率處於限制性水準",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "10年實質利率 2.55%",
+   "evidence": "10年實質利率 2.60%",
    "module": "利率"
   },
   {
@@ -103,7 +111,7 @@
    "headline": "期限溢酬偏高，長端在要求額外補償",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "期限溢酬（近似）+1.16 個百分點",
+   "evidence": "期限溢酬（近似）+1.22 個百分點",
    "module": "利率"
   },
   {
@@ -124,11 +132,11 @@
   }
  ],
  "summary": {
-  "total": 15,
-  "hawkish": 4,
+  "total": 16,
+  "hawkish": 5,
   "dovish": 7,
   "neutral": 4,
-  "score": -6,
+  "score": -4,
   "tilt": "偏降息"
  },
  "scenario": {
@@ -146,15 +154,15 @@
   "core_cpi": 2.4459799375700753,
   "core_pce": 3.3441430040338282,
   "supercore": 3.1040978972467492,
-  "ten_year": 4.95,
-  "real_ten_year": 2.55,
-  "curve_10_2": 0.39000000000000057,
-  "recession_gauge": 39.100308175693925,
+  "ten_year": 4.96,
+  "real_ten_year": 2.6,
+  "curve_10_2": 0.33000000000000007,
+  "recession_gauge": 39.290679286353445,
   "composite_labor": -5.3431230429545185
  },
  "as_of": {
   "labor": "2026-08-01",
   "inflation": "2026-08-01",
-  "rates": "2026-09-10"
+  "rates": "2026-09-11"
  }
 }
