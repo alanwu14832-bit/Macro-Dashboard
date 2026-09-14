@@ -330,10 +330,14 @@
 
   /* --------------------------------------------- 進場動畫（分段浮現） ---- */
   // 只跑一次，且只在使用者沒有要求減少動態時。
-  if (!REDUCED.matches) {
+  const fromSameOrigin = !!(window.navigation && navigation.activation
+                            && navigation.activation.from);
+  if (!REDUCED.matches && !fromSameOrigin) {
     const blocks = [...document.querySelectorAll(".content section, .verdict, .live-bar")];
     blocks.forEach((node, index) => {
-      node.style.setProperty("--enter-delay", `${Math.min(index * 45, 320)}ms`);
+      // 只給前 4 項 stagger，之後一律 0——第 5 個之後的延遲只是在讓人等
+      node.style.setProperty("--enter-delay",
+                             `${index < 4 ? index * 40 : 0}ms`);
       node.classList.add("enter");
     });
     requestAnimationFrame(() => {
@@ -342,6 +346,8 @@
     // 保險絲：頁面在背景分頁載入時 rAF 會被凍結，內容就停在 opacity:0。
     // 進場動畫失敗的代價不該是「整頁空白」，所以逾時就直接顯示。
     setTimeout(() => root.classList.add("entered"), 600);
+  } else {
+    root.classList.add("entered");
   }
 
   /* -------------------------------------------------- 底部分頁列 -------- */

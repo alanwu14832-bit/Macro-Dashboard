@@ -86,10 +86,14 @@
     const bySymbol = new Map(quotes.map(q => [String(q.symbol), q]));
     let changed = 0;
 
+    // 先算後比再寫：108 個磁磚每 5 秒無條件寫 inline style 會強迫整片重算樣式，
+    // 即使顏色根本沒變。底色本身就是 300ms 的 crossfade，不再疊閃光——
+    // 熱力圖要看的是整片的形狀，逐格閃爍會把形狀打散成噪音。
     for (const tile of document.querySelectorAll("[data-heat]")) {
       const quote = bySymbol.get(tile.dataset.heat);
       if (!quote || quote.change_percent === undefined) continue;
-      tile.style.background = heatColor(quote.change_percent);
+      const next = heatColor(quote.change_percent);
+      if (tile.style.background !== next) tile.style.background = next;
     }
 
     // 自選清單的名稱欄：MIS 的報價自帶名稱，第一輪回來就補上
@@ -196,6 +200,13 @@
       p.wait = CADENCE[kind].base;
     } else if (++p.idle >= 2) {
       p.wait = Math.min(p.wait * 2, CADENCE[kind].max);
+    }
+    // 脈動的語意是「連線是活的」。收盤後節奏會自動爬到 90 秒（台股）、
+    // 300 秒（美股），那顆點還在 2.4 秒跳一次就是在說謊。
+    if (!disabled) {
+      const slow = (twSymbols.length && pace.tw.wait > CADENCE.tw.base)
+                || (otherSymbols.length && pace.other.wait > CADENCE.other.base);
+      document.documentElement.classList.toggle("is-static", !!slow);
     }
     if (recovering) startTimers();   // 失敗時兩組都停了，一起接回來
     else schedule(kind);
@@ -348,6 +359,7 @@
 
   // 分頁在背景時不必一直打 API
   document.addEventListener("visibilitychange", () => {
+    document.documentElement.classList.toggle("page-hidden", document.hidden);
     if (document.hidden) {
       stopTimers();
     } else if (!disabled) {
