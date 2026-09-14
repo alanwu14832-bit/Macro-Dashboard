@@ -281,20 +281,42 @@ def _related_reading(headline: str, ctx: dict) -> str:
 
 
 def _curated_brief(brief: dict) -> str:
-    """整理過的要聞：四類、中文 headline、一行說明與來源。"""
+    """整理過的要聞：四類，預設只出標題。
+
+    內文收在標題底下，點標題才展開。理由是掃視與閱讀是兩件事：早上那一眼要
+    的是「今天有哪幾件事」，不是十二段各 90 字的說明；真的想看某一則再點開。
+    這也讓這個區塊從全頁最長（2,219 字）縮回一份可以一眼掃完的清單。
+
+    標題本身是展開鈕而不是外連——點標題會跳走的話，就沒有「先看一眼再決定」
+    這個動作了。原文連結放在展開後的內文裡。
+    """
     groups = []
     for sec in brief["sections"]:
         if not sec["items"]:
             continue
         items = []
         for it in sec["items"]:
-            head = esc(it["headline"])
-            if it["link"]:
-                head = (f'<a href="{esc(it["link"])}" target="_blank" '
-                        f'rel="noopener noreferrer">{head}</a>')
-            meta = "　".join(x for x in (esc(it["detail"]), esc(it["source"])) if x)
-            items.append(f'<li><span class="bf-h">{head}</span>'
-                         + (f'<span class="bf-m">{meta}</span>' if meta else "") + '</li>')
+            body = []
+            if it.get("detail"):
+                body.append(f'<p class="bf-detail">{esc(it["detail"])}</p>')
+            meta = []
+            if it.get("source"):
+                meta.append(esc(it["source"]))
+            if it.get("link"):
+                meta.append(f'<a href="{esc(it["link"])}" target="_blank" '
+                            f'rel="noopener noreferrer">看原文 →</a>')
+            if meta:
+                body.append(f'<p class="bf-m">{"　".join(meta)}</p>')
+            if body:
+                items.append(
+                    f'<li class="bf-item"><details class="bf-d">'
+                    f'<summary class="bf-h">{esc(it["headline"])}</summary>'
+                    f'<div class="bf-body">{"".join(body)}</div>'
+                    f'</details></li>')
+            else:
+                # 沒有內文可展開就不要做成假的可點元素
+                items.append(f'<li class="bf-item"><span class="bf-h bf-flat">'
+                             f'{esc(it["headline"])}</span></li>')
         groups.append(f'<div class="bf-group"><div class="bf-k">{esc(sec["title"])}</div>'
                       f'<ul class="bf-list">{"".join(items)}</ul></div>')
     synthesis = (f'<p class="bf-syn"><strong>與本期判斷的交集</strong>　{esc(brief["synthesis"])}</p>'

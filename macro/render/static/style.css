@@ -1805,3 +1805,30 @@ footer.site .foot-fine { margin: 0 auto; max-width: var(--measure); font-size: 0
 .src-name { font-weight: 650; font-size: 0.95rem; }
 .src-what { font-size: 0.88rem; color: var(--ink-2); line-height: 1.65; }
 .src-when { font-size: 0.8rem; color: var(--ink-muted); }
+
+/* 要聞：預設只出標題，點標題才展開內文。
+   刻意不做成有框的摺疊卡——一則新聞不是一張卡片，十二張卡片會比原本的
+   十二段文字更吵。這裡要的是一份可以一眼掃完的清單，外加一個安靜的展開。 */
+.bf-item { padding: 0 !important; }
+.bf-d { border: 0; background: none; margin: 0; }
+.bf-d > summary.bf-h {
+  list-style: none; cursor: pointer; padding: 7px 22px 7px 0;
+  position: relative; -webkit-tap-highlight-color: transparent;
+}
+.bf-d > summary.bf-h::-webkit-details-marker { display: none; }
+/* 展開記號放右側，標題文字因此可以從最左邊對齊，掃視時眼睛不必繞路 */
+.bf-d > summary.bf-h::after {
+  content: "＋"; position: absolute; right: 2px; top: 7px;
+  color: var(--ink-muted); font-size: 0.82rem; font-weight: 400;
+  transition: transform 140ms var(--ease);
+}
+.bf-d[open] > summary.bf-h::after { content: "−"; }
+.bf-d > summary.bf-h:hover { color: var(--series-1); }
+.bf-d > summary.bf-h:focus-visible {
+  outline: 2px solid var(--series-1); outline-offset: 2px; border-radius: 4px;
+}
+.bf-body { padding: 0 0 9px; }
+.bf-detail { font-size: 0.85rem; color: var(--ink-2); line-height: 1.7; margin: 0 0 5px; }
+.bf-flat { padding: 7px 0; }
+@media (pointer: coarse) { .bf-d > summary.bf-h { min-height: 44px; display: flex; align-items: center; } }
+@media (prefers-reduced-motion: reduce) { .bf-d > summary.bf-h::after { transition: none; } }
