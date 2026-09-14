@@ -1,6 +1,6 @@
 {
  "date": "2026-09-15",
- "generated_at": "2026-09-15T01:10:29+08:00",
+ "generated_at": "2026-09-15T02:36:15+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -9,6 +9,14 @@
    "severity": "high",
    "evidence": "核心 PCE 3.3%，距 2% 目標 +1.3 個百分點",
    "module": "物價"
+  },
+  {
+   "key": "tw_signal_light_extreme",
+   "headline": "台灣景氣對策信號亮紅燈，熱絡區間已 8 個月",
+   "direction": "neutral",
+   "severity": "high",
+   "evidence": "綜合分數 41 分（紅燈 38–45、藍燈 9–16）",
+   "module": "台灣"
   },
   {
    "key": "unemployment_falling_for_wrong_reason",
@@ -99,6 +107,14 @@
    "module": "利率"
   },
   {
+   "key": "tw_export_orders_contracting",
+   "headline": "台灣外銷訂單動向指數低於 50，看減家數多於看增",
+   "direction": "neutral",
+   "severity": "medium",
+   "evidence": "動向指數 48.8（50 為擴張與收縮分界）",
+   "module": "台灣"
+  },
+  {
    "key": "credit_complacent",
    "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
    "direction": "neutral",
@@ -108,10 +124,10 @@
   }
  ],
  "summary": {
-  "total": 13,
+  "total": 15,
   "hawkish": 4,
   "dovish": 7,
-  "neutral": 2,
+  "neutral": 4,
   "score": -6,
   "tilt": "偏降息"
  },
