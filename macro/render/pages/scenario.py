@@ -140,4 +140,10 @@ def render(ctx: dict, scenario: dict, summary: dict) -> str:
                  "兩者背離時，才有交易價值。") + "</div>",
                         terms=["signal_engine"]))
 
+    # 「對股市的含義」從總覽移來：它是寫死的九宮格映射、一季改寫 0 次，
+    # 而且是全站最接近投資建議的一塊——放在有完整門檻出處與免責脈絡的這一頁，
+    # 比每天孤立在總覽第一屏更符合「不構成投資建議」這條規矩。
+    from . import overview_blocks as blocks
+    body.append(blocks.implications(ctx, scenario, summary))
+
     return "".join(body)

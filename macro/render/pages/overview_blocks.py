@@ -331,17 +331,44 @@ def _inflation_read(core_pce, ann3) -> str:
 
 # ------------------------------------------- 5 市場定價（精簡＋導向專頁） --
 
-def market_pricing(ctx: dict) -> str:
-    """市場怎麼定價這個總經環境。這裡只給結論，細節在各專頁。"""
+def price_band(ctx: dict) -> str:
+    """今日價格：全頁唯一的即時內容，也是開盤前那一次瀏覽存在的理由。
+
+    這裡吸收了原本「公債利率」與「商品與傳導」兩個區塊的讀數。實測 33 天的
+    存檔：10 年期動了 19 天、實質利率 16 天、衰退刻度 21 天——相對地情境判定
+    只改過 1 次。把利率整塊刪掉會刪掉版面上最會動的東西，所以表刪、讀數留。
+
+    黃金與銅移出：它們在這裡只有近一月的變動，放進一條日頻的帶子裡會說謊。
+    """
     eq = ctx.get("equities") or {}
     market = ctx.get("market") or {}
+    rates = ctx.get("rates") or {}
+    comm = ctx.get("commodities") or {}
     tw = eq.get("tw") or {}
     us = eq.get("us") or {}
     vol = market.get("volatility") or {}
     risk = market.get("risk") or {}
     liq = market.get("liquidity") or {}
 
+    curve = {r["name"]: r for r in (rates.get("curve") or {}).get("rows") or []}
+    shape = rates.get("shape") or {}
+    credit = {c["name"]: c for c in (rates.get("credit") or {}).get("rows") or []}
+
     tiles = []
+    ten = curve.get("10Y")
+    if ten:
+        tiles.append(stat("10 年期公債", pct(ten["value"], 2),
+                          delta=fmt(ten.get("chg_1m"), 2, suffix=" pp 近一月", signed=True),
+                          direction=None, asof="估值的分母"))
+    if shape.get("slope_10_2") is not None:
+        tiles.append(stat("10 年減 2 年", fmt(shape["slope_10_2"], 2, suffix=" pp", signed=True),
+                          delta=esc(shape.get("label", "")), direction=None,
+                          asof="曲線形狀"))
+    hy = credit.get("高收益")
+    if hy:
+        tiles.append(stat("高收益利差", pct(hy["value"], 2),
+                          delta=f'十年第 {fmt(hy.get("pct10y"), 0)} 百分位',
+                          direction=None, asof="風險胃納的價格"))
     for row in (us.get("indices") or [])[:2]:
         tiles.append(stat(row["name"], fmt(row["price"], 2),
                           delta=fmt(row["change_percent"], 2, suffix="%", signed=True),
@@ -356,6 +383,14 @@ def market_pricing(ctx: dict) -> str:
         tiles.append(stat("VIX", fmt(vol["vix"], 1),
                           delta=esc(vol.get("verdict", "")), direction=None,
                           asof="波動率定價"))
+    rows = list((comm.get("groups") or [{}])[0].get("rows") or [])
+    for group in (comm.get("groups") or []):
+        rows.extend(group.get("rows") or [])
+    wti = next((r for r in rows if r.get("name") == "WTI 原油"), None)
+    if wti and wti.get("value") is not None:
+        tiles.append(stat("WTI 原油", fmt(wti["value"], 2),
+                          delta=fmt(wti.get("chg_1m"), 1, suffix="% 近一月", signed=True),
+                          direction=None, asof="供需與地緣"))
 
     parts = [f'<div class="grid grid-4">{"".join(tiles)}</div>'] if tiles else []
 
@@ -379,14 +414,15 @@ def market_pricing(ctx: dict) -> str:
         parts.append(callout("<br>".join(lines)))
 
     parts.append('<p class="mc-foot-note">'
+                 '<a href="/fed/">看完整殖利率曲線與信用利差 →</a>　'
                  '<a href="/equities/">看完整美股與國際 →</a>　'
                  '<a href="/tw/">看完整台股 →</a>　'
-                 '<a href="/market/">看股債相關性與實質利率張力 →</a></p>')
+                 '<a href="/commodities/">看完整商品 →</a></p>')
 
     if not parts:
         return ""
-    return section("market", "市場定價", "".join(parts),
-                   note="美股為收盤價，台股為盤中即時；板塊輪動由固定規則判定")
+    return section("prices", "今日價格", "".join(parts),
+                   note="台股為盤中即時，美股與利率為前一交易日收盤")
 
 
 # 類股 ETF 的宏觀屬性。判定 risk-on/off 與循環／防禦要靠這個分類。
@@ -494,8 +530,14 @@ def _sector_pressure(scenario: dict) -> list[list[str]]:
 
 # ------------------------------------------------------- 7 今日觀察清單 --
 
-def watchlist(ctx: dict, fomc: dict | None) -> str:
-    """今日與未來數日要盯的事件：數據、財報、央行、標售、期權到期。"""
+def watchlist(ctx: dict, fomc: dict | None, *, scenario: dict | None = None) -> str:
+    """接下來盯什麼：未來幾天有什麼會來，以及來了會不會改判定。
+
+    換檔門檻從原本「聯準會立場」區塊的摺疊裡升上來排在表頭——那是規矩 1
+    的本體（可反駁的門檻），被摺起來而它上面卻擺著深頁的複本，位階是倒的。
+
+    「為什麼要盯」整欄移到講義：那四句話每天一模一樣，每天重看零資訊增益。
+    """
     from ...sources import treasury
 
     rows = []
@@ -508,7 +550,7 @@ def watchlist(ctx: dict, fomc: dict | None) -> str:
         })
 
     fresh = ctx.get("freshness") or {}
-    for item in (fresh.get("imminent") or [])[:8]:
+    for item in (fresh.get("imminent") or [])[:5]:
         rows.append({
             "days": item.get("days_away"), "kind": "數據",
             "what": esc(item["name"]),
@@ -523,7 +565,7 @@ def watchlist(ctx: dict, fomc: dict | None) -> str:
         })
 
     eq = ctx.get("equities") or {}
-    for e in ((eq.get("us") or {}).get("earnings") or [])[:6]:
+    for e in ((eq.get("us") or {}).get("earnings") or [])[:3]:
         rows.append({
             "days": None, "kind": "財報",
             "what": f'{esc(e["symbol"])} 財報（{esc(e["date"][5:].replace("-", "/"))}'
@@ -543,15 +585,31 @@ def watchlist(ctx: dict, fomc: dict | None) -> str:
         return ""
 
     rows.sort(key=lambda r: (r["days"] if r["days"] is not None else 99))
-    table_rows = [
-        [esc(r["kind"]), r["what"],
-         (_when_label(r["days"]) if r["days"] is not None else "—"),
-         esc(r["why"])]
-        for r in rows
-    ]
+
+    # 換檔門檻排在最前面：它回答「來了會不會改判定」，其餘只回答「什麼會來」
+    table_rows = []
+    for t in (scenario or {}).get("transitions") or []:
+        if t.get("gap") is None:
+            continue
+        table_rows.append([
+            "門檻", f'{esc(t["name"])}　{esc(t.get("need", ""))}',
+            "—", f'還差 {fmt(abs(t["gap"]), 2)} {esc(t.get("unit", ""))}'])
+        if len(table_rows) >= 2:
+            break
+
+    near, later = [], []
+    for r in rows:
+        line = [esc(r["kind"]), r["what"],
+                (_when_label(r["days"]) if r["days"] is not None else "—"), ""]
+        (near if (r["days"] is not None and r["days"] <= 7) else later).append(line)
+
+    table_rows.extend(near[:8])
+    head = ["類型", "事件", "時間", "距換檔"]
+    body = table(head, table_rows)
+    if later:
+        body += accordion(f"七天以外（{len(later)} 項）", table(head, later))
     return section(
-        "watchlist", "今日觀察清單",
-        table(["類型", "事件", "時間", "為什麼要盯"], table_rows),
+        "watchlist", "接下來盯什麼", body,
         note="沒有市場共識欄位——那是付費資料，本站不做推估")
 
 

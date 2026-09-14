@@ -66,9 +66,20 @@ class ChangeRendering(unittest.TestCase):
         added = [{"headline": f"訊號 {i}", "severity": "low"} for i in range(9)]
         html = changes_top({}, {"added": added}, [], SCENARIO, None)
         self.assertIn("看全部 9 項變動", html)
-        self.assertIn('href="#changed"', html)
-        # 只露出前 5 筆，其餘收在下面的完整比對區塊
-        self.assertEqual(html.count('class="chg-row"'), 5)
+        # 完整比對已從總覽底部移到存檔頁——摘要與細節隔著整頁就不再是
+        # 摘要與細節的關係，只是同一件事佔兩次跨頁目錄
+        self.assertIn('href="/archive/#today"', html)
+        self.assertNotIn('href="#changed"', html)
+        # 露出前 8 筆，其餘到存檔頁看
+        self.assertEqual(html.count('class="chg-row"'), 8)
+
+    def test_title_states_the_actual_comparison_date(self):
+        """不能叫「與上次建置相比」——archive.previous() 取的是昨天的快照，
+        而每小時建置會同日覆寫，名字錯了會讓人以為比的是一小時前。"""
+        html = changes_top({}, {"added": [{"headline": "x", "severity": "low"}]},
+                           [], SCENARIO, {"date": "2026-09-13", "scenario": {}})
+        self.assertIn("自 2026-09-13 以來", html)
+        self.assertNotIn("與上次建置相比", html)
 
     def test_scope_footer_is_always_present(self):
         for diff in ({}, {"added": [{"headline": "x", "severity": "high"}]}):

@@ -217,7 +217,8 @@ def main() -> int:
          lambda: guide_page.render(ctx)),
         ("/archive/", "存檔", "存檔",
          "每天的判斷與關鍵讀數，可回看任一天的結論。",
-         lambda: archive_page.render(snapshots)),
+         lambda: archive_page.render(snapshots, diff=diff,
+                                    reading_changes=reading_changes)),
     ]
 
     # 兩段式：先渲染出全部頁面的內文、抽出各頁的區塊清單，
@@ -230,6 +231,16 @@ def main() -> int:
             print(f"   ✗ {path}", flush=True)
             traceback.print_exc()
             failures.append(path)
+
+    # 總覽的版面預算。結構超標＝建置失敗（只有改程式才會動）；字數超標只警告
+    # （它隨訊號條數與新聞長度浮動，用硬失敗擋它會讓網站因為版面而停止更新）。
+    hard, soft = overview.budget_report(bodies.get("/", ""))
+    for line in soft:
+        print(f"   ⚠ 總覽版面：{line}", flush=True)
+    if hard:
+        for line in hard:
+            print(f"   ✗ 總覽版面：{line}", flush=True)
+        failures.append("總覽版面預算")
 
     section_map = {path: layout.extract_sections(body)
                    for path, body in bodies.items()}

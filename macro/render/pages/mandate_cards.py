@@ -40,26 +40,6 @@ def _chain(steps: list[tuple]) -> str:
     return f'<div class="mc-chain">{"".join(cards)}</div>'
 
 
-def _drawer(bundle, group_key: str, label: str) -> str:
-    from ... import catalogue
-    specs = catalogue.ALL_GROUPS.get(group_key) or {}
-    rows = []
-    for series_id, (name, unit, freq, _start) in specs.items():
-        series = bundle[series_id] if bundle else None
-        latest = (fmt(series.last, 2, suffix=f" {unit}" if unit else "")
-                  if series is not None and series.last is not None else "—")
-        asof = (zh_date(series.last_date, freq=freq)
-                if series is not None and series.last_date else "—")
-        rows.append([
-            f'<a href="/explore/?id={esc(series_id)}">{esc(name)}</a>',
-            latest, asof,
-            {"d": "日", "w": "週", "m": "月", "q": "季", "a": "年"}.get(freq, freq)])
-    if not rows:
-        return ""
-    return accordion(f"{label}：全部 {len(rows)} 檔指標",
-                     table(["指標", "最新值", "資料日期", "頻率"], rows))
-
-
 # ------------------------------------------------------------------ 就業 --
 
 def employment(ctx: dict, scenario: dict) -> str:
@@ -120,7 +100,6 @@ def employment(ctx: dict, scenario: dict) -> str:
         f'<details class="mc-chain-wrap"><summary class="mc-chain-toggle">'
         f'查看 職缺、流量、失業率 傳導</summary>{chain}</details>'
         + callout("<strong>二階解讀</strong>：" + _payroll_read(latest, avg3, breakeven))
-        + _drawer(ctx.get("_bundle"), "labor", "就業")
         + f'<p class="mc-foot-note">非農 {zh_date(labor.get("as_of"))}　'
           f'口徑：月增（千人）；趨勢：近 3 個月平均</p>',
         terms=["breakeven_payrolls"])
@@ -226,7 +205,97 @@ def inflation(ctx: dict, scenario: dict) -> str:
         f'<details class="mc-chain-wrap"><summary class="mc-chain-toggle">'
         f'查看 PPI、CPI、PCE 傳導</summary>{chain}</details>'
         + callout("<strong>二階解讀</strong>：" + _inflation_read(core_pce, core_pce_3m))
-        + _drawer(ctx.get("_bundle"), "inflation", "通膨")
         + f'<p class="mc-foot-note">{esc("　".join(dates))}　'
           f'口徑：年增率；動能：近 3 個月年化</p>',
         terms=["core_inflation", "supercore"])
+
+# ------------------------------------------------------------ 雙目標合併 --
+
+def _compact(label, sub, value, foot) -> str:
+    return (f'<div class="mc-cell"><div class="mc-label">{esc(label)}'
+            f'<span class="mc-sub">｜{esc(sub)}</span></div>'
+            f'<div class="mc-value">{value}</div>'
+            f'<div class="mc-foot">{esc(foot)}</div></div>')
+
+
+def _streak(series, above) -> str:
+    """連續同向幾個月。慢慢漂的變化不會觸發任何門檻，只能靠這個看見。"""
+    if series is None:
+        return ""
+    months = 0
+    for i in range(1, 13):
+        value = series.at(-i)
+        if value is None or not above(value):
+            break
+        months += 1
+    return f"連 {months} 個月" if months >= 2 else ""
+
+
+def dual_mandate(ctx: dict, scenario: dict) -> str:
+    """就業與通膨合成一個區塊。
+
+    實測 33 天的存檔：就業判定只改寫過 1 次、通膨判定 0 次——其餘日子那兩張
+    四格卡一個數字都沒變，卻各佔一個區塊。所以平日壓成左右各兩格，當天真的
+    有新公布時才升格回完整卡（含傳導鏈與二階解讀）。
+
+    刻意保持左右對稱：兩邊同時降、同時升，只降一邊會讓那個對稱看起來像 bug。
+    """
+    labor = ctx.get("labor") or {}
+    infl = ctx.get("inflation") or {}
+    payrolls = labor.get("payrolls") or {}
+    head = infl.get("headline") or {}
+    if not payrolls or not head:
+        return ""
+
+    fresh = (ctx.get("freshness") or {}).get("fresh") or {}
+    today = ((ctx.get("freshness") or {}).get("today") or {}).get("periodic") or []
+    published = {row.get("id") for row in today if isinstance(row, dict)}
+    JOB_IDS = {"PAYEMS", "UNRATE", "ICSA", "JTSJOL"}
+    INF_IDS = {"CPIAUCSL", "PCEPILFE", "PPIFIS"}
+    upgrade = bool((set(fresh) | published) & (JOB_IDS | INF_IDS))
+
+    if upgrade:
+        # 有新公布的日子：整塊給完整的兩張卡，該看的細節一次到齊
+        return employment(ctx, scenario) + inflation(ctx, scenario)
+
+    bundle = ctx.get("_bundle")
+    unrate = (labor.get("unemployment") or {}).get("rate")
+    avg3 = payrolls.get("avg3")
+    breakeven = (labor.get("breakeven") or {}).get("value")
+    core_pce = head.get("core_pce")
+    ann3 = (infl.get("momentum") or {}).get("core_pce_3m")
+    supercore = (infl.get("supercore") or {})
+
+    jobs = "".join([
+        _compact("三月均非農", "vs 損益兩平", _wan(avg3),
+                 _gap_note(avg3, breakeven)),
+        _compact("失業率", "九宮格水準", pct(unrate, 1),
+                 (_streak(bundle["UNRATE"] if bundle else None,
+                          lambda v: unrate is not None and v >= unrate - 0.15)
+                  or f'判定 {scenario.get("employment_label", "")}')),
+    ])
+    prices = "".join([
+        _compact("核心 PCE", "九宮格水準", pct(core_pce, 1),
+                 f'判定 {scenario.get("inflation_label", "")}'),
+        _compact("核心三月年化", "動能", pct(ann3, 1),
+                 ("低於年增，降溫中" if (ann3 is not None and core_pce is not None
+                                        and ann3 < core_pce) else "高於年增，仍在加速")),
+    ])
+
+    tail = ""
+    if supercore.get("months_above"):
+        tail = (f'<p class="mc-foot-note">核心服務除住房連 '
+                f'{supercore["months_above"]} 個月高於 2.5%——沒有單日事件的'
+                f'累積變化不會觸發任何門檻，只能這樣看見。</p>')
+
+    return section(
+        "mandate", "雙目標",
+        f'<div class="dual"><div class="dual-half">'
+        f'<div class="mc-eyebrow">就業</div>'
+        f'<div class="mc-cells">{jobs}</div></div>'
+        f'<div class="dual-half"><div class="mc-eyebrow">通膨</div>'
+        f'<div class="mc-cells">{prices}</div></div></div>'
+        + tail
+        + '<p class="mc-foot-note"><a href="/labor/">看完整就業拆解 →</a>　'
+          '<a href="/inflation/">看完整通膨拆解 →</a></p>',
+        note="今天有新公布時，這一塊會自動展開成完整的雙目標卡")

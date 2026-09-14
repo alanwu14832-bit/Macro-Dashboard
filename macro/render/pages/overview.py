@@ -19,54 +19,6 @@ LEAN_WASH = {"hawkish": "var(--hawkish-wash)", "dovish": "var(--dovish-wash)",
              "neutral": "var(--neutral-wash)"}
 
 
-def narrative(ctx: dict, scenario: dict, summary: dict) -> str:
-    """整體情勢的一段話。由數字組出來，不是寫死的文案。"""
-    labor = ctx["labor"]
-    inflation = ctx["inflation"]
-    rates = ctx["rates"]
-    debt = ctx["debt"]
-
-    bits = []
-    bits.append(f"聯準會目前的重心判定為<strong>{esc(scenario['regime_label'])}</strong>；"
-                f"訊號合計{esc(summary['tilt'])}"
-                f"（{summary['hawkish']} 條偏升息、{summary['dovish']} 條偏降息）。")
-
-    unrate = labor["unemployment"]["rate"]
-    avg3 = labor["payrolls"]["avg3"]
-    breakeven = labor["breakeven"].get("value")
-    if unrate is not None and avg3 is not None and breakeven:
-        verdict = "撐不住現有失業率" if avg3 < breakeven else "足以吸收新增勞動力"
-        bits.append(f"失業率 {fmt(unrate, 1, suffix='%')}，"
-                    f"但三月均非農 {thousands_to_wan(avg3)}低於損益兩平的 "
-                    f"{thousands_to_wan(breakeven, signed=False)}，{verdict}。")
-
-    core_pce = inflation["headline"]["core_pce"]
-    ann3 = inflation["momentum"].get("core_pce_3m")
-    supercore = inflation["supercore"]
-    if core_pce is not None:
-        chunk = f"另一頭，核心 PCE {fmt(core_pce, 1, suffix='%')}"
-        if ann3 is not None:
-            chunk += f"、近三月年化 {fmt(ann3, 1, suffix='%')}"
-            chunk += "已在放緩" if ann3 < core_pce else "仍在加速"
-        if supercore.get("months_above"):
-            chunk += (f"，核心服務除住房連 {supercore['months_above']} 個月高於 2.5%")
-        bits.append(chunk + "。")
-
-    nominal = rates["decomposition"].get("nominal")
-    real = rates["decomposition"].get("real")
-    if nominal is not None:
-        chunk = f"長端方面，10 年期 {fmt(nominal, 2, suffix='%')}"
-        if real is not None:
-            chunk += f"、實質 {fmt(real, 2, suffix='%')}"
-        supply = debt["supply"]
-        chunk += f"；長端供給壓力判定為「{esc(supply['level'])}」"
-        if supply["reasons"]:
-            chunk += f"（{esc(supply['reasons'][0])}）"
-        bits.append(chunk + "。")
-
-    return "".join(f"<p>{b}</p>" for b in bits)
-
-
 def keys_strip(ctx: dict, scenario: dict, summary: dict) -> str:
     """關鍵數字帶：六個數字一排，各附判定或補充，取代原本的三欄一眼板。
 
@@ -109,7 +61,9 @@ def keys_strip(ctx: dict, scenario: dict, summary: dict) -> str:
         fut_sub = f'2 年期減政策利率 {fmt(stance.get("market_gap"), 2, suffix=" pp", signed=True)}'
         fut_label = "市場定價"
 
-    items = [
+    # 事實與判定分開：上面四格是機構發布的數字，下面兩格是本站規則的輸出。
+    # 混在同一排會讓「規則說的」看起來跟「BLS 說的」一樣硬。
+    facts = [
         key("核心 PCE 年增", pct(core_pce, 1), inf_sub),
         key("失業率", pct(unrate, 1), jobs_sub),
         key("政策利率上緣", pct(stance.get("policy"), 2),
@@ -118,12 +72,19 @@ def keys_strip(ctx: dict, scenario: dict, summary: dict) -> str:
         key("10 年期公債", pct(decomp.get("nominal"), 2),
             f'實質 {pct(decomp.get("real"), 2)}　近三月 '
             f'{fmt(decomp.get("chg_3m"), 2, suffix=" pp", signed=True)}'),
-        key(fut_label, fut_value, fut_sub),
-        key("規則訊號", f'{summary["total"]}<span class="unit"> 條</span>',
-            f'{summary["dovish"]} 條偏降息、{summary["hawkish"]} 條偏升息　'
-            f'{tag(scenario["lean"], summary["tilt"])}'),
     ]
-    return f'<div class="keys">{"".join(items)}</div>'
+    calls = [
+        key("規則訊號", f'{summary["total"]}<span class="unit"> 條</span>',
+            f'{summary["dovish"]} 條偏降息、{summary["hawkish"]} 條偏升息'),
+        key("情境傾向", esc(scenario["regime_label"]),
+            f'{tag(scenario["lean"], summary["tilt"])}　'
+            f'就業{esc(scenario["employment_label"])}'
+            f'、通膨{esc(scenario["inflation_label"])}'),
+    ]
+    return (f'<div class="keys keys-fact">{"".join(facts)}</div>'
+            f'<div class="keys-split"><span>以上為機構發布的數字</span>'
+            f'<span>以下為本站規則的判定</span></div>'
+            f'<div class="keys keys-call">{"".join(calls)}</div>')
 
 
 def _digits(value) -> int:
@@ -201,83 +162,6 @@ def _commodity_row(ctx: dict, name: str) -> dict | None:
         if row.get("name") == name:
             return row
     return None
-
-
-def _related_reading(headline: str, ctx: dict) -> str:
-    """新聞講到什麼，就把本站對應的讀數放在旁邊。最多兩項，不硬湊。"""
-    text = headline.lower()
-    out: list[str] = []
-
-    def has(pattern: str) -> bool:
-        return re.search(pattern, text) is not None
-
-    if has(r"\b(oil|crude|opec|brent|gasoline|gas prices|energy)\b"):
-        row = _commodity_row(ctx, "WTI 原油")
-        if row and row.get("value") is not None:
-            out.append(f'WTI {fmt(row["value"], 2)} 美元/桶，近一月 '
-                       f'{fmt(row.get("chg_1m"), 1, suffix="%", signed=True)}')
-    if has(r"\bgold\b"):
-        row = _commodity_row(ctx, "黃金")
-        if row and row.get("value") is not None:
-            out.append(f'黃金 {fmt(row["value"], 0)} 美元/盎司，近一月 '
-                       f'{fmt(row.get("chg_1m"), 1, suffix="%", signed=True)}')
-    if has(r"\b(fed|fomc|powell|rate cuts?|rate hikes?|interest rates?|"
-           r"treasur(ies|ys)|treasury yields?|yields?|bonds?)\b"):
-        bits = []
-        nominal = ((ctx.get("rates") or {}).get("decomposition") or {}).get("nominal")
-        if nominal is not None:
-            bits.append(f"10 年期 {pct(nominal, 2)}")
-        nxt = (ctx.get("fedfunds") or {}).get("next")
-        if nxt:
-            bits.append(f'期貨定價 {esc(nxt["label"])} {esc(nxt["headline"])}')
-        if bits:
-            out.append("，".join(bits))
-    if has(r"\b(dollar|yen|yuan|euro|rupee|currenc(y|ies)|forex|fx)\b"):
-        world = ctx.get("world") or {}
-        dollar = world.get("dollar") or {}
-        bits = []
-        if dollar.get("broad") is not None:
-            bits.append(f'美元廣義指數 {fmt(dollar["broad"], 1)}，近一月 '
-                        f'{fmt(dollar.get("chg_1m"), 1, suffix="%", signed=True)}')
-        if has(r"\byen\b"):
-            jpy = next((r for r in (world.get("fx") or {}).get("rows") or []
-                        if r.get("name") == "美元/日圓"), None)
-            if jpy and jpy.get("value") is not None:
-                bits.append(f'美元/日圓 {fmt(jpy["value"], 2)}')
-        if bits:
-            out.append("，".join(bits))
-    if has(r"\b(stocks?|shares|wall street|s&p|nasdaq|dow|equit(y|ies)|rally|"
-           r"sell-?off|investors|futures)\b"):
-        us = ((ctx.get("equities") or {}).get("us") or {}).get("indices") or []
-        if us and us[0].get("price") is not None:
-            out.append(f'{esc(us[0]["name"])} {fmt(us[0]["price"], 2)}'
-                       f'（{fmt(us[0].get("change_percent"), 2, suffix="%", signed=True)}）')
-    if has(r"\b(bitcoin|crypto|ethereum)\b"):
-        rows = ((ctx.get("market") or {}).get("crypto") or {}).get("rows") or []
-        if rows and rows[0].get("value") is not None:
-            out.append(f'{esc(rows[0]["name"])} {fmt(rows[0]["value"], 0)} 美元，近一月 '
-                       f'{fmt(rows[0].get("chg_1m"), 1, suffix="%", signed=True)}')
-    if has(r"\b(inflation|cpi|pce|prices)\b"):
-        head = (ctx.get("inflation") or {}).get("headline") or {}
-        if head.get("core_pce") is not None:
-            out.append(f'核心 PCE {pct(head["core_pce"], 1)}、核心 CPI {pct(head.get("core_cpi"), 1)}')
-    if has(r"\b(jobs?|payrolls?|unemployment|labor market|jobless)\b"):
-        labor = ctx.get("labor") or {}
-        rate = (labor.get("unemployment") or {}).get("rate")
-        if rate is not None:
-            out.append(f'失業率 {pct(rate, 1)}、三月均非農 '
-                       f'{thousands_to_wan((labor.get("payrolls") or {}).get("avg3"))}')
-    if has(r"\b(recession|gdp)\b"):
-        gauge = (ctx.get("growth") or {}).get("gauge") or {}
-        if gauge.get("value") is not None:
-            out.append(f'衰退風險刻度 {fmt(gauge["value"], 0)}/100（{esc(gauge.get("level", ""))}）')
-    if has(r"\b(taiwan|tsmc|chips?|semiconductors?|nvidia)\b"):
-        twii = next((r for r in ((ctx.get("equities") or {}).get("tw") or {}).get("index") or []
-                     if str(r.get("symbol")) == "^TWII"), None)
-        if twii and twii.get("price") is not None:
-            out.append(f'台股加權 {fmt(twii["price"], 0)}'
-                       f'（{fmt(twii.get("change_percent"), 2, suffix="%", signed=True)}）')
-    return "；".join(out[:2])
 
 
 def _curated_brief(brief: dict) -> str:
@@ -373,10 +257,9 @@ def market_brief(ctx: dict, *, limit: int = 6) -> str:
         if link.lower().startswith(("http://", "https://")):
             title = (f'<a href="{esc(link)}" target="_blank" rel="noopener noreferrer">'
                      f'{title}</a>')
-        reading = _related_reading(headline, ctx)
         items.append(f'<div class="digest-item"><span class="digest-n">{count} 家</span>'
                      f'<span class="digest-text">{title}'
-                     + (f'<span class="digest-data">{reading}</span>' if reading else "")
+                     + (f'<span class="digest-data"></span>' if reading else "")
                      + '</span></div>')
     return ('<p class="muted" style="font-size:.82rem;margin-bottom:8px">'
             '尚未整理：以下是關鍵字挑出的原始標題，整理版由排程任務每天寫入。</p>'
@@ -517,40 +400,6 @@ def module_cards(ctx: dict, signals: list[dict]) -> str:
     return f'<div class="grid grid-3">{"".join(out)}</div>'
 
 
-def changes_block(diff: dict, reading_changes: list[dict]) -> str:
-    parts = []
-    if diff.get("first_run"):
-        parts.append('<p class="muted">這是第一次產生，還沒有可比對的上期。</p>')
-    elif diff.get("same") and not reading_changes:
-        parts.append('<p class="muted">訊號組成與關鍵讀數都與上期相同。</p>')
-    else:
-        if diff.get("added"):
-            parts.append("<p><strong>新增訊號</strong></p>")
-            parts.append('<div class="signal-list">'
-                         + "".join(f'<div class="signal">'
-                                   f'<div class="sev {s["severity"]}">＋</div>'
-                                   f'<div><div class="headline">{esc(s["headline"])}</div>'
-                                   f'<div class="evidence">{esc(s.get("evidence",""))}</div></div>'
-                                   f'<div class="side">{tag(s["direction"])}</div></div>'
-                                   for s in diff["added"]) + "</div>")
-        if diff.get("removed"):
-            parts.append("<p><strong>不再觸發</strong></p>")
-            parts.append('<div class="signal-list">'
-                         + "".join(f'<div class="signal">'
-                                   f'<div class="sev low">－</div>'
-                                   f'<div><div class="headline">{esc(s["headline"])}</div></div>'
-                                   f'<div class="side">{tag(s.get("direction","neutral"))}</div></div>'
-                                   for s in diff["removed"]) + "</div>")
-        if reading_changes:
-            rows = [[esc(c["name"]),
-                     fmt(c["was"], 2, suffix=c["unit"]),
-                     fmt(c["now"], 2, suffix=c["unit"]),
-                     delta_span(c["change"], 2, suffix=c["unit"])]
-                    for c in reading_changes]
-            parts.append(table(["讀數", "上期", "本期", "變動"], rows))
-    return "".join(parts)
-
-
 def _change_items(diff: dict, reading_changes: list[dict],
                   scenario: dict, prior: dict | None) -> list[dict]:
     """把「跟上次建置相比變了什麼」收成一份排好序的清單。
@@ -606,7 +455,7 @@ CHANGE_SCOPE = ("偵測範圍：九宮格的三個位置、規則訊號的增減
 
 
 def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
-                scenario: dict, prior: dict | None, *, shown: int = 5) -> str:
+                scenario: dict, prior: dict | None, *, shown: int = 8) -> str:
     """總覽最上面的變動卡堆。
 
     放在判斷之上是刻意的：每天打開來，九成的像素跟昨天一樣，唯一有價值的
@@ -616,8 +465,11 @@ def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
     來源是伺服器端算好、直接烘進 HTML 的建置比對——service worker 的快取
     騙不了它，離線打開也仍然為真。
     """
+    base = (prior or {}).get("date")
+    title = f"自 {base} 以來" if base else "自上次以來"
+
     if diff.get("first_run"):
-        return section("changes", "與上次建置相比",
+        return section("changes", title,
                        '<p class="muted">這是第一次建置，還沒有可以比對的上一期。</p>')
 
     items = _change_items(diff, reading_changes, scenario, prior)
@@ -628,8 +480,8 @@ def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
             tail = (f'　下一筆公布：{esc(nxt["name"])}'
                     f'（{_when(nxt.get("days_away"))}）')
         return section(
-            "changes", "與上次建置相比",
-            f'<div class="chg-none">判斷與關鍵讀數都沒有變動。{tail}</div>'
+            "changes", title,
+            f'<div class="chg-none">判斷與關鍵讀數與 {esc(str(base or "上次"))} 相同。{tail}</div>'
             f'<p class="chg-scope">{esc(CHANGE_SCOPE)}</p>')
 
     rows = []
@@ -638,7 +490,7 @@ def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
         detail = item.get("detail") or ""
         extra = item.get("delta") or ""
         rows.append(
-            f'<a class="chg-row" href="#changed">'
+            f'<a class="chg-row" href="/archive/#today">'
             f'<span class="chg-sev sev-{esc(sev)}" title="{esc(SEV_TEXT.get(sev, ""))}">'
             f'{SEV_GLYPH.get(sev, "●")}'
             f'<span class="sr-only">{esc(SEV_TEXT.get(sev, ""))}</span></span>'
@@ -650,11 +502,11 @@ def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
 
     more = ""
     if len(items) > shown:
-        more = (f'<a class="chg-more" href="#changed">'
+        more = (f'<a class="chg-more" href="/archive/#today">'
                 f'看全部 {len(items)} 項變動　›</a>')
 
     return section(
-        "changes", "與上次建置相比",
+        "changes", title,
         f'<div class="chg-stack">{"".join(rows)}</div>{more}'
         f'<p class="chg-scope">{esc(CHANGE_SCOPE)}</p>',
         note=f"共 {len(items)} 項")
@@ -666,76 +518,148 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
     lean = scenario["lean"]
     body = []
 
-    # ---- 變動：排在判斷之上（設計規格第 1 階段）----
+    # ---- 1 目前情境（真的 section：側欄目錄與尋找的索引才抓得到它）----
+    body.append(verdict_section(ctx, scenario, summary, signals, lean))
+
+    # ---- 2 自上次以來 ----
     body.append(changes_top(ctx, diff, reading_changes, scenario, prior))
 
-    # ---- 判斷 ----
-    body.append(
-        f'<div class="verdict" style="--regime-color:{LEAN_COLOR[lean]}">'
-        f'<div class="eyebrow">目前情境</div>'
-        f'<div class="hero-figure">{esc(scenario["name"])}：{esc(scenario["regime_label"])}</div>'
-        f'<p class="dim" style="margin:0">{esc(scenario["regime_explain"])}</p>'
-        + keys_strip(ctx, scenario, summary)
-        + f'<div class="callout key">'
-          f'{direction_line(scenario, summary, (ctx["rates"] or {}).get("stance") or {}, ctx.get("fedfunds"))}</div>'
-        + accordion(f"本期關鍵訊號（{summary['total']} 條）",
-                    signals_block(signals, grid=True) + legend_note())
-        + accordion("完整敘述", narrative(ctx, scenario, summary))
-        + f'<p style="margin:12px 0 0"><a href="/scenario/">'
-          f'這個判斷怎麼來的、對應什麼部位　→</a></p>'
-        f'</div>')
-
-    # ---- 今天到了什麼：新數據、資本市場要聞（並排一個區塊） ----
+    # ---- 3 今天到了什麼（機構發了什麼；與「別人怎麼說」分開容器）----
     body.append(section(
-        "today", "今日更新與要聞",
-        f'<div class="today-grid"><div><h3>今日更新的數據</h3>{today_updates_block(ctx)}</div>'
-        f'<div><h3>今日資本市場要聞</h3>{market_brief(ctx)}</div></div>',
-        note="新數據以台北時間為準；要聞由排程任務每日讀完全部來源後整理成四類"))
+        "today", "今天到了什麼", today_updates_block(ctx),
+        note="以台北時間為準；這裡只放機構正式發布的數字"))
 
-    # ---- 1 就業、2 通膨（雙目標，同一套視覺語言）----
-    body.append(cards.employment(ctx, scenario))
-    body.append(cards.inflation(ctx, scenario))
+    # ---- 4 接下來盯什麼（含換檔門檻：來了會不會改判定）----
+    body.append(blocks.watchlist(ctx, next_meeting(), scenario=scenario))
 
-    # ---- 3 聯準會立場與政策 ----
-    body.append(blocks.fed_stance(ctx, scenario, next_meeting()))
+    # ---- 5 今日價格（全頁唯一的即時內容）----
+    body.append(blocks.price_band(ctx))
 
-    # ---- 4 公債利率 ----
-    body.append(blocks.rate_structure(ctx))
+    # ---- 6 雙目標（平日四格，公布日升格成完整卡）----
+    body.append(cards.dual_mandate(ctx, scenario))
 
-    # ---- 5 市場定價 ----
-    body.append(blocks.market_pricing(ctx))
+    # ---- 7 別人怎麼說 ----
+    body.append(section(
+        "voices", "別人怎麼說",
+        '<p class="chg-scope">以下每一句的錯誤責任在報導者。本站沒有為它們設'
+        '任何門檻，也不會因為它們改變上面的判定。</p>'
+        + market_brief(ctx)))
 
-    # ---- 6 商品與傳導 ----
-    body.append(blocks.commodities_block(ctx))
-
-    # ---- 7 對股市的含義 ----
-    body.append(blocks.implications(ctx, scenario, summary))
-
-    # ---- 8 今日觀察清單 ----
-    body.append(blocks.watchlist(ctx, next_meeting()))
-
-    # ---- 頁尾：模組導覽（精簡）與期間比對 ----
-    body.append(module_nav())
-
-    # ---- 變化 ----
-    body.append(section("changed", "跟上期比，什麼變了",
-                        accordion("展開比對",
-                                  changes_block(diff, reading_changes)),
-                        note="每天一筆判斷快照，可回看任一天的結論"))
+    # ---- 8 看更詳細的模組 ----
+    body.append(module_nav(ctx))
 
     return "".join(body)
 
 
-def module_nav() -> str:
-    """頁尾的精簡模組導覽。
+def verdict_section(ctx: dict, scenario: dict, summary: dict,
+                    signals: list[dict], lean: str) -> str:
+    """目前情境。
 
-    詳細數據現在直接在總覽上，所以這裡不需要六張大卡——一行連結
-    就夠了，給習慣從首頁進各模組的讀者。
+    原本是一個 <div class="verdict">，所以 layout 的區塊抽取正則抓不到它——
+    側欄的跨頁目錄底下沒有「判定」這一項，尋找頁的全站索引也索引不到全站
+    最重要的那一句話。改成真的 section 只花三行，換回錨點、目錄與索引。
+
+    嚴重度高的訊號直接列在版面上，其餘收起來：把全部訊號都摺起來，等於把
+    「可反駁」這個性質也一起摺起來，而那是這個產品的全部主張。
     """
-    links = [("/labor/", "勞動市場"), ("/inflation/", "通膨"),
-             ("/fed/", "聯準會與利率"), ("/debt/", "長端與債務"),
-             ("/growth/", "成長與信用"), ("/market/", "市場面"),
-             ("/scenario/", "情境與部位"), ("/deep-dive/", "深度專題")]
-    items = "　·　".join(f'<a href="{h}">{esc(t)}</a>' for h, t in links)
+    high = [s for s in signals if s.get("severity") == "high"]
+    rest = [s for s in signals if s.get("severity") != "high"]
+    stance = (ctx["rates"] or {}).get("stance") or {}
+
+    parts = [
+        f'<div class="hero-figure">{esc(scenario["name"])}：'
+        f'{esc(scenario["regime_label"])}</div>',
+        f'<p class="dim" style="margin:0 0 4px">{esc(scenario["regime_explain"])}</p>',
+        keys_strip(ctx, scenario, summary),
+        f'<div class="callout key">'
+        f'{direction_line(scenario, summary, stance, ctx.get("fedfunds"))}</div>',
+    ]
+    if high:
+        parts.append(f'<h3 class="fd-h">最重的 {len(high)} 條規則訊號</h3>')
+        parts.append(signals_block(high, grid=True))
+    if rest:
+        parts.append(accordion(f"其餘 {len(rest)} 條訊號",
+                               signals_block(rest, grid=True) + legend_note()))
+    parts.append('<p style="margin:12px 0 0"><a href="/scenario/">'
+                 '這個判斷怎麼來的、對應什麼部位　→</a></p>')
+
+    return section(
+        "verdict", "目前情境",
+        f'<div class="verdict verdict-flat" style="--regime-color:{LEAN_COLOR[lean]}">'
+        + "".join(parts) + '</div>',
+        note="判定由寫死的門檻產生；同一份資料每次執行結果一致")
+
+
+def module_nav(ctx: dict | None = None) -> str:
+    """看更詳細的模組。
+
+    漸進揭露的成敗全在這一行——前面每刪一個區塊，它就多欠一份責任。沒有
+    日期的連結列是裝飾；標上「近 7 天有幾檔更新」之後它回答一個真問題：
+    這一頁這週沒動，今晚不用點。有更新的排前面。
+    """
+    links = [("/labor/", "勞動市場", "勞動市場"), ("/inflation/", "通膨", "通膨"),
+             ("/fed/", "聯準會與利率", "利率"), ("/debt/", "長端與債務", "債務"),
+             ("/growth/", "成長與信用", "成長"), ("/market/", "市場面", "市場"),
+             ("/scenario/", "情境與部位", None), ("/deep-dive/", "深度專題", None)]
+
+    counts: dict[str, int] = {}
+    for row in ((ctx or {}).get("freshness") or {}).get("rows") or []:
+        age = row.get("updated_days")
+        if age is not None and age <= 7:
+            counts[row.get("module", "")] = counts.get(row.get("module", ""), 0) + 1
+
+    items = []
+    for href, label, module in links:
+        n = counts.get(module or "", 0)
+        badge = (f'<span class="nav-fresh">近 7 天 {n} 檔更新</span>' if n else "")
+        items.append((n, f'<a class="mod-link" href="{href}">{esc(label)}{badge}</a>'))
+    items.sort(key=lambda x: -x[0])
+
     return section("modules", "看更詳細的模組",
-                   f'<p class="mc-foot-note" style="font-size:.88rem">{items}</p>')
+                   f'<div class="mod-row">{"".join(i[1] for i in items)}</div>')
+
+# --------------------------------------------------------------- 版面預算 --
+
+# 總覽在四個月內被抱怨過兩次「東西太多」。前一次的修法是把表收進摺疊——
+# 那是把「決定不了」變成「先收起來」，所以復發了。這一次改成預算加驅逐律：
+# 要加第 9 個區塊，必須指名擠掉現有八個裡的哪一個。
+#
+# 結構類的預算（區塊、表、摺疊、讀數格）只有改程式才會動，所以超標就讓建置
+# 失敗。字數不同：它會隨訊號條數與當天新聞長度自然浮動，用硬失敗擋它的代價
+# 是「網站因為版面預算而停止更新資料」——那比版面變長嚴重得多，所以只警告。
+BUDGET = {
+    "sections": 8,
+    "tables": 3,
+    "accordions": 3,      # 不含要聞的行內展開（見 NEWS_DISCLOSURES）
+    "cells": 22,
+}
+NEWS_DISCLOSURES = 12     # 要聞四類各 3 則，每則一個行內展開；具名例外
+VISIBLE_CHARS_SOFT = 2600  # 重構當下實測 2,537，留 2.5% 餘裕
+
+
+def measure(body: str) -> dict:
+    """量總覽的版面用量。輸入是渲染完的 body HTML。"""
+    import re
+    visible = re.sub(r'<div class="acc-body">.*?</div></details>', "</details>",
+                     body, flags=re.S)
+    visible = re.sub(r'<div class="bf-body">.*?</div></details>', "</details>",
+                     visible, flags=re.S)
+    text = re.sub(r"\s+", "", re.sub(r"<[^>]+>", "", visible))
+    return {
+        "sections": body.count("<section id="),
+        "tables": body.count("<table"),
+        "accordions": max(0, body.count("<details") - NEWS_DISCLOSURES),
+        "cells": (body.count('class="stat') + body.count('class="key"')
+                  + body.count('class="mc-cell')),
+        "visible_chars": len(text),
+    }
+
+
+def budget_report(body: str) -> tuple[list[str], list[str]]:
+    """回傳 (硬性超標, 軟性警告)。硬性超標要讓建置失敗。"""
+    used = measure(body)
+    hard = [f'{k} {used[k]} 超過上限 {v}——要加東西必須指名擠掉哪一個'
+            for k, v in BUDGET.items() if used[k] > v]
+    soft = ([f'可見字元 {used["visible_chars"]} 超過 {VISIBLE_CHARS_SOFT}']
+            if used["visible_chars"] > VISIBLE_CHARS_SOFT else [])
+    return hard, soft

@@ -6,6 +6,41 @@ from ..html import accordion, callout, delta_span, esc, fmt, section, table, tag
 from ...series import Series
 
 
+def changes_block(diff: dict, reading_changes: list[dict]) -> str:
+    parts = []
+    if diff.get("first_run"):
+        parts.append('<p class="muted">這是第一次產生，還沒有可比對的上期。</p>')
+    elif diff.get("same") and not reading_changes:
+        parts.append('<p class="muted">訊號組成與關鍵讀數都與上期相同。</p>')
+    else:
+        if diff.get("added"):
+            parts.append("<p><strong>新增訊號</strong></p>")
+            parts.append('<div class="signal-list">'
+                         + "".join(f'<div class="signal">'
+                                   f'<div class="sev {s["severity"]}">＋</div>'
+                                   f'<div><div class="headline">{esc(s["headline"])}</div>'
+                                   f'<div class="evidence">{esc(s.get("evidence",""))}</div></div>'
+                                   f'<div class="side">{tag(s["direction"])}</div></div>'
+                                   for s in diff["added"]) + "</div>")
+        if diff.get("removed"):
+            parts.append("<p><strong>不再觸發</strong></p>")
+            parts.append('<div class="signal-list">'
+                         + "".join(f'<div class="signal">'
+                                   f'<div class="sev low">－</div>'
+                                   f'<div><div class="headline">{esc(s["headline"])}</div></div>'
+                                   f'<div class="side">{tag(s.get("direction","neutral"))}</div></div>'
+                                   for s in diff["removed"]) + "</div>")
+        if reading_changes:
+            rows = [[esc(c["name"]),
+                     fmt(c["was"], 2, suffix=c["unit"]),
+                     fmt(c["now"], 2, suffix=c["unit"]),
+                     delta_span(c["change"], 2, suffix=c["unit"])]
+                    for c in reading_changes]
+            parts.append(table(["讀數", "上期", "本期", "變動"], rows))
+    return "".join(parts)
+
+
+
 def _series_from_archive(snapshots: list[dict], key: str) -> Series:
     pairs = []
     for snap in snapshots:
@@ -15,8 +50,17 @@ def _series_from_archive(snapshots: list[dict], key: str) -> Series:
     return Series.from_pairs(key, pairs, frequency="d")
 
 
-def render(snapshots: list[dict]) -> str:
+def render(snapshots: list[dict], *, diff: dict | None = None,
+           reading_changes: list[dict] | None = None) -> str:
     body = []
+
+    # 完整的期間比對從總覽移來：摘要與細節隔著九個區塊與兩個側欄小標，
+    # 就不再是摘要與細節的關係，只是同一件事佔兩次跨頁目錄。
+    if diff is not None:
+        body.append(section(
+            "today", "跟上期比，什麼變了",
+            changes_block(diff, reading_changes or []),
+            note="總覽上的「自上次以來」是這一份的前幾項"))
 
     if not snapshots:
         return ('<div class="card"><p class="muted">還沒有存檔。'
