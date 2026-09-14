@@ -183,6 +183,50 @@ def get_json(url: str, **kwargs):
     return json.loads(get(url, **kwargs))
 
 
+def get_bytes(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
+              retries: int = 3, timeout: int = 90,
+              allow_stale: bool = True) -> bytes:
+    """Fetch `url` as raw bytes, with the same on-disk cache policy as `get`.
+
+    `get` decodes to text, which corrupts anything that is not UTF-8 — the
+    國發會 landing zone ships its 景氣指標 as a ZIP. Kept separate rather than
+    adding a mode flag to `get` so the text path stays the common one.
+    """
+    path = _cache_path(url, namespace)[:-len(".json.gz")] + ".bin.gz"
+    if ttl > 0 and os.path.exists(path):
+        if time.time() - os.path.getmtime(path) <= ttl:
+            try:
+                with gzip.open(path, "rb") as fh:
+                    return fh.read()
+            except Exception:
+                pass
+
+    host = urllib.parse.urlparse(url).netloc
+    last_error: Exception | None = None
+    for attempt in range(retries):
+        _throttle(host)
+        request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                raw = response.read()
+            tmp = path + ".tmp"
+            with gzip.open(tmp, "wb") as fh:
+                fh.write(raw)
+            os.replace(tmp, path)
+            return raw
+        except Exception as exc:
+            last_error = exc
+            time.sleep(1.5 * (attempt + 1))
+
+    if allow_stale and os.path.exists(path):
+        try:
+            with gzip.open(path, "rb") as fh:
+                return fh.read()
+        except Exception:
+            pass
+    raise FetchError(f"{url} failed: {last_error}")
+
+
 def build_url(base: str, params: dict) -> str:
     clean = {k: v for k, v in params.items() if v is not None}
     return base + "?" + urllib.parse.urlencode(clean)

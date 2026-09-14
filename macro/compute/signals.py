@@ -17,6 +17,8 @@ from __future__ import annotations
 
 from typing import Callable
 
+from . import taiwan as taiwan_mod
+
 RULES: list[Callable] = []
 
 
@@ -498,6 +500,102 @@ def volatility_complacent(ctx):
         "低波動本身不是賣訊，但代表壞消息來時的重定價幅度會較大",
         f"VIX {vix:.1f}",
         "neutral", "low", "市場")
+
+
+# ============================================================ 台灣規則 =======
+# 方向一律 neutral。鷹派／鴿派在這個站上專指「聯準會的政策方向」，台灣的
+# 景氣循環不構成聯準會的理由，讓它去加減 tilt 會讓總覽的判斷被無關的
+# 資訊推動。台灣的訊號要能出現在「今天變了什麼」，但不能改寫美國的判斷。
+
+@rule
+def tw_signal_light_extreme(ctx):
+    cycle = (ctx.get("taiwan") or {}).get("cycle") or {}
+    light, score = cycle.get("light"), cycle.get("score")
+    if light not in ("紅", "藍") or score is None:
+        return None
+    streak = cycle.get("light_streak") or 0
+    hot = light == "紅"
+    return _signal(
+        "tw_signal_light_extreme",
+        f"台灣景氣對策信號亮{light}燈，{'熱絡' if hot else '低迷'}區間已 {streak} 個月",
+        "紅燈與藍燈是國發會定義的兩個極端區間，歷史上停留越久，往中間"
+        "回歸的幅度越大" if hot else
+        "藍燈代表景氣低迷，歷史上常伴隨政策轉向寬鬆",
+        f"綜合分數 {score:.0f} 分（紅燈 38–45、藍燈 9–16）",
+        "neutral", "medium" if streak < 6 else "high", "台灣")
+
+
+@rule
+def tw_leading_falling(ctx):
+    cycle = (ctx.get("taiwan") or {}).get("cycle") or {}
+    if not cycle.get("leading_falling"):
+        return None
+    months = cycle.get("leading_down") or 0
+    return _signal(
+        "tw_leading_falling",
+        f"台灣領先指標連續 {months} 個月下滑",
+        "領先指標不含趨勢指數轉折通常早於同時指標，是台灣景氣由盛轉衰"
+        "最早看得到的一組數字",
+        f"不含趨勢指數 {cycle['leading']:.1f}（{months} 個月連降）",
+        "neutral", "high" if months >= 5 else "medium", "台灣")
+
+
+@rule
+def tw_export_orders_contracting(ctx):
+    block = (ctx.get("taiwan") or {}).get("external") or {}
+    orders = block.get("orders")
+    if orders is None or orders >= taiwan_mod.EXPORT_ORDERS_MID:
+        return None
+    return _signal(
+        "tw_export_orders_contracting",
+        "台灣外銷訂單動向指數低於 50，看減家數多於看增",
+        "外銷訂單領先海關出口約一到三個月，是台股營收預期最直接的上游",
+        f"動向指數 {orders:.1f}（50 為擴張與收縮分界）",
+        "neutral", "medium", "台灣")
+
+
+@rule
+def tw_exports_contracting(ctx):
+    block = (ctx.get("taiwan") or {}).get("external") or {}
+    months = block.get("exports_negative_months") or 0
+    if months < taiwan_mod.EXPORT_WEAK_MONTHS:
+        return None
+    return _signal(
+        "tw_exports_contracting",
+        f"台灣海關出口值連續 {months} 個月負成長",
+        "出口佔台灣 GDP 六成以上，連續負成長會經由企業獲利傳導到台股與就業",
+        f"最新年增率 {block['exports_yoy']:+.1f}%",
+        "neutral", "high" if months >= 6 else "medium", "台灣")
+
+
+@rule
+def tw_unemployment_off_lows(ctx):
+    block = (ctx.get("taiwan") or {}).get("labour") or {}
+    gap = block.get("unemployment_gap")
+    if gap is None or gap < taiwan_mod.UNEMPLOYMENT_RISE_PP:
+        return None
+    return _signal(
+        "tw_unemployment_off_lows",
+        "台灣失業率已離近一年低點超過 0.3 個百分點",
+        "台灣失業率波動遠小於美國，離低點 0.3 個百分點在本地已是明顯轉弱",
+        f"{block['unemployment']:.2f}%，近 12 個月低點 "
+        f"{block['unemployment_low_12m']:.2f}%（+{gap:.2f}）",
+        "neutral", "medium", "台灣")
+
+
+@rule
+def tw_m1b_stalling(ctx):
+    block = (ctx.get("taiwan") or {}).get("money") or {}
+    m1b = block.get("m1b_yoy")
+    if m1b is None or m1b >= taiwan_mod.M1B_STALL_PCT:
+        return None
+    return _signal(
+        "tw_m1b_stalling",
+        f"台灣 M1B 年增率降至 {m1b:.1f}%，市場活水轉弱",
+        "M1B 是活期存款加通貨，台股慣用它衡量可立即動用的資金；"
+        "年增率走低代表資金從活存移往定存或流出",
+        f"M1B 年增 {m1b:+.1f}%（本站門檻 {taiwan_mod.M1B_STALL_PCT:.0f}%）",
+        "neutral", "medium", "台灣")
 
 
 # ============================================================== 主入口 ======

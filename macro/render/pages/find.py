@@ -67,7 +67,8 @@ def build_index(section_map: dict | None = None,
 
     group_names = {"labor": "勞動市場", "inflation": "通膨", "rates": "利率",
                    "debt": "債務", "growth": "成長", "market": "市場",
-                   "world": "全球", "commodities": "大宗商品"}
+                   "world": "全球", "commodities": "大宗商品",
+                   "global": "全球", "taiwan": "台灣總經"}
     for group, specs in catalogue.ALL_GROUPS.items():
         for series_id, (name, _unit, _freq, _start) in specs.items():
             entries.append({"t": name, "u": f"/explore/?id={series_id}",

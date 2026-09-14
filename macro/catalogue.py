@@ -265,6 +265,18 @@ GLOBAL_SERIES: dict[str, Spec] = {
     "DTWEXEMEGS": ("美元指數（新興市場）", "指數", "d", "2006-01-02"),
 }
 
+# ---------------------------------------------------------------- 台灣 -----
+# 台灣總經的主體走國發會與主計總處（見 macro/sources/ndc.py、taiwan.py）；
+# FRED 上只有這四檔仍在更新且拿得到——有效匯率來自 BIS，進出口來自 IMF。
+# 外匯存底 FRED 只有 SDR 計價（TRESEGTWM194N），單位換算會讓讀者誤讀
+# 成美元，所以不收。
+TAIWAN: dict[str, Spec] = {
+    "RBTWBIS":       ("台灣實質有效匯率", "指數 2020=100", "m", LONG_START),
+    "NBTWBIS":       ("台灣名目有效匯率", "指數 2020=100", "m", LONG_START),
+    "VALEXPTWM052N": ("台灣出口金額", "百萬美元", "m", "2006-01-01"),
+    "VALIMPTWM052N": ("台灣進口金額", "百萬美元", "m", "2006-01-01"),
+}
+
 # ------------------------------------------------------------- 市場面 -------
 MARKET: dict[str, Spec] = {
     "SP500":      ("標普 500", "點", "d", "2015-01-01"),
@@ -315,7 +327,7 @@ COMMODITY_GROUPS = [
 ALL_GROUPS = {
     "labor": LABOR, "inflation": INFLATION, "rates": RATES, "debt": DEBT,
     "growth": GROWTH, "global": GLOBAL_SERIES, "market": MARKET,
-    "commodities": COMMODITIES,
+    "commodities": COMMODITIES, "taiwan": TAIWAN,
 }
 
 

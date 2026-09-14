@@ -29,6 +29,7 @@ GROUP_LABELS = {
     "labor": "勞動市場", "inflation": "通膨", "rates": "利率與信用",
     "debt": "債務與財政", "growth": "成長與消費", "global": "全球與匯率",
     "market": "市場", "commodities": "大宗商品", "sectors": "行業別就業",
+    "taiwan": "台灣總經",
 }
 
 

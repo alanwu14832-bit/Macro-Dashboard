@@ -598,6 +598,9 @@ def module_nav(ctx: dict | None = None) -> str:
     links = [("/labor/", "勞動市場", "勞動市場"), ("/inflation/", "通膨", "通膨"),
              ("/fed/", "聯準會與利率", "利率"), ("/debt/", "長端與債務", "債務"),
              ("/growth/", "成長與信用", "成長"), ("/market/", "市場面", "市場"),
+             # 台灣的序列不走 FRED，不在新鮮度追蹤清單裡，所以沒有更新徽章。
+             # 沒有徽章就沒有——不拿別的模組的計數來假裝它有。
+             ("/taiwan/", "台灣總經", None),
              ("/scenario/", "情境與部位", None), ("/deep-dive/", "深度專題", None)]
 
     counts: dict[str, int] = {}

@@ -22,7 +22,7 @@ from macro import archive, clock, data, deepdive, paths
 from macro.compute import (commodities, debt, equities, fedfunds, freshness,
                            reaction,
                            growth, inflation, labor, market, news, rates,
-                           scenario, signals, world)
+                           scenario, signals, taiwan, world)
 from macro.render import api, layout
 from macro.render.pages import (archive as archive_page,
                                 deepdive as deepdive_page,
@@ -40,12 +40,14 @@ from macro.render.pages import (archive as archive_page,
                                 overview,
                                 release as release_page,
                                 sources as sources_page,
+                                taiwan as taiwan_page,
                                 scenario as scenario_page, world as world_page)
 
 MODULES = [
     ("labor", labor), ("inflation", inflation), ("rates", rates),
     ("fedfunds", fedfunds), ("debt", debt), ("growth", growth), ("market", market), ("world", world),
     ("commodities", commodities), ("equities", equities),
+    ("taiwan", taiwan),
     ("news", news), ("freshness", freshness),
 ]
 
@@ -184,6 +186,10 @@ def main() -> int:
         ("/equities/", "美股與國際", "美股與國際",
          "美股指數、權值股、類股輪動與新興市場，個股與 ETF 每 45 秒更新。",
          lambda: equities_page.render_us(ctx)),
+        ("/taiwan/", "台灣總經", "台灣總經",
+         "景氣對策信號與領先指標、外銷訂單與海關出口、工業生產與內需、"
+         "失業率與物價、央行利率與 M1B——台灣自己的循環，不是從美國外推。",
+         lambda: taiwan_page.render(ctx, found)),
         ("/tw/", "台股", "台股",
          "加權與櫃買指數、權值股、熱力圖、三大法人資金流向與融資融券，每 5 秒更新。",
          lambda: equities_page.render_tw(ctx)),
@@ -198,7 +204,8 @@ def main() -> int:
          "以及反方觀點與證偽條件。",
          lambda: deepdive_page.render_index(reports)),
         ("/explore/", "自選比較", "自選比較",
-         "從 196 檔序列自選最多 4 個比較，轉換方式與區間隨你調，資料即時取自 FRED。",
+         "從目錄裡的全部序列自選最多 4 個比較，轉換方式與區間隨你調，"
+         "資料即時取自 FRED。",
          lambda: explore_page.render(ctx)),
         ("/freshness/", "資料新鮮度", "資料新鮮度",
          "每個指標多新、下次什麼時候更新，以及為什麼總經資料沒有即時可言。",
