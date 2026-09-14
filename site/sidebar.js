@@ -582,6 +582,42 @@
     });
   }
 
+  /* -------------------------------------- topbar 三態與寬表的水平凍結 --- */
+  // 都用 class 切換而不是在捲動處理器裡讀版面：讀 offsetTop 會強迫重算，
+  // 那正是捲動掉帧的來源（scroll spy 那邊已經踩過一次）。
+  let edgeTick = false;
+  const paintEdge = () => {
+    edgeTick = false;
+    root.classList.toggle("topbar-stuck", window.scrollY > 1);
+  };
+  window.addEventListener("scroll", () => {
+    if (!edgeTick) { edgeTick = true; requestAnimationFrame(paintEdge); }
+  }, { passive: true });
+  paintEdge();
+
+  document.querySelectorAll(".table-wrap").forEach((wrap) => {
+    let tick = false;
+    const paint = () => {
+      tick = false;
+      wrap.classList.toggle("is-scrolled", wrap.scrollLeft > 0);
+    };
+    wrap.addEventListener("scroll", () => {
+      if (!tick) { tick = true; requestAnimationFrame(paint); }
+    }, { passive: true });
+  });
+
+  // thead 黏住時才長陰影：用 1px sentinel 判斷，不輪詢位置
+  document.querySelectorAll("table thead").forEach((head) => {
+    const wrap = head.closest(".table-wrap") || head.closest("section");
+    if (!wrap || !("IntersectionObserver" in window)) return;
+    const mark = document.createElement("div");
+    mark.style.cssText = "height:1px;margin-bottom:-1px";
+    wrap.insertBefore(mark, wrap.firstChild);
+    new IntersectionObserver(
+      ([e]) => head.classList.toggle("is-stuck", !e.isIntersecting),
+      { threshold: 1 }).observe(mark);
+  });
+
   /* ------------------------------------------------------ 回到頂端 ------- */
   const toTop = document.getElementById("to-top");
   if (toTop) {
