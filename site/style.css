@@ -1832,3 +1832,30 @@ footer.site .foot-fine { margin: 0 auto; max-width: var(--measure); font-size: 0
 .bf-flat { padding: 7px 0; }
 @media (pointer: coarse) { .bf-d > summary.bf-h { min-height: 44px; display: flex; align-items: center; } }
 @media (prefers-reduced-motion: reduce) { .bf-d > summary.bf-h::after { transition: none; } }
+
+/* 事實與判定分排：混在同一排會讓「規則說的」看起來跟「BLS 說的」一樣硬 */
+.keys-split {
+  display: flex; justify-content: space-between; gap: 10px;
+  margin: 6px 0; padding: 4px 0; border-top: 1px dashed var(--border);
+  font-size: 0.7rem; color: var(--ink-muted); letter-spacing: .04em;
+}
+.keys-call .key-v { color: var(--ink-2); }
+.verdict-flat { border: 0; box-shadow: none; padding: 0; background: none; }
+.verdict-flat .hero-figure { margin-top: 0; }
+
+/* 雙目標：平日左右各兩格 */
+.dual { display: grid; gap: 14px; }
+@media (min-width: 700px) { .dual { grid-template-columns: 1fr 1fr; gap: 22px; } }
+.dual-half .mc-eyebrow { margin-bottom: 6px; }
+
+/* 模組列：帶「近 7 天 N 檔更新」，沒動的排後面 */
+.mod-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.mod-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 13px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface); text-decoration: none; color: var(--ink);
+  font-size: 0.86rem;
+}
+.mod-link:hover { border-color: var(--border-strong); }
+.nav-fresh { font-size: 0.72rem; color: var(--delta-up); }
+@media (pointer: coarse) { .mod-link { min-height: 44px; } }
