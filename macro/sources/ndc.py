@@ -13,13 +13,13 @@ from __future__ import annotations
 
 import csv
 import io
-import json
 import zipfile
 
-from ..http import get, get_bytes
+from ..http import get_bytes
 from ..series import Series
+from . import datagov
 
-DATASET_API = "https://data.gov.tw/api/v2/rest/dataset/6099"
+DATASET_ID = 6099
 
 # dataset API 掛掉時的退路。這個路徑會過期，所以它只是退路，不是主要來源。
 FALLBACK_ZIP = (
@@ -98,15 +98,8 @@ def _iso(period: str) -> str | None:
 
 
 def zip_url(*, ttl: float = 24 * 3600) -> str:
-    try:
-        meta = json.loads(get(DATASET_API, ttl=ttl, namespace="ndc", timeout=40))
-        for entry in meta["result"]["distribution"]:
-            url = entry.get("resourceDownloadUrl")
-            if url and url.lower().endswith(".zip"):
-                return url
-    except Exception:
-        pass
-    return FALLBACK_ZIP
+    return datagov.download_url(DATASET_ID, ext=".zip", fallback=FALLBACK_ZIP,
+                                ttl=ttl)
 
 
 def _empty() -> dict[str, Series]:

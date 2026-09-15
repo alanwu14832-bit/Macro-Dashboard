@@ -72,7 +72,7 @@ git pull --rebase --autostash origin main
 
 ## 台灣的資料源跟其他頁不一樣
 
-台灣不在 FRED 也不在 OECD，所以 `/taiwan/` 的資料來自三個直接解析的來源，
+台灣不在 FRED 也不在 OECD，所以 `/taiwan/` 的資料來自幾個直接解析的來源，
 每一個都有自己的脆弱點：
 
 - **國發會景氣指標**（`macro/sources/ndc.py`）。一個 ZIP 涵蓋景氣對策信號、
@@ -87,6 +87,20 @@ git pull --rebase --autostash origin main
   不准內插——兩次理監事會議之間畫出斜線等於捏造從未存在的利率。
 - **主計總處 CPI**（`macro/sources/taiwan.py`）。DGBAS 的伺服器少送中介憑證，
   所以走 `macro/http.py` 的 curl 路徑（驗證仍然完整執行，沒有關掉任何東西）。
+- **各部會統計資料庫**（`macro/sources/statdb.py`）。主計總處、勞動部、財政部、
+  內政部是**同一套 `webMain.aspx` 引擎**，一支解析器涵蓋四個部會：GDP、M1B／M2、
+  美元計價外匯存底、積體電路與對美出口、無薪假都從這裡來。欄位位置要先查
+  `sys=212&funid=<代號>` 的表定義；**位置選錯不報錯，只會拿到隔壁那一欄**，所以
+  `macro/compute/taiwan.py` 的 `OFFICIAL` 一律用標籤取序列，標籤對不上就是空的。
+  參數錯誤回 HTTP 200 加純文字，不是 4xx；`ymt` 要填遠未來值。
+- **經濟部統計處外銷訂單金額**（`macro/sources/moea.py`）。和國發會的「外銷訂單
+  動向指數」是兩回事：後者是家數擴散指數。單位寫在每一列，對不上就丟那一列。
+
+**不要用央行 `cpx.cbc.gov.tw` 的 PX JSON 端點。** 它對不存在的期別回 200 並填入
+捏造值（前幾期的加總），不會報錯。央行的數字改從主計總處轉載或 data.gov.tw 的 CSV 取。
+
+下載網址裡帶版本號的（國發會 ZIP、主計總處 CPI XML、經濟部 CSV）一律經
+`macro/sources/datagov.py` 用資料集編號解析當前網址，寫死的只當退路。
 
 ZIP 要用 `http.get_bytes()`，不是 `get()`——後者會把二進位解成 UTF-8 弄壞它。
 

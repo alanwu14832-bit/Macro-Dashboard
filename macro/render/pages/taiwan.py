@@ -1,7 +1,7 @@
 """台灣總經頁。
 
 站上的部位在台股，判斷卻一直來自美國。這一頁補的是台灣自己的循環：
-景氣位置、外需、生產與內需、勞動與物價、資金與利率。
+景氣位置、外需、GDP 與內需、勞動與物價、資金與利率。
 
 排序不是照資料來源，是照傳導順序——外銷訂單先動，接著海關出口與工業生產，
 再來是勞動與物價，最後才是利率與資金。讀者由上往下讀，讀到的是一條鏈。
@@ -9,11 +9,8 @@
 from __future__ import annotations
 
 from ..common import glossary, line_chart, signals_block
-from ..html import (accordion, callout, delta_span, esc, fmt, kv, pct, section,
+from ..html import (accordion, callout, delta_span, esc, fmt, kv, section,
                     stat, table, zh_date)
-
-LIGHT_CLASS = {"紅": "hawkish", "黃紅": "hawkish", "綠": "neutral",
-               "黃藍": "dovish", "藍": "dovish"}
 
 
 def _n(value, digits=1, suffix="", signed=False):
@@ -21,6 +18,11 @@ def _n(value, digits=1, suffix="", signed=False):
     if value is None:
         return '<span class="muted">—</span>'
     return fmt(value, digits, suffix=suffix, signed=signed)
+
+
+def _hundred(value):
+    """百萬美元 -> 億美元。"""
+    return None if value is None else value / 100
 
 
 def _verdict(cycle: dict) -> str:
@@ -91,8 +93,16 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
         ["外銷訂單動向指數", _n(ext["orders"], 1),
          ("看增家數多於看減" if ext["orders_expanding"] else "看減家數多於看增"),
          zh_date(ext["orders_date"])],
+        ["外銷訂單金額　年增", delta_span(ext["orders_amount_yoy"], 1, suffix="%"),
+         f'{_n(_hundred(ext["orders_amount"]), 1, suffix=" 億美元")}',
+         zh_date(ext["orders_amount_date"])],
         ["海關出口值　年增", delta_span(ext["exports_yoy"], 1, suffix="%"),
          f'{_n(ext["exports"], 0)} 十億元', zh_date(ext["exports_date"])],
+        ["積體電路出口　年增", delta_span(ext["ic_yoy"], 1, suffix="%"),
+         f'佔總出口 {_n(ext["ic_share"], 1, suffix="%")}', zh_date(ext["ic_date"])],
+        ["對美出口佔總出口", _n(ext["us_share"], 1, suffix="%"),
+         f'一年前 {_n(ext["us_share_prior"], 1, suffix="%")}',
+         zh_date(ext["us_share_date"])],
         ["半導體設備進口　年增", delta_span(ext["semi_equip_yoy"], 1, suffix="%"),
          "未來產能，領先出口約一年", zh_date(ext["semi_equip_date"])],
         ["機電設備進口　年增", delta_span(ext["capex_yoy"], 1, suffix="%"),
@@ -103,18 +113,27 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
     body.append(section(
         "external", "外需",
         table(["指標", "讀數", "說明", "資料日期"], ext_rows,
-              foot="外銷訂單動向指數以回報家數編製，50 是擴張與收縮的分界——"
-                   "它衡量的是廠商看增或看減的家數比例，不是金額。")
-        + line_chart("海關出口值年增率",
-                     [(ext["exports_yoy_series"], "海關出口年增", "series-1")],
+              foot="外銷訂單動向指數以回報家數編製，50 是分界，測的是看增家數的比例；"
+                   "外銷訂單金額才是訂單的規模。金額大漲而動向指數低於 50，代表成長"
+                   "集中在少數大廠。")
+        + line_chart("海關出口值與外銷訂單金額年增率",
+                     [(ext["exports_yoy_series"], "海關出口年增", "series-1"),
+                      (ext["orders_amount_yoy_series"], "外銷訂單金額年增", "series-3")],
                      years=20, default_years=8, digits=1, freq="m",
                      include_zero=True,
-                     sub="出口佔台灣 GDP 六成以上，這條線是台股企業獲利的上游"),
-        note="外銷訂單領先海關出口約一到三個月",
+                     sub="訂單領先出口約一到三個月。出口佔台灣 GDP 六成以上，"
+                         "這兩條線是台股企業獲利的上游"),
+        note="海關出口與積體電路出口取自財政部，外銷訂單金額取自經濟部統計處",
         terms=["tw_export_orders"]))
 
-    # ---- 3. 生產與內需 ----
+    # ---- 3. GDP、生產與內需 ----
     out_rows = [
+        ["經濟成長率（實質 GDP 年增）", delta_span(out["gdp_growth"], 2, suffix="%"),
+         "季頻，約季後一個月公布", zh_date(out["gdp_date"], freq="q")],
+        ["實質民間消費　年增", delta_span(out["consumption_yoy"], 1, suffix="%"),
+         "內需", zh_date(out["consumption_date"], freq="q")],
+        ["實質固定資本形成　年增", delta_span(out["investment_yoy"], 1, suffix="%"),
+         "投資循環", zh_date(out["investment_date"], freq="q")],
         ["工業生產指數　年增", delta_span(out["industrial_yoy"], 1, suffix="%"),
          f'指數 {_n(out["industrial"], 1)}', zh_date(out["industrial_date"])],
         ["批發、零售及餐飲營業額　年增", delta_span(out["retail_yoy"], 1, suffix="%"),
@@ -129,15 +148,20 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
          "產出的實體對照", zh_date(out["power_date"])],
     ]
     body.append(section(
-        "output", "生產與內需",
+        "output", "GDP、生產與內需",
         table(["指標", "讀數", "說明", "資料日期"], out_rows)
+        + line_chart("經濟成長率",
+                     [(out["gdp_series"], "實質 GDP 年增", "series-1")],
+                     years=25, default_years=10, digits=2, freq="q",
+                     include_zero=True,
+                     sub="主計總處按季發布。季與季之間的判斷仍靠工業生產與同時指標")
         + line_chart("工業生產與批發零售餐飲營業額",
                      [(out["industrial_series"], "工業生產指數", "series-1"),
                       (out["retail_series"], "批發零售餐飲（十億元）", "series-3")],
                      years=15, default_years=6, digits=1, freq="m",
                      series_axes=[None, "right"], right_suffix=" 十億元",
                      sub="外需帶動生產，生產帶動所得，所得才輪到內需"),
-        note="用電量與加班工時通常比出口晚一個月公布，這裡各標各的日期"))
+        note="GDP 是季頻、其餘是月頻，用電量與加班工時通常比出口晚一個月，各標各的日期"))
 
     # ---- 4. 勞動與物價 ----
     tiles = [
@@ -151,22 +175,34 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
              delta="主計總處總指數", asof=zh_date(lab["cpi_date"])),
         stat("加班工時", _n(lab["overtime"], 1, suffix=" 小時"),
              delta="加班先減，才輪到減員", asof=zh_date(lab["overtime_date"])),
-        stat("單位產出勞動成本　年增", _n(lab["unit_labour_cost_yoy"], 1,
-                                  suffix="%", signed=True),
-             delta="成本傳導到物價的那一段",
-             asof=zh_date(lab["unit_labour_cost_date"])),
+        stat("無薪假實施人數", _n(lab["furlough_workers"], 0, suffix=" 人"),
+             delta=(f'{_n(lab["furlough_firms"], 0)} 家事業單位'
+                    if lab["furlough_firms"] is not None else ""),
+             asof=zh_date(lab["furlough_date"])),
     ]
     body.append(section(
         "labour", "勞動與物價",
         f'<div class="grid grid-4">{"".join(tiles)}</div>'
+        + table(["指標", "讀數", "說明", "資料日期"], [
+            ["單位產出勞動成本　年增",
+             _n(lab["unit_labour_cost_yoy"], 1, suffix="%", signed=True),
+             "成本傳導到物價的那一段", zh_date(lab["unit_labour_cost_date"])],
+            ["工業及服務業受僱員工淨進入率", _n(lab["net_entry"], 2, suffix="%"),
+             "進入率減退出率", zh_date(lab["net_entry_date"])],
+        ])
         + line_chart("失業率與 CPI 年增率",
                      [(lab["unemployment_series"], "失業率", "series-1"),
                       (lab["cpi_series"], "CPI 年增率", "series-8")],
                      years=20, default_years=8, digits=2, freq="m",
                      sub="台灣失業率的波動遠小於美國，讀它要看離低點多遠，"
-                         "不是看絕對水準"),
-        note="失業率取自國發會落後指標構成項目，CPI 取自主計總處",
-        terms=["tw_unemployment"]))
+                         "不是看絕對水準")
+        + line_chart("無薪假實施人數",
+                     [(lab["furlough_series"], "實施人數（月底）", "series-1")],
+                     years=10, default_years=5, digits=0, freq="m",
+                     sub="勞雇雙方協商減少工時的通報。企業先減班才裁員，所以它比失業率"
+                         "早轉折；2020 年 3 月以前的口徑不同，不接"),
+        note="失業率取自國發會落後指標構成項目，CPI 取自主計總處，無薪假取自勞動部",
+        terms=["tw_unemployment", "tw_furlough"]))
 
     # ---- 5. 資金與利率 ----
     unchanged = money.get("policy_unchanged_months")
@@ -178,16 +214,20 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
         stat("台美政策利差", _n(money["spread_vs_fed"], 2, suffix="pp", signed=True),
              delta=f'聯準會上緣 {_n(money["fed_upper"], 2, suffix="%")}',
              asof="負值＝台灣利率低於美國，利差不利台幣"),
-        stat("M1B 年增率", _n(money["m1b_yoy"], 2, suffix="%", signed=True),
-             delta="活存加通貨，台股的可動用資金",
-             asof=zh_date(money["m1b_date"]),
-             spark=[(dt.isoformat(), v) for dt, v in
-                    money["m1b_series"].tail(60).pairs()]),
+        stat("M1B 減 M2 年增率", _n(money["m1b_m2_spread"], 2, suffix="pp", signed=True),
+             delta=(f'M1B {_n(money["m1b_yoy"], 2, suffix="%")}　'
+                    f'M2 {_n(money["m2_yoy"], 2, suffix="%")}'),
+             asof=zh_date(money["m1b_m2_date"])),
         stat("美元兌新台幣", _n(money["twd"], 3),
              delta=f'近一年 {_n(money["twd_chg_1y"], 1, suffix="%", signed=True)}',
              asof=f'{zh_date(money["twd_date"], freq="d")}　數字變大＝台幣貶值'),
     ]
+    reserves_change = money.get("fx_reserves_change")
     money_rows = [
+        ["外匯存底", _n(_hundred(money["fx_reserves"]), 1, suffix=" 億美元"),
+         (f'較上月 {_n(_hundred(reserves_change), 1, suffix=" 億美元", signed=True)}'
+          if reserves_change is not None else "美元計價，央行統計"),
+         zh_date(money["fx_reserves_date"])],
         ["五大銀行新承做放款平均利率", _n(money["loan_rate"], 3, suffix="%"),
          "企業實際借到的價格", zh_date(money["loan_rate_date"])],
         ["全體金融機構放款與投資　年增", delta_span(money["credit_yoy"], 2, suffix="%"),
@@ -199,19 +239,21 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
     body.append(section(
         "money", "資金與利率",
         f'<div class="grid grid-4">{"".join(tiles)}</div>'
-        + table(["指標", "讀數", "說明", "資料日期"], money_rows)
+        + table(["指標", "讀數", "說明", "資料日期"], money_rows,
+                foot="外匯存底取自統計資料庫，比央行每月初的新聞稿慢一期。")
+        + line_chart("M1B 與 M2 年增率",
+                     [(money["m1b_series"], "M1B 年增率", "series-1"),
+                      (money["m2_series"], "M2 年增率", "series-3")],
+                     years=25, default_years=10, digits=2, freq="m",
+                     sub="M1B 線跌破 M2 線就是台股慣稱的死亡交叉：資金從活存移往定存。"
+                         "兩條都是日平均數的年增率")
         + line_chart("央行重貼現率與五大銀行新承做放款利率",
                      [(money["policy_series"], "重貼現率", "series-1"),
                       (money["loan_rate_series"], "五大銀行放款利率", "series-3")],
                      years=25, default_years=10, digits=3, freq="m",
                      sub="政策利率是階梯——兩次決策之間它就是不動，圖上按月展開"
-                         "水準，不在決策之間內插")
-        + line_chart("M1B 年增率",
-                     [(money["m1b_series"], "M1B 年增率", "series-1")],
-                     years=25, default_years=10, digits=1, freq="m",
-                     include_zero=True,
-                     sub="台股慣用的資金面指標。年增率轉負代表資金淨流出活存"),
-        note="重貼現率解析自中央銀行「央行貼放利率」頁，M1B 與放款投資取自國發會",
+                         "水準，不在決策之間內插"),
+        note="M1B、M2 與外匯存底取自主計總處轉載的央行統計，重貼現率解析自央行貼放利率頁",
         terms=["tw_m1b", "tw_policy_rate"]))
 
     # ---- 6. 台灣訊號 ----
@@ -235,14 +277,14 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
         "notes", "拿不到什麼",
         f'<div class="card">{gap_html}'
         + kv([
-            ("台灣 GDP", "主計總處只以季頻發布且沒有穩定的免費 API，本站不收。"
-                        "月頻的替代是同時指標與工業生產指數。"),
-            ("M2 與貨幣總計數全表", "國發會只在領先指標構成項目裡提供 M1B。"
-                                "常見的「M1B 與 M2 黃金交叉」因此畫不出來，"
-                                "本站改看 M1B 年增率本身。"),
-            ("外匯存底", "FRED 上的台灣外匯存底以 SDR 計價，換算成美元會讓讀者"
-                       "誤讀，本站不收。"),
-            ("融資維持率", "證交所與櫃買中心不公開，本站在台股頁已標明。"),
+            ("月頻 GDP", "台灣 GDP 只按季發布。季與季之間的判斷靠同時指標與工業生產指數，"
+                        "兩者都不是 GDP 的替身。"),
+            ("當月的外匯存底", "統計資料庫比央行每月初的新聞稿慢一期，本站不解析新聞稿，"
+                          "所以最新一期會晚到。"),
+            ("融資維持率", "證交所與櫃買中心不發布整體市場的維持率資料集。可以由個股融資"
+                        "餘額 × 收盤價 ÷ 融資金額推估，但口徑與官方的整戶擔保維持率不同，"
+                        "本站尚未做。"),
+            ("國際收支", "央行只有季頻，本站尚未收。"),
             ("景氣指標的修正", "國發會每月回溯修正歷史值，本站每次建置重抓整包，"
                           "所以圖上的歷史會跟著官方一起變。"),
         ])
@@ -252,16 +294,17 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
                         "綠、黃紅、紅五個燈號。分界是官方定義，本站原樣使用。"),
             ("領先指標（不含趨勢）", "七項領先性指標的綜合指數，剔除長期趨勢後"
                             "只留循環成分。轉折通常早於同時指標數個月。"),
-            ("外銷訂單動向指數", "以回報家數編製的擴散指數，50 為分界。"
-                        "它測的是看增家數多還是看減家數多，不是訂單金額。"),
-            ("M1B", "通貨淨額加支票存款、活期存款與活期儲蓄存款——可立即動用的錢。"
-                   "台股慣用它衡量市場資金動能。"),
+            ("外銷訂單：動向指數與金額", "動向指數以回報家數編製，50 為分界，測的是看增"
+                                "家數多還是看減家數多；金額由經濟部統計處發布，是訂單的規模。"),
+            ("M1B 與 M2", "M1B 是通貨加活期存款——可立即動用的錢；M2 再加上定存、"
+                         "外匯存款等。台股慣看兩者年增率的交叉。"),
+            ("無薪假", "勞動部公布的「勞雇雙方協商減少工時」通報，企業減班休息的家數與人數。"),
             ("重貼現率", "中央銀行對金融機構融通的基準利率，是台灣的政策利率。"
                     "它是階梯函數，一年可能一次都不調整。"),
             ("實質有效匯率", "BIS 編製，對主要貿易對手的加權匯率再扣掉相對物價。"
                       "指數走高代表出口相對變貴。"),
             ("為什麼各格的日期不一樣", "台灣各項統計的公布時程本來就不同："
-                          "海關出口與失業率較快，用電量與加班工時較慢。"
+                          "財政部出口較快，用電量與加班工時較慢，GDP 是季頻。"
                           "本站不對齊到同一個月，各標各的。"),
         ]))))
 

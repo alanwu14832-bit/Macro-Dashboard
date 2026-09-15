@@ -131,12 +131,13 @@ class Rules(unittest.TestCase):
                          "exports_yoy": -12.3},
             "labour": {"unemployment": 4.1, "unemployment_low_12m": 3.5,
                        "unemployment_gap": 0.6},
-            "money": {"m1b_yoy": 1.2},
+            "money": {"m1b_yoy": 1.2, "m2_yoy": 4.0, "m1b_m2_spread": -2.8,
+                      "m1b_m2_negative_months": 4},
         }}
         fired = [fn(ctx) for fn in signals.RULES
                  if fn.__name__.startswith("tw_")]
         fired = [s for s in fired if s]
-        self.assertEqual(len(fired), 6, "六條台灣規則在這個情境下應全部觸發")
+        self.assertEqual(len(fired), 7, "七條台灣規則在這個情境下應全部觸發")
         for signal in fired:
             self.assertEqual(signal["direction"], "neutral", signal["key"])
             self.assertEqual(signal["module"], "台灣", signal["key"])
@@ -153,7 +154,8 @@ class Rules(unittest.TestCase):
                          "exports_yoy": 8.1},
             "labour": {"unemployment": 3.4, "unemployment_low_12m": 3.35,
                        "unemployment_gap": 0.05},
-            "money": {"m1b_yoy": 6.0},
+            "money": {"m1b_yoy": 6.0, "m2_yoy": 5.0, "m1b_m2_spread": 1.0,
+                      "m1b_m2_negative_months": 0},
         }}
         fired = [fn(ctx) for fn in signals.RULES
                  if fn.__name__.startswith("tw_")]

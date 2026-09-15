@@ -598,6 +598,23 @@ def tw_m1b_stalling(ctx):
         "neutral", "medium", "台灣")
 
 
+@rule
+def tw_m1b_below_m2(ctx):
+    block = (ctx.get("taiwan") or {}).get("money") or {}
+    spread = block.get("m1b_m2_spread")
+    if spread is None or spread >= 0:
+        return None
+    months = block.get("m1b_m2_negative_months") or 0
+    return _signal(
+        "tw_m1b_below_m2",
+        f"台灣 M1B 年增率低於 M2（死亡交叉），已 {months} 個月",
+        "M1B 是通貨加活期存款，M2 再加上定存與外匯存款。M1B 成長慢於 M2 "
+        "代表資金從隨時可動用的活存移往定存，台股慣用它判斷市場資金動能轉弱",
+        f"M1B 年增 {block['m1b_yoy']:.2f}%、M2 年增 {block['m2_yoy']:.2f}%"
+        f"（差 {spread:+.2f} 個百分點）",
+        "neutral", "medium" if (months >= 3 or spread <= -1.0) else "low", "台灣")
+
+
 # ============================================================== 主入口 ======
 
 SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2}

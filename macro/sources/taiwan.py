@@ -13,7 +13,11 @@ import re
 
 from ..http import get
 from ..series import Series
+from . import datagov
 
+# 網址裡的 11525/230555 是上架版本號，主計總處重新上架就換。每次建置先經
+# 政府資料開放平臺（資料集 6019）解析當前網址，這條寫死的只當退路。
+CPI_DATASET = 6019
 CPI_XML = ("https://ws.dgbas.gov.tw/001/Upload/461/relfile/11525/230555/"
            "pr0101a1m.xml")
 
@@ -42,7 +46,9 @@ def cpi(*, ttl: float = 24 * 3600) -> dict[str, Series]:
     empty = {"index": Series("TW_CPI", [], [], frequency="m"),
              "yoy": Series("TW_CPI_YOY", [], [], frequency="m")}
     try:
-        raw = get(CPI_XML, ttl=ttl, namespace="taiwan", timeout=90, retries=2)
+        target = datagov.download_url(CPI_DATASET, ext=".xml",
+                                      fallback=CPI_XML, ttl=ttl)
+        raw = get(target, ttl=ttl, namespace="taiwan", timeout=90, retries=2)
     except Exception:
         return empty
 

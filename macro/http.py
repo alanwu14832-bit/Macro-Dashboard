@@ -31,6 +31,14 @@ HOST_SPACING = {
     "api.worldbank.org": 0.4,
     "data-api.ecb.europa.eu": 0.6,
     "sdmx.oecd.org": 1.0,
+    # 台灣各部會統計資料庫：密集連打時會直接丟連線（不是 4xx），
+    # 回來的是空值而且不會報錯。
+    "nstatdb.dgbas.gov.tw": 1.5,
+    "statdb.mol.gov.tw": 1.2,
+    "web02.mof.gov.tw": 1.2,
+    "statis.moi.gov.tw": 1.2,
+    "service.moea.gov.tw": 0.8,
+    "data.gov.tw": 0.6,
 }
 DEFAULT_SPACING = 0.5
 
