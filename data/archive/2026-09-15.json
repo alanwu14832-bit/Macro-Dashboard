@@ -1,6 +1,6 @@
 {
  "date": "2026-09-15",
- "generated_at": "2026-09-15T16:17:22+08:00",
+ "generated_at": "2026-09-15T16:23:10+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -121,13 +121,21 @@
    "severity": "low",
    "evidence": "高收益利差 2.65%，十年百分位 4%",
    "module": "利率"
+  },
+  {
+   "key": "tw_m1b_below_m2",
+   "headline": "台灣 M1B 年增率低於 M2（死亡交叉），已 1 個月",
+   "direction": "neutral",
+   "severity": "low",
+   "evidence": "M1B 年增 7.34%、M2 年增 7.42%（差 -0.08 個百分點）",
+   "module": "台灣"
   }
  ],
  "summary": {
-  "total": 15,
+  "total": 16,
   "hawkish": 5,
   "dovish": 6,
-  "neutral": 4,
+  "neutral": 5,
   "score": -2,
   "tilt": "方向分歧"
  },
