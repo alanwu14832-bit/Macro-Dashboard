@@ -1,28 +1,43 @@
 {
- "date": "2026-09-15",
- "generated_at": "2026-09-15T16:15:00+08:00",
+ "date": "2026-09-16",
+ "generated_at": "2026-09-16T15:50:00+08:00",
  "sections": [
-  {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "美10年期殖利率升至4.96%，創2007年以來新高", "detail": "期貨定價9/16 FOMC升息機率94%，到2027年7月累計升息約94bp；油價與殖利率同步走高，股債同向、債券失去避險功能", "source": "CNBC、Financial Times 等3家", "link": ""},
-   {"headline": "布蘭特逼近110美元、WTI 97.26美元，近一月漲16%", "detail": "沙烏地繞道荷莫茲的輸油管遭無人機攻擊，修復需3–5週，未來一兩個月推升美國總體CPI", "source": "AP、CNBC、Oil & Gas 等", "link": ""},
-   {"headline": "中國8月零售銷售不如預期、投資持續下滑", "detail": "中國內需疲弱，對原物料需求與亞洲出口是拖累；銅金比處十年低檔也在定價成長放緩", "source": "CNBC", "link": ""},
-   {"headline": "英國薪資成長放緩至3.9%，南韓央行紀錄顯示連續升息有分歧", "detail": "各國央行在油價推升通膨與成長降溫之間拉扯", "source": "Guardian、Reuters", "link": ""}
-  ]},
-  {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "科技業CEO呼籲放緩AI開發，AI概念股重挫", "detail": "輝達跌3.4%、那斯達克100跌0.8%，AI供應鏈評價面臨壓力", "source": "CNN、Guardian、Reuters、CBS", "link": ""},
-   {"headline": "Abbott同意付3.84億美元和解受污染嬰兒配方奶指控", "detail": "一次性法律成本，醫療保健類股個案風險", "source": "DOJ、Reuters", "link": ""},
-   {"headline": "波音獲美國海軍首份MQ-25A無人加油機量產合約", "detail": "伊朗戰爭造成彈藥短缺，國防採購加速", "source": "Defense News、Janes", "link": ""},
-   {"headline": "Costco調漲Kirkland機油價格並限購", "detail": "油價上漲開始傳導到零售端商品", "source": "AP、Yahoo Finance 等3家", "link": ""}
-  ]},
-  {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "胡塞攻擊沙烏地並奪取紅海戰略島嶼，波灣國家延後與伊朗的荷莫茲談判", "detail": "傳導路徑：能源航道受威脅 → 油價、運費上升；分析師警告油價可能看到150美元", "source": "Reuters、Guardian ME、gCaptain 等4家", "link": ""},
-   {"headline": "美國以涉伊朗為由制裁俄羅斯VTB銀行；五角大廈揭露伊朗戰爭花費334億美元", "detail": "傳導路徑：金融制裁擴大、國防支出與財政赤字增加 → 長端供給壓力", "source": "Treasury、Reuters、CNBC", "link": ""},
-   {"headline": "美軍首度證實在軌道部署太空武器，中國要求停止備戰", "detail": "傳導路徑：美中緊張升溫 → 避險需求、國防與科技供應鏈", "source": "BBC、CNN、FT、SCMP 等4家", "link": ""}
-  ]},
-  {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "台股加權收45,511點跌0.8%、櫃買跌1.5%，跟隨美國AI股賣壓", "detail": "聯發科跌2.9%，台積電小漲0.2%，台達電逆勢漲3.1%", "source": "Fincept 報價", "link": ""},
-   {"headline": "景氣對策信號亮紅燈41分，已連8個月熱絡，但外銷訂單動向指數48.8低於50", "detail": "景氣仍熱但出口接單前瞻轉弱，看減家數多於看增", "source": "儀表板（國發會、經濟部）", "link": ""}
-  ]}
+  {
+   "key": "macro",
+   "title": "總經數據與事件",
+   "items": [
+    {"headline": "FOMC 今晚決議，期貨隱含升息機率 94%，10 年期升到 4.97%", "detail": "路徑定價到 2027/7 累計再升 92bp；股市開會前下跌，市場開始討論 5% 殖利率的門檻。", "source": "CBS News、MarketWatch、CNBC、FT", "link": ""},
+    {"headline": "沙烏地東西向輸油管遇襲關閉，WTI 一個月漲 16% 到 97.3 美元", "detail": "延布港裝載一度暫停、歐洲貨載被取消，日本煉廠搶中東原油；美國能源部長稱只是短暫中斷，業界估修復要數月。油價佔 CPI 約 6.2%，直接推升未來一兩個月的總體通膨。", "source": "Oil & Gas、BBC、AP、CNBC", "link": ""},
+    {"headline": "英國 CPI 跳升到 3.1%、日銀預期升息 25bp，CBO 警告伊朗戰爭推升通膨", "detail": "能源成本推升英國表面通膨（核心仍穩）；CBO 估戰事已花 380 億美元、每月再 20–30 億，並耗掉三分之二飛彈攔截庫存。主要央行同步轉鷹，壓縮美國提早降息的空間。", "source": "CNBC、Reuters Business、AP、ABC News", "link": ""}
+   ]
+  },
+  {
+   "key": "company",
+   "title": "公司新聞",
+   "items": [
+    {"headline": "SK 海力士傳與英特爾洽談首度在美國代工記憶體晶片", "detail": "若成局，等於記憶體供應鏈往美國本土移一段，也替英特爾晶圓廠找到新客戶。", "source": "Reuters 獨家", "link": ""},
+    {"headline": "GSK 以最高 7.5 億美元授權中國藥廠的癌症標靶新藥", "detail": "大藥廠持續向中國生技買管線，是近年授權金流的常態。", "source": "Reuters Asia、南華早報", "link": ""},
+    {"headline": "黃仁勳將出席川普為習近平舉行的國宴，特斯拉恢復中國折扣", "detail": "美中領袖會前傳出討論調降兩個關鍵產業關稅，科技巨頭靠攏；特斯拉降價則反映中國需求端壓力。另有海岸防衛隊與 FBI 登上駛往德州油輪調查網路攻擊，能源運輸的資安風險同步升高。", "source": "CNBC、Reuters、南華早報、CBS News", "link": ""}
+   ]
+  },
+  {
+   "key": "geo",
+   "title": "地緣政治",
+   "items": [
+    {"headline": "胡塞奪紅海兩座戰略島嶼，沙烏地攔下麥加附近無人機並劃下紅線", "detail": "荷姆茲航運量仍停在個位數，紅海與波灣同時受威脅，是這波油價與運費的主因。", "source": "AP、Guardian ME、CNN", "link": ""},
+    {"headline": "無人機攻擊讓俄羅斯半數主要柴油煉廠減產，俄烏持續互擊能源設施", "detail": "全球柴油裂解價差的上行風險，會透過運輸成本再回到核心商品價格。", "source": "Reuters、Oil & Gas", "link": ""},
+    {"headline": "北約在立陶宛擊落無人機、俄艦向丹麥直升機發射照明彈；貝森特週末會何立峰", "detail": "歐洲邊境摩擦升溫支撐避險，美中財金對話則是關稅與伊朗議題的緩衝，兩股力量方向相反。", "source": "AP、PBS、BBC、Reuters World", "link": ""}
+   ]
+  },
+  {
+   "key": "taiwan",
+   "title": "台灣",
+   "items": [
+    {"headline": "台股收 45,848.90 點、上漲 0.7%，櫃買大漲 2.7%", "detail": "本日收盤價。中小型股表現明顯強於權值股。", "source": "Fincept Terminal", "link": ""},
+    {"headline": "AI 供應鏈領漲：聯發科 +2.3%、台達電 +2.4%、廣達 +2.3%，台積電平盤 2,380 元", "detail": "資金往 ASIC 與電源、伺服器組裝移動，台積電原地不動。", "source": "Fincept Terminal", "link": ""},
+    {"headline": "記憶體供應鏈變數：SK 海力士傳赴美與英特爾合作生產", "detail": "與台系封測、載板的分工可能重排，值得追蹤後續是否成案。", "source": "Reuters", "link": ""}
+   ]
+  }
  ],
- "synthesis": "與本期判斷的交集：沙國管線停擺與紅海衝突推升油價、10年期創2007年來新高且市場押注9/16升息，讓「通膨未解／通膨優先」的判斷更站得住，新增的 r−g 轉正訊號也呼應長端壓力。"
+ "synthesis": "與本期判斷的交集：沙烏地管線斷供把 WTI 一個月推高 16%，同一天 10 年期升到 4.97%、期限溢酬 1.23 個百分點，正好對上儀表板「油價上行推升未來一至兩月 CPI」與「長端要求額外補償」兩條訊號；英國 CPI 跳到 3.1%、日銀預期升息，也讓「通膨優先」的九宮格定位更站得住。"
 }
