@@ -8,13 +8,14 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+from ... import clock
 from ..html import accordion, callout, card, esc, kv, section, stat
 
 
 def _clock(moment: datetime | None) -> str:
     if moment is None:
         return "—"
-    local = moment.astimezone()
+    local = moment.astimezone(clock.TAIPEI)
     return f"{local.month}/{local.day} {local.hour:02d}:{local.minute:02d}"
 
 

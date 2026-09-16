@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from datetime import date
 
+from . import clock
+
 MEETINGS = [
     # 2026 年（聯準會 2025-06 公布）
     date(2026, 1, 28), date(2026, 3, 18), date(2026, 4, 29),
@@ -25,7 +27,7 @@ MEETINGS = [
 
 def next_meeting(today: date | None = None) -> dict | None:
     """下一次 FOMC 決策日與倒數天數。行事曆走完回 None。"""
-    today = today or date.today()
+    today = today or clock.us_today()
     for when in MEETINGS:
         if when >= today:
             return {"date": when, "days": (when - today).days}

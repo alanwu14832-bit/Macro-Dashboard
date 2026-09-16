@@ -232,8 +232,10 @@ def finnhub_earnings(symbols: list[str], *, days: int = 14,
     token = finnhub_key()
     if not token or not symbols:
         return []
-    from datetime import date, timedelta
-    start = date.today()
+    from datetime import timedelta
+
+    from .. import clock
+    start = clock.us_today()
     url = build_url(FINNHUB_EARNINGS, {
         "from": start.isoformat(),
         "to": (start + timedelta(days=days)).isoformat(),
@@ -286,7 +288,7 @@ def normalise(row: dict, *, name: str = "", region: str = "") -> dict:
     stamp = row.get("timestamp")
     when = None
     if isinstance(stamp, (int, float)):
-        when = datetime.fromtimestamp(stamp, tz=timezone.utc).astimezone()
+        when = datetime.fromtimestamp(stamp, tz=timezone.utc).astimezone(TAIPEI)
     elif isinstance(stamp, str):
         try:
             when = datetime.fromisoformat(stamp)

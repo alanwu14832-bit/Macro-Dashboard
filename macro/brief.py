@@ -23,7 +23,7 @@ import json
 import os
 from datetime import date
 
-from . import paths
+from . import clock, paths
 
 BRIEF_FILE = os.path.join(paths.DATA_DIR, "brief.json")
 MAX_AGE_DAYS = 2
@@ -73,7 +73,7 @@ def normalise(raw: dict) -> dict | None:
 
 def load(today: date | None = None, path: str = BRIEF_FILE) -> dict | None:
     """讀取並檢查新鮮度：超過 MAX_AGE_DAYS 的整理不上總覽，寧可退回原始標題。"""
-    today = today or date.today()
+    today = today or clock.today()
     try:
         with open(path, encoding="utf-8") as fh:
             brief = normalise(json.load(fh))

@@ -12,7 +12,7 @@ import json
 import os
 from datetime import date, datetime, timezone
 
-from .. import http, paths
+from .. import clock, http, paths
 from . import quotes
 
 MONTH_CODES = "FGHJKMNQUVXZ"          # CME 月份代碼：1 月 F … 12 月 Z
@@ -44,7 +44,7 @@ def contract_months(start: date, months: int = 12) -> list[tuple[str, str]]:
 
 def _when(stamp) -> str | None:
     if isinstance(stamp, (int, float)):
-        return (datetime.fromtimestamp(stamp, tz=timezone.utc).astimezone()
+        return (datetime.fromtimestamp(stamp, tz=timezone.utc).astimezone(clock.TAIPEI)
                 .isoformat(timespec="minutes"))
     if isinstance(stamp, str) and stamp:
         return stamp
@@ -90,7 +90,7 @@ def _save_snapshot(found: dict[str, dict]) -> None:
     """記住每個合約最後一次成功的報價。沒有新東西也照寫——雲端建置的
     commit 步驟會 git add 這個檔，檔案不存在會讓整個步驟失敗。"""
     snapshot = _load_snapshot()
-    now = datetime.now().isoformat(timespec="seconds")
+    now = clock.now().isoformat(timespec="seconds")
     for symbol, row in found.items():
         snapshot[symbol] = {"price": row["price"], "quoted_at": row.get("quoted_at"),
                             "source": row.get("source"), "saved_at": now}

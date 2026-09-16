@@ -10,6 +10,7 @@ import json
 import os
 from datetime import datetime
 
+from .. import clock
 from ..sources import quotes, twse_open
 
 # ---- 美股：指數 + 權值股 -------------------------------------------------
@@ -230,7 +231,7 @@ def _save_snapshot(groups: list[list[dict]]) -> None:
                 "limit_up": row.get("limit_up"), "limit_down": row.get("limit_down"),
                 "market_status": row.get("market_status"),
                 "quoted_at": row["quoted_at"].isoformat() if row.get("quoted_at") else None,
-                "saved_at": datetime.now().isoformat(timespec="seconds"),
+                "saved_at": clock.now().isoformat(timespec="seconds"),
                 "source": row.get("source"),
             }
     try:
@@ -366,7 +367,7 @@ def compute(bundle=None) -> dict:
         "stale_count": sum(1 for r in everything if r.get("stale")),
         "source_note": ("Fincept Terminal" if quotes.available()
                         else "Finnhub" if quotes.finnhub_key() else "存檔"),
-        "fetched_at": datetime.now(),
+        "fetched_at": clock.now(),
         "us": {
             "indices": us_indices, "proxies": us_proxies,
             "stocks": us_stocks, "sectors": us_sectors,

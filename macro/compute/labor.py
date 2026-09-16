@@ -6,9 +6,9 @@
 """
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import timedelta
 
-from .. import catalogue
+from .. import catalogue, clock
 from ..data import Bundle
 from ..series import Series
 from ..sources import fred
@@ -71,7 +71,7 @@ def revision_tracking(bundle: Bundle, months: int = 14) -> dict:
             continue
         # 就業報告約在次月第一個週五公布；取次月 15 日的 vintage 保守涵蓋
         release = (ref.replace(day=1) + timedelta(days=45)).replace(day=15)
-        if release > date.today():
+        if release > clock.us_today():
             continue
         vintage = fred.vintage_series("PAYEMS", release.isoformat(), start="2015-01-01")
         if len(vintage) < 2:

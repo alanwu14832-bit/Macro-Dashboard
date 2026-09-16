@@ -9,8 +9,7 @@
 """
 from __future__ import annotations
 
-from datetime import date
-
+from .. import clock
 from ..http import build_url, get_json
 from ..series import Series
 
@@ -101,7 +100,7 @@ def daily_market(*, months: int = 6, ttl: float = 6 * 3600) -> dict:
     已經走完的月份內容不會再變，快取放 30 天；只有當月需要照一般
     TTL 更新——一天實際上只多一次上游呼叫。
     """
-    today = date.today()
+    today = clock.today()
     wanted = []
     y, m = today.year, today.month
     for _ in range(months):
@@ -152,7 +151,7 @@ def institutional_history(*, days: int = 130, ttl: float = 6 * 3600) -> list[dic
 
     yi = 100_000_000.0
     out = []
-    today = date.today()
+    today = clock.today()
     for i in range(days):
         d = today - timedelta(days=i)
         if d.weekday() >= 5:                     # 週末必休市，不用問

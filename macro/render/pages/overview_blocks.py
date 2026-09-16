@@ -620,7 +620,10 @@ def _when_label(days: int) -> str:
 def _next_opex() -> dict | None:
     """下一個月選擇權到期日（每月第三個星期五）。"""
     from datetime import date, timedelta
-    today = date.today()
+
+    from ... import clock
+    # 到期日是美東日期（16:00 收盤），拿美東的今天比
+    today = clock.us_today()
     for offset in (0, 1):
         year = today.year + (today.month + offset - 1) // 12
         month = (today.month + offset - 1) % 12 + 1

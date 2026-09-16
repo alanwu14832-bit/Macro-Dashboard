@@ -12,14 +12,12 @@ from __future__ import annotations
 import json
 import os
 from datetime import date, datetime
-from zoneinfo import ZoneInfo
 
-from .. import paths
+from .. import clock, paths
 from ..data import Bundle
 from ..http import build_url, get_json
 from ..sources import fred
 
-TAIPEI = ZoneInfo("Asia/Taipei")
 # 上一輪建置看到的每檔序列資料日期。build.py 每輪寫回。
 STATE_FILE = os.path.join(paths.DATA_DIR, "series_dates.json")
 
@@ -56,7 +54,7 @@ def _release_dates(release_id: int, *, limit: int = 3) -> list[str]:
     params = {
         "release_id": release_id, "api_key": fred.api_key(), "file_type": "json",
         "sort_order": "asc", "include_release_dates_with_no_data": "true",
-        "realtime_start": date.today().isoformat(), "limit": limit,
+        "realtime_start": clock.us_today().isoformat(), "limit": limit,
     }
     try:
         payload = get_json(build_url("https://api.stlouisfed.org/fred/release/dates", params),
@@ -125,7 +123,8 @@ def observed_updates(bundle: Bundle, state: dict, today: date) -> tuple[list[dic
 
 
 def compute(bundle: Bundle) -> dict:
-    today = date.today()
+    # 發布日是美東日期，拿美東的今天比（見 clock.us_today）
+    today = clock.us_today()
     rows = []
     for series_id, label, module, release_id in TRACKED:
         series = bundle[series_id]
@@ -177,7 +176,7 @@ def compute(bundle: Bundle) -> dict:
              and r["frequency"] != "d"}
 
     # 台北日期：使用者在台灣看，「今天」就該是台灣的今天；雲端建置跑在 UTC。
-    today_taipei = datetime.now(TAIPEI).date()
+    today_taipei = clock.today()
     updates, series_state = observed_updates(bundle, load_state(), today_taipei)
 
     return {
@@ -191,6 +190,6 @@ def compute(bundle: Bundle) -> dict:
         },
         "series_state": series_state,
         "external": EXTERNAL,
-        "generated": datetime.now(),
+        "generated": clock.now(),
         "next_up": rows[0] if rows else None,
     }

@@ -10,6 +10,7 @@ from __future__ import annotations
 from datetime import date
 
 from .. import catalogue
+from ..clock import today as _today
 from ..data import Bundle
 from ..series import Series, EMPTY
 from ..sources import sdmx, taiwan
@@ -47,7 +48,7 @@ def _staleness(last: date | None, today: date) -> tuple[bool, int | None]:
 
 
 def country_table(bundle: Bundle, external: dict) -> dict:
-    today = date.today()
+    today = _today()
     rows = []
     for code, block in catalogue.GLOBAL_BLOCKS.items():
         cpi_value = cpi_date = None

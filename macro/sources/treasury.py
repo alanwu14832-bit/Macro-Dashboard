@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 
+from .. import clock
 from ..http import get_json
 
 UPCOMING = "https://www.treasurydirect.gov/TA_WS/securities/upcoming?format=json"
@@ -38,7 +39,7 @@ def upcoming(*, days: int = 21, ttl: float = 6 * 3600) -> list[dict]:
     except Exception:
         return []
 
-    today = date.today()
+    today = clock.us_today()
     out = {}
     for row in rows or []:
         term = str(row.get("securityTerm", ""))

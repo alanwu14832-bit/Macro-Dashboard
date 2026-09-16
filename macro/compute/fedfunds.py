@@ -15,7 +15,7 @@ from __future__ import annotations
 import calendar
 from datetime import date
 
-from .. import fomc
+from .. import clock, fomc
 from ..data import Bundle
 from ..sources import fedfunds as source
 
@@ -115,7 +115,7 @@ def summarise(rows: list[dict]) -> str:
 
 def compute(bundle: Bundle) -> dict:
     effr = bundle["DFF"].last
-    today = date.today()
+    today = clock.us_today()
     if effr is None:
         return {"available": False, "reason": "沒有有效聯邦資金利率（DFF）可當起點",
                 "rows": [], "monthly": []}
