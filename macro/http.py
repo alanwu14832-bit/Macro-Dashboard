@@ -38,6 +38,8 @@ HOST_SPACING = {
     "web02.mof.gov.tw": 1.2,
     "statis.moi.gov.tw": 1.2,
     "service.moea.gov.tw": 0.8,
+    "www.stat.gov.tw": 1.0,
+    "www.cbc.gov.tw": 0.8,
     "data.gov.tw": 0.6,
 }
 DEFAULT_SPACING = 0.5

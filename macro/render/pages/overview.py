@@ -5,6 +5,7 @@ import re
 
 from ...compute.news import _headline, _is_market, _same_story, _tokens
 from ...compute.scenario import REGIME_LABELS
+from ... import clock
 from ...fomc import next_meeting
 from . import mandate_cards as cards
 from . import overview_blocks as blocks
@@ -124,7 +125,9 @@ def today_updates_block(ctx: dict) -> str:
             continue
         periodic.append(_series_update(series, series_id))
     periodic.sort(key=lambda u: u["name"])
-    daily = today.get("daily") or []
+    # 日頻序列（殖利率、匯率）每個交易日都「更新」，列在「今天」底下會把 43 檔
+    # 天天在動的數字跟真正的發布混在一起，而且跟「今日價格」重複。
+    daily: list[dict] = []
 
     parts = []
     if periodic:
@@ -399,47 +402,60 @@ def module_cards(ctx: dict, signals: list[dict]) -> str:
     return f'<div class="grid grid-3">{"".join(out)}</div>'
 
 
-def _fomc_items(state: dict | None) -> list[dict]:
-    """FOMC 決議置頂，排在換格之上。
+def _chg_row(item: dict) -> str:
+    sev = item["sev"]
+    detail = item.get("detail") or ""
+    extra = item.get("delta") or ""
+    return (
+        f'<a class="chg-row" href="{esc(item.get("href") or "/archive/#today")}">'
+        f'<span class="chg-sev sev-{esc(sev)}" title="{esc(SEV_TEXT.get(sev, ""))}">'
+        f'{SEV_GLYPH.get(sev, "●")}'
+        f'<span class="sr-only">{esc(SEV_TEXT.get(sev, ""))}</span></span>'
+        f'<span class="chg-body">'
+        f'<span class="chg-tag">{esc(item["tag"])}</span>'
+        f'<span class="chg-title">{esc(item["title"])}{(" " + extra) if extra else ""}</span>'
+        + (f'<span class="chg-detail">{esc(detail)}</span>' if detail else "")
+        + f'</span><span class="chg-go" aria-hidden="true">›</span></a>')
 
-    2026-09-16 升息，總覽兩天都沒有顯示：政策利率讀的是還沒更新的 FRED，
-    行事曆在會後默默翻到下一次。所以會後一週內，「決議」或「決議遺漏」
-    兩者之一一定出現在這裡（macro/fomc.py decision_status），而且不依賴
-    跟昨天的比對——決議不是「讀數變動」，是事件。
+
+def today_section(ctx: dict) -> str:
+    """今天：重大數據與政策決議。總覽的第一個區塊。
+
+    2026-09-16 FOMC 升息、9/17 台灣央行放寬房貸成數，網站都沒顯示。使用者要的是
+    打開總覽第一眼就知道「今天有沒有重大數據或政策轉向」——所以第一句就是答案，
+    底下才是清單。央行決議會後一週內都列著（本週稍早），決議遺漏永遠置頂。
+    清單來自 compute/events.py，全是機構正式發布的事實，不放本站規則的判定。
     """
-    from datetime import date as _date
+    ev = ctx.get("events") or {}
+    day = ev.get("date") or clock.today()
+    weekday = ev.get("weekday") or "一二三四五六日"[day.weekday()]
+    parts = [callout(esc(ev.get("verdict") or "今天的重大事件這一輪沒有計算成功，請看下方更新清單。"),
+                     key=True)]
 
-    if not state or state.get("state") not in ("announced", "missing"):
-        return []
-    if state["state"] == "announced":
-        effective = _date.fromisoformat(state["effective"])
-        vote = f'，表決 {state["vote"]}' if state.get("vote") else ""
-        return [{
-            "rank": -1, "sev": "high", "tag": "FOMC 決議",
-            "title": state["headline"],
-            "detail": (f'{state["date"]} 聯準會聲明{vote}；'
-                       f'新利率 {effective.month}/{effective.day} 生效。'),
-            "href": "/fed/#statement",
-        }]
-    meeting = _date.fromisoformat(state["meeting"])
-    return [{
-        "rank": -1, "sev": "high", "tag": "FOMC 決議遺漏",
-        "title": f"{meeting.month}/{meeting.day} FOMC 決議本站沒有取得",
-        "detail": f'{state["reason"]}。政策利率可能仍是舊值，請以聯準會官網為準。',
-        "href": "https://www.federalreserve.gov/newsevents/pressreleases.htm",
-    }]
+    today_rows = [e for e in ev.get("events") or [] if e["today"]]
+    earlier = [e for e in ev.get("events") or [] if not e["today"]]
+    if today_rows:
+        parts.append(f'<div class="chg-stack">{"".join(_chg_row(e) for e in today_rows)}</div>')
+    if earlier:
+        parts.append('<h3 class="fd-h">本週稍早</h3>'
+                     f'<div class="chg-stack">{"".join(_chg_row(e) for e in earlier)}</div>')
+    if ev and not ev.get("calendar_ok", True):
+        parts.append('<p class="chg-scope">台灣統計發布看板這一輪沒有取得，今天的台灣數據可能漏列。</p>')
+    parts.append('<h3 class="fd-h">今天更新的序列</h3>' + today_updates_block(ctx))
+    return section(
+        "today", "今天", "".join(parts),
+        note=f"{day.month}/{day.day}（{weekday}）台北時間；FOMC、台灣央行、美台主要發布")
 
 
 def _change_items(diff: dict, reading_changes: list[dict],
-                  scenario: dict, prior: dict | None,
-                  fomc: dict | None = None) -> list[dict]:
+                  scenario: dict, prior: dict | None) -> list[dict]:
     """把「跟上次建置相比變了什麼」收成一份排好序的清單。
 
     排序是判斷的輕重，不是時間：換格（九宮格位置變了）永遠排第一，因為它
     代表整套判斷的前提改變；其次是新觸發的嚴重訊號、再其次是跨過門檻的讀數。
     「不再觸發」排最後——訊號消失通常不是新資訊，是舊資訊退場。
     """
-    items: list[dict] = _fomc_items(fomc)
+    items: list[dict] = []
 
     was = (prior or {}).get("scenario") or {}
     for key, cur_key, label in (("employment", "employment_label", "就業"),
@@ -481,7 +497,8 @@ def _change_items(diff: dict, reading_changes: list[dict],
     return items
 
 
-CHANGE_SCOPE = ("偵測範圍：FOMC 決議、九宮格的三個位置、規則訊號的增減、9 項關鍵讀數。"
+CHANGE_SCOPE = ("偵測範圍：九宮格的三個位置、規則訊號的增減、9 項關鍵讀數。央行決議與今天的"
+                "重大數據在最上面的「今天」。"
                 "曲線形狀、市場廣度、法人連續性不在偵測範圍內。")
 
 
@@ -499,15 +516,11 @@ def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
     base = (prior or {}).get("date")
     title = f"自 {base} 以來" if base else "自上次以來"
 
-    fomc_state = ctx.get("fomc")
     if diff.get("first_run"):
-        # 沒有上一期可比，但決議不是比對出來的——照樣置頂
-        items = _fomc_items(fomc_state)
-        if not items:
-            return section("changes", title,
-                           '<p class="muted">這是第一次建置，還沒有可以比對的上一期。</p>')
-    else:
-        items = _change_items(diff, reading_changes, scenario, prior, fomc=fomc_state)
+        return section("changes", title,
+                       '<p class="muted">這是第一次建置，還沒有可以比對的上一期。</p>')
+
+    items = _change_items(diff, reading_changes, scenario, prior)
     if not items:
         nxt = ((ctx.get("freshness") or {}).get("imminent") or [None])[0]
         tail = ""
@@ -519,21 +532,7 @@ def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
             f'<div class="chg-none">判斷與關鍵讀數與 {esc(str(base or "上次"))} 相同。{tail}</div>'
             f'<p class="chg-scope">{esc(CHANGE_SCOPE)}</p>')
 
-    rows = []
-    for item in items[:shown]:
-        sev = item["sev"]
-        detail = item.get("detail") or ""
-        extra = item.get("delta") or ""
-        rows.append(
-            f'<a class="chg-row" href="{esc(item.get("href") or "/archive/#today")}">'
-            f'<span class="chg-sev sev-{esc(sev)}" title="{esc(SEV_TEXT.get(sev, ""))}">'
-            f'{SEV_GLYPH.get(sev, "●")}'
-            f'<span class="sr-only">{esc(SEV_TEXT.get(sev, ""))}</span></span>'
-            f'<span class="chg-body">'
-            f'<span class="chg-tag">{esc(item["tag"])}</span>'
-            f'<span class="chg-title">{esc(item["title"])}{(" " + extra) if extra else ""}</span>'
-            + (f'<span class="chg-detail">{esc(detail)}</span>' if detail else "")
-            + f'</span><span class="chg-go" aria-hidden="true">›</span></a>')
+    rows = [_chg_row(item) for item in items[:shown]]
 
     more = ""
     if len(items) > shown:
@@ -553,16 +552,14 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
     lean = scenario["lean"]
     body = []
 
-    # ---- 1 目前情境（真的 section：側欄目錄與尋找的索引才抓得到它）----
+    # ---- 1 今天：重大數據與政策決議（第一眼的問題：今天有沒有事）----
+    body.append(today_section(ctx))
+
+    # ---- 2 目前情境（真的 section：側欄目錄與尋找的索引才抓得到它）----
     body.append(verdict_section(ctx, scenario, summary, signals, lean))
 
-    # ---- 2 自上次以來 ----
+    # ---- 3 自上次以來 ----
     body.append(changes_top(ctx, diff, reading_changes, scenario, prior))
-
-    # ---- 3 今天到了什麼（機構發了什麼；與「別人怎麼說」分開容器）----
-    body.append(section(
-        "today", "今天到了什麼", today_updates_block(ctx),
-        note="以台北時間為準；這裡只放機構正式發布的數字"))
 
     # ---- 4 接下來盯什麼（含換檔門檻：來了會不會改判定）----
     body.append(blocks.watchlist(ctx, next_meeting(), scenario=scenario))

@@ -18,10 +18,10 @@ import time
 import traceback
 from datetime import date, datetime
 
-from macro import archive, clock, data, deepdive, fomc, paths
-from macro.sources import fomc_text
+from macro import archive, cbc_board, clock, data, deepdive, fomc, paths
+from macro.sources import cbc as cbc_source, fomc_text
 from macro.compute import (commodities, debt, equities, fedfunds, freshness,
-                           reaction,
+                           reaction, events,
                            growth, inflation, labor, market, news, rates,
                            scenario, signals, taiwan, world)
 from macro.render import api, layout
@@ -131,6 +131,36 @@ def main() -> int:
             print(f"   ✗ {name}", flush=True)
             traceback.print_exc()
 
+    # 台灣央行理監事會：決議在 taiwan 模組裡讀（它要用來校正重貼現率），
+    # 會議日程從央行 RSS 的預定日期公告讀，狀態定義跟 FOMC 一樣。
+    ctx["cbc"] = cbc_board.decision_status(
+        (ctx.get("taiwan") or {}).get("cbc_decision"),
+        cbc_board.meetings(cbc_source.board_schedule()))
+    cbc_state = ctx["cbc"] or {}
+    if cbc_state.get("state") == "announced":
+        note = ("（貼放利率表尚未更新，重貼現率依新聞稿校正）"
+                if ((ctx.get("taiwan") or {}).get("cbc_patch") or {}).get("patched") else "")
+        print(f"   ✓ 台灣央行 {cbc_state['date']}：{cbc_state['headline']}{note}", flush=True)
+    elif cbc_state.get("state") == "missing":
+        print(f"   ✗ 台灣央行 {cbc_state['meeting']} 決議遺漏：{cbc_state['reason']}"
+              f"——總覽會置頂顯示缺口", flush=True)
+        if os.environ.get("GITHUB_ACTIONS"):
+            print(f"::error title=台灣央行決議遺漏::{cbc_state['meeting']} {cbc_state['reason']}",
+                  flush=True)
+    if not any(m >= clock.today() for m in cbc_board.meetings(cbc_source.board_schedule())):
+        print("   ⚠ 台灣央行理監事會日程已排完：等央行 12 月公告隔年預定日期，"
+              "公告前會議遺漏將無法被偵測", flush=True)
+
+    # 總覽第一個區塊「今天」：政策決議與重大數據。要等 freshness、fomc、cbc 都好了才算。
+    try:
+        ctx["events"] = events.compute(ctx)
+        print(f"   ✓ 今天：{ctx['events']['verdict']}", flush=True)
+    except Exception:
+        ctx["events"] = {}
+        failures.append("events")
+        print("   ✗ events", flush=True)
+        traceback.print_exc()
+
     # 「剛公布」狀態落地：每小時建置都寫一份，發送端跟上一輪比對，
     # 有「新出現」的指標才推播——同一次發布只推一次。
     # 市場反應：發布落點頁要用，推播也用同一個函式（macro/compute/reaction.py）
@@ -148,6 +178,11 @@ def main() -> int:
             "name": (f"FOMC 決議：{fomc.action_label(state)}"
                      f"（{fomc.range_label(state['lower'], state['upper'])}）"),
             "date": state["date"],
+        }
+    if (cbc_state.get("state") == "announced"
+            and (clock.today() - date.fromisoformat(cbc_state["date"])).days <= 2):
+        fresh_state[f"CBC:{cbc_state['date']}"] = {
+            "name": cbc_state["headline"], "date": cbc_state["date"],
         }
     with open(os.path.join(paths.DATA_DIR, "fresh_state.json"), "w",
               encoding="utf-8") as fh:

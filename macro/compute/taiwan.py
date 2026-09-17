@@ -19,6 +19,7 @@
 """
 from __future__ import annotations
 
+from .. import cbc_board
 from ..data import Bundle
 from ..series import EMPTY, Series
 from ..sources import cbc, moea, ndc, statdb, taiwan as dgbas
@@ -309,6 +310,8 @@ def money(ind: dict[str, Series], rate: dict[str, Series], bundle: Bundle,
         "policy": policy.last, "policy_date": rate["changes"].last_date,
         "policy_series": policy,
         "policy_changes": rate["changes"],
+        # 貼放利率表還沒補上時由決議新聞稿校正（cbc_board.reconcile_discount）
+        "policy_source": (rate["changes"].meta or {}).get("patched_from"),
         "policy_unchanged_months": (
             _months_between(rate["changes"].last_date, policy.last_date)
             if rate["changes"].last_date and policy.last_date else None),
@@ -366,8 +369,11 @@ def compute(bundle: Bundle) -> dict:
     ind = ndc.indicators()
     cpi = dgbas.cpi()
     rate = cbc.discount_rate()
+    decision = cbc.latest_board_decision()
+    rate, patch = cbc_board.reconcile_discount(rate, decision)
     gov = official()
     return {
+        "cbc_decision": decision, "cbc_patch": patch,
         "cycle": cycle(ind),
         "external": external(ind, bundle, gov),
         "output": output(ind, gov),

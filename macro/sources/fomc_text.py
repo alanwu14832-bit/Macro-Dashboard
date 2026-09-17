@@ -98,7 +98,7 @@ def latest_decision(*, ttl: float = RSS_TTL) -> dict:
             return {**base, "status": "unparsed",
                     "reason": "聲明的動詞跟前後兩次的利率區間對不上，不採用"}
         out.update(prev_date=parsed[1][0], prev_lower=previous["lower"],
-                   prev_upper=previous["upper"])
+                   prev_upper=previous["upper"], prev_action=previous["action"])
     return out
 
 # 措辭光譜。挑的是聯準會實際會換掉的字，不是泛用的情緒詞。

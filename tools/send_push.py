@@ -193,6 +193,8 @@ def compose_data_update() -> dict | None:
     # 而不是丟到總覽讓人自己找。多個同時公布時帶第一個。
     if any(sid.startswith("FOMC:") for sid in new_ids):
         landing = "/fed/#statement"
+    elif any(sid.startswith("CBC:") for sid in new_ids):
+        landing = "/taiwan/#money"
     else:
         landing = f"/release/{new_ids[0]}/" if new_ids[0] in RELEASE_ROUTES else "/release/"
 

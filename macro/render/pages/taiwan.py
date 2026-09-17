@@ -25,6 +25,27 @@ def _hundred(value):
     return None if value is None else value / 100
 
 
+def _board_callout(state: dict | None) -> str:
+    """理監事會決議用中文講在資金與利率最上面。只看貼放利率表的話，利率不變、
+    調準備率、調房貸成數這些決議全部看不到。"""
+    if not state:
+        return ""
+    if state.get("state") == "announced":
+        lines = "；".join(state.get("details") or [])
+        return callout(
+            f'<strong>{esc(state["headline"])}</strong>　{esc(state["date"])} 理監事會決議'
+            + (f'：{esc(lines)}' if lines else "")
+            + f'。<a href="{esc(state["url"])}" target="_blank" rel="noopener noreferrer">決議新聞稿</a>',
+            key=True)
+    if state.get("state") == "missing":
+        return callout(
+            f'<strong>{esc(state["meeting"])} 的理監事會決議本站沒有取得</strong>：'
+            f'{esc(state["reason"])}。重貼現率可能仍是舊值，請以央行公告為準。', key=True)
+    if state.get("state") == "pending":
+        return callout(f'今天（{esc(state["meeting"])}）央行理監事會，約 16:30 公布決議。')
+    return ""
+
+
 def _verdict(cycle: dict) -> str:
     light, score = cycle.get("light"), cycle.get("score")
     if light is None or score is None:
@@ -206,10 +227,13 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
 
     # ---- 5. 資金與利率 ----
     unchanged = money.get("policy_unchanged_months")
+    source = money.get("policy_source")
     tiles = [
         stat("央行重貼現率", _n(money["policy"], 3, suffix="%"),
              delta=(f'已 {unchanged} 個月未調整' if unchanged else ""),
-             asof=(f'最近一次調整 {zh_date(money["policy_date"], freq="d")}'
+             asof=(f'依 {esc(source["statement"])} 理監事會決議，貼放利率表尚未更新'
+                   if source else
+                   f'最近一次調整 {zh_date(money["policy_date"], freq="d")}'
                    if money["policy_date"] else "")),
         stat("台美政策利差", _n(money["spread_vs_fed"], 2, suffix="pp", signed=True),
              delta=f'聯準會上緣 {_n(money["fed_upper"], 2, suffix="%")}',
@@ -238,7 +262,8 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
     ]
     body.append(section(
         "money", "資金與利率",
-        f'<div class="grid grid-4">{"".join(tiles)}</div>'
+        _board_callout(ctx.get("cbc"))
+        + f'<div class="grid grid-4">{"".join(tiles)}</div>'
         + table(["指標", "讀數", "說明", "資料日期"], money_rows,
                 foot="外匯存底取自統計資料庫，比央行每月初的新聞稿慢一期。")
         + line_chart("M1B 與 M2 年增率",

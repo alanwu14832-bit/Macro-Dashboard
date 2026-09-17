@@ -15,9 +15,10 @@ from datetime import date, datetime, time, timedelta
 from unittest import mock
 
 from macro import fomc
-from macro.clock import NEW_YORK
+from macro.clock import NEW_YORK, TAIPEI
+from macro.compute import events
 from macro.data import Bundle
-from macro.render.pages.overview import _change_items, changes_top
+from macro.render.pages.overview import changes_top, today_section
 from macro.series import Series
 from macro.sources import fomc_text
 
@@ -185,11 +186,9 @@ class Status(unittest.TestCase):
 
 
 class OverviewNeverOmits(unittest.TestCase):
-    SCENARIO = {"employment_label": "放緩", "inflation_label": "偏高", "regime_label": "通膨優先"}
-
     def test_every_meeting_surfaces_a_decision_or_a_gap(self):
         """行事曆上每一次會議，會後一到七天，不論聲明抓到、抓不到、讀不出，
-        總覽變動區最上面都要有 FOMC 那一列。"""
+        總覽最上面的「今天」都要有 FOMC 那一列。"""
         for meeting in fomc.MEETINGS:
             for days_after in (1, 3, 7):
                 now = datetime.combine(meeting + timedelta(days=days_after),
@@ -200,24 +199,26 @@ class OverviewNeverOmits(unittest.TestCase):
                                   "reason": "讀不出"},
                                  ok((meeting - timedelta(days=42)).isoformat())):
                     state = fomc.decision_status(decision, now)
-                    html = changes_top({"fomc": state}, {"same": True}, [],
-                                       self.SCENARIO, {"date": "x", "scenario": {}})
-                    self.assertIn('class="chg-tag">FOMC 決議', html,
+                    ev = events.build(state, None, {}, [], now.astimezone(TAIPEI))
+                    html = today_section({"events": ev})
+                    self.assertIn('class="chg-tag">FOMC', html,
                                   f"{meeting} +{days_after}d {decision.get('status')}")
 
-    def test_decision_outranks_a_regime_change(self):
-        prior = {"scenario": {"employment": "持穩", "inflation": "偏高", "regime": "通膨優先"}}
-        state = fomc.decision_status(ok("2026-09-16", prev_lower=3.5, prev_upper=3.75),
+    def test_missing_decision_is_first(self):
+        state = fomc.decision_status({"status": "unavailable", "reason": "抓不到"},
                                      ny(2026, 9, 17))
-        items = _change_items({}, [], self.SCENARIO, prior, fomc=state)
-        self.assertEqual(items[0]["tag"], "FOMC 決議")
-        self.assertEqual(items[1]["tag"], "換格")
+        freshness = {"rows": [{"name": "CPI", "frequency": "m", "updated": None,
+                               "next_release": date(2026, 9, 17)}]}
+        ev = events.build(state, None, freshness, [], ny(2026, 9, 17).astimezone(TAIPEI))
+        self.assertEqual(ev["events"][0]["tag"], "FOMC　決議遺漏")
+        self.assertIn("決議遺漏 1 項", ev["verdict"])
 
-    def test_first_build_still_shows_the_decision(self):
-        state = fomc.decision_status(ok("2026-09-16"), ny(2026, 9, 17))
-        html = changes_top({"fomc": state}, {"first_run": True}, [], self.SCENARIO, None)
-        self.assertIn("FOMC 決議", html)
-        self.assertIn('href="/fed/#statement"', html)
+    def test_changes_stack_no_longer_repeats_the_decision(self):
+        """決議只在「今天」出現一次，「自上次以來」只放本站判定的比對。"""
+        html = changes_top({"fomc": {"state": "announced"}}, {"same": True}, [],
+                           {"employment_label": "放緩", "inflation_label": "偏高",
+                            "regime_label": "通膨優先"}, {"date": "x", "scenario": {}})
+        self.assertNotIn("FOMC", html)
 
 
 if __name__ == "__main__":
