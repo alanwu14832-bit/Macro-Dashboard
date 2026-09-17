@@ -1,28 +1,28 @@
 {
- "date": "2026-09-16",
- "generated_at": "2026-09-16T16:10:19+08:00",
+ "date": "2026-09-17",
+ "generated_at": "2026-09-17T20:30:00+08:00",
  "sections": [
   {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "Fed 今日（9/16）決議，期貨隱含升息機率 94%，到 2027/7 累計定價升息 93bp", "detail": "FT 調查的經濟學家主張 Fed 頂住川普壓力升息，美股會前走弱；這是本輪緊縮週期的第一步，而不是一次性調整", "source": "Financial Times、AP News、CBS News、MarketWatch", "link": ""},
-   {"headline": "美債 10 年期 4.97%、30 年期 5.34%，10 年期近一月上升 34bp，期限溢酬約 +1.23 個百分點", "detail": "長端逼近 5% 主要來自實質利率與期限溢酬，不是通膨預期；股債同向，債券對沖股票的功能失效", "source": "儀表板讀數；CNBC 2 則", "link": ""},
-   {"headline": "沙烏地東西向輸油管遭無人機攻擊關閉、Yanbu 港裝船暫停，WTI 97.26 美元（近一月 +16.1%）、布蘭特 109.51 美元", "detail": "沙國取消部分運往歐洲的貨載、日本煉油廠搶購中東原油；美國庫存增加讓油價盤中回落，但專家估計修復需要數月", "source": "CNBC、Oil & Gas、AP News、BBC World", "link": ""},
-   {"headline": "英國 8 月 CPI 升至 3.1%，能源推升；日銀預期升息 1 碼至三十年新高", "detail": "能源衝擊正在擴散到其他經濟體的通膨，全球主要央行同步偏緊", "source": "CNBC、Reuters Business", "link": ""}
+   {"headline": "Fed 一致決議升息，為 2023 年以來首次，點陣圖暗示年內再升一次", "detail": "期貨定價 10/28 會議升息機率 100%（其中 +50bp 52%），到 2027/7 累計再升約 98bp；Goldman 也喊十月升息，緊縮循環重啟。", "source": "CBS、CNN、PBS、Reuters 等多家", "link": ""},
+   {"headline": "美 10 年期殖利率升至 5.00%，實質利率 2.62%、期限溢酬約 +1.2 個百分點", "detail": "長端近一月 +32bp、近三月 +53bp，主要由實質利率推升；中國美債持有量降到 2008 年來最低，長端供需壓力未解。", "source": "儀表板讀數；FT、Asia News", "link": ""},
+   {"headline": "油價高檔震盪：WTI 107 美元、布蘭特 131 美元，近一月分別 +27%、+42%", "detail": "沙烏地改經阿曼輸出原油讓油價小幅回落，但荷莫茲海峽通行船數仍只有個位數、俄羅斯柴油出口禁令延到十月底，能源推升 CPI 的壓力還在。", "source": "Oil & Gas、Reuters Energy、Reuters Business", "link": ""},
+   {"headline": "英國央行維持利率 3.75% 不跟進 Fed，但警告戰爭可能迫使未來升息", "detail": "主要央行政策開始分歧；美元指數（廣體）118.2，近一月 -0.8%。", "source": "Guardian、CNBC", "link": ""}
   ]},
   {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "SK 海力士與英特爾洽談在美國代工生產記憶體晶片，屬首例", "detail": "若成案，記憶體產能將首度落地美國，並替英特爾晶圓代工帶進大客戶，牽動記憶體供應鏈的地理配置", "source": "Reuters 獨家", "link": ""},
-   {"headline": "黃仁勳將出席川普為習近平舉辦的國宴", "detail": "美中峰會若鬆動晶片出口管制，會直接影響輝達中國營收與 AI 伺服器供應鏈", "source": "CNBC、Reuters World", "link": ""},
-   {"headline": "GSK 以最高 7.5 億美元授權中國藥廠的抗癌藥美國權利", "detail": "美中緊張下大型藥廠仍持續向中國生技採購新藥，授權交易節奏未受影響", "source": "Reuters Asia、South China Morning Post", "link": ""}
+   {"headline": "美股在 Fed 升息後走低：道瓊 -1.2%、標普 -0.5%，那斯達克持平", "detail": "微軟 -1.4%、亞馬遜 -1.0%，輝達 +0.8%；黃金升息後一度跌逾 1%，比特幣近一月 -3.5%。", "source": "AP、PBS、Reuters；報價", "link": ""},
+   {"headline": "Generac 與亞馬遜簽約後股價大漲，資料中心電力設備需求再獲驗證", "detail": "同時美眾院推進法案要壓低 AI 資料中心轉嫁給家戶的電費，雲端大廠的電力成本可能上升。", "source": "Yahoo Finance；CBS、CNBC、Reuters", "link": ""},
+   {"headline": "美司法部再度在反壟斷案中對 Google 取得重大救濟", "detail": "Alphabet 當日 -0.6%，搜尋業務的結構性限制風險延續。", "source": "DOJ", "link": ""},
+   {"headline": "歐盟對 MMG 收購英美資源鎳資產發出反壟斷異議", "detail": "鎳近一月 -5.4%，這筆交易卡關會影響電池金屬的供應整合。", "source": "MarketWatch、Reuters Business", "link": ""}
   ]},
   {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "中東供油三線受阻：沙國輸油管停擺、胡塞奪取紅海戰略島嶼、荷姆茲海峽通行船數仍在個位數", "detail": "傳導路徑：原油與運費 → 總體 CPI；沙國稱無人機逼近麥加是「紅線」，衝突升級風險未退", "source": "AP News、Guardian、CNN World、Oil & Gas", "link": ""},
-   {"headline": "美國國會預算處：伊朗戰爭已花費 380 億美元、每月 20–30 億，攔截飛彈耗掉三分之二，並警告通膨上升", "detail": "傳導路徑：軍費擴大財政赤字與公債供給 → 期限溢酬與長端殖利率", "source": "ABC News、Reuters US、AP News、CBS News 等 4 家", "link": ""},
-   {"headline": "川習峰會前美中討論調降兩個關鍵產業的關稅，貝森特本週末會晤何立峰；中國同時以科技安全為由收緊出境", "detail": "傳導路徑：關稅與出口管制 → 科技供應鏈與人民幣匯率", "source": "Bloomberg、Business Insider、Reuters World、BBC Asia", "link": ""},
-   {"headline": "俄烏互攻能源設施，俄國前幾大柴油煉廠半數減產；北約在立陶宛擊落無人機", "detail": "傳導路徑：柴油供給收緊 → 歐洲能源價格與運輸成本", "source": "Reuters World、Oil & Gas、AP News、PBS NewsHour", "link": ""}
+   {"headline": "美眾院通過俄羅斯制裁法案，對購買俄國能源的國家課最高 100% 關稅，送交川普簽署", "detail": "印度警告影響雙邊關係、中國反擊；傳導路徑是油價與亞洲貿易／匯率。", "source": "ABC、CBS、CNBC、Reuters 等 7 家", "link": ""},
+   {"headline": "川普稱伊朗戰爭可能接近尾聲，但胡塞與沙烏地衝突升溫", "detail": "胡塞宣稱擊落沙國 F-15、美方已在阿曼與胡塞接觸，中國也施壓伊朗約束胡塞；傳導路徑是荷莫茲與紅海航道、油價。", "source": "Iran International、Reuters、Janes", "link": ""},
+   {"headline": "歐盟提議讓加拿大成為首個「準會員」，川普稱為敵對行為並威脅關稅", "detail": "傳導路徑是美歐、美加關稅風險與貿易供應鏈。", "source": "AP、FT、CNN、Reuters", "link": ""}
   ]},
   {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "加權指數收 45,848.90 點（+0.7%），櫃買指數 +2.7% 明顯強於大盤", "detail": "台積電平盤 2,380 元，聯發科、台達電、廣達各漲 2.3–2.4%，資金從權王擴散到 AI 零組件與中小型股", "source": "儀表板報價（本日收盤）", "link": ""},
-   {"headline": "美中峰會與關稅談判進入關鍵週，AI 供應鏈出口管制走向是台股下一個變數", "detail": "黃仁勳出席國宴、雙方討論關稅調降，結果會直接影響台灣 AI 伺服器與晶片的對陸出貨", "source": "CNBC、Reuters、Bloomberg", "link": ""}
+   {"headline": "台股加權指數收 46,288 點、漲 1.0%，台積電 +1.9% 收 2,425 元領漲", "detail": "鴻海、廣達各 +1.0%，聯發科 -0.7%、台達電 -1.5%，櫃買 -0.3%，漲勢集中在權值股。", "source": "報價（本日收盤）", "link": ""},
+   {"headline": "美國晶片製造人才短缺，台積電與三星海外廠急缺人力", "detail": "影響台積電美國廠的產能爬坡與成本。", "source": "CNBC", "link": ""}
   ]}
  ],
- "synthesis": "與本期判斷的交集：沙國輸油管停擺加上紅海與荷姆茲受阻、WTI 近一月 +16%，支撐「油價推升 CPI」與通膨優先的判斷，戰費擴大赤字則呼應期限溢酬偏高與 r−g 訊號，Fed 升息 94% 的定價與此一致；但就業端的偏降息訊號仍在，政策傾向維持分歧。"
+ "synthesis": "與本期判斷的交集：Fed 重啟升息、期貨再定價近一百個基點、10 年期站上 5%，加上布蘭特 131 美元與荷莫茲受阻，都讓「通膨未解／通膨優先」更站得住；但三月均非農 7.1 萬低於損益兩平，就業面的降息訊號仍在，傾向維持分歧。"
 }
