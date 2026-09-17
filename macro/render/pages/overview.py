@@ -68,7 +68,8 @@ def keys_strip(ctx: dict, scenario: dict, summary: dict) -> str:
         key("失業率", pct(unrate, 1), jobs_sub),
         key("政策利率上緣", pct(stance.get("policy"), 2),
             f'實質 {pct(stance.get("real_policy"), 2)}　' +
-            ("具限制性" if (stance.get("real_policy") or 0) > 1 else "接近中性")),
+            ("具限制性" if (stance.get("real_policy") or 0) > 1 else "接近中性") +
+            ("　依聯準會聲明" if stance.get("policy_source") else "")),
         key("10 年期公債", pct(decomp.get("nominal"), 2),
             f'實質 {pct(decomp.get("real"), 2)}　近三月 '
             f'{fmt(decomp.get("chg_3m"), 2, suffix=" pp", signed=True)}'),
@@ -398,15 +399,47 @@ def module_cards(ctx: dict, signals: list[dict]) -> str:
     return f'<div class="grid grid-3">{"".join(out)}</div>'
 
 
+def _fomc_items(state: dict | None) -> list[dict]:
+    """FOMC 決議置頂，排在換格之上。
+
+    2026-09-16 升息，總覽兩天都沒有顯示：政策利率讀的是還沒更新的 FRED，
+    行事曆在會後默默翻到下一次。所以會後一週內，「決議」或「決議遺漏」
+    兩者之一一定出現在這裡（macro/fomc.py decision_status），而且不依賴
+    跟昨天的比對——決議不是「讀數變動」，是事件。
+    """
+    from datetime import date as _date
+
+    if not state or state.get("state") not in ("announced", "missing"):
+        return []
+    if state["state"] == "announced":
+        effective = _date.fromisoformat(state["effective"])
+        vote = f'，表決 {state["vote"]}' if state.get("vote") else ""
+        return [{
+            "rank": -1, "sev": "high", "tag": "FOMC 決議",
+            "title": state["headline"],
+            "detail": (f'{state["date"]} 聯準會聲明{vote}；'
+                       f'新利率 {effective.month}/{effective.day} 生效。'),
+            "href": "/fed/#statement",
+        }]
+    meeting = _date.fromisoformat(state["meeting"])
+    return [{
+        "rank": -1, "sev": "high", "tag": "FOMC 決議遺漏",
+        "title": f"{meeting.month}/{meeting.day} FOMC 決議本站沒有取得",
+        "detail": f'{state["reason"]}。政策利率可能仍是舊值，請以聯準會官網為準。',
+        "href": "https://www.federalreserve.gov/newsevents/pressreleases.htm",
+    }]
+
+
 def _change_items(diff: dict, reading_changes: list[dict],
-                  scenario: dict, prior: dict | None) -> list[dict]:
+                  scenario: dict, prior: dict | None,
+                  fomc: dict | None = None) -> list[dict]:
     """把「跟上次建置相比變了什麼」收成一份排好序的清單。
 
     排序是判斷的輕重，不是時間：換格（九宮格位置變了）永遠排第一，因為它
     代表整套判斷的前提改變；其次是新觸發的嚴重訊號、再其次是跨過門檻的讀數。
     「不再觸發」排最後——訊號消失通常不是新資訊，是舊資訊退場。
     """
-    items: list[dict] = []
+    items: list[dict] = _fomc_items(fomc)
 
     was = (prior or {}).get("scenario") or {}
     for key, cur_key, label in (("employment", "employment_label", "就業"),
@@ -448,7 +481,7 @@ def _change_items(diff: dict, reading_changes: list[dict],
     return items
 
 
-CHANGE_SCOPE = ("偵測範圍：九宮格的三個位置、規則訊號的增減、8 項關鍵讀數。"
+CHANGE_SCOPE = ("偵測範圍：FOMC 決議、九宮格的三個位置、規則訊號的增減、9 項關鍵讀數。"
                 "曲線形狀、市場廣度、法人連續性不在偵測範圍內。")
 
 
@@ -466,11 +499,15 @@ def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
     base = (prior or {}).get("date")
     title = f"自 {base} 以來" if base else "自上次以來"
 
+    fomc_state = ctx.get("fomc")
     if diff.get("first_run"):
-        return section("changes", title,
-                       '<p class="muted">這是第一次建置，還沒有可以比對的上一期。</p>')
-
-    items = _change_items(diff, reading_changes, scenario, prior)
+        # 沒有上一期可比，但決議不是比對出來的——照樣置頂
+        items = _fomc_items(fomc_state)
+        if not items:
+            return section("changes", title,
+                           '<p class="muted">這是第一次建置，還沒有可以比對的上一期。</p>')
+    else:
+        items = _change_items(diff, reading_changes, scenario, prior, fomc=fomc_state)
     if not items:
         nxt = ((ctx.get("freshness") or {}).get("imminent") or [None])[0]
         tail = ""
@@ -488,7 +525,7 @@ def changes_top(ctx: dict, diff: dict, reading_changes: list[dict],
         detail = item.get("detail") or ""
         extra = item.get("delta") or ""
         rows.append(
-            f'<a class="chg-row" href="/archive/#today">'
+            f'<a class="chg-row" href="{esc(item.get("href") or "/archive/#today")}">'
             f'<span class="chg-sev sev-{esc(sev)}" title="{esc(SEV_TEXT.get(sev, ""))}">'
             f'{SEV_GLYPH.get(sev, "●")}'
             f'<span class="sr-only">{esc(SEV_TEXT.get(sev, ""))}</span></span>'

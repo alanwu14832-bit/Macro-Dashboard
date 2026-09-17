@@ -18,7 +18,8 @@ import time
 import traceback
 from datetime import date, datetime
 
-from macro import archive, clock, data, deepdive, paths
+from macro import archive, clock, data, deepdive, fomc, paths
+from macro.sources import fomc_text
 from macro.compute import (commodities, debt, equities, fedfunds, freshness,
                            reaction,
                            growth, inflation, labor, market, news, rates,
@@ -96,6 +97,29 @@ def main() -> int:
     # 總覽的全指標下拉要讀原始序列的最新值，所以把 bundle 也放進 ctx
     ctx: dict = {"_bundle": bundle}
     failures: list[str] = []
+
+    # FOMC 決議排在所有模組之前：政策利率要在任何人讀它之前就依聲明校正好。
+    # 決議遺漏刻意不列入 failures——建置失敗會讓 CI 跳過提交，網站停在一個
+    # 連「決議遺漏」缺口都沒顯示的舊版本，比顯示缺口更糟。
+    decision = fomc_text.latest_decision(
+        ttl=ttl if args.offline else min(ttl, fomc_text.RSS_TTL))
+    ctx["fomc_patch"] = fomc.reconcile_policy(bundle, decision)
+    ctx["fomc"] = fomc.decision_status(decision)
+    state = ctx["fomc"] or {}
+    if state.get("state") == "announced":
+        note = "（FRED 尚未更新，政策利率依聲明校正）" if ctx["fomc_patch"]["patched"] else ""
+        print(f"   ✓ FOMC {state['date']}：{state['headline']}{note}", flush=True)
+    elif state.get("state") == "missing":
+        print(f"   ✗ FOMC {state['meeting']} 決議遺漏：{state['reason']}"
+              f"——總覽會置頂顯示缺口", flush=True)
+        if os.environ.get("GITHUB_ACTIONS"):
+            print(f"::error title=FOMC 決議遺漏::{state['meeting']} {state['reason']}",
+                  flush=True)
+    for series_id in ctx["fomc_patch"]["conflict"]:
+        print(f"   ⚠ FRED 的 {series_id} 與 FOMC 聲明不一致，以 FRED 為準", flush=True)
+    if (fomc.MEETINGS[-1] - clock.us_today()).days < 120:
+        print(f"   ⚠ FOMC 行事曆只排到 {fomc.MEETINGS[-1]}，請把下一年的會議日期加進"
+              f" macro/fomc.py——排完之後會議遺漏將無法被偵測", flush=True)
     for name, module in MODULES:
         try:
             ctx[name] = module.compute(bundle)
@@ -116,7 +140,15 @@ def main() -> int:
         ctx["reaction"] = None
         print("   ✗ reaction（期貨報價抓不到，落點頁會說明沒量到）", flush=True)
 
-    fresh_state = (ctx.get("freshness") or {}).get("fresh") or {}
+    fresh_state = dict((ctx.get("freshness") or {}).get("fresh") or {})
+    # FOMC 決議也走「數據更新」推播：鍵在上一輪不存在才推，同一次決議只推一次。
+    if (state.get("state") == "announced"
+            and (clock.us_today() - date.fromisoformat(state["date"])).days <= 2):
+        fresh_state[f"FOMC:{state['date']}"] = {
+            "name": (f"FOMC 決議：{fomc.action_label(state)}"
+                     f"（{fomc.range_label(state['lower'], state['upper'])}）"),
+            "date": state["date"],
+        }
     with open(os.path.join(paths.DATA_DIR, "fresh_state.json"), "w",
               encoding="utf-8") as fh:
         json.dump(fresh_state, fh, ensure_ascii=False, indent=1)

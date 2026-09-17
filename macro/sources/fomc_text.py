@@ -20,6 +20,87 @@ from ..http import get
 
 FEED = "https://www.federalreserve.gov/feeds/press_monetary.xml"
 
+# RSS 只快取 30 分鐘。原本跟聲明一起快取 12 小時，結果 2026-09-16 升息之後，
+# 每小時建置照樣跑，新聲明卻要半天後才進得來。聲明本身發布後不會再改，另外快取一年。
+RSS_TTL = 1800
+STATEMENT_TTL = 365 * 24 * 3600
+
+_FRACTION = re.compile(r"^(\d+)/(\d+)$")
+_MIXED = re.compile(r"^(\d+)(?:-(\d+)/(\d+))?$")
+_DECISION = re.compile(
+    r"decided to (raise|increase|lower|reduce|maintain|keep)\s+the target range for "
+    r"the federal funds rate\s+(?:by\s+(\S+)\s+percentage points?\s+)?"
+    r"(?:to|at)\s+(\S+)\s+to\s+(\S+)\s+percent", re.I)
+_ACTIONS = {"raise": "raise", "increase": "raise", "lower": "lower",
+            "reduce": "lower", "maintain": "hold", "keep": "hold"}
+
+
+def _rate(token: str) -> float | None:
+    """聲明裡的利率寫法：'4'、'3-3/4'、'1/4'。"""
+    token = token.strip()
+    if m := _FRACTION.match(token):
+        return int(m.group(1)) / int(m.group(2))
+    if m := _MIXED.match(token):
+        whole = float(m.group(1))
+        return whole + int(m.group(2)) / int(m.group(3)) if m.group(2) else whole
+    return None
+
+
+def parse_decision(text: str) -> dict | None:
+    """從聲明全文讀出決議：動作、新的目標區間、調整幅度。讀不出來回 None。"""
+    normal = re.sub(r"[‐‑‒–]", "-", text)
+    m = _DECISION.search(normal)
+    if not m:
+        return None
+    lower, upper = _rate(m.group(3)), _rate(m.group(4))
+    if lower is None or upper is None or upper <= lower:
+        return None
+    return {"action": _ACTIONS[m.group(1).lower()], "lower": lower, "upper": upper,
+            "step": _rate(m.group(2)) if m.group(2) else None}
+
+
+def latest_decision(*, ttl: float = RSS_TTL) -> dict:
+    """最近一次 FOMC 決議，來源是聯準會自己的聲明。
+
+    status 三種，後兩種都必須在頁面上被看見，不能退回成「沒事」：
+      ok           讀出決議，且動詞與前後兩次的利率區間一致
+      unparsed     聲明在，但讀不出決議，或動詞跟數字對不上
+      unavailable  RSS 或聲明頁抓不到
+    """
+    links = _statement_links(min(ttl, RSS_TTL))
+    if not links:
+        return {"status": "unavailable", "reason": "抓不到聯準會貨幣政策新聞稿的 RSS"}
+
+    parsed = []
+    for date, href in links[:2]:
+        try:
+            body = _clean(get(href, ttl=STATEMENT_TTL, namespace="fomc",
+                              timeout=25, retries=2))
+        except Exception:
+            body = ""
+        parsed.append((date, href, body, parse_decision(body) if body else None))
+
+    date, href, body, decision = parsed[0]
+    base = {"date": date, "url": href}
+    if not body:
+        return {**base, "status": "unavailable", "reason": "聲明頁抓不到，或版面改了"}
+    if decision is None:
+        return {**base, "status": "unparsed",
+                "reason": "聲明已發布，但讀不出「decided to … the target range」這一句"}
+
+    out = {**base, "status": "ok", **decision, "vote": _vote(body)}
+    previous = parsed[1][3] if len(parsed) > 1 else None
+    if previous:
+        moved = decision["upper"] - previous["upper"]
+        consistent = {"raise": moved > 0, "lower": moved < 0,
+                      "hold": moved == 0}[decision["action"]]
+        if not consistent:
+            return {**base, "status": "unparsed",
+                    "reason": "聲明的動詞跟前後兩次的利率區間對不上，不採用"}
+        out.update(prev_date=parsed[1][0], prev_lower=previous["lower"],
+                   prev_upper=previous["upper"])
+    return out
+
 # 措辭光譜。挑的是聯準會實際會換掉的字，不是泛用的情緒詞。
 HAWKISH_TERMS = [
     "elevated", "restrictive", "firm", "tight", "persistent", "elevated uncertainty",
@@ -85,16 +166,15 @@ def _statement_links(ttl: float) -> list[tuple[str, str]]:
 
 def compare(*, ttl: float = 12 * 3600) -> dict:
     """最近一次聲明，以及它跟上一次的逐句差異。"""
-    links = _statement_links(ttl)
+    links = _statement_links(min(ttl, RSS_TTL))
     if len(links) < 2:
         return {}
 
     texts = []
     for date, href in links[:2]:
         try:
-            # 已發布的聲明不會再改，快取一年
-            body = _clean(get(href, ttl=365 * 24 * 3600, namespace="fomc",
-                                   timeout=25, retries=2))
+            body = _clean(get(href, ttl=STATEMENT_TTL, namespace="fomc",
+                              timeout=25, retries=2))
         except Exception:
             return {}
         if not body:

@@ -191,7 +191,10 @@ def compose_data_update() -> dict | None:
 
     # 落點是那個指標自己的發布頁，不是首頁——通知點開就該直接到那個數字，
     # 而不是丟到總覽讓人自己找。多個同時公布時帶第一個。
-    landing = f"/release/{new_ids[0]}/" if new_ids[0] in RELEASE_ROUTES else "/release/"
+    if any(sid.startswith("FOMC:") for sid in new_ids):
+        landing = "/fed/#statement"
+    else:
+        landing = f"/release/{new_ids[0]}/" if new_ids[0] in RELEASE_ROUTES else "/release/"
 
     return {
         "title": f"數據更新：{names}",

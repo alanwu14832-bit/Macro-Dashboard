@@ -41,5 +41,10 @@ def us_today() -> date:
     return datetime.now(NEW_YORK).date()
 
 
+def us_now() -> datetime:
+    """美東的現在時間。判斷「FOMC 聲明應該已經公布了沒」要看到時分。"""
+    return datetime.now(NEW_YORK)
+
+
 def stamp(prefix: str = "最後更新 ") -> str:
     return prefix + now().strftime("%Y-%m-%d %H:%M")

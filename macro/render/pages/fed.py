@@ -19,11 +19,28 @@ def _mark_words(sentence: str, words: list[dict], side: str) -> str:
     return out
 
 
-def _statement_block(st: dict) -> str:
+def _decision_callout(decision: dict | None) -> str:
+    """決議本身用中文講在最上面。英文逐句比對是給想看措辭的人，不是給想知道升降息的人。"""
+    if not decision:
+        return ""
+    if decision.get("state") == "announced":
+        vote = f'，表決 {esc(decision["vote"])}' if decision.get("vote") else ""
+        return callout(f'<strong>{esc(decision["headline"])}</strong>　'
+                       f'{esc(decision["date"])} 決議，{esc(decision["effective"])} 生效{vote}。',
+                       key=True)
+    if decision.get("state") == "missing":
+        return callout(f'<strong>{esc(decision["meeting"])} 的 FOMC 決議本站沒有取得</strong>：'
+                       f'{esc(decision["reason"])}。政策利率可能仍是舊值，請以聯準會官網為準。',
+                       key=True)
+    return ""
+
+
+def _statement_block(st: dict, decision: dict | None = None) -> str:
     """FOMC 聲明文本分析。看的是「哪一句改了」，不是重讀整份聲明。"""
     if not st:
         return section("statement", "上次會議聲明",
-                       '<div class="card"><p class="muted">'
+                       _decision_callout(decision)
+                       + '<div class="card"><p class="muted">'
                        '目前取不到聯準會的聲明全文。</p></div>')
 
     vote_changed = st["vote"] and st["vote"] != st["vote_prev"]
@@ -38,7 +55,7 @@ def _statement_block(st: dict) -> str:
              direction=None, asof=f'全文共 {st["sentences"]} 句'),
     ])
 
-    parts = [f'<div class="grid grid-3">{tiles}</div>']
+    parts = [_decision_callout(decision), f'<div class="grid grid-3">{tiles}</div>']
 
     if vote_changed:
         parts.append(callout(
@@ -169,7 +186,9 @@ def render(ctx: dict, signals: list[dict]) -> str:
     tiles = [
         stat("政策利率上緣", pct(stance["policy"], 2),
              delta=f'有效聯邦資金 {pct(stance["effective"], 2)}',
-             asof=f'{zh_date(d["as_of"], freq="d")} 資料'),
+             asof=(f'依 {esc(stance["policy_source"]["statement"])} 聯準會聲明，FRED 尚未更新'
+                   if stance.get("policy_source")
+                   else f'{zh_date(d["as_of"], freq="d")} 資料')),
         stat("實質政策利率", pct(stance["real_policy"], 2),
              delta="政策利率減核心 PCE", asof="正值代表政策具限制性"),
         stat("10 年期公債", pct(decomposition["nominal"], 2),
@@ -185,7 +204,7 @@ def render(ctx: dict, signals: list[dict]) -> str:
 
     body.append(_futures_block(ctx.get("fedfunds") or {}))
 
-    body.append(_statement_block(d.get("statement") or {}))
+    body.append(_statement_block(d.get("statement") or {}, ctx.get("fomc")))
 
     # ---- 曲線 ----
     curve_rows = d["curve"]["rows"]

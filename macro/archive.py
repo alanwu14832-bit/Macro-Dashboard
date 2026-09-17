@@ -47,6 +47,8 @@ def build_snapshot(ctx: dict, signals: list[dict], summary: dict,
             "supercore": inflation.get("supercore", {}).get("yoy"),
             "ten_year": rates.get("decomposition", {}).get("nominal"),
             "real_ten_year": rates.get("decomposition", {}).get("real"),
+            # 原本沒有記：2026-09-16 升息之後，「跟昨天比變了什麼」根本不可能比到
+            "policy_upper": rates.get("stance", {}).get("policy"),
             "curve_10_2": rates.get("shape", {}).get("slope_10_2"),
             "recession_gauge": growth.get("gauge", {}).get("value"),
             "composite_labor": labor.get("composite", {}).get("value"),
@@ -95,6 +97,7 @@ def reading_changes(current: dict, prior: dict | None) -> list[dict]:
     if not prior:
         return []
     labels = {
+        "policy_upper": ("政策利率上緣", "%", 1),
         "payrolls_3m": ("三月均非農", "千人", 10),
         "unemployment": ("失業率", "%", 1),
         "core_pce": ("核心 PCE", "%", 1),

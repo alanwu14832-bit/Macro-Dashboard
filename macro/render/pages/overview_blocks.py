@@ -652,7 +652,9 @@ def fed_stance(ctx: dict, scenario: dict, fomc: dict | None) -> str:
     if stance.get("policy") is not None:
         tiles.append(stat("政策利率上緣", pct(stance["policy"], 2),
                           delta=f'有效聯邦資金 {pct(stance.get("effective"), 2)}',
-                          direction=None, asof="目標區間上緣"))
+                          direction=None,
+                          asof=(f'依 {esc(stance["policy_source"]["statement"])} 聯準會聲明，FRED 尚未更新'
+                                if stance.get("policy_source") else "目標區間上緣")))
     if stance.get("real_policy") is not None:
         tiles.append(stat("實質政策利率", pct(stance["real_policy"], 2),
                           delta="政策利率減核心 PCE", direction=None,

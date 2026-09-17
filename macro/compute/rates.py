@@ -198,6 +198,8 @@ def policy_stance(bundle: Bundle) -> dict:
     return {
         "policy": policy.last if policy else None,
         "policy_lower": bundle["DFEDTARL"].last,
+        # FRED 還沒補上時由 FOMC 聲明校正（macro/fomc.py reconcile_policy），頁面要講明
+        "policy_source": (policy.meta or {}).get("patched_from") if policy else None,
         "effective": bundle["DFF"].last,
         "sofr": bundle["SOFR"].last,
         "real_policy": real_policy,
