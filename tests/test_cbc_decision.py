@@ -186,5 +186,75 @@ class OverviewNeverOmits(unittest.TestCase):
                                   f"{meeting} +{days_after}d {decision.get('status')}")
 
 
+class HistoricalWording(unittest.TestCase):
+    """對抗性審查拿 2011 年起 61 份真實新聞稿跑出來、原本讀錯或讀不到的寫法。"""
+
+    def test_reserve_ratio_with_the_verb_first_2022(self):
+        text = (HOLD.replace("維持年息2%、2.375%及4.25%", "維持年息1.5%、1.875%及3.75%")
+                + "三、本行理事會一致同意調升新台幣存款準備率0.25個百分點。"
+                + "另調升新台幣活期性及定期性存款準備率各0.25個百分點(詳附件)，自本年10月1日起實施。")
+        reserve = cbc.parse_board_decision(text, 2022)["reserve"]
+        self.assertEqual(reserve, {"action": "raise", "step": 0.25, "effective": "2022-10-01"})
+
+    def test_full_width_percent_2011(self):
+        text = ("本行重貼現率、擔保放款融通利率及短期融通利率各調升0.125個百分點，分別由年息"
+                "1.750％、2.125％及4％調整為年息1.875％、2.25％及4.125％，自本年7月1日起實施。")
+        rate = cbc.parse_board_decision(text, 2011)["rate"]
+        self.assertEqual((rate["action"], rate["from"], rate["to"], rate["effective"]),
+                         ("raise", 1.75, 1.875, "2011-07-01"))
+
+    def test_effective_date_in_the_lead_sentence_2016(self):
+        text = ("三、本日本行理事會一致決議採行下列措施，並自本年3月25日起實施。(一) 本行重貼現率、"
+                "擔保放款融通利率及短期融通利率各調降0.125個百分點，分別由年息1.625%、2%及3.875%"
+                "調整為1.5%、1.875%及3.75%。四、本行將密切關注。")
+        rate = cbc.parse_board_decision(text, 2016)["rate"]
+        self.assertEqual(rate["effective"], "2016-03-25")
+
+    def test_ltv_wordings(self):
+        body = (HOLD + "修正「中央銀行對金融機構辦理不動產抵押貸款業務規定」，自本年3月19日起實施。"
+                "(1) 第3戶購屋貸款最高成數，由6成降至5.5成。(2) 購地貸款最高成數降為5成，並保留1成動工款。"
+                "業務聯繫單位：")
+        changes = cbc.parse_board_decision(body, 2021)["credit"]["changes"]
+        self.assertEqual(changes, ["第 3 戶以上購屋貸款成數上限 6 成 → 5.5 成",
+                                   "購地貸款成數上限調為 5 成"])
+
+    def test_notice_title_with_spacing(self):
+        pages = {"u1": "發布日期：2026-09-17 " + SEPT_2026}
+        items = [{"title": "中央銀行 理監事聯席會議決議新聞稿 ", "link": "u1"}]
+        with mock.patch.object(cbc, "get", side_effect=lambda url, **_: pages[url]):
+            self.assertEqual(cbc.latest_board_decision(items=items)["status"], "ok")
+
+    def test_redirected_homepage_is_rejected_by_the_page_fetch(self):
+        from macro.http import FetchError
+
+        def fake_get(url, **kwargs):
+            body = "<html>中央銀行首頁 最新消息</html>"
+            if kwargs["validate"](body):
+                return body
+            raise FetchError("不合格")
+
+        with mock.patch.object(cbc, "get", side_effect=fake_get):
+            self.assertEqual(cbc._notice_text("https://www.cbc.gov.tw/tw/cp-302-1-x-1.html"), "")
+
+
+class MoreStatus(unittest.TestCase):
+    def test_unreadable_notice_on_an_unscheduled_date_is_missing(self):
+        state = cbc_board.decision_status({"status": "unparsed", "date": "2026-10-15", "reason": "讀不出"},
+                                          SCHEDULE, tpe(2026, 10, 15, 18))
+        self.assertEqual((state["state"], state["meeting"]), ("missing", "2026-10-15"))
+
+    def test_after_announcement_time_pending_is_overdue(self):
+        state = cbc_board.decision_status(ok("2026-06-18"), SCHEDULE, tpe(2026, 9, 17, 17))
+        self.assertEqual((state["state"], state["overdue"]), ("pending", True))
+
+    def test_move_without_effective_date_says_why_it_was_not_patched(self):
+        decision = {"status": "ok", "date": "2026-09-17",
+                    "rate": {"action": "raise", "step": 0.125, "from": 2.0, "to": 2.125,
+                             "effective": None}}
+        _rate, result = cbc_board.reconcile_discount(Reconcile.RATE, decision)
+        self.assertFalse(result["patched"])
+        self.assertIn("讀不出生效日", result["reason"])
+
+
 if __name__ == "__main__":
     unittest.main()

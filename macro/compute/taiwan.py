@@ -316,6 +316,7 @@ def money(ind: dict[str, Series], rate: dict[str, Series], bundle: Bundle,
             _months_between(rate["changes"].last_date, policy.last_date)
             if rate["changes"].last_date and policy.last_date else None),
         "fed_upper": fed.last,
+        "fed_source": (fed.meta or {}).get("patched_from"),
         "spread_vs_fed": ((policy.last - fed.last)
                           if (policy.last is not None and fed.last is not None)
                           else None),
@@ -369,11 +370,14 @@ def compute(bundle: Bundle) -> dict:
     ind = ndc.indicators()
     cpi = dgbas.cpi()
     rate = cbc.discount_rate()
-    decision = cbc.latest_board_decision()
+    # 央行 RSS 約 3 MB，一次建置只抓一次：決議與會議日程共用
+    news = cbc.news_items()
+    decision = cbc.latest_board_decision(items=news)
+    schedule = cbc.board_schedule(items=news)
     rate, patch = cbc_board.reconcile_discount(rate, decision)
     gov = official()
     return {
-        "cbc_decision": decision, "cbc_patch": patch,
+        "cbc_decision": decision, "cbc_patch": patch, "cbc_schedule": schedule,
         "cycle": cycle(ind),
         "external": external(ind, bundle, gov),
         "output": output(ind, gov),

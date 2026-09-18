@@ -15,7 +15,9 @@ from __future__ import annotations
 import difflib
 import html as html_module
 import re
+from email.utils import parsedate_to_datetime
 
+from ..clock import NEW_YORK
 from ..http import get
 
 FEED = "https://www.federalreserve.gov/feeds/press_monetary.xml"
@@ -28,8 +30,8 @@ STATEMENT_TTL = 365 * 24 * 3600
 _FRACTION = re.compile(r"^(\d+)/(\d+)$")
 _MIXED = re.compile(r"^(\d+)(?:-(\d+)/(\d+))?$")
 _DECISION = re.compile(
-    r"decided to (raise|increase|lower|reduce|maintain|keep)\s+the target range for "
-    r"the federal funds rate\s+(?:by\s+(\S+)\s+percentage points?\s+)?"
+    r"decided(?:\s+today)?\s+to (raise|increase|lower|reduce|maintain|keep)\s+the target "
+    r"range for the federal funds rate\s+(?:by\s+(\S+)\s+percentage points?,?\s+)?"
     r"(?:to|at)\s+(\S+)\s+to\s+(\S+)\s+percent", re.I)
 _ACTIONS = {"raise": "raise", "increase": "raise", "lower": "lower",
             "reduce": "lower", "maintain": "hold", "keep": "hold"}
@@ -66,40 +68,63 @@ def latest_decision(*, ttl: float = RSS_TTL) -> dict:
       ok           讀出決議，且動詞與前後兩次的利率區間一致
       unparsed     聲明在，但讀不出決議，或動詞跟數字對不上
       unavailable  RSS 或聲明頁抓不到
+
+    比最新讀得出的決議還新的聲明：像決議（有 target range 那一句）卻讀不出、或
+    抓不到內容，都算遺漏，並把已讀到的決議放在 previous 讓頁面照樣顯示；不像決議
+    的（例如 2020-03-23 的無限量購債聲明）就略過，不能讓它頂掉剛公布的決議。
     """
     links = _statement_links(min(ttl, RSS_TTL))
     if not links:
         return {"status": "unavailable", "reason": "抓不到聯準會貨幣政策新聞稿的 RSS"}
 
-    parsed = []
-    for date, href in links[:2]:
-        try:
-            body = _clean(get(href, ttl=STATEMENT_TTL, namespace="fomc",
-                              timeout=25, retries=2))
-        except Exception:
-            body = ""
-        parsed.append((date, href, body, parse_decision(body) if body else None))
+    fetched = []
+    for day, href, published in links[:4]:
+        body = _statement(href)
+        fetched.append({"date": day, "url": href, "published": published, "body": body,
+                        "decision": parse_decision(body) if body else None})
+    readable = [f for f in fetched if f["decision"] and f["date"]]
+    current = readable[0] if readable else None
 
-    date, href, body, decision = parsed[0]
-    base = {"date": date, "url": href}
-    if not body:
-        return {**base, "status": "unavailable", "reason": "聲明頁抓不到，或版面改了"}
-    if decision is None:
-        return {**base, "status": "unparsed",
-                "reason": "聲明已發布，但讀不出「decided to … the target range」這一句"}
+    blocker = None
+    for f in fetched:
+        if f is current:
+            break
+        if not f["date"]:
+            blocker = {"status": "unparsed", "url": f["url"], "reason": "聲明網址與發布時間都讀不出日期"}
+        elif not f["body"]:
+            blocker = {"status": "unavailable", "date": f["date"], "url": f["url"],
+                       "published": f["published"], "reason": "聲明頁抓不到，或版面改了"}
+        elif "target range for the federal funds rate" in f["body"].lower():
+            blocker = {"status": "unparsed", "date": f["date"], "url": f["url"],
+                       "published": f["published"],
+                       "reason": "聲明已發布，但讀不出「decided to … the target range」這一句"}
+        if blocker:
+            break
 
-    out = {**base, "status": "ok", **decision, "vote": _vote(body)}
-    previous = parsed[1][3] if len(parsed) > 1 else None
-    if previous:
-        moved = decision["upper"] - previous["upper"]
+    if current is None:
+        return blocker or {"status": "unavailable", "reason": "最近幾份聲明都沒有利率決議"}
+
+    def pack(f: dict) -> dict:
+        return {**f["decision"], "status": "ok", "date": f["date"], "url": f["url"],
+                "published": f["published"], "vote": _vote(f["body"])}
+
+    out = pack(current)
+    older = readable[1] if len(readable) > 1 else None
+    if older:
+        moved = current["decision"]["upper"] - older["decision"]["upper"]
         consistent = {"raise": moved > 0, "lower": moved < 0,
-                      "hold": moved == 0}[decision["action"]]
+                      "hold": moved == 0}[current["decision"]["action"]]
         if not consistent:
-            return {**base, "status": "unparsed",
+            return {"status": "unparsed", "date": current["date"], "url": current["url"],
+                    "published": current["published"],
                     "reason": "聲明的動詞跟前後兩次的利率區間對不上，不採用"}
-        out.update(prev_date=parsed[1][0], prev_lower=previous["lower"],
-                   prev_upper=previous["upper"], prev_action=previous["action"])
+        out.update(prev_date=older["date"], prev_lower=older["decision"]["lower"],
+                   prev_upper=older["decision"]["upper"], prev_action=older["decision"]["action"],
+                   previous=pack(older))
+    if blocker:
+        return {**blocker, "previous": out}
     return out
+
 
 # 措辭光譜。挑的是聯準會實際會換掉的字，不是泛用的情緒詞。
 HAWKISH_TERMS = [
@@ -141,8 +166,13 @@ def _count_terms(text: str, terms: list[str]) -> dict[str, int]:
     return {t: lowered.count(t) for t in terms if lowered.count(t)}
 
 
-def _statement_links(ttl: float) -> list[tuple[str, str]]:
-    """(標題日期, 網址)，新到舊。只取真正的 FOMC statement。"""
+def _statement_links(ttl: float) -> list[tuple[str, str, str]]:
+    """(聲明日期, 網址, 發布時間 ISO)，新到舊。只取標題正好是 FOMC statement 的。
+
+    「FOMC statement on policy normalization principles」這種標題也含那串字，
+    但不是利率決議；只比對子字串會讓它頂掉真正的決議聲明。日期先看網址的
+    monetaryYYYYMMDD，沒有就用 RSS 發布時間換算的美東日期。
+    """
     try:
         xml = get(FEED, ttl=ttl, namespace="fomc", timeout=25, retries=2)
     except Exception:
@@ -154,14 +184,34 @@ def _statement_links(ttl: float) -> list[tuple[str, str]]:
         if not (title and link):
             continue
         name = html_module.unescape(re.sub(r"<!\[CDATA\[|\]\]>", "", title.group(1))).strip()
-        href = re.sub(r"<!\[CDATA\[|\]\]>", "", link.group(1)).strip()
-        if "FOMC statement" not in name:
+        if not re.fullmatch(r"(?:Federal Reserve issues )?FOMC statement", name):
             continue
+        href = re.sub(r"<!\[CDATA\[|\]\]>", "", link.group(1)).strip()
+        published = ""
+        stamp_raw = re.search(r"<pubDate>(.*?)</pubDate>", item, re.S)
+        if stamp_raw:
+            try:
+                published = parsedate_to_datetime(
+                    re.sub(r"<!\[CDATA\[|\]\]>", "", stamp_raw.group(1)).strip()
+                ).astimezone(NEW_YORK).isoformat()
+            except (TypeError, ValueError):
+                published = ""
         stamp = re.search(r"monetary(\d{8})", href)
-        date = (f"{stamp.group(1)[:4]}-{stamp.group(1)[4:6]}-{stamp.group(1)[6:]}"
-                if stamp else "")
-        out.append((date, href))
+        if stamp:
+            day = f"{stamp.group(1)[:4]}-{stamp.group(1)[4:6]}-{stamp.group(1)[6:]}"
+        else:
+            day = published[:10]
+        out.append((day, href, published))
     return out
+
+
+def _statement(href: str) -> str:
+    """聲明全文。版面抓不到正文的回應不寫入一年的快取（http.get validate）。"""
+    try:
+        return _clean(get(href, ttl=STATEMENT_TTL, namespace="fomc", timeout=25,
+                          retries=2, validate=lambda raw: bool(_clean(raw))))
+    except Exception:
+        return ""
 
 
 def compare(*, ttl: float = 12 * 3600) -> dict:
@@ -171,12 +221,8 @@ def compare(*, ttl: float = 12 * 3600) -> dict:
         return {}
 
     texts = []
-    for date, href in links[:2]:
-        try:
-            body = _clean(get(href, ttl=STATEMENT_TTL, namespace="fomc",
-                              timeout=25, retries=2))
-        except Exception:
-            return {}
+    for date, href, _published in links[:2]:
+        body = _statement(href)
         if not body:
             return {}
         texts.append((date, body))

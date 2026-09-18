@@ -25,11 +25,15 @@ def _hundred(value):
     return None if value is None else value / 100
 
 
-def _board_callout(state: dict | None) -> str:
+def _board_callout(states) -> str:
     """理監事會決議用中文講在資金與利率最上面。只看貼放利率表的話，利率不變、
     調準備率、調房貸成數這些決議全部看不到。"""
-    if not state:
-        return ""
+    if isinstance(states, dict):
+        states = [states]
+    return "".join(_one_board(state) for state in states or [])
+
+
+def _one_board(state: dict) -> str:
     if state.get("state") == "announced":
         lines = "；".join(state.get("details") or [])
         return callout(
@@ -42,6 +46,9 @@ def _board_callout(state: dict | None) -> str:
             f'<strong>{esc(state["meeting"])} 的理監事會決議本站沒有取得</strong>：'
             f'{esc(state["reason"])}。重貼現率可能仍是舊值，請以央行公告為準。', key=True)
     if state.get("state") == "pending":
+        if state.get("overdue"):
+            return callout(f'<strong>今天（{esc(state["meeting"])}）的理監事會決議應已公布，'
+                           f'本站尚未取得</strong>，請先看央行公告。', key=True)
         return callout(f'今天（{esc(state["meeting"])}）央行理監事會，約 16:30 公布決議。')
     return ""
 
@@ -237,7 +244,8 @@ def render(ctx: dict, signals: list[dict] | None = None) -> str:
                    if money["policy_date"] else "")),
         stat("台美政策利差", _n(money["spread_vs_fed"], 2, suffix="pp", signed=True),
              delta=f'聯準會上緣 {_n(money["fed_upper"], 2, suffix="%")}',
-             asof="負值＝台灣利率低於美國，利差不利台幣"),
+             asof=("聯準會上緣依聲明，FRED 尚未更新" if money.get("fed_source")
+                   else "負值＝台灣利率低於美國，利差不利台幣")),
         stat("M1B 減 M2 年增率", _n(money["m1b_m2_spread"], 2, suffix="pp", signed=True),
              delta=(f'M1B {_n(money["m1b_yoy"], 2, suffix="%")}　'
                     f'M2 {_n(money["m2_yoy"], 2, suffix="%")}'),

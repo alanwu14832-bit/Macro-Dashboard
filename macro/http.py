@@ -44,6 +44,11 @@ HOST_SPACING = {
 }
 DEFAULT_SPACING = 0.5
 
+# build.py --offline 時設成 True：一律只讀快取（不論新舊），沒有快取就直接失敗、
+# 不連網。原本靠各來源自己把 ttl 設成無限，新加的來源各有自己的短 TTL，
+# 結果「離線」建置照樣連網。
+OFFLINE = False
+
 _lock = threading.Lock()
 _last_hit: dict[str, float] = {}
 
@@ -125,16 +130,23 @@ def _write_cache(path: str, url: str, body: str) -> None:
 
 def get(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
         retries: int = 4, timeout: int = 30, allow_stale: bool = True,
-        headers: dict | None = None) -> str:
+        headers: dict | None = None, validate=None) -> str:
     """Fetch `url` as text, preferring a cache entry younger than `ttl` seconds.
 
     On repeated failure, falls back to a stale cache entry when one exists so a
     single flaky source cannot break the whole build.
+
+    `validate(body) -> bool`：內容不合格的回應不寫入快取，快取裡不合格的也當作沒有。
+    央行的新聞稿頁還沒上線時會 302 轉到首頁、最後回 200——沒有這道檢查，
+    首頁會以那篇新聞稿的網址被快取一週，整週都讀不到決議。
     """
+    ok = validate or (lambda _body: True)
     path = _cache_path(url, namespace)
-    cached = _read_cache(path, ttl)
-    if cached is not None:
+    cached = _read_cache(path, float("inf") if OFFLINE else ttl)
+    if cached is not None and ok(cached):
         return cached
+    if OFFLINE:
+        raise FetchError(f"--offline：{_redact(url)} 沒有可用的快取")
 
     host = urllib.parse.urlparse(url).netloc
     last_error: Exception | None = None
@@ -144,14 +156,18 @@ def get(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
             _throttle(host)
             try:
                 body = _curl(url, timeout)
-                _write_cache(path, url, body)
-                return body
             except Exception as exc:
                 last_error = exc
                 time.sleep(2.0 * (attempt + 1))
+                continue
+            if not ok(body):
+                last_error = FetchError("回應內容沒有通過檢查，不寫入快取")
+                break
+            _write_cache(path, url, body)
+            return body
         if allow_stale:
             stale = _read_cache(path, ttl=float("inf"))
-            if stale is not None:
+            if stale is not None and ok(stale):
                 return stale
         raise FetchError(f"{url} failed: {last_error}")
 
@@ -166,6 +182,9 @@ def get(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
                 if response.headers.get("Content-Encoding") == "gzip":
                     raw = gzip.decompress(raw)
                 body = raw.decode("utf-8", errors="replace")
+            if not ok(body):
+                last_error = FetchError("回應內容沒有通過檢查，不寫入快取")
+                break
             _write_cache(path, url, body)
             return body
         except urllib.error.HTTPError as exc:
@@ -184,7 +203,7 @@ def get(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
 
     if allow_stale:
         stale = _read_cache(path, ttl=float("inf"))
-        if stale is not None:
+        if stale is not None and ok(stale):
             return stale
     raise FetchError(f"{url} failed: {last_error}")
 
@@ -203,6 +222,8 @@ def get_bytes(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
     adding a mode flag to `get` so the text path stays the common one.
     """
     path = _cache_path(url, namespace)[:-len(".json.gz")] + ".bin.gz"
+    if OFFLINE:
+        ttl = float("inf")
     if ttl > 0 and os.path.exists(path):
         if time.time() - os.path.getmtime(path) <= ttl:
             try:
@@ -210,6 +231,8 @@ def get_bytes(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
                     return fh.read()
             except Exception:
                 pass
+    if OFFLINE:
+        raise FetchError(f"--offline：{_redact(url)} 沒有可用的快取")
 
     host = urllib.parse.urlparse(url).netloc
     last_error: Exception | None = None

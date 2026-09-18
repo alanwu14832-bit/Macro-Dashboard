@@ -113,8 +113,28 @@ def summarise(rows: list[dict]) -> str:
     return f"期貨定價到 {label} 累計{word} {abs(cum):.0f} bp（約 {abs(cum) / STEP_BP:.1f} 碼）"
 
 
+def start_rate(bundle: Bundle) -> tuple[float | None, str | None]:
+    """期貨路徑的起點。
+
+    決議剛公布時 DFEDTARL 已依聲明校正，DFF（EFFR）要再晚兩天才有決議後的值。
+    用舊 EFFR 當起點，會把剛宣布的那一碼重複算成「市場定價下次升息」。
+    所以起點依目標區間平移：EFFR − 當時的下緣 + 最新的下緣。
+    """
+    dff, lower = bundle["DFF"], bundle["DFEDTARL"]
+    effr = dff.last
+    if (effr is None or not dff.last_date or not lower.last_date
+            or lower.last_date <= dff.last_date):
+        return effr, None
+    before = lower.value_on(dff.last_date)
+    if before is None or abs(lower.last - before) < 1e-9:
+        return effr, None
+    shifted = effr - before + lower.last
+    return shifted, (f"EFFR（{dff.last_date.isoformat()}）尚未反映最新決議，"
+                     f"起點依目標區間平移為 {shifted:.2f}%")
+
+
 def compute(bundle: Bundle) -> dict:
-    effr = bundle["DFF"].last
+    effr, effr_note = start_rate(bundle)
     today = clock.us_today()
     if effr is None:
         return {"available": False, "reason": "沒有有效聯邦資金利率（DFF）可當起點",
@@ -143,6 +163,7 @@ def compute(bundle: Bundle) -> dict:
         "available": True,
         "effr": effr,
         "effr_date": bundle["DFF"].last_date,
+        "effr_note": effr_note,
         "rows": rows,
         "monthly": monthly,
         "stale": all(m["stale"] for m in monthly),

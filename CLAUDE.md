@@ -35,7 +35,7 @@ python3 build.py              # 一般建置（6 小時內的快取直接用）
 python3 build.py --fresh      # 忽略快取全部重抓
 python3 build.py --offline    # 只用快取、不連網
 python3 build.py --ttl 3000   # 自訂快取有效期（排程用）
-python3 -m unittest discover tests   # 95 個測試，CI 會先跑這個
+python3 -m unittest discover tests   # 220 個測試，CI 會先跑這個
 ```
 
 **乾淨 clone 跑不動 `--offline`**：`data/cache/` 在 .gitignore 裡。第一次要用
@@ -131,14 +131,41 @@ ZIP 要用 `http.get_bytes()`，不是 `get()`——後者會把二進位解成 
 - 建置時先用聲明校正政策利率（`fomc.reconcile_policy`），所有模組才讀它。
   補上的點在序列 meta 標 `patched_from`，頁面要寫「依聲明，FRED 尚未更新」；
   FRED 補上後以 FRED 為準，不一致時保留 FRED 並印警告。
-- **會後一週內，總覽的「今天」一定有 FOMC 決議或決議遺漏**
-  （`fomc.decision_status` → `events.policy_events`）。抓不到、讀不出、RSS 停在
-  上一次，全部算遺漏並顯示紅色缺口。`tests/test_fomc_decision.py` 與
-  `tests/test_cbc_decision.py` 對行事曆上每一次會議都驗這件事。
+- **會後一週內，總覽的「今天」一定有決議或決議遺漏**
+  （`decision_states` → `events.policy_events`）。抓不到、讀不出、RSS 停在上一次，
+  全部算遺漏並顯示紅色缺口。`decision_states` 回傳的是**一串**狀態而不是一個：
+  臨時會議的決議不會被下一次例會的待公布蓋掉。`tests/test_fomc_decision.py` 與
+  `tests/test_cbc_decision.py` 對行事曆上每一次會議、以及不在行事曆上的日期都驗這件事。
+- **臨時會議不在行事曆上，遺漏一樣要偵測得到**：讀不出或抓不到的最新聲明只要帶日期、
+  在一週內、且比讀得出的決議新，就算遺漏。2020-03-03 臨時降息的寫法（`decided today
+  to lower … by 1/2 percentage point, to …`）也要讀得出來，有測試釘住。
+- 聲明只認標題**正好**是 `FOMC statement` 的那幾則。「FOMC statement on policy
+  normalization principles」不是決議；沒有 target range 那一句的聲明（2020-03-23）
+  要略過，不能讓它頂掉剛公布的決議。
+- 過了公布時間還沒取得，要標 `overdue` 並顯示「公布時間已過」。**不准承諾更新時間**
+  （原本寫「最慢一小時內更新」，實際建置間隔 2–6 小時）——只說本頁的建置時間。
+- 「轉向」需要上一次的動作才能判斷；上一份聲明被擠出 RSS 時只能說「變動」，不准冒稱轉向。
 - 遺漏**不列入建置失敗**：失敗會讓 CI 跳過提交，網站停在連缺口都沒顯示的舊版本。
-  改印 `::error::` 讓 Actions 標紅。
+  改印 `::error::` 讓 Actions 標紅。判斷程式自己出錯時，也退成一列「決議遺漏」。
 - `macro/fomc.py` 的 `MEETINGS` 剩不到 120 天時建置會印警告——排完之後就偵測不到遺漏。
-  臨時會議不在行事曆上，但從 RSS 讀到的決議照樣會置頂。
+  央行的 `MEETINGS_FALLBACK` 同理，RSS 公告到更晚的日期時建置會提醒補進去。
+
+## 抓回來的東西要先檢查再快取
+
+央行的新聞稿頁還沒上線時會 302 轉到首頁、最後回 HTTP 200。沒有檢查的話，首頁會以
+那篇新聞稿的網址被快取一週，整週都讀不到決議。所以 `http.get(validate=...)`：
+內容不合格就不寫快取、也不採用快取裡不合格的舊值，下一輪重抓。長 TTL 的抓取
+（聲明一年、央行新聞稿一週）一律要帶 `validate`。
+
+`--offline` 由 `http.OFFLINE` 在 HTTP 層一刀切：只讀快取（不論新舊），沒有快取直接
+失敗、不連網。原本靠各來源自己把 TTL 設成無限，新來源各有自己的短 TTL，結果
+「離線」建置照樣連網。
+
+美國數據的公布時間**不能用 FRED 的 last_updated**：PPI 美東 8:30 發布、FRED 中午才
+更新，換成台北就跨到隔天。時刻寫在 `events.RELEASE_TIMES`（預設 8:30、JOLTS 10:00、
+工業生產 9:15、SLOOS 14:00），用美東時區換算台北，冬令時間自動跟著變。
+FRED 的發布行事曆抓不到時要記進 `freshness` 的 `calendar_failed`，
+第一句就不能說「今天沒有重大數據」——那是沒偵測到，不是沒有。
 
 ## 時間一律用 `macro/clock.py`
 

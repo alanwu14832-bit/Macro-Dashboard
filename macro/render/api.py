@@ -80,6 +80,9 @@ def write_series(bundle: Bundle) -> dict:
             # 建置當下的值，讓選單不必等 function 就能顯示概況
             "prev": _round(series.at(-2)) if series.at(-2) is not None else None,
         })
+        if (series.meta or {}).get("patched_from"):
+            # 依聯準會聲明補上的點，FRED 還沒有；/api/series 即時取的是 FRED 原始資料
+            entries[-1]["patched_from"] = series.meta["patched_from"]
 
     total_bytes += _write(os.path.join(DATA_OUT, "catalogue.json"), {
         "count": len(entries),

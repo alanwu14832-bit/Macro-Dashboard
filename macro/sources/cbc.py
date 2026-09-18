@@ -117,8 +117,15 @@ _PUBLISHED = re.compile(r"發布日期[：:]\s*(\d{4})-(\d{2})-(\d{2})")
 _EFFECTIVE = re.compile(r"自本年(\d{1,2})月(\d{1,2})日起實施")
 _RATE_MOVE = re.compile(r"各調(升|降)([\d.]+)個百分點，?分別由年息([\d.]+)%.*?調整為(?:年息)?([\d.]+)%")
 _RATE_HOLD = re.compile(r"分別維持年息([\d.]+)%")
-_RESERVE = re.compile(r"存款準備率各?調(升|降)([\d.]+)個百分點")
-_LTV = re.compile(r"由(\d+)成(?:調)?([升降])為(\d+)成")
+# 兩種語序都有：「存款準備率各調升0.25個百分點」（2024）與
+# 「另調升新台幣活期性及定期性存款準備率各0.25個百分點」（2022）
+_RESERVE = [re.compile(r"存款準備率各?調(升|降)([\d.]+)個百分點"),
+            re.compile(r"調(升|降)(?:新台幣)?(?:活期性及定期性)?存款準備率各?([\d.]+)個百分點")]
+# 成數寫法很多：「由6成降為5成」「由6成降至5.5成」「降為5成」「上限為7成」
+# 「調降…最高成數為6成」。一律錨定在「最高成數」之後，才不會讀到「保留1成動工款」。
+_LTV = re.compile(r"最高成數(?:上限)?[^。；]{0,20}?(?:由([\d.]+)成[，,]?\s*)?"
+                  r"(?:一律)?(?:調)?(?:[升降]|放寬|提高)?(?:為|至)([\d.]+)成")
+_SECTION = re.compile(r"[一二三四五六七八九十]、")
 _LTV_SUBJECTS = [
     ("第2戶", "第 2 戶購屋貸款"), ("第3戶", "第 3 戶以上購屋貸款"),
     ("高價住宅", "高價住宅貸款"), ("公司法人", "公司法人購置住宅貸款"),
@@ -143,6 +150,16 @@ def news_items(*, ttl: float = NEWS_TTL) -> list[dict]:
             for item in _ITEM.findall(xml)]
 
 
+def _notice_text(link: str) -> str:
+    """新聞稿正文。沒有「發布日期」的回應（例如還沒上線時被 302 轉到首頁）不寫入
+    一週的快取，下一輪建置會重抓。"""
+    try:
+        return page_text(get(link, ttl=PAGE_TTL, namespace="cbc", timeout=40, retries=2,
+                             validate=lambda raw: bool(_PUBLISHED.search(page_text(raw)))))
+    except Exception:
+        return ""
+
+
 def page_text(raw_html: str) -> str:
     body = re.sub(r"<script.*?</script>|<style.*?</style>", " ", raw_html, flags=re.S)
     return re.sub(r"\s+", " ", html_module.unescape(_TAG.sub(" ", body))).strip()
@@ -158,6 +175,17 @@ def _effective(sentence: str, year: int) -> str | None:
         return None
 
 
+def _section_effective(body: str, sentence: str, year: int) -> str | None:
+    """調息那句沒寫生效日時，往回找同一個「三、」大點的導言句——2016-03-24 寫成
+    「本日本行理事會一致決議採行下列措施，並自本年3月25日起實施。(一) 本行重貼現率…」。"""
+    at = body.find(sentence)
+    if at < 0:
+        return None
+    starts = [m.start() for m in _SECTION.finditer(body) if m.start() <= at]
+    start = starts[-1] if starts else 0
+    return _effective(body[start:at], year)
+
+
 def _ltv_changes(body: str) -> list[str]:
     """「由 X 成降為 Y 成」前面同一條款裡的貸款類別，全部列出。
 
@@ -168,11 +196,16 @@ def _ltv_changes(body: str) -> list[str]:
     for m in _LTV.finditer(body):
         before = body[max(0, m.start() - 80):m.start()]
         cuts = [before.rfind("。"), before.rfind("；")]
-        cuts += [x.end() - 1 for x in re.finditer(r"\d\.\s|\([一二三四五六七八九十]\)", before)]
+        cuts += [x.end() - 1 for x in re.finditer(
+            r"\d\.\s|\([一二三四五六七八九十]\)|\(\d\)", before)]
         clause = before[max(cuts) + 1:]
         found = sorted((clause.find(key), label) for key, label in _LTV_SUBJECTS if key in clause)
         label = "、".join(label for _pos, label in found) or "購屋貸款"
-        line = f"{label}成數上限 {m.group(1)} 成 → {m.group(3)} 成"
+        new = float(m.group(2))
+        if m.group(1):
+            line = f"{label}成數上限 {float(m.group(1)):g} 成 → {new:g} 成"
+        else:
+            line = f"{label}成數上限調為 {new:g} 成"
         if line not in out:
             out.append(line)
     return out
@@ -186,24 +219,34 @@ def parse_board_decision(text: str, year: int) -> dict | None:
     同一句：2024-12 以後每一份新聞稿都會用過去式提到「第七度調整選擇性信用
     管制措施」，只比對那幾個字會把每次會議都當成有調整。
     """
-    body = text.split("業務聯繫單位")[0]
+    # 2011 年的新聞稿用全形％；只換這一個字，不做整篇 NFKC（會把全形逗號與
+    # 「(一)」也換掉，句型比對就跟著變了）
+    body = text.split("業務聯繫單位")[0].replace("％", "%")
     rate = reserve = credit = None
+    reserve_candidates = []
     for sentence in re.split(r"(?<=。)", body):
         if rate is None and "重貼現率" in sentence and "擔保放款融通利率" in sentence:
             if m := _RATE_MOVE.search(sentence):
                 rate = {"action": "raise" if m.group(1) == "升" else "lower",
                         "step": float(m.group(2)), "from": float(m.group(3)),
-                        "to": float(m.group(4)), "effective": _effective(sentence, year)}
+                        "to": float(m.group(4)),
+                        "effective": _effective(sentence, year) or _section_effective(body, sentence, year)}
             elif m := _RATE_HOLD.search(sentence):
                 value = float(m.group(1))
                 rate = {"action": "hold", "step": None, "from": value, "to": value,
                         "effective": None}
-        if reserve is None and (m := _RESERVE.search(sentence)):
-            reserve = {"action": "raise" if m.group(1) == "升" else "lower",
-                       "step": float(m.group(2)), "effective": _effective(sentence, year)}
+        for pattern in _RESERVE:
+            if m := pattern.search(sentence):
+                reserve_candidates.append({
+                    "action": "raise" if m.group(1) == "升" else "lower",
+                    "step": float(m.group(2)), "effective": _effective(sentence, year)})
+                break
         if (credit is None and "不動產抵押貸款業務規定" in sentence and "修正" in sentence
                 and (effective := _effective(sentence, year))):
             credit = {"effective": effective, "changes": _ltv_changes(body)}
+    if reserve_candidates:
+        # 導言句（「同意調升…存款準備率0.25個百分點」）沒有生效日，優先用有日期的那句
+        reserve = next((r for r in reserve_candidates if r["effective"]), reserve_candidates[0])
     if rate is None:
         return None
     return {"rate": rate, "reserve": reserve, "credit": credit}
@@ -213,17 +256,13 @@ def latest_board_decision(*, ttl: float = NEWS_TTL,
                           items: list[dict] | None = None) -> dict:
     """最近一次理監事會決議。status 與 FOMC 同一套：ok／unparsed／unavailable。"""
     items = news_items(ttl=ttl) if items is None else items
-    notices = [i for i in items if i["title"] == DECISION_TITLE]
+    notices = [i for i in items if re.sub(r"\s+", "", i["title"]).endswith("理監事聯席會議決議新聞稿")]
     if not notices:
         return {"status": "unavailable", "reason": "抓不到央行新聞稿 RSS，或裡面沒有決議新聞稿"}
 
     parsed = []
     for notice in notices[:2]:
-        try:
-            text = page_text(get(notice["link"], ttl=PAGE_TTL, namespace="cbc",
-                                 timeout=40, retries=2))
-        except Exception:
-            text = ""
+        text = _notice_text(notice["link"])
         published = _PUBLISHED.search(text)
         when = (date(int(published.group(1)), int(published.group(2)),
                      int(published.group(3))) if published else None)
@@ -264,12 +303,9 @@ def board_schedule(*, ttl: float = NEWS_TTL, items: list[dict] | None = None) ->
         title_year = re.match(r"(\d{3})年", notice["title"])
         if SCHEDULE_TITLE not in notice["title"] or not title_year:
             continue
-        try:
-            text = page_text(get(notice["link"], ttl=PAGE_TTL, namespace="cbc",
-                                 timeout=40, retries=2))
-        except Exception:
-            continue
-        dates.update(parse_schedule(text, int(title_year.group(1))))
+        text = _notice_text(notice["link"])
+        if text:
+            dates.update(parse_schedule(text, int(title_year.group(1))))
     return sorted(dates)
 
 

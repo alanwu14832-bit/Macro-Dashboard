@@ -441,6 +441,10 @@ def today_section(ctx: dict) -> str:
                      f'<div class="chg-stack">{"".join(_chg_row(e) for e in earlier)}</div>')
     if ev and not ev.get("calendar_ok", True):
         parts.append('<p class="chg-scope">台灣統計發布看板這一輪沒有取得，今天的台灣數據可能漏列。</p>')
+    if ev and not ev.get("us_calendar_ok", True):
+        parts.append('<p class="chg-scope">美國發布行事曆這一輪沒有取得（'
+                     + esc("、".join(ev.get("us_calendar_failed") or []))
+                     + '），今天的美國數據可能漏列。</p>')
     parts.append('<h3 class="fd-h">今天更新的序列</h3>' + today_updates_block(ctx))
     return section(
         "today", "今天", "".join(parts),

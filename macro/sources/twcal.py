@@ -25,7 +25,8 @@ MAJOR = [
     ("財政部", ("進出口貿易",), "海關進出口"),
     ("經濟部", ("外銷訂單",), "外銷訂單"),
     ("經濟部", ("工業生產",), "工業生產"),
-    ("國家發展委員會", ("景氣",), "景氣對策信號"),
+    # 國發會同一天發「景氣動向指標」與「景氣對策信號」兩項，只認後者才不會算成兩項
+    ("國家發展委員會", ("景氣對策信號",), "景氣對策信號"),
 ]
 
 
@@ -90,11 +91,14 @@ def parse(page: str, today: date) -> list[dict]:
         when = _date(slot.get("date", ""), today)
         if when is None:
             continue
+        period = (slot.get("notice") or "").strip("()")
         out.append({
             "dept": item.get("DeptName") or "", "name": item.get("name") or "",
-            "label": major_label(item.get("DeptName") or "", item.get("name") or ""),
+            # 「114年第2次年修正」是修訂舊數字，不是新發布
+            "label": None if "修正" in period else major_label(item.get("DeptName") or "",
+                                                               item.get("name") or ""),
             "date": when, "time": _time(slot.get("time", "")),
-            "period": (slot.get("notice") or "").strip("()"),
+            "period": period,
         })
     return out
 

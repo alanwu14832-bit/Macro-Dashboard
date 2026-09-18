@@ -19,6 +19,7 @@ import traceback
 from datetime import date, datetime
 
 from macro import archive, cbc_board, clock, data, deepdive, fomc, paths
+from macro import http as http_layer
 from macro.sources import cbc as cbc_source, fomc_text
 from macro.compute import (commodities, debt, equities, fedfunds, freshness,
                            reaction, events,
@@ -69,6 +70,8 @@ def main() -> int:
     args = parser.parse_args()
 
     started = time.time()
+    # --offline 在 HTTP 層強制：一律只讀快取、沒有快取就失敗，任何來源都不連網
+    http_layer.OFFLINE = args.offline
     ttl = (0 if args.fresh else float("inf") if args.offline
            else args.ttl if args.ttl is not None else 6 * 3600)
     verbose = not args.quiet
@@ -101,20 +104,28 @@ def main() -> int:
     # FOMC 決議排在所有模組之前：政策利率要在任何人讀它之前就依聲明校正好。
     # 決議遺漏刻意不列入 failures——建置失敗會讓 CI 跳過提交，網站停在一個
     # 連「決議遺漏」缺口都沒顯示的舊版本，比顯示缺口更糟。
-    decision = fomc_text.latest_decision(
-        ttl=ttl if args.offline else min(ttl, fomc_text.RSS_TTL))
-    ctx["fomc_patch"] = fomc.reconcile_policy(bundle, decision)
-    ctx["fomc"] = fomc.decision_status(decision)
-    state = ctx["fomc"] or {}
-    if state.get("state") == "announced":
-        note = "（FRED 尚未更新，政策利率依聲明校正）" if ctx["fomc_patch"]["patched"] else ""
-        print(f"   ✓ FOMC {state['date']}：{state['headline']}{note}", flush=True)
-    elif state.get("state") == "missing":
-        print(f"   ✗ FOMC {state['meeting']} 決議遺漏：{state['reason']}"
-              f"——總覽會置頂顯示缺口", flush=True)
-        if os.environ.get("GITHUB_ACTIONS"):
-            print(f"::error title=FOMC 決議遺漏::{state['meeting']} {state['reason']}",
-                  flush=True)
+    try:
+        decision = fomc_text.latest_decision(ttl=min(ttl, fomc_text.RSS_TTL))
+        ctx["fomc_patch"] = fomc.reconcile_policy(bundle, decision)
+        ctx["fomc"] = fomc.decision_states(decision)
+    except Exception:
+        # 判斷程式本身出錯也要看得見：退成「決議遺漏」那一列，而不是整列消失
+        traceback.print_exc()
+        ctx["fomc_patch"] = {"patched": False, "conflict": [], "effective": None}
+        ctx["fomc"] = [{"state": "missing", "meeting": clock.us_today().isoformat(),
+                        "reason": "本站判斷 FOMC 決議的程式這一輪出錯"}]
+    for state in ctx["fomc"]:
+        if state["state"] == "announced":
+            note = "（FRED 尚未更新，政策利率依聲明校正）" if ctx["fomc_patch"]["patched"] else ""
+            print(f"   ✓ FOMC {state['date']}：{state['headline']}{note}", flush=True)
+        elif state["state"] == "missing":
+            print(f"   ✗ FOMC {state['meeting']} 決議遺漏：{state['reason']}"
+                  f"——總覽會置頂顯示缺口", flush=True)
+            if os.environ.get("GITHUB_ACTIONS"):
+                print(f"::error title=FOMC 決議遺漏::{state['meeting']} {state['reason']}",
+                      flush=True)
+        elif state["state"] == "pending" and state.get("overdue"):
+            print(f"   ⚠ FOMC {state['meeting']} 已過公布時間，聲明尚未取得", flush=True)
     for series_id in ctx["fomc_patch"]["conflict"]:
         print(f"   ⚠ FRED 的 {series_id} 與 FOMC 聲明不一致，以 FRED 為準", flush=True)
     if (fomc.MEETINGS[-1] - clock.us_today()).days < 120:
@@ -133,23 +144,34 @@ def main() -> int:
 
     # 台灣央行理監事會：決議在 taiwan 模組裡讀（它要用來校正重貼現率），
     # 會議日程從央行 RSS 的預定日期公告讀，狀態定義跟 FOMC 一樣。
-    ctx["cbc"] = cbc_board.decision_status(
-        (ctx.get("taiwan") or {}).get("cbc_decision"),
-        cbc_board.meetings(cbc_source.board_schedule()))
-    cbc_state = ctx["cbc"] or {}
-    if cbc_state.get("state") == "announced":
-        note = ("（貼放利率表尚未更新，重貼現率依新聞稿校正）"
-                if ((ctx.get("taiwan") or {}).get("cbc_patch") or {}).get("patched") else "")
-        print(f"   ✓ 台灣央行 {cbc_state['date']}：{cbc_state['headline']}{note}", flush=True)
-    elif cbc_state.get("state") == "missing":
-        print(f"   ✗ 台灣央行 {cbc_state['meeting']} 決議遺漏：{cbc_state['reason']}"
-              f"——總覽會置頂顯示缺口", flush=True)
-        if os.environ.get("GITHUB_ACTIONS"):
-            print(f"::error title=台灣央行決議遺漏::{cbc_state['meeting']} {cbc_state['reason']}",
-                  flush=True)
-    if not any(m >= clock.today() for m in cbc_board.meetings(cbc_source.board_schedule())):
+    tw_ctx = ctx.get("taiwan") or {}
+    published_schedule = tw_ctx.get("cbc_schedule") or []
+    schedule = cbc_board.meetings(published_schedule)
+    try:
+        ctx["cbc"] = cbc_board.decision_states(tw_ctx.get("cbc_decision"), schedule)
+    except Exception:
+        traceback.print_exc()
+        ctx["cbc"] = [{"state": "missing", "meeting": clock.today().isoformat(),
+                       "reason": "本站判斷台灣央行決議的程式這一輪出錯"}]
+    for state in ctx["cbc"]:
+        if state["state"] == "announced":
+            note = ("（貼放利率表尚未更新，重貼現率依新聞稿校正）"
+                    if (tw_ctx.get("cbc_patch") or {}).get("patched") else "")
+            print(f"   ✓ 台灣央行 {state['date']}：{state['headline']}{note}", flush=True)
+        elif state["state"] == "missing":
+            print(f"   ✗ 台灣央行 {state['meeting']} 決議遺漏：{state['reason']}"
+                  f"——總覽會置頂顯示缺口", flush=True)
+            if os.environ.get("GITHUB_ACTIONS"):
+                print(f"::error title=台灣央行決議遺漏::{state['meeting']} {state['reason']}",
+                      flush=True)
+    if (tw_ctx.get("cbc_patch") or {}).get("reason"):
+        print(f"   ⚠ 台灣央行：{tw_ctx['cbc_patch']['reason']}", flush=True)
+    if not any(m >= clock.today() for m in schedule):
         print("   ⚠ 台灣央行理監事會日程已排完：等央行 12 月公告隔年預定日期，"
               "公告前會議遺漏將無法被偵測", flush=True)
+    if published_schedule and max(published_schedule) > cbc_board.MEETINGS_FALLBACK[-1]:
+        print(f"   ⚠ 央行已公告到 {max(published_schedule)} 的理監事會日程，請把新日期補進"
+              f" macro/cbc_board.py 的 MEETINGS_FALLBACK（RSS 抓不到時的退路）", flush=True)
 
     # 總覽第一個區塊「今天」：政策決議與重大數據。要等 freshness、fomc、cbc 都好了才算。
     try:
@@ -171,19 +193,20 @@ def main() -> int:
         print("   ✗ reaction（期貨報價抓不到，落點頁會說明沒量到）", flush=True)
 
     fresh_state = dict((ctx.get("freshness") or {}).get("fresh") or {})
-    # FOMC 決議也走「數據更新」推播：鍵在上一輪不存在才推，同一次決議只推一次。
-    if (state.get("state") == "announced"
-            and (clock.us_today() - date.fromisoformat(state["date"])).days <= 2):
-        fresh_state[f"FOMC:{state['date']}"] = {
-            "name": (f"FOMC 決議：{fomc.action_label(state)}"
-                     f"（{fomc.range_label(state['lower'], state['upper'])}）"),
-            "date": state["date"],
-        }
-    if (cbc_state.get("state") == "announced"
-            and (clock.today() - date.fromisoformat(cbc_state["date"])).days <= 2):
-        fresh_state[f"CBC:{cbc_state['date']}"] = {
-            "name": cbc_state["headline"], "date": cbc_state["date"],
-        }
+    # 央行決議也走「數據更新」推播：鍵在上一輪不存在才推，同一次決議只推一次。
+    for state in ctx.get("fomc") or []:
+        if (state["state"] == "announced"
+                and (clock.us_today() - date.fromisoformat(state["date"])).days <= 2):
+            fresh_state[f"FOMC:{state['date']}"] = {
+                "name": (f"FOMC 決議：{fomc.action_label(state)}"
+                         f"（{fomc.range_label(state['lower'], state['upper'])}）"),
+                "date": state["date"],
+            }
+    for state in ctx.get("cbc") or []:
+        if (state["state"] == "announced"
+                and (clock.today() - date.fromisoformat(state["date"])).days <= 2):
+            fresh_state[f"CBC:{state['date']}"] = {"name": state["headline"],
+                                                   "date": state["date"]}
     with open(os.path.join(paths.DATA_DIR, "fresh_state.json"), "w",
               encoding="utf-8") as fh:
         json.dump(fresh_state, fh, ensure_ascii=False, indent=1)

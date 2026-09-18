@@ -33,9 +33,9 @@ TRACKED = [
     ("GDPC1", "實質 GDP", "成長", 53),
     ("RSAFS", "零售銷售", "成長", 9),
     ("INDPRO", "工業生產", "成長", 13),
-    ("HOUST", "新屋開工", "成長", 20),
+    ("HOUST", "新屋開工", "成長", 27),
     ("DGS10", "公債殖利率", "利率", 18),
-    ("DRTSCILM", "放款標準調查", "信用", 34),
+    ("DRTSCILM", "放款標準調查", "信用", 191),
 ]
 
 # 非 FRED 來源沒有發布行事曆，只能報告資料本身的日期。
@@ -49,8 +49,9 @@ EXTERNAL = [
 ]
 
 
-def _release_dates(release_id: int, *, limit: int = 3) -> list[str]:
-    """今天之後的發布日。"""
+def _release_dates(release_id: int, *, limit: int = 3) -> list[str] | None:
+    """今天之後的發布日。抓不到回 None——跟「沒有排定日期」（空清單）要分開，
+    否則限流的那一天，總覽會說「今天沒有重大數據」。"""
     params = {
         "release_id": release_id, "api_key": fred.api_key(), "file_type": "json",
         "sort_order": "asc", "include_release_dates_with_no_data": "true",
@@ -60,7 +61,7 @@ def _release_dates(release_id: int, *, limit: int = 3) -> list[str]:
         payload = get_json(build_url("https://api.stlouisfed.org/fred/release/dates", params),
                            ttl=12 * 3600, namespace="fred")
     except Exception:
-        return []
+        return None
     return [row["date"] for row in payload.get("release_dates", [])]
 
 
@@ -126,6 +127,7 @@ def compute(bundle: Bundle) -> dict:
     # 發布日是美東日期，拿美東的今天比（見 clock.us_today）
     today = clock.us_today()
     rows = []
+    calendar_failed: list[str] = []
     for series_id, label, module, release_id in TRACKED:
         series = bundle[series_id]
         if not series:
@@ -140,8 +142,13 @@ def compute(bundle: Bundle) -> dict:
                 meta = {"updated": meta.get("last_updated", "")}
             except Exception:
                 meta = {}
+                calendar_failed.append(label)
         updated = _parse_updated(meta.get("updated", ""))
         upcoming = _release_dates(release_id)
+        if upcoming is None:
+            if label not in calendar_failed:
+                calendar_failed.append(label)
+            upcoming = []
         next_release = None
         days_away = None
         for candidate in upcoming:
@@ -181,6 +188,7 @@ def compute(bundle: Bundle) -> dict:
 
     return {
         "rows": rows,
+        "calendar_failed": calendar_failed,
         "imminent": imminent,
         "fresh": fresh,
         "today": {

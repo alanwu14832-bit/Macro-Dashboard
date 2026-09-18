@@ -1,24 +1,12 @@
-"""雙目標卡的判定測試。標題是規則產生的，規則要有測試守。"""
+"""雙目標卡的判定測試。
+
+完整的就業／通膨卡（含 `_employment_headline` 產生的標題）已經移除：它們只在
+「當天有新公布」時才出現，而那正好會讓總覽撞上版面預算的硬上限、建置失敗、
+CI 跳過提交——網站在最該更新的那一天停住。那些內容留在 /labor/ 與 /inflation/。
+"""
 import unittest
 
-from macro.render.pages.mandate_cards import _employment_headline, _gap_note, _wan
-
-
-class TestEmploymentHeadline(unittest.TestCase):
-    def test_negative_payrolls_and_flat_unrate(self):
-        self.assertEqual(_employment_headline(-23.0, 20.0, 83.0, 4.1, 4.1),
-                         "非農轉負，失業率持穩")
-
-    def test_falling_unrate(self):
-        self.assertEqual(_employment_headline(-23.0, 20.0, 83.0, 4.1, 4.2),
-                         "非農轉負，失業率下行")
-
-    def test_rising_unrate(self):
-        self.assertEqual(_employment_headline(150.0, 100.0, 83.0, 4.3, 4.1),
-                         "非農回升，失業率上行")
-
-    def test_slowing(self):
-        self.assertIn("非農放緩", _employment_headline(50.0, 100.0, 83.0, 4.1, 4.1))
+from macro.render.pages.mandate_cards import _gap_note, _wan
 
 
 class TestHelpers(unittest.TestCase):

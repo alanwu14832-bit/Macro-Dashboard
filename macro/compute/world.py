@@ -80,9 +80,10 @@ def country_table(bundle: Bundle, external: dict) -> dict:
             s = bundle[block["long"]]
             long_yield, long_date = s.last, s.last_date
 
-        policy = None
+        policy = policy_source = None
         if block.get("policy"):
             policy = bundle[block["policy"]].last
+            policy_source = (bundle[block["policy"]].meta or {}).get("patched_from")
 
         fx = fx_chg = None
         if block.get("fx"):
@@ -99,7 +100,7 @@ def country_table(bundle: Bundle, external: dict) -> dict:
             "cpi_series": cpi_series,
             "unemployment": unemployment, "unemployment_date": unemployment_date,
             "long": long_yield, "long_date": long_date,
-            "policy": policy,
+            "policy": policy, "policy_source": policy_source,
             "fx": fx, "fx_chg_1y": fx_chg,
             # 停更的 CPI 不拿來算實質殖利率：用五年前的通膨減今天的殖利率，
             # 得到的數字看起來精確，其實沒有意義。

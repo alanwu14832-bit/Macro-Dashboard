@@ -3,17 +3,18 @@
 跟 macro/fomc.py 同一套規矩，只是時區換成台北：
   - 決議的真相是決議新聞稿，不是貼放利率表（那張表只在利率有變時才多一列）
   - 會後一週內，「決議」或「決議遺漏」一定出現在總覽的「今天」區塊
-  - 抓不到、讀不出、RSS 停在上一次，全部算遺漏
+  - 抓不到、讀不出、RSS 停在上一次，全部算遺漏；臨時會議也一樣
 """
 from __future__ import annotations
 
 from datetime import date, datetime, time, timedelta
 
 from . import clock
+from .clock import TAIPEI
 from .series import Series
 
 # 央行每年 12 月公告隔年日期；公告從 RSS 自動讀（sources/cbc.board_schedule），
-# 這份寫死的只是 RSS 抓不到時的退路。
+# 這份寫死的只是 RSS 抓不到時的退路。公告讀到比這份更晚的日期時，建置會提醒補進來。
 MEETINGS_FALLBACK = [
     date(2025, 3, 20), date(2025, 6, 19), date(2025, 9, 18), date(2025, 12, 18),
     date(2026, 3, 19), date(2026, 6, 18), date(2026, 9, 17), date(2026, 12, 17),
@@ -21,6 +22,7 @@ MEETINGS_FALLBACK = [
 
 WINDOW_DAYS = 7
 # 會後記者會 16:30，新聞稿通常 16:50 前後上 RSS；過了 17:30 還沒有就算遺漏。
+ANNOUNCE_AT = time(16, 30)
 ANNOUNCE_BY = time(17, 30)
 
 
@@ -74,36 +76,54 @@ def details(decision: dict) -> list[str]:
     return lines
 
 
-def decision_status(decision: dict | None, schedule: list[date],
-                    now: datetime | None = None) -> dict | None:
-    """announced／pending／missing／None，定義與 fomc.decision_status 相同。"""
-    now = now or clock.now()
+def decision_states(decision: dict | None, schedule: list[date],
+                    now: datetime | None = None) -> list[dict]:
+    """announced／pending／missing，定義與 fomc.decision_states 相同，時間用台北。"""
+    now = (now or clock.now()).astimezone(TAIPEI)
     today = now.date()
     decision = decision or {}
 
     announced = None
     if decision.get("status") == "ok" and decision.get("date"):
         announced = date.fromisoformat(decision["date"])
+    unreadable = None
+    if decision.get("status") in ("unparsed", "unavailable") and decision.get("date"):
+        unreadable = date.fromisoformat(decision["date"])
 
-    meeting = next((m for m in reversed(schedule) if m <= today), None)
-    if meeting is not None and (today - meeting).days > WINDOW_DAYS:
-        meeting = None
+    states: list[dict] = []
+    if (unreadable is not None and 0 <= (today - unreadable).days <= WINDOW_DAYS
+            and (announced is None or unreadable > announced)):
+        states.append({"state": "missing", "meeting": unreadable.isoformat(),
+                       "reason": decision.get("reason") or "沒有取得決議新聞稿"})
 
-    if (announced is not None and (today - announced).days <= WINDOW_DAYS
-            and (meeting is None or announced >= meeting)):
-        return {"state": "announced", "headline": headline(decision),
-                "details": details(decision), "change": is_change(decision),
-                **decision}
+    past = next((m for m in reversed(schedule)
+                 if datetime.combine(m, ANNOUNCE_BY, tzinfo=TAIPEI) <= now), None)
+    if past is not None and (today - past).days > WINDOW_DAYS:
+        past = None
+    if (past is not None and (announced is None or announced < past)
+            and not (unreadable is not None and unreadable >= past)):
+        if announced is not None:
+            reason = f"最新取得的決議新聞稿是 {decision['date']}，還不是這次會議的"
+        else:
+            reason = decision.get("reason") or "沒有取得決議新聞稿"
+        states.append({"state": "missing", "meeting": past.isoformat(), "reason": reason})
 
-    if meeting is None:
-        return None
-    if today == meeting and now.time() < ANNOUNCE_BY:
-        return {"state": "pending", "meeting": meeting.isoformat()}
-    if announced is not None:
-        reason = f"最新取得的決議新聞稿是 {decision['date']}，還不是這次會議的"
-    else:
-        reason = decision.get("reason") or "沒有取得決議新聞稿"
-    return {"state": "missing", "meeting": meeting.isoformat(), "reason": reason}
+    if today in schedule and now < datetime.combine(today, ANNOUNCE_BY, tzinfo=TAIPEI):
+        if announced is None or announced < today:
+            at = datetime.combine(today, ANNOUNCE_AT, tzinfo=TAIPEI)
+            states.append({"state": "pending", "meeting": today.isoformat(),
+                           "at": at.isoformat(), "overdue": now >= at})
+
+    if announced is not None and 0 <= (today - announced).days <= WINDOW_DAYS:
+        states.append({**decision, "state": "announced", "headline": headline(decision),
+                       "details": details(decision), "change": is_change(decision)})
+    return states
+
+
+def decision_status(decision: dict | None, schedule: list[date],
+                    now: datetime | None = None) -> dict | None:
+    states = decision_states(decision, schedule, now)
+    return states[0] if states else None
 
 
 def reconcile_discount(rate: dict[str, Series], decision: dict | None,
@@ -111,11 +131,14 @@ def reconcile_discount(rate: dict[str, Series], decision: dict | None,
     """貼放利率表還沒補上這次調整時，用決議新聞稿補上生效日那一點。"""
     from .sources import cbc
 
-    result = {"patched": False, "conflict": False}
+    result = {"patched": False, "conflict": False, "reason": None}
     if (decision or {}).get("status") != "ok":
         return rate, result
     move = decision["rate"]
-    if move["action"] == "hold" or not move.get("effective"):
+    if move["action"] == "hold":
+        return rate, result
+    if not move.get("effective"):
+        result["reason"] = "決議調整了利率，但新聞稿裡讀不出生效日，重貼現率沒有校正"
         return rate, result
     effective = date.fromisoformat(move["effective"])
     changes = rate["changes"]

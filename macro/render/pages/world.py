@@ -28,7 +28,9 @@ def render(ctx: dict) -> str:
         table_rows.append([
             esc(r["name"]), cpi_cell,
             pct(r["unemployment"], 1) if r["unemployment"] is not None else '<span class="muted">—</span>',
-            pct(r["policy"], 2) if r["policy"] is not None else '<span class="muted">—</span>',
+            (pct(r["policy"], 2) + ('<br><small class="muted">依聯準會聲明，FRED 尚未更新</small>'
+                                    if r.get("policy_source") else ""))
+            if r["policy"] is not None else '<span class="muted">—</span>',
             pct(r["long"], 2) if r["long"] is not None else '<span class="muted">—</span>',
             fmt(r["real_yield"], 2, suffix="%", signed=True) if r["real_yield"] is not None
             else '<span class="muted">—</span>',

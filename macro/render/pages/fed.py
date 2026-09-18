@@ -19,19 +19,27 @@ def _mark_words(sentence: str, words: list[dict], side: str) -> str:
     return out
 
 
-def _decision_callout(decision: dict | None) -> str:
+def _decision_callout(states) -> str:
     """決議本身用中文講在最上面。英文逐句比對是給想看措辭的人，不是給想知道升降息的人。"""
-    if not decision:
-        return ""
+    if isinstance(states, dict):
+        states = [states]
+    return "".join(_one_decision(state) for state in states or [])
+
+
+def _one_decision(decision: dict) -> str:
     if decision.get("state") == "announced":
         vote = f'，表決 {esc(decision["vote"])}' if decision.get("vote") else ""
+        effective = ("" if decision.get("action") == "hold"
+                     else f'，{esc(decision["effective"])} 生效')
         return callout(f'<strong>{esc(decision["headline"])}</strong>　'
-                       f'{esc(decision["date"])} 決議，{esc(decision["effective"])} 生效{vote}。',
-                       key=True)
+                       f'{esc(decision["date"])} 決議{effective}{vote}。', key=True)
     if decision.get("state") == "missing":
         return callout(f'<strong>{esc(decision["meeting"])} 的 FOMC 決議本站沒有取得</strong>：'
                        f'{esc(decision["reason"])}。政策利率可能仍是舊值，請以聯準會官網為準。',
                        key=True)
+    if decision.get("state") == "pending" and decision.get("overdue"):
+        return callout(f'<strong>{esc(decision["meeting"])} 的 FOMC 聲明應已公布，本站尚未取得</strong>'
+                       f'，請先看聯準會官網。', key=True)
     return ""
 
 
@@ -158,7 +166,8 @@ def _futures_block(ff: dict) -> str:
     body = (
         callout(f'<strong>{esc(ff["summary"])}</strong>；起點是 EFFR '
                 f'{pct(ff["effr"], 2)}（{zh_date(ff.get("effr_date"), freq="d")}）。'
-                f'{stale_note}', key=True)
+                f'{stale_note}'
+                + (f'<br>{esc(ff["effr_note"])}' if ff.get("effr_note") else ""), key=True)
         + table(["會議", "會後隱含利率", "相對今日", "升息", "不變", "降息"], rows,
                 foot="每列是「這次會議」的邊際機率，隱含利率是累計路徑。粗體是該次最可能的結果。")
         + accordion("各月合約報價與隱含平均利率",
