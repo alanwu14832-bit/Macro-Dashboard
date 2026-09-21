@@ -1,6 +1,6 @@
 {
  "date": "2026-09-21",
- "generated_at": "2026-09-21T19:11:23+08:00",
+ "generated_at": "2026-09-21T23:39:13+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -87,7 +87,7 @@
    "headline": "股債同向，債券失去對沖股票的功能",
    "direction": "neutral",
    "severity": "medium",
-   "evidence": "標普報酬與10年殖利率變動相關 -0.31（近一年）",
+   "evidence": "標普報酬與10年殖利率變動相關 -0.30（近一年）",
    "module": "市場"
   },
   {
@@ -119,7 +119,7 @@
    "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
    "direction": "neutral",
    "severity": "low",
-   "evidence": "高收益利差 2.70%，十年百分位 11%",
+   "evidence": "高收益利差 2.68%，十年百分位 8%",
    "module": "利率"
   },
   {
@@ -129,13 +129,21 @@
    "severity": "low",
    "evidence": "M1B 年增 7.34%、M2 年增 7.42%（差 -0.08 個百分點）",
    "module": "台灣"
+  },
+  {
+   "key": "volatility_complacent",
+   "headline": "波動率處於低檔，市場對總經風險定價不足",
+   "direction": "neutral",
+   "severity": "low",
+   "evidence": "VIX 14.8",
+   "module": "市場"
   }
  ],
  "summary": {
-  "total": 16,
+  "total": 17,
   "hawkish": 5,
   "dovish": 6,
-  "neutral": 5,
+  "neutral": 6,
   "score": -2,
   "tilt": "方向分歧"
  },
