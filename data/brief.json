@@ -1,27 +1,28 @@
 {
- "date": "2026-09-18",
- "generated_at": "2026-09-18T14:55:00+08:00",
+ "date": "2026-09-21",
+ "generated_at": "2026-09-21T23:55:00+08:00",
  "sections": [
   {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "日本央行升息 1 碼至 1.25%，創 31 年新高", "detail": "緊接 FOMC 之後出手，並點名通膨疑慮；日美利差收斂會降低日資外流誘因，對美債長端需求是逆風。", "source": "FT、CNBC、WSJ、Al Jazeera 等 6 家", "link": ""},
-   {"headline": "FOMC 9/16 升息 1 碼至 3.75%–4.00%，並暗示年內還有一次", "detail": "期貨定價 10/28 升息機率 56%，到 2027/7 累計再升 72bp；決議當日美股回落、黃金跌逾 1%。", "source": "AP、Reuters、CNN 等 4 家", "link": ""},
-   {"headline": "油價連三日回落，沙烏地改道阿曼輸出、中國施壓伊朗約束胡塞", "detail": "供應中斷疑慮降溫，但 WTI 仍在 107 美元、近一月 +27%，能源佔 CPI 約 6.2%，通膨傳導壓力未解。", "source": "Reuters、CNBC、OilPrice 等 6 家", "link": ""}
+   {"headline": "川普稱願與伊朗對話，美油盤中跌回每桶 100 美元以下、創 11 日低", "detail": "儀表板 WTI 讀數仍停在 107 美元（近一月 +27%）是資料落後；油價回落帶動全球公債反彈、殖利率回落，但美國柴油仍創 6.50 美元新高，供給面緊張未解。", "source": "CNBC、Financial Times、Oil & Gas 等 4 家", "link": ""},
+   {"headline": "芝加哥聯準會 Goolsbee：強勁需求可能正在推升通膨", "detail": "聯準會 9/16 剛升息一碼至 3.75%–4.00%，期貨對 10/28 再升息機率 52%、到 2027 年中累計再升約 3 碼；10 年期 4.94%。", "source": "Reuters 2 家", "link": ""},
+   {"headline": "Fed 與英格蘭銀行在 Jane Street 虧損後加強審查銀行對交易公司的曝險", "detail": "信用利差位於十年低檔（高收益 2.68%），監理收緊是少數會讓風險重新定價的觸發點。", "source": "Financial Times、Reuters", "link": ""}
   ]},
   {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "中國長鑫存儲（CXMT）跨足 NAND 快閃記憶體，正面挑戰三星與長江存儲", "detail": "在全球記憶體短缺之際擴產，中期會壓縮記憶體漲價循環的延續性，牽動模組與 NAND 供應鏈定價。", "source": "Reuters World 獨家", "link": ""},
-   {"headline": "伊朗戰事推升中美航線貨櫃運價，分析師估將測試歷史高點", "detail": "運價是商品到岸成本的前導指標，續漲會在未來一至兩季回頭推升核心商品通膨。", "source": "Reuters Business、Iran International", "link": ""},
-   {"headline": "美方批准 48 架 F-35 售沙烏地，金額約 240 億美元", "detail": "洛克希德長約能見度拉高；同日五角大廈與其簽 AIM-260 飛彈增產框架，國防供應鏈訂單續強。", "source": "FT、SCMP、Defense News", "link": ""}
+   {"headline": "AMD 市值首度突破 1 兆美元，五日連漲；Meta 單日 +7.1%", "detail": "AI 樂觀情緒帶動那斯達克 100 +2.2%，AI 算力供應鏈（含台灣 ASIC、電源）同步受惠。", "source": "CNBC、Fincept 報價", "link": ""},
+   {"headline": "Paramount 與加州等州檢達成和解，併購華納兄弟往前一大步", "detail": "移除最大監理障礙，兩家股價走揚，媒體業整併加速。", "source": "Reuters、CNBC、MarketWatch 等 4 家", "link": ""},
+   {"headline": "Google 遭愛爾蘭隱私監管機關罰款 4.03 億歐元（位置資料）", "detail": "金額對 Alphabet 有限（當日股價 +2.0%），但延續歐盟對美國科技平台的監理壓力。", "source": "Guardian、Reuters", "link": ""},
+   {"headline": "Novo Nordisk 公布後 Wegovy 成長策略，股價下跌", "detail": "GLP-1 減重藥競爭與定價壓力仍是市場疑慮。", "source": "CNBC", "link": ""}
   ]},
   {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "美國國會通過俄羅斯—伊朗制裁法案送交川普簽署，印度面臨 100% 關稅威脅", "detail": "若對進口俄油國家課徵次級關稅，傳導路徑是原油運輸重組加運價與貿易成本上升。", "source": "AP、BBC、Oil & Gas 等 5 家", "link": ""},
-   {"headline": "聯合國專家指美國對伊朗兩次空襲可能構成戰爭罪；俄中否決伊朗制裁監督延長", "detail": "外交解方後退、戰事延長機率上升，是原油與避險資產的風險貼水來源。", "source": "AP、BBC、CBS、Reuters 等 5 家", "link": ""},
-   {"headline": "歐盟邀加拿大成為首個「聯繫會員」，川普稱之為敵意行為並威脅加徵關稅", "detail": "北美—歐洲貿易集團重組的訊號；若關稅實現，透過供應鏈成本回到商品通膨。", "source": "AP、CNBC、BBC、NPR 等 5 家", "link": ""}
+   {"headline": "美中在川習峰會前同意 AI 對話，美方提議 AI 事故通報機制；稀土出口下滑迫使川普降溫", "detail": "傳導路徑：關稅與稀土供應鏈風險下降，有利科技股與半導體。", "source": "BBC、FT、SCMP 等 6 家", "link": ""},
+   {"headline": "美國制裁伊朗航空公司、伊朗威脅擴大戰爭範圍；伊朗總統將赴紐約出席聯大", "detail": "傳導路徑：荷莫茲海峽危機持續（卡達能源稱擴產可能延後），油價與避險需求的雙向風險都大。", "source": "CNBC、NBC、Iran International 等", "link": ""},
+   {"headline": "烏克蘭對俄羅斯發動上千架無人機、包括史上最大規模攻擊莫斯科；俄執政黨以 57% 勝選", "detail": "傳導路徑：俄國能源設施與出口風險，支撐油價與歐洲燃料（第四季航空燃油短缺）。", "source": "AP、BBC、Reuters 等 5 家", "link": ""},
+   {"headline": "德國總理梅爾茨所屬 CDU 在兩邦選舉慘敗、極右 AfD 大勝", "detail": "傳導路徑：德國改革與財政擴張執行力受疑，歐元與德債風險溢酬。", "source": "CNN、Guardian、AP 等 4 家", "link": ""}
   ]},
   {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "台股加權指數收 47,180.75 點、上漲 1.9%，櫃買指數大漲 3.6%", "detail": "本日收盤價；在 FOMC 升息後仍收紅，資金面對 AI 供應鏈的偏好未受利率上行壓抑。", "source": "Fincept Terminal", "link": ""},
-   {"headline": "聯發科收 4,710 元、漲 4.7% 領漲，台積電 2,460 元漲 1.4%、台達電漲 3.0%", "detail": "ASIC 與電源供應族群同步走強，鴻海平盤、廣達小跌，資金集中在設計與電源環節。", "source": "Fincept Terminal", "link": ""},
-   {"headline": "台灣央行 9/17 決議利率不變，重貼現率維持 2%，並調整房貸信用管制", "detail": "利率按兵不動、改用總量管制處理房市，與美日同步升息形成利差擴大壓力。", "source": "央行決議原文", "link": ""}
+   {"headline": "台股加權指數收 47,718.84 點、漲 1.1%；台達電 +8.1%、聯發科 +6.4%，台積電 +0.8% 收 2,480 元", "detail": "AI 電源與 ASIC 族群領漲，跟隨美股 AI 樂觀情緒；櫃買指數持平。", "source": "Fincept 報價（本日收盤）", "link": ""},
+   {"headline": "台灣央行 9/17 利率不變（重貼現率 2%），另調整房貸信用管制", "detail": "與聯準會升息方向分歧，台美利差擴大，留意新台幣匯率壓力。", "source": "台灣央行", "link": ""}
   ]}
  ],
- "synthesis": "與本期判斷的交集：FOMC 與日本央行同週升息、油價雖回落但 WTI 近一月仍 +27%、核心服務除住房 3.1% 連 64 個月高於 2.5%——三者都支持「通膨優先」的政策重心；反向訊號是高收益利差十年百分位僅 11%，市場幾乎沒有替這些風險定價。"
+ "synthesis": "與本期判斷的交集：Goolsbee 的需求推升通膨論與柴油創高支撐「通膨未解／通膨優先」，但油價因美伊對話跌破 100 美元、美中緩和，若延續將削弱油價上行這條偏升息訊號。"
 }
