@@ -1,6 +1,6 @@
 {
  "date": "2026-09-22",
- "generated_at": "2026-09-22T05:19:51+08:00",
+ "generated_at": "2026-09-22T08:22:01+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -87,7 +87,7 @@
    "headline": "股債同向，債券失去對沖股票的功能",
    "direction": "neutral",
    "severity": "medium",
-   "evidence": "標普報酬與10年殖利率變動相關 -0.30（近一年）",
+   "evidence": "標普報酬與10年殖利率變動相關 -0.31（近一年）",
    "module": "市場"
   },
   {
