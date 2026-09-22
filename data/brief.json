@@ -1,28 +1,44 @@
 {
- "date": "2026-09-21",
- "generated_at": "2026-09-21T23:55:00+08:00",
+ "date": "2026-09-23",
+ "generated_at": "2026-09-23T04:30:00+08:00",
  "sections": [
-  {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "川普稱願與伊朗對話，美油盤中跌回每桶 100 美元以下、創 11 日低", "detail": "儀表板 WTI 讀數仍停在 107 美元（近一月 +27%）是資料落後；油價回落帶動全球公債反彈、殖利率回落，但美國柴油仍創 6.50 美元新高，供給面緊張未解。", "source": "CNBC、Financial Times、Oil & Gas 等 4 家", "link": ""},
-   {"headline": "芝加哥聯準會 Goolsbee：強勁需求可能正在推升通膨", "detail": "聯準會 9/16 剛升息一碼至 3.75%–4.00%，期貨對 10/28 再升息機率 52%、到 2027 年中累計再升約 3 碼；10 年期 4.94%。", "source": "Reuters 2 家", "link": ""},
-   {"headline": "Fed 與英格蘭銀行在 Jane Street 虧損後加強審查銀行對交易公司的曝險", "detail": "信用利差位於十年低檔（高收益 2.68%），監理收緊是少數會讓風險重新定價的觸發點。", "source": "Financial Times、Reuters", "link": ""}
-  ]},
-  {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "AMD 市值首度突破 1 兆美元，五日連漲；Meta 單日 +7.1%", "detail": "AI 樂觀情緒帶動那斯達克 100 +2.2%，AI 算力供應鏈（含台灣 ASIC、電源）同步受惠。", "source": "CNBC、Fincept 報價", "link": ""},
-   {"headline": "Paramount 與加州等州檢達成和解，併購華納兄弟往前一大步", "detail": "移除最大監理障礙，兩家股價走揚，媒體業整併加速。", "source": "Reuters、CNBC、MarketWatch 等 4 家", "link": ""},
-   {"headline": "Google 遭愛爾蘭隱私監管機關罰款 4.03 億歐元（位置資料）", "detail": "金額對 Alphabet 有限（當日股價 +2.0%），但延續歐盟對美國科技平台的監理壓力。", "source": "Guardian、Reuters", "link": ""},
-   {"headline": "Novo Nordisk 公布後 Wegovy 成長策略，股價下跌", "detail": "GLP-1 減重藥競爭與定價壓力仍是市場疑慮。", "source": "CNBC", "link": ""}
-  ]},
-  {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "美中在川習峰會前同意 AI 對話，美方提議 AI 事故通報機制；稀土出口下滑迫使川普降溫", "detail": "傳導路徑：關稅與稀土供應鏈風險下降，有利科技股與半導體。", "source": "BBC、FT、SCMP 等 6 家", "link": ""},
-   {"headline": "美國制裁伊朗航空公司、伊朗威脅擴大戰爭範圍；伊朗總統將赴紐約出席聯大", "detail": "傳導路徑：荷莫茲海峽危機持續（卡達能源稱擴產可能延後），油價與避險需求的雙向風險都大。", "source": "CNBC、NBC、Iran International 等", "link": ""},
-   {"headline": "烏克蘭對俄羅斯發動上千架無人機、包括史上最大規模攻擊莫斯科；俄執政黨以 57% 勝選", "detail": "傳導路徑：俄國能源設施與出口風險，支撐油價與歐洲燃料（第四季航空燃油短缺）。", "source": "AP、BBC、Reuters 等 5 家", "link": ""},
-   {"headline": "德國總理梅爾茨所屬 CDU 在兩邦選舉慘敗、極右 AfD 大勝", "detail": "傳導路徑：德國改革與財政擴張執行力受疑，歐元與德債風險溢酬。", "source": "CNN、Guardian、AP 等 4 家", "link": ""}
-  ]},
-  {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "台股加權指數收 47,718.84 點、漲 1.1%；台達電 +8.1%、聯發科 +6.4%，台積電 +0.8% 收 2,480 元", "detail": "AI 電源與 ASIC 族群領漲，跟隨美股 AI 樂觀情緒；櫃買指數持平。", "source": "Fincept 報價（本日收盤）", "link": ""},
-   {"headline": "台灣央行 9/17 利率不變（重貼現率 2%），另調整房貸信用管制", "detail": "與聯準會升息方向分歧，台美利差擴大，留意新台幣匯率壓力。", "source": "台灣央行", "link": ""}
-  ]}
+  {
+   "key": "macro",
+   "title": "總經數據與事件",
+   "items": [
+    {"headline": "川普聯大威脅「消滅」伊朗又稱選後會談成，油價跌破 100 美元", "detail": "伊朗稱美方鬆綁即可七天內重開荷莫茲；WTI 仍 107 美元、近一月 +27.4%", "source": "Reuters 等 6 家", "link": ""},
+    {"headline": "美國柴油價創 6.51 美元新高，財政部評估出口禁令可行性", "detail": "業界估全球柴油短缺延續到 2027 年，成本會落後滲入核心商品", "source": "CBS／CNBC 等 3 家", "link": ""},
+    {"headline": "美國戰略石油儲備降到 1982 年以來最低水位", "detail": "政策端可用來壓油價的庫存工具所剩無幾", "source": "Reuters 2 家", "link": ""},
+    {"headline": "10 年期持平 5.01%，期貨定價 10/28 升息機率 60%", "detail": "期限溢酬 +1.02pp、10 年實質 2.68%，長端由風險補償推高", "source": "CNBC、儀表板", "link": ""}
+   ]
+  },
+  {
+   "key": "company",
+   "title": "公司新聞",
+   "items": [
+    {"headline": "阿里巴巴發表自研新晶片與 AI 模型藍圖", "detail": "川習峰會前宣示算力自主，牽動輝達中國市佔與台廠 ASIC 需求", "source": "AP／Asia News 2 家", "link": ""},
+    {"headline": "Anthropic 與 OpenAI 同時推出更便宜的模型", "detail": "推論單位成本下降但用量上升，對資料中心資本支出節奏是雙面刃", "source": "CNBC", "link": ""},
+    {"headline": "Kalshi 申請 CFTC 開放預測市場保證金交易", "detail": "獲准後可用借款下注，監管性質將往槓桿衍生品靠", "source": "CNBC／Yahoo 2 家", "link": ""}
+   ]
+  },
+  {
+   "key": "geo",
+   "title": "地緣政治",
+   "items": [
+    {"headline": "美、丹麥、格陵蘭簽約，美方將新建兩座軍事基地", "detail": "北極對峙落幕，傳導於北極航道與關鍵礦產布局", "source": "BBC／Reuters 等 5 家", "link": ""},
+    {"headline": "沙烏地東西輸油管遭無人機攻擊後重啟，Aramco 加大波灣裝載", "detail": "這條繞過荷莫茲的替代路徑能否穩定，直接決定油價地緣溢價", "source": "FT／Reuters 等 4 家", "link": ""},
+    {"headline": "利比亞 Sharara 油田遭武裝團體關閥減產", "detail": "與沙烏地重啟反向的供給干擾，油市維持在消息驅動的緊繃狀態", "source": "Reuters 2 家", "link": ""},
+    {"headline": "歐盟延長對俄制裁三年，卻將 Usmanov、Fridman 除名", "detail": "制裁鬆動先例會壓低俄系能源與金屬的風險溢價", "source": "Reuters／FT 等 4 家", "link": ""}
+   ]
+  },
+  {
+   "key": "taiwan",
+   "title": "台灣",
+   "items": [
+    {"headline": "台股 9/22 收 47,800 點（+0.2%），聯發科 +3.4% 領漲", "detail": "台積電 2,460（-0.8%）、鴻海 +1.2%；今晨尚未開盤，為上一交易日收盤", "source": "Fincept Terminal", "link": ""},
+    {"headline": "川習峰會前美方重申對日、韓、台的支持", "detail": "稀土管制與 AI 晶片談判並行，台灣供應鏈同時是籌碼與風險點", "source": "Reuters／SCMP 2 家", "link": ""}
+   ]
+  }
  ],
- "synthesis": "與本期判斷的交集：Goolsbee 的需求推升通膨論與柴油創高支撐「通膨未解／通膨優先」，但油價因美伊對話跌破 100 美元、美中緩和，若延續將削弱油價上行這條偏升息訊號。"
+ "synthesis": "WTI 107 美元、柴油創高、SPR 降至 1982 年以來最低，三者同向支撐「通膨優先」與 10/28 升息 60% 的定價；反向劇本只有美伊談成、荷莫茲重開。"
 }
