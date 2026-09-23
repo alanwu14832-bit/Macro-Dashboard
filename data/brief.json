@@ -1,44 +1,44 @@
 {
  "date": "2026-09-23",
- "generated_at": "2026-09-23T04:30:00+08:00",
+ "generated_at": "2026-09-23T16:10:00+08:00",
  "sections": [
   {
    "key": "macro",
    "title": "總經數據與事件",
    "items": [
-    {"headline": "川普聯大威脅「消滅」伊朗又稱選後會談成，油價跌破 100 美元", "detail": "伊朗稱美方鬆綁即可七天內重開荷莫茲；WTI 仍 107 美元、近一月 +27.4%", "source": "Reuters 等 6 家", "link": ""},
-    {"headline": "美國柴油價創 6.51 美元新高，財政部評估出口禁令可行性", "detail": "業界估全球柴油短缺延續到 2027 年，成本會落後滲入核心商品", "source": "CBS／CNBC 等 3 家", "link": ""},
-    {"headline": "美國戰略石油儲備降到 1982 年以來最低水位", "detail": "政策端可用來壓油價的庫存工具所剩無幾", "source": "Reuters 2 家", "link": ""},
-    {"headline": "10 年期持平 5.01%，期貨定價 10/28 升息機率 60%", "detail": "期限溢酬 +1.02pp、10 年實質 2.68%，長端由風險補償推高", "source": "CNBC、儀表板", "link": ""}
+    {"headline": "油價急跌，沙烏地東西向管線復運加上美伊重啟談判，創逾一年最長連跌", "detail": "WTI 單日跌逾 3% 一度失守 100 美元；儀表板讀數仍是 107 美元、近一月 +27%，供給面緩解若延續，會削弱「油價推升未來一兩月 CPI」這條訊號。", "source": "Oil & Gas、Reuters、FT 等 6 家", "link": ""},
+    {"headline": "川普表態支持柴油出口禁令，因美國柴油價格創歷史新高", "detail": "零售汽油已 4.48 美元/加侖、近一年 +48%；出口禁令會壓低國內油品價格但打亂煉油與出口供應鏈，Atlantic Council 警告會衝擊美國供應鏈。", "source": "5 家（FT、Reuters、gCaptain 等）", "link": ""},
+    {"headline": "ECB 警告油氣價格飆漲把歐洲的抗通膨戰線拖到 2027 年", "detail": "與美國核心 PCE 3.3%、核心服務除住房 3.1% 的僵固態勢一致，主要央行同步卡在「通膨優先」。", "source": "Fars News", "link": ""},
+    {"headline": "美元升至兩個月高點，市場押注聯準會升息", "detail": "期貨定價 10/28 會議升息機率 56%、到 2027/7 累計升息 77bp；廣體美元指數 119.5、近一月 +1.0%。10 年期反而回落至 4.96%（前 5.01%），10 減 2 收斂到 0.20pp。", "source": "Reuters World、Reuters Business", "link": ""}
    ]
   },
   {
    "key": "company",
    "title": "公司新聞",
    "items": [
-    {"headline": "阿里巴巴發表自研新晶片與 AI 模型藍圖", "detail": "川習峰會前宣示算力自主，牽動輝達中國市佔與台廠 ASIC 需求", "source": "AP／Asia News 2 家", "link": ""},
-    {"headline": "Anthropic 與 OpenAI 同時推出更便宜的模型", "detail": "推論單位成本下降但用量上升，對資料中心資本支出節奏是雙面刃", "source": "CNBC", "link": ""},
-    {"headline": "Kalshi 申請 CFTC 開放預測市場保證金交易", "detail": "獲准後可用借款下注，監管性質將往槓桿衍生品靠", "source": "CNBC／Yahoo 2 家", "link": ""}
+    {"headline": "輝達投資的 Nscale 被爆在衝刺 350 億美元 IPO 前隱匿位元組跳動合約", "detail": "AI 資料中心新創的估值與客戶集中度受質疑，牽動整條 AI 算力租賃供應鏈的融資條件。", "source": "Financial Times", "link": ""},
+    {"headline": "全球銀行警告英國暴利稅將促使業務撤出倫敦", "detail": "金融機構重新配置人力與資本的政策風險，對英鎊資產與倫敦金融業評價是負面因子。", "source": "Financial Times", "link": ""},
+    {"headline": "南韓計畫 2035 年前把中東原油進口依賴降到 50%", "detail": "荷姆茲風險溢價長期化促使亞洲煉油業分散來源，中長期改變原油貿易流向。", "source": "Reuters Business", "link": ""}
    ]
   },
   {
    "key": "geo",
    "title": "地緣政治",
    "items": [
-    {"headline": "美、丹麥、格陵蘭簽約，美方將新建兩座軍事基地", "detail": "北極對峙落幕，傳導於北極航道與關鍵礦產布局", "source": "BBC／Reuters 等 5 家", "link": ""},
-    {"headline": "沙烏地東西輸油管遭無人機攻擊後重啟，Aramco 加大波灣裝載", "detail": "這條繞過荷莫茲的替代路徑能否穩定，直接決定油價地緣溢價", "source": "FT／Reuters 等 4 家", "link": ""},
-    {"headline": "利比亞 Sharara 油田遭武裝團體關閥減產", "detail": "與沙烏地重啟反向的供給干擾，油市維持在消息驅動的緊繃狀態", "source": "Reuters 2 家", "link": ""},
-    {"headline": "歐盟延長對俄制裁三年，卻將 Usmanov、Fridman 除名", "detail": "制裁鬆動先例會壓低俄系能源與金屬的風險溢價", "source": "Reuters／FT 等 4 家", "link": ""}
+    {"headline": "美伊六月以來首次直接談判，同時川普在聯大演說揚言「殲滅」伊朗", "detail": "伊朗放話若美方放鬆軍事壓力、七天內可重開荷姆茲海峽——這是目前油價與通膨路徑最大的單一變數（傳導：油價→CPI→政策利率）。", "source": "4 家（BBC、FT、Reuters、CNBC）", "link": ""},
+    {"headline": "沙烏地東西向輸油管遭攻擊後已恢復運轉，利比亞產量也回到正常", "detail": "供給中斷風險短線解除，是今天油價回跌的直接原因（傳導：油價、避險）。", "source": "3 家（Reuters、WSJ、Oil & Gas）", "link": ""},
+    {"headline": "美國與丹麥、格陵蘭簽署北極安全協議，將建兩座軍事基地", "detail": "北約內部緊張緩解，並牽動北極航道與關鍵礦產的長期布局（傳導：供應鏈）。", "source": "4 家（BBC、Reuters、AP、Defense News）", "link": ""},
+    {"headline": "川習會前夕，中國駐美大使稱台灣與人權是「紅線」", "detail": "峰會若僅止於芬太尼等技術性議題，對關稅與科技管制的緩解有限（傳導：供應鏈、避險）。", "source": "2 家（Reuters US、Asia News）", "link": ""}
    ]
   },
   {
    "key": "taiwan",
    "title": "台灣",
    "items": [
-    {"headline": "台股 9/22 收 47,800 點（+0.2%），聯發科 +3.4% 領漲", "detail": "台積電 2,460（-0.8%）、鴻海 +1.2%；今晨尚未開盤，為上一交易日收盤", "source": "Fincept Terminal", "link": ""},
-    {"headline": "川習峰會前美方重申對日、韓、台的支持", "detail": "稀土管制與 AI 晶片談判並行，台灣供應鏈同時是籌碼與風險點", "source": "Reuters／SCMP 2 家", "link": ""}
+    {"headline": "台股收 48,157 點、上漲 0.7%，台積電漲 1.6% 至 2,500 元", "detail": "鴻海 +1.2%、聯發科持平、櫃買指數 -0.3%，權值股帶動而非全面普漲。", "source": "Fincept Terminal 收盤價", "link": ""},
+    {"headline": "外交部表示將就軍售與美方保持「密切聯繫」", "detail": "在川習會把台灣列為紅線的背景下，軍售節奏是兩岸與美中關係的近期觀察點。", "source": "Reuters US", "link": ""}
    ]
   }
  ],
- "synthesis": "WTI 107 美元、柴油創高、SPR 降至 1982 年以來最低，三者同向支撐「通膨優先」與 10/28 升息 60% 的定價；反向劇本只有美伊談成、荷莫茲重開。"
+ "synthesis": "今天的新聞同時往兩個方向拉：美元走強與期貨定價升息機率 56%，呼應「通膨優先」的政策重心；但油價因沙烏地管線復運與美伊談判急跌、10 年期回落到 4.96%，正好戳中本期「油價上行推升未來一兩月 CPI」這條偏升息訊號的前提——若油價跌勢延續，通膨未解的判斷會先從能源這一側鬆動。"
 }
