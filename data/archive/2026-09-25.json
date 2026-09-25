@@ -1,6 +1,6 @@
 {
  "date": "2026-09-25",
- "generated_at": "2026-09-25T20:19:51+08:00",
+ "generated_at": "2026-09-25T22:20:25+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -115,14 +115,6 @@
    "module": "台灣"
   },
   {
-   "key": "credit_complacent",
-   "headline": "信用利差處在十年低檔，市場幾乎沒有反映風險",
-   "direction": "neutral",
-   "severity": "low",
-   "evidence": "高收益利差 2.73%，十年百分位 17%",
-   "module": "利率"
-  },
-  {
    "key": "tw_m1b_below_m2",
    "headline": "台灣 M1B 年增率低於 M2（死亡交叉），已 1 個月",
    "direction": "neutral",
@@ -140,10 +132,10 @@
   }
  ],
  "summary": {
-  "total": 17,
+  "total": 16,
   "hawkish": 5,
   "dovish": 6,
-  "neutral": 6,
+  "neutral": 5,
   "score": -2,
   "tilt": "方向分歧"
  },
