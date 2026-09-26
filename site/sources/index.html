@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="總經儀表板">
-<link rel="stylesheet" href="/style.css?v=1790369124">
+<link rel="stylesheet" href="/style.css?v=1790381379">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>📊</text></svg>">
 <script>
 (function(){var d=document.documentElement;try{
@@ -52,7 +52,7 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
       </button>
       <div class="topbar-title">資料來源</div>
       <a class="topbar-guide" href="/guide/">使用講義</a>
-      <div class="topbar-meta">最後更新 2026-09-26 04:50</div>
+      <div class="topbar-meta">最後更新 2026-09-26 08:14</div>
       <button type="button" class="icon-btn" id="reload-btn" aria-label="重新載入">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
@@ -65,13 +65,13 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
     </header>
     <main class="content" id="content">
       <div class="wrap">
-<a class="trust" href="/freshness/" data-build="2026-09-26T04:50+08:00" aria-label="最後更新 09 月 26 日 04 時 50 分 台北時間，開啟資料狀態"><span class="trust-dot" aria-hidden="true"></span><span>最後更新 <time datetime="2026-09-26T04:50+08:00">2026-09-26 04:50</time> 台北</span><span class="trust-next" data-trust-next></span><span class="trust-go" aria-hidden="true">›</span></a>
+<a class="trust" href="/freshness/" data-build="2026-09-26T08:14+08:00" aria-label="最後更新 09 月 26 日 08 時 14 分 台北時間，開啟資料狀態"><span class="trust-dot" aria-hidden="true"></span><span>最後更新 <time datetime="2026-09-26T08:14+08:00">2026-09-26 08:14</time> 台北</span><span class="trust-next" data-trust-next></span><span class="trust-go" aria-hidden="true">›</span></a>
 <header class="page-head"><h1>資料來源</h1><p class="lede">數字從哪裡來、判斷怎麼產生，以及我們拿不到什麼。</p></header>
 <section id="where"><div class="section-head"><h2>數字從哪裡來</h2></div><div class="src-list"><div class="src"><div class="src-name">FRED（聖路易聯準銀行）</div><div class="src-what">美國總經的主體：就業、物價、利率、債務、成長、信用。原始資料來自勞工統計局、經濟分析局、勞工部、財政部、聯準會、能源資訊署與 IMF，FRED 只是統一的取用口</div><div class="src-when">各指標依自己的發布行事曆，日頻到季頻不等</div></div><div class="src"><div class="src-name">臺灣證券交易所</div><div class="src-what">台股加權與櫃買指數、個股與 ETF 報價、三大法人買賣超、融資融券餘額、每日成交統計</div><div class="src-when">盤中即時；法人與融資為收盤後</div></div><div class="src"><div class="src-name">Finnhub</div><div class="src-what">美股與國際市場的指數與個股報價、財報行事曆</div><div class="src-when">各市場交易時段</div></div><div class="src"><div class="src-name">Yahoo Finance</div><div class="src-what">股價指數期貨與公債期貨——用來呈現數據公布後的市場反應</div><div class="src-when">交易時段內即時</div></div><div class="src"><div class="src-name">聯準會官網</div><div class="src-what">FOMC 會議聲明全文，用於逐句比對措辭變化與表決結果</div><div class="src-when">每次會議後</div></div><div class="src"><div class="src-name">TreasuryDirect（美國財政部）</div><div class="src-what">公債標售行事曆與結果</div><div class="src-when">每個標售日</div></div><div class="src"><div class="src-name">OECD SDMX</div><div class="src-what">主要經濟體的消費者物價，用於全球對照</div><div class="src-when">每月，各國時程不一</div></div><div class="src"><div class="src-name">歐洲央行資料入口</div><div class="src-what">歐元區失業率與核心 HICP</div><div class="src-when">每月</div></div><div class="src"><div class="src-name">行政院主計總處</div><div class="src-what">台灣消費者物價指數；總體統計資料庫的經濟成長率與 GDP 支出面，以及它轉載的央行貨幣總計數 M1B／M2 與美元計價外匯存底。勞動部、財政部、內政部的統計資料庫是同一套查詢引擎，本站用同一支解析器取用</div><div class="src-when">物價每月 5 日前後；GDP 約季後一個月</div></div><div class="src"><div class="src-name">財政部</div><div class="src-what">貨品別與國別出口：積體電路出口、對美出口佔總出口</div><div class="src-when">每月上旬</div></div><div class="src"><div class="src-name">勞動部</div><div class="src-what">勞雇雙方協商減少工時（無薪假）的事業單位家數與實施人數</div><div class="src-when">每半個月</div></div><div class="src"><div class="src-name">經濟部統計處</div><div class="src-what">外銷訂單金額（美元與新臺幣計價）</div><div class="src-when">每月下旬</div></div><div class="src"><div class="src-name">國家發展委員會</div><div class="src-what">台灣總經的主體：景氣對策信號與燈號、領先／同時／落後指標，以及三組指標的全部構成項目——外銷訂單動向指數、貨幣總計數 M1B、工業生產指數、海關出口值、機電與半導體設備進口、製造業銷售量與存貨、批發零售餐飲營業額、失業率、五大銀行新承做放款利率、金融機構放款與投資。下載網址透過政府資料開放平臺的 dataset API 解析，因為國發會每月重新上傳、檔案路徑會換</div><div class="src-when">每月 27 日前後，並回溯修正歷史值</div></div><div class="src"><div class="src-name">中央銀行</div><div class="src-what">重貼現率的完整調整紀錄（台灣的政策利率）。央行沒有把它放進任何開放資料檔，本站解析「央行貼放利率」頁的表格</div><div class="src-when">理監事會議後，一年可能一次都不調整</div></div><div class="src"><div class="src-name">LBMA（倫敦金銀市場協會）</div><div class="src-what">黃金與白銀的官方定盤價</div><div class="src-when">每個交易日</div></div><div class="src"><div class="src-name">CME 聯邦資金期貨</div><div class="src-what">利率決策的市場隱含機率。本站以合約價自行推算，不是 CME FedWatch 的數字</div><div class="src-when">每個交易日</div></div><div class="src"><div class="src-name">WorldMonitor</div><div class="src-what">國際新聞的來源目錄（不是新聞內容本身）</div><div class="src-when">目錄隨上游更新</div></div></div><p class="chg-scope">每個頁面上的讀數都標有自己的資料期間——那是該指標的統計期間，不是抓取時間。兩者可能差好幾週，尤其是月頻與季頻的指標。</p></section><section id="judgement"><div class="section-head"><h2>判斷怎麼產生</h2></div><div class="callout key">站上所有的判定——九宮格位置、政策重心、規則訊號、曲線形態、信用利差的百分位帶——<strong>都由寫死的門檻產生</strong>。沒有預測模型、沒有機器學習、沒有人工調整。同一份資料在任何時間重跑一次，得到的結論完全一樣。</div><p>這帶來兩個性質。第一，每個結論都可以回溯到它引用的那幾個數字與那條門檻——點任何一張訊號卡都會展開它的規則。第二，結論可以被反駁：你不同意某條門檻，就知道要去改哪一個數字。</p><p>代價是它不會比規則聰明。規則沒有涵蓋的情況，它就是沉默，而不是猜一個答案。</p></section><section id="gaps"><div class="section-head"><h2>我們沒有什麼</h2></div><div class="src-list"><div class="src"><div class="src-name">市場共識預期</div><div class="src-what">彭博、路透的經濟學家調查中位數是付費資料。</div><div class="src-when">改用：所有「優於／低於預期」的說法本站都不說；只跟前值與該指標自己的近期節奏比。</div></div><div class="src"><div class="src-name">CME FedWatch 官方機率</div><div class="src-what">官方發布的機率表需要授權。</div><div class="src-when">改用：改用聯邦資金期貨合約價自行推算，方法一致但數字可能與官方有小幅差異，頁面上一律標明是自行推算。</div></div><div class="src"><div class="src-name">主權 CDS 報價</div><div class="src-what">ICE 與 Markit 的主權信用違約交換報價是付費資料。</div><div class="src-when">改用：債務風險改看期限貼水與 30 年減 10 年利差，並在頁面上說明這是替代指標。</div></div><div class="src"><div class="src-name">台股融資維持率</div><div class="src-what">證交所與櫃買中心不發布整體市場的維持率資料集。</div><div class="src-when">改用：可以由個股融資餘額 × 收盤價 ÷ 融資金額推估，但口徑與官方的整戶擔保維持率不同，本站尚未做；目前改看融資餘額與其增減。</div></div><div class="src"><div class="src-name">月頻的台灣 GDP</div><div class="src-what">主計總處只按季發布。</div><div class="src-when">改用：季與季之間改看國發會的同時指標與工業生產指數，兩者都不是 GDP 的替身。</div></div><div class="src"><div class="src-name">即時的總經數據</div><div class="src-what">總經數據本身就不是即時的：非農月頻、GDP 季頻、JOLTS 還延遲一個月。</div><div class="src-when">改用：與其追求無意義的重整頻率，本站把每個數字的資料期間與新鮮度攤開。</div></div></div><p class="chg-scope">這一份清單跟來源清單一樣重要：知道少了什麼，才知道一個判斷的邊界在哪裡。相關頁面上也都會就地標明，不會只寫在這裡。</p></section><section id="cadence"><div class="section-head"><h2>什麼時候會更新</h2></div><div class="table-wrap"><table><thead><tr><th>類型</th><th>內容</th><th>節奏</th></tr></thead><tbody><tr><td class="">即時</td><td class="num">台股報價與熱力圖</td><td class="num">交易時段內每 5 秒</td></tr><tr><td class="">即時</td><td class="num">美股與國際報價</td><td class="num">各市場交易時段，每 45 秒</td></tr><tr><td class="">每次重建</td><td class="num">所有總經讀數、判定、訊號、圖表</td><td class="num">一天數次</td></tr><tr><td class="">每月／每季</td><td class="num">多數總經指標本身</td><td class="num">依各自的官方發布行事曆</td></tr></tbody><tfoot><tr><td colspan="3">頁面頂端的「最後更新」是這一份內容產生的時間。重建由排程觸發，實際間隔會因排程服務的負載而變動，所以那裡只說資料多舊，不預告下一次。</td></tr></tfoot></table></div></section><section id="credit"><div class="section-head"><h2>版權與授權</h2></div><p>新聞來源目錄取自 <a href="https://github.com/koala73/worldmonitor" target="_blank" rel="noopener noreferrer">WorldMonitor</a>（AGPL-3.0）；新聞內容的版權屬於各原始媒體，本站只顯示標題與連結。各資料來源的數據版權屬於原始發布機構。</p><div class="callout">本站是個人的資料整理，不構成投資建議，也不提供個人化的投資或財務建議。所有判定都是規則的輸出，不是推薦。</div></section>
       </div>
       <footer class="site">
         <p class="foot-main">所有判定由固定規則產生，同一份資料每次執行結果一致。<a href="/sources/">資料來源與判斷方法</a></p>
-        <p class="foot-fine">個人資料整理，不構成投資建議。最後更新 2026-09-26 04:50</p>
+        <p class="foot-fine">個人資料整理，不構成投資建議。最後更新 2026-09-26 08:14</p>
       </footer>
     </main>
   </div>
@@ -95,12 +95,12 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
   </svg>
 </button>
 <script>window.__SB={"url": "https://nwbfjoroqnhpymdtdbwu.supabase.co", "key": "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"}</script>
-<script src="/sidebar.js?v=1790369124" defer></script>
-<script src="/chart.js?v=1790369124" defer></script>
-<script src="/account.js?v=1790369124" defer></script>
-<script src="/quotes.js?v=1790369124" defer></script>
-<script src="/explore.js?v=1790369124" defer></script>
-<script src="/notify.js?v=1790369124" defer></script>
+<script src="/sidebar.js?v=1790381379" defer></script>
+<script src="/chart.js?v=1790381379" defer></script>
+<script src="/account.js?v=1790381379" defer></script>
+<script src="/quotes.js?v=1790381379" defer></script>
+<script src="/explore.js?v=1790381379" defer></script>
+<script src="/notify.js?v=1790381379" defer></script>
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
 </html>
