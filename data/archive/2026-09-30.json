@@ -1,6 +1,6 @@
 {
  "date": "2026-09-30",
- "generated_at": "2026-09-30T00:11:50+08:00",
+ "generated_at": "2026-09-30T05:08:58+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -12,7 +12,7 @@
   },
   {
    "key": "tw_signal_light_extreme",
-   "headline": "台灣景氣對策信號亮紅燈，熱絡區間已 8 個月",
+   "headline": "台灣景氣對策信號亮紅燈，熱絡區間已 9 個月",
    "direction": "neutral",
    "severity": "high",
    "evidence": "綜合分數 41 分（紅燈 38–45、藍燈 9–16）",
@@ -31,7 +31,7 @@
    "headline": "實質利率高於實質成長，債務比會自動累積",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "r−g 為 +0.7 個百分點，債務佔 GDP 123%",
+   "evidence": "r−g 為 +0.8 個百分點，債務佔 GDP 123%",
    "module": "債務"
   },
   {
@@ -71,7 +71,7 @@
    "headline": "10年實質利率處於限制性水準",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "10年實質利率 2.83%",
+   "evidence": "10年實質利率 2.90%",
    "module": "利率"
   },
   {
@@ -87,7 +87,7 @@
    "headline": "股債同向，債券失去對沖股票的功能",
    "direction": "neutral",
    "severity": "medium",
-   "evidence": "標普報酬與10年殖利率變動相關 -0.32（近一年）",
+   "evidence": "標普報酬與10年殖利率變動相關 -0.33（近一年）",
    "module": "市場"
   },
   {
@@ -103,7 +103,7 @@
    "headline": "期限溢酬偏高，長端在要求額外補償",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "期限溢酬（近似）+1.17 個百分點",
+   "evidence": "期限溢酬（近似）+1.25 個百分點",
    "module": "利率"
   },
   {
@@ -111,7 +111,7 @@
    "headline": "台灣外銷訂單動向指數低於 50，看減家數多於看增",
    "direction": "neutral",
    "severity": "medium",
-   "evidence": "動向指數 48.8（50 為擴張與收縮分界）",
+   "evidence": "動向指數 49.7（50 為擴張與收縮分界）",
    "module": "台灣"
   },
   {
@@ -121,21 +121,13 @@
    "severity": "low",
    "evidence": "M1B 年增 7.34%、M2 年增 7.42%（差 -0.08 個百分點）",
    "module": "台灣"
-  },
-  {
-   "key": "volatility_complacent",
-   "headline": "波動率處於低檔，市場對總經風險定價不足",
-   "direction": "neutral",
-   "severity": "low",
-   "evidence": "VIX 14.2",
-   "module": "市場"
   }
  ],
  "summary": {
-  "total": 16,
+  "total": 15,
   "hawkish": 5,
   "dovish": 6,
-  "neutral": 5,
+  "neutral": 4,
   "score": -2,
   "tilt": "方向分歧"
  },
@@ -154,16 +146,16 @@
   "core_cpi": 2.4459799375700753,
   "core_pce": 3.3441430040338282,
   "supercore": 3.1040978972467492,
-  "ten_year": 5.17,
-  "real_ten_year": 2.83,
+  "ten_year": 5.24,
+  "real_ten_year": 2.9,
   "policy_upper": 4.0,
-  "curve_10_2": 0.3600000000000003,
-  "recession_gauge": 40.00548511565848,
+  "curve_10_2": 0.3200000000000003,
+  "recession_gauge": 39.67781129882148,
   "composite_labor": -5.971731974985126
  },
  "as_of": {
   "labor": "2026-08-01",
   "inflation": "2026-08-01",
-  "rates": "2026-09-25"
+  "rates": "2026-09-28"
  }
 }
