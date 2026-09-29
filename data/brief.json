@@ -1,26 +1,26 @@
 {
  "date": "2026-09-29",
- "generated_at": "2026-09-29T15:30:00+08:00",
+ "generated_at": "2026-09-29T22:25:00+08:00",
  "sections": [
   {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "澳洲央行升息至 4.6%，創 2011 年來新高並稱不排除再升", "detail": "主要央行重回升息，呼應美債 10 年期 5.17% 的高利率環境", "source": "Reuters、CNBC、Guardian", "link": ""},
-   {"headline": "油價續強：WTI 96.4 美元近一月 +10.5%，布蘭特 114.9 美元", "detail": "美國戰略石油儲備降至 1982 年來最低，油價與美債殖利率連動創 1990 年來最緊", "source": "FT、Reuters、Oil & Gas", "link": ""},
-   {"headline": "期貨定價 10/28 會議 88% 按兵不動，至 2027 年中累計升息約 1.4 碼", "detail": "美元指數近一月 +1.6%，市場等本週就業數據", "source": "儀表板讀數", "link": ""}
+   {"headline": "沙烏地恢復紅海原油裝運，油價連四日回落；WTI 96.4 美元仍較上月 +10.5%", "detail": "美國戰略石油儲備降至 1982 年來最低、卡達延長 LNG 不可抗力，供給緩衝偏薄，油價回落未改能源推升 CPI 的訊號。", "source": "WSJ、Reuters、Oil & Gas 等多家", "link": ""},
+   {"headline": "10 年期殖利率 5.17%、期限溢酬約 1.17 個百分點，10 減 2 利差擴至 0.36", "detail": "期貨定價 10/28 會議 88% 按兵不動、到 2027 年 7 月累計升息約 36bp，長端要求額外補償。", "source": "儀表板讀數", "link": ""},
+   {"headline": "中國降息並補貼房貸；美中同意對 600 億美元商品互降關稅", "detail": "中國需求刺激與貿易緩和有利工業金屬與出口鏈，但農產清單排除黃豆。", "source": "Reuters、SCMP、Time 等", "link": ""}
   ]},
   {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "OpenAI 因安全測試未過關喊停新模型發布", "detail": "AI 資本支出敘事短線雜音，聯發科今日重挫 7.1%", "source": "4 家：BBC、CNBC、Reuters", "link": ""},
-   {"headline": "FAA 因軟體問題延後波音 737 MAX 10 認證，股價一度跌 7%", "detail": "交機時程再延，影響航太供應鏈與航空公司運力", "source": "3 家：CNBC、Reuters", "link": ""},
-   {"headline": "印度 Essar 宣布投資 150 億美元在愛荷華建全美最大鋼廠", "detail": "", "source": "4 家：CNBC、CBS、WSJ", "link": ""}
+   {"headline": "AMD 以 82 億美元收購李飛飛的 World Labs，押注「實體 AI」", "detail": "AI 晶片商向模型與應用端延伸，加劇與輝達的生態系競爭。", "source": "CNBC、Reuters", "link": ""},
+   {"headline": "FAA 延後波音 737 MAX 10 認證，股價重挫 7%", "detail": "交機時程再延，影響航空公司運力規劃與航太供應鏈。", "source": "CNBC、Reuters", "link": ""},
+   {"headline": "OpenAI 以安全疑慮擱置新模型發布；Anthropic IPO 公開說明書揭露 AI 風險", "detail": "AI 產業監理與上市評價壓力升溫，Oura 同日延後 IPO。", "source": "BBC、Reuters、CNBC 等 6 家", "link": ""}
   ]},
   {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "美伊談判僵持，川普否認提供解凍資產；荷莫茲海峽再傳美軍受傷", "detail": "傳導：油價與歐洲天然氣風險溢價，卡達延長 LNG 不可抗力", "source": "4 家：Reuters、CBS、NBC", "link": ""},
-   {"headline": "美中同意對 600 億美元商品互降關稅（農產、玩具等，未含黃豆）", "detail": "傳導：緩和供應鏈與通膨壓力，對出口鏈偏正面", "source": "Reuters、CNN、Foreign Policy", "link": ""},
-   {"headline": "美國對加拿大約 10 億美元酒類與乳品禁令生效", "detail": "傳導：北美貿易摩擦延續，局部推升食品價格", "source": "BBC、CBS", "link": ""}
+   {"headline": "美伊透過調停方各自談判，荷莫茲僵局未解；中東原油出口升至開戰以來高點", "detail": "傳導路徑：油價風險溢價與歐洲天然氣價格，談判進展將決定能源通膨壓力。", "source": "CNBC、Iran International、Reuters", "link": ""},
+   {"headline": "美國對約 10 億美元加拿大進口商品禁令生效", "detail": "傳導路徑：北美供應鏈與消費品價格，貿易摩擦延續。", "source": "AP、CBS", "link": ""},
+   {"headline": "愛沙尼亞指控俄羅斯縱火攻擊援烏軍工廠，俄國 2027 軍費大增 27%", "detail": "傳導路徑：歐洲國防支出與避險需求。", "source": "AP、BBC、SCMP、Reuters", "link": ""}
   ]},
   {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "台股收 47,631.96 點跌 0.8%，聯發科 -7.1%、台達電 -3.9%", "detail": "台積電、鴻海平盤，AI 題材內部分歧", "source": "儀表板報價", "link": ""},
-   {"headline": "美中降關稅與輝達新 AI 代理安全平台，AI 供應鏈消息面多空交錯", "detail": "", "source": "SCMP、CNN", "link": ""}
+   {"headline": "加權指數收 47,632 點、跌 0.8%，聯發科重挫 7.1%、台達電跌 3.9%", "detail": "AI 相關權值股獲利了結，台積電平盤 2,475 元撐住指數。", "source": "儀表板報價", "link": ""},
+   {"headline": "美國海軍成立無人機指揮部，SCMP 稱可能重塑台海作戰規劃", "detail": "台海防務動態，對市場直接影響有限。", "source": "South China Morning Post", "link": ""}
   ]}
  ],
- "synthesis": "與本期判斷的交集：油價續漲、澳洲升息與美債 10 年期 5.17% 都支持「通膨未解／通膨優先」，期貨定價未來升息而非降息。"
+ "synthesis": "與本期判斷的交集：油價雖連跌但仍較上月大漲、SPR 見底，加上長端殖利率 5.17% 與期貨定價升息，支撐「通膨未解／通膨優先」的判斷。"
 }
