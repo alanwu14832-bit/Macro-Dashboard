@@ -1,26 +1,103 @@
 {
- "date": "2026-09-30",
- "generated_at": "2026-09-30T16:25:00+08:00",
+ "date": "2026-10-01",
+ "generated_at": "2026-10-01T02:45:00+08:00",
  "sections": [
-  {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "美 30 年期殖利率創 2002 年來新高後賣壓稍歇，10 年期仍在 5.24%", "detail": "單日 +7bp、近一月 +57bp，期限溢酬約 1.25 個百分點，10 年實質利率 2.90% 已屬限制性。", "source": "CNBC、Financial Times", "link": ""},
-   {"headline": "期貨定價 10/28 會議 88% 按兵不動，到 2027 年中累計升息約 36bp", "detail": "EFFR 3.88%，市場與政策利率差 +0.92 個百分點，升息尾巴還掛著。", "source": "儀表板期貨定價", "link": ""},
-   {"headline": "英國通膨跳升至 4%、比利時創 2023 年來新高，能源推升歐洲物價", "detail": "布蘭特 114.9 美元、近一月 +18.5%，海外通膨回溫呼應美國油價傳導訊號。", "source": "Guardian、Fars News", "link": ""}
-  ]},
-  {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "波音拿下美國海軍 F/A-XX 次世代戰機合約，股價漲 3%", "detail": "約 200 億美元級計畫，國防航太供應鏈訂單能見度拉長；Raytheon 同步獲 207 億美元 AMRAAM 擴產合約。", "source": "CNBC、Reuters、Defense News 等 4 家", "link": ""},
-   {"headline": "Shell 主導的 LNG Canada 批准第二期、出口產能倍增", "detail": "TC Energy 同步推進 Coastal GasLink 擴建，北美 LNG 往亞洲的供給中期增加。", "source": "Reuters、gCaptain 等 3 家", "link": ""},
-   {"headline": "DeepSeek 開源工具助華為晶片替代輝達", "detail": "中國 AI 算力去輝達化再進一步，長期壓縮輝達中國份額，對台灣 AI 伺服器供應鏈是結構性變數。", "source": "SCMP、Asia News", "link": ""}
-  ]},
-  {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "川普否認提供伊朗制裁鬆綁，卡達推動和談，油價應聲回升", "detail": "伊朗戰爭進入第八個月，荷莫茲海峽流量仍是油價主軸；傳導路徑：油價→美國 CPI。", "source": "CNBC、Reuters 等 4 家", "link": ""},
-   {"headline": "美軍撤出伊拉克，外界擔心伊朗代理人與 IS 坐大", "detail": "中東安全真空提高能源供給風險溢價；傳導路徑：油價、避險需求。", "source": "Reuters、Japan Times", "link": ""},
-   {"headline": "索馬利亞海盜劫持油輪殺害 5 名船員", "detail": "紅海／亞丁灣航運風險再升，運費與保險成本上行；傳導路徑：能源航道、運價。", "source": "BBC、Reuters Energy 等 3 家", "link": ""}
-  ]},
-  {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "台股加權收 47,940 點、漲 0.6%，台達電大漲 3%", "detail": "台積電 2,480 元小漲 0.2%、櫃買 +1.2%，美股前一晚全面收高帶動。", "source": "儀表板報價", "link": ""},
-   {"headline": "川習國家檔案館行程傳因台灣議題臨時更動，北京批台「褻瀆先烈」", "detail": "兩岸口水升溫但未見實質動作，對台股風險溢價影響有限。", "source": "NPR、Reuters 等 2 家", "link": ""}
-  ]}
+  {
+   "key": "macro",
+   "title": "總經數據與事件",
+   "items": [
+    {
+     "headline": "油價再度走高：WTI 96.16 美元（近一月 +13.7%）、布蘭特 113.96 美元（+27.0%），美伊談判停滯、荷莫茲原油出口雖回到戰前水準但成品油仍緊",
+     "detail": "俄羅斯柴油出口禁令延至 10/31，美國再從戰略儲油借出最多 4,000 萬桶。能源佔 CPI 約 6.2%，未來一至兩月推升總體 CPI。",
+     "source": "Reuters、Oil & Gas、Interfax、CNBC 等多家",
+     "link": ""
+    },
+    {
+     "headline": "德國通膨升至近三年新高、進口物價創 2022 年以來最高，歐洲再度承受能源驅動的通膨衝擊",
+     "detail": "德國同日下令 SEFE 再補 8 TWh 天然氣庫存備冬。能源型通膨從歐洲外溢，支持長端利率維持高檔。",
+     "source": "Reuters Business、Fars News、OilPrice",
+     "link": ""
+    },
+    {
+     "headline": "Fed 監察報告：25 億美元總部翻修有缺失但無違法，Powell 免於刑事轉介；期貨定價 10/28 按兵不動 88%、至 2027 年 7 月累計升息 36bp",
+     "detail": "政治壓力暫解，但利率路徑定價未變：EFFR 3.88%、10 年期 5.24%（近一月 +57bp）、10 年實質 2.90%。",
+     "source": "CBS、CNBC、FT、Reuters、CNN、AP",
+     "link": ""
+    }
+   ]
+  },
+  {
+   "key": "company",
+   "title": "公司新聞",
+   "items": [
+    {
+     "headline": "波音（Boeing）拿下美國海軍 F/A-XX 下一代艦載戰機合約，規模估約 200 億美元",
+     "detail": "波音國防部門的重大訂單，牽動戰機供應鏈配置。",
+     "source": "Defense News、The War Zone、USNI News",
+     "link": ""
+    },
+    {
+     "headline": "美國 FTC 對 Anthropic 與 OpenAI 啟動 AI 安全調查",
+     "detail": "AI 龍頭首次面對 FTC 安全面調查，對 AI 資本支出敘事是潛在變數。",
+     "source": "ABC News、CBS News",
+     "link": ""
+    },
+    {
+     "headline": "諾和諾德（Novo Nordisk）口服 Wegovy 真實世界研究：由針劑轉口服的病患持續減重",
+     "detail": "支持口服 GLP-1 市場擴張，對減重藥競爭格局是正面訊號。",
+     "source": "CNBC、Reuters",
+     "link": ""
+    }
+   ]
+  },
+  {
+   "key": "geo",
+   "title": "地緣政治",
+   "items": [
+    {
+     "headline": "美伊談判停滯：Trump 否認提供制裁減免，德黑蘭稱已收到美方提案並準備談判",
+     "detail": "傳導路徑：油價。談判無進展是本週油價反彈主因之一。",
+     "source": "CNBC、gCaptain、Reuters、Iran International",
+     "link": ""
+    },
+    {
+     "headline": "英國首相 Burnham 稱有「強烈跡象」伊朗涉入 RAF Fairford 空軍基地事件；愛沙尼亞指俄羅斯縱火攻擊軍工廠 Milrem",
+     "detail": "傳導路徑：避險與能源風險溢酬。歐洲對伊、俄對抗升級。",
+     "source": "BBC、FT、Guardian、AP、Defense News",
+     "link": ""
+    },
+    {
+     "headline": "中國對巴西牛肉加徵 55% 關稅；Trump 全球關稅在美國貿易法院再度面臨挑戰",
+     "detail": "傳導路徑：供應鏈與貿易政策不確定性。海運運價已創一年新高。",
+     "source": "Reuters、SCMP、CNBC、CNN、Foreign Policy",
+     "link": ""
+    }
+   ]
+  },
+  {
+   "key": "taiwan",
+   "title": "台灣",
+   "items": [
+    {
+     "headline": "台股 9/30 收 47,940.13（+0.6%）、櫃買 +1.2%；台積電 2,480 元（+0.2%），台達電 +3.0% 領漲，廣達 -0.9%",
+     "detail": "今日開盤前報價為 9/30 收盤。美股隔夜三大指數各漲逾 1%、輝達 +1.8%。",
+     "source": "儀表板報價",
+     "link": ""
+    },
+    {
+     "headline": "DeepSeek 與華為瞄準輝達 AI 主導地位的關鍵環節",
+     "detail": "中國 AI 自主化加速，是台積電與台灣 AI 供應鏈的長線競爭訊號。",
+     "source": "The New York Times（via Asia News）",
+     "link": ""
+    },
+    {
+     "headline": "美中貿易休戰下海運運價創一年新高",
+     "detail": "出口旺季運費上升會壓縮台灣出口商毛利。",
+     "source": "FreightWaves（via Asia News）",
+     "link": ""
+    }
+   ]
+  }
  ],
- "synthesis": "與本期判斷的交集：長端殖利率創高、油價在伊朗戰事下維持高檔且歐洲通膨回溫，支持「通膨未解／通膨優先」判斷，市場仍定價明年升息而非降息。"
+ "synthesis": "與本期判斷的交集：油價再漲（WTI 近一月 +13.7%）、俄羅斯延長柴油出口禁令、美伊談判停滯、德國通膨創近三年新高，讓「通膨未解／通膨優先」與「油價上行推升 CPI」的訊號更站得住；期貨仍定價未來一至二年升息，10 年期 5.24% 未見鬆動。"
 }
