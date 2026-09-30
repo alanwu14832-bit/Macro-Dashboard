@@ -1,6 +1,6 @@
 {
  "date": "2026-10-01",
- "generated_at": "2026-10-01T03:45:14+08:00",
+ "generated_at": "2026-10-01T07:19:45+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -71,7 +71,7 @@
    "headline": "10年實質利率處於限制性水準",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "10年實質利率 2.90%",
+   "evidence": "10年實質利率 2.91%",
    "module": "利率"
   },
   {
@@ -103,7 +103,7 @@
    "headline": "期限溢酬偏高，長端在要求額外補償",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "期限溢酬（近似）+1.25 個百分點",
+   "evidence": "期限溢酬（近似）+1.27 個百分點",
    "module": "利率"
   },
   {
@@ -146,16 +146,16 @@
   "core_cpi": 2.4459799375700753,
   "core_pce": 3.0075959761856064,
   "supercore": 3.1040978972467492,
-  "ten_year": 5.24,
-  "real_ten_year": 2.9,
+  "ten_year": 5.26,
+  "real_ten_year": 2.91,
   "policy_upper": 4.0,
-  "curve_10_2": 0.3200000000000003,
-  "recession_gauge": 40.11794456777773,
+  "curve_10_2": 0.3700000000000001,
+  "recession_gauge": 39.59450041935395,
   "composite_labor": -5.971731974985126
  },
  "as_of": {
   "labor": "2026-08-01",
   "inflation": "2026-08-01",
-  "rates": "2026-09-28"
+  "rates": "2026-09-29"
  }
 }
