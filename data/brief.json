@@ -1,26 +1,27 @@
 {
- "date": "2026-09-29",
- "generated_at": "2026-09-29T22:25:00+08:00",
+ "date": "2026-09-30",
+ "generated_at": "2026-09-30T10:50:00+08:00",
  "sections": [
   {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "沙烏地恢復紅海原油裝運，油價連四日回落；WTI 96.4 美元仍較上月 +10.5%", "detail": "美國戰略石油儲備降至 1982 年來最低、卡達延長 LNG 不可抗力，供給緩衝偏薄，油價回落未改能源推升 CPI 的訊號。", "source": "WSJ、Reuters、Oil & Gas 等多家", "link": ""},
-   {"headline": "10 年期殖利率 5.17%、期限溢酬約 1.17 個百分點，10 減 2 利差擴至 0.36", "detail": "期貨定價 10/28 會議 88% 按兵不動、到 2027 年 7 月累計升息約 36bp，長端要求額外補償。", "source": "儀表板讀數", "link": ""},
-   {"headline": "中國降息並補貼房貸；美中同意對 600 億美元商品互降關稅", "detail": "中國需求刺激與貿易緩和有利工業金屬與出口鏈，但農產清單排除黃豆。", "source": "Reuters、SCMP、Time 等", "link": ""}
+   {"headline": "美 30 年期殖利率創 2002 年來新高，10 年期升至 5.24%", "detail": "近一月 +57bp、期限溢酬約 1.25 個百分點，長端賣壓主導股債同向。", "source": "CNBC、Financial Times", "link": ""},
+   {"headline": "布蘭特 114.9 美元、WTI 96.4 美元，白宮研議柴油減稅救油價", "detail": "WTI 近一月 +10.5%，美國戰略儲油降至 1982 年來最低，汽油 4.46 美元推升近月 CPI。", "source": "Oil & Gas、Reuters", "link": ""},
+   {"headline": "期貨定價 10/28 維持利率 88%、降息僅 12%，2027 年中前累計升息約 1.4 碼", "detail": "EFFR 3.88%，市場與聯準會方向分歧仍大。", "source": "儀表板讀數", "link": ""}
   ]},
   {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "AMD 以 82 億美元收購李飛飛的 World Labs，押注「實體 AI」", "detail": "AI 晶片商向模型與應用端延伸，加劇與輝達的生態系競爭。", "source": "CNBC、Reuters", "link": ""},
-   {"headline": "FAA 延後波音 737 MAX 10 認證，股價重挫 7%", "detail": "交機時程再延，影響航空公司運力規劃與航太供應鏈。", "source": "CNBC、Reuters", "link": ""},
-   {"headline": "OpenAI 以安全疑慮擱置新模型發布；Anthropic IPO 公開說明書揭露 AI 風險", "detail": "AI 產業監理與上市評價壓力升溫，Oura 同日延後 IPO。", "source": "BBC、Reuters、CNBC 等 6 家", "link": ""}
+   {"headline": "波音拿下約 200 億美元 F/A-XX 海軍新一代戰機合約", "detail": "國防訂單能見度拉長，航太與軍工供應鏈受惠。", "source": "4 家：FT、Defense News 等", "link": ""},
+   {"headline": "Shell 主導的 LNG Canada 二期定案，出口產能倍增", "detail": "北美 LNG 供給增加，緩和亞洲氣價；TC Energy 同步擴建管線。", "source": "3 家：Reuters、gCaptain 等", "link": ""},
+   {"headline": "Tesla 洽 300 億美元信用額度，加速資本支出與 AI 布局", "detail": "AI 資本支出擴張延續，高利率下改以舉債支應。", "source": "Reuters", "link": ""}
   ]},
   {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "美伊透過調停方各自談判，荷莫茲僵局未解；中東原油出口升至開戰以來高點", "detail": "傳導路徑：油價風險溢價與歐洲天然氣價格，談判進展將決定能源通膨壓力。", "source": "CNBC、Iran International、Reuters", "link": ""},
-   {"headline": "美國對約 10 億美元加拿大進口商品禁令生效", "detail": "傳導路徑：北美供應鏈與消費品價格，貿易摩擦延續。", "source": "AP、CBS", "link": ""},
-   {"headline": "愛沙尼亞指控俄羅斯縱火攻擊援烏軍工廠，俄國 2027 軍費大增 27%", "detail": "傳導路徑：歐洲國防支出與避險需求。", "source": "AP、BBC、SCMP、Reuters", "link": ""}
+   {"headline": "川普否認提供伊朗制裁鬆綁，德黑蘭稱願談判；美軍撤出伊拉克", "detail": "荷莫茲航道不確定性未解，傳導至油價與歐洲 LNG 價格。", "source": "3 家：Reuters、Iran International 等", "link": ""},
+   {"headline": "沙烏地 Yanbu 輸油管恢復裝船", "detail": "紓解部分供給中斷，但布蘭特仍在十年 97 百分位。", "source": "Oil & Gas、Reuters", "link": ""},
+   {"headline": "中國警告歐盟若擴大關稅將報復，並推降息與房貸補貼", "detail": "中國 9 月製造業回到擴張，但貿易摩擦牽動全球供應鏈。", "source": "CNBC、FT、Bloomberg", "link": ""}
   ]},
   {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "加權指數收 47,632 點、跌 0.8%，聯發科重挫 7.1%、台達電跌 3.9%", "detail": "AI 相關權值股獲利了結，台積電平盤 2,475 元撐住指數。", "source": "儀表板報價", "link": ""},
-   {"headline": "美國海軍成立無人機指揮部，SCMP 稱可能重塑台海作戰規劃", "detail": "台海防務動態，對市場直接影響有限。", "source": "South China Morning Post", "link": ""}
+   {"headline": "台股盤中漲 1.3% 至 48,252 點，台達電 +4.1%、聯發科 +2.2%", "detail": "美股前一交易日普漲約 1%，AI 電源與 IC 設計領漲。", "source": "儀表板報價（盤中）", "link": ""},
+   {"headline": "台積電盤中 2,500 元、+1.0%", "detail": "權值股帶動大盤，AI 供應鏈仍是主軸。", "source": "儀表板報價（盤中）", "link": ""},
+   {"headline": "台灣規劃 8.5 億美元彈藥支出因應封鎖情境", "detail": "兩岸風險溢價議題延續，川習會亦臨時調整行程。", "source": "2 家：SCMP、Asia News", "link": ""}
   ]}
  ],
- "synthesis": "與本期判斷的交集：油價雖連跌但仍較上月大漲、SPR 見底，加上長端殖利率 5.17% 與期貨定價升息，支撐「通膨未解／通膨優先」的判斷。"
+ "synthesis": "與本期判斷的交集：油價續漲加上長端殖利率創高，強化「通膨優先」與市場定價升息的判斷，而低 VIX 訊號消失反映風險定價正在回升。"
 }
