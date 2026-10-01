@@ -1,27 +1,27 @@
 {
  "date": "2026-10-01",
- "generated_at": "2026-10-01T02:45:00+08:00",
+ "generated_at": "2026-10-01T15:20:00+08:00",
  "sections": [
   {
    "key": "macro",
    "title": "總經數據與事件",
    "items": [
     {
-     "headline": "油價再度走高：WTI 96.16 美元（近一月 +13.7%）、布蘭特 113.96 美元（+27.0%），美伊談判停滯、荷莫茲原油出口雖回到戰前水準但成品油仍緊",
-     "detail": "俄羅斯柴油出口禁令延至 10/31，美國再從戰略儲油借出最多 4,000 萬桶。能源佔 CPI 約 6.2%，未來一至兩月推升總體 CPI。",
-     "source": "Reuters、Oil & Gas、Interfax、CNBC 等多家",
+     "headline": "全球債市賣壓擴大、亞洲殖利率跳升：美國 10 年期 5.26%（前一日 5.24%）、10 減 2 利差擴至 0.37 個百分點",
+     "detail": "通膨數據偏軟讓 10 月升息押注降溫，但長端沒有跟著鬆；期貨定價 10/28 不變 88%、降息 12%。",
+     "source": "FT、Reuters、儀表板讀數",
      "link": ""
     },
     {
-     "headline": "德國通膨升至近三年新高、進口物價創 2022 年以來最高，歐洲再度承受能源驅動的通膨衝擊",
-     "detail": "德國同日下令 SEFE 再補 8 TWh 天然氣庫存備冬。能源型通膨從歐洲外溢，支持長端利率維持高檔。",
-     "source": "Reuters Business、Fars News、OilPrice",
+     "headline": "中東原油出口回到戰前約八成，油價單日收跌約 2.5%；儀表板 WTI 96.16 美元、近一月仍 +13.7%",
+     "detail": "供給回補壓低原油，但價格仍在十年高檔區，對 CPI 的推升還在路上。",
+     "source": "CBS、Oil & Gas、OilPrice",
      "link": ""
     },
     {
-     "headline": "Fed 監察報告：25 億美元總部翻修有缺失但無違法，Powell 免於刑事轉介；期貨定價 10/28 按兵不動 88%、至 2027 年 7 月累計升息 36bp",
-     "detail": "政治壓力暫解，但利率路徑定價未變：EFFR 3.88%、10 年期 5.24%（近一月 +57bp）、10 年實質 2.90%。",
-     "source": "CBS、CNBC、FT、Reuters、CNN、AP",
+     "headline": "成品油持續吃緊：俄羅斯柴油出口禁令延至 10/31、中國煉廠暫停 10 月燃油出口，Trump 稱仍在考慮禁止柴油出口",
+     "detail": "柴油緊俏讓原油溢價不易消退，零售汽油 4.46 美元、近一月 +9.7%。",
+     "source": "Reuters、Interfax、Oil & Gas、CNBC",
      "link": ""
     }
    ]
@@ -31,21 +31,21 @@
    "title": "公司新聞",
    "items": [
     {
-     "headline": "波音（Boeing）拿下美國海軍 F/A-XX 下一代艦載戰機合約，規模估約 200 億美元",
-     "detail": "波音國防部門的重大訂單，牽動戰機供應鏈配置。",
-     "source": "Defense News、The War Zone、USNI News",
+     "headline": "亞馬遜與 Constellation 簽 20 年核電購電合約，帶動約 30 億美元投資，供 AI 資料中心用電",
+     "detail": "AI 資本支出延伸到電力端，Constellation 股價上漲。",
+     "source": "Reuters Energy、Nuclear Energy",
      "link": ""
     },
     {
-     "headline": "美國 FTC 對 Anthropic 與 OpenAI 啟動 AI 安全調查",
-     "detail": "AI 龍頭首次面對 FTC 安全面調查，對 AI 資本支出敘事是潛在變數。",
-     "source": "ABC News、CBS News",
+     "headline": "騰訊向甲骨文租用 10 萬顆晶片加速 AI 布局",
+     "detail": "中國雲端業者改以海外租賃取得算力，算力需求仍強。",
+     "source": "Financial Times、Reuters",
      "link": ""
     },
     {
-     "headline": "諾和諾德（Novo Nordisk）口服 Wegovy 真實世界研究：由針劑轉口服的病患持續減重",
-     "detail": "支持口服 GLP-1 市場擴張，對減重藥競爭格局是正面訊號。",
-     "source": "CNBC、Reuters",
+     "headline": "Paramount 與華納兄弟探索合併後公司任命 Ynon Kreiz 為共同執行長",
+     "detail": "",
+     "source": "CNBC、CNN",
      "link": ""
     }
    ]
@@ -55,21 +55,21 @@
    "title": "地緣政治",
    "items": [
     {
-     "headline": "美伊談判停滯：Trump 否認提供制裁減免，德黑蘭稱已收到美方提案並準備談判",
-     "detail": "傳導路徑：油價。談判無進展是本週油價反彈主因之一。",
-     "source": "CNBC、gCaptain、Reuters、Iran International",
+     "headline": "伊朗稱正考慮停火反提案；Bessent 警告伊朗經濟兩週內將「無物可換」，美伊談判仍停滯",
+     "detail": "傳導路徑：油價。另有 Flydubai 飛以色列班機機師遇刺、該公司停飛以色列航線，動機未明。",
+     "source": "CBS、Iran International、FXEmpire、BBC",
      "link": ""
     },
     {
-     "headline": "英國首相 Burnham 稱有「強烈跡象」伊朗涉入 RAF Fairford 空軍基地事件；愛沙尼亞指俄羅斯縱火攻擊軍工廠 Milrem",
-     "detail": "傳導路徑：避險與能源風險溢酬。歐洲對伊、俄對抗升級。",
-     "source": "BBC、FT、Guardian、AP、Defense News",
+     "headline": "Trump 宣布南韓對美 2,000 億美元能源投資（核電、阿拉斯加 LNG、德州燃氣電廠），南韓總統對阿拉斯加 LNG 部分提出保留",
+     "detail": "傳導路徑：能源供應鏈與貿易協議落實度。",
+     "source": "Reuters、PBS、SCMP、CNBC",
      "link": ""
     },
     {
-     "headline": "中國對巴西牛肉加徵 55% 關稅；Trump 全球關稅在美國貿易法院再度面臨挑戰",
-     "detail": "傳導路徑：供應鏈與貿易政策不確定性。海運運價已創一年新高。",
-     "source": "Reuters、SCMP、CNBC、CNN、Foreign Policy",
+     "headline": "俄羅斯就加里寧格勒向北約發出核警告，波羅的海緊張升高",
+     "detail": "傳導路徑：避險與歐洲能源風險溢酬。",
+     "source": "SCMP、gCaptain",
      "link": ""
     }
    ]
@@ -79,25 +79,25 @@
    "title": "台灣",
    "items": [
     {
-     "headline": "台股 9/30 收 47,940.13（+0.6%）、櫃買 +1.2%；台積電 2,480 元（+0.2%），台達電 +3.0% 領漲，廣達 -0.9%",
-     "detail": "今日開盤前報價為 9/30 收盤。美股隔夜三大指數各漲逾 1%、輝達 +1.8%。",
+     "headline": "台股 10/1 收 48,353.49（+0.9%）、櫃買 +0.4%；台積電 2,510 元（+1.2%）、聯發科 +1.2%、鴻海 +1.0%",
+     "detail": "美股隔夜三大指數各漲逾 1%，輝達 +0.5%。",
      "source": "儀表板報價",
      "link": ""
     },
     {
-     "headline": "DeepSeek 與華為瞄準輝達 AI 主導地位的關鍵環節",
-     "detail": "中國 AI 自主化加速，是台積電與台灣 AI 供應鏈的長線競爭訊號。",
-     "source": "The New York Times（via Asia News）",
+     "headline": "亞洲 9 月製造業 PMI 受 AI 熱潮帶動擴張：南韓出口訂單創四個月高、印度七個月高、中國回到擴張",
+     "detail": "區域電子出口動能延續，與台灣 AI 供應鏈同向。",
+     "source": "Reuters Asia、Reuters Business",
      "link": ""
     },
     {
-     "headline": "美中貿易休戰下海運運價創一年新高",
-     "detail": "出口旺季運費上升會壓縮台灣出口商毛利。",
-     "source": "FreightWaves（via Asia News）",
+     "headline": "路透獨家：美方評估中國明年入侵台灣的可能性低",
+     "detail": "",
+     "source": "Reuters",
      "link": ""
     }
    ]
   }
  ],
- "synthesis": "與本期判斷的交集：油價再漲（WTI 近一月 +13.7%）、俄羅斯延長柴油出口禁令、美伊談判停滯、德國通膨創近三年新高，讓「通膨未解／通膨優先」與「油價上行推升 CPI」的訊號更站得住；期貨仍定價未來一至二年升息，10 年期 5.24% 未見鬆動。"
+ "synthesis": "與本期判斷的交集：原油因中東出口回補而回落，但成品油禁令接連延長、長端殖利率再升到 5.26%，「通膨未解／通膨優先」與期限溢酬偏高的訊號沒有鬆動；訊號組合與昨日相同。"
 }
