@@ -1,6 +1,6 @@
 {
  "date": "2026-10-02",
- "generated_at": "2026-10-02T15:35:09+08:00",
+ "generated_at": "2026-10-02T22:15:41+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -23,7 +23,7 @@
    "headline": "失業率下降來自勞動力萎縮，不是就業改善",
    "direction": "dovish",
    "severity": "high",
-   "evidence": "人口月增 +13.6 萬、勞動力月增 -5.3 萬；黃金年齡就業率 12 個月 +0.0 個百分點",
+   "evidence": "人口月增 +12.9 萬、勞動力月增 -4.1 萬；黃金年齡就業率 12 個月 +0.0 個百分點",
    "module": "就業"
   },
   {
@@ -55,7 +55,7 @@
    "headline": "三月均非農低於損益兩平，撐不住現有失業率",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "三月均 +7.1 萬人，損益兩平約 8.0 萬人",
+   "evidence": "三月均 +5.1 萬人，損益兩平約 7.7 萬人",
    "module": "就業"
   },
   {
@@ -99,6 +99,14 @@
    "module": "物價"
   },
   {
+   "key": "systematic_downward_revisions",
+   "headline": "初值近一年呈系統性下修，實質動能弱於初值",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "近 10 個月有 60% 遭下修，平均修正 -2.8 萬人",
+   "module": "就業"
+  },
+  {
    "key": "term_premium_elevated",
    "headline": "期限溢酬偏高，長端在要求額外補償",
    "direction": "hawkish",
@@ -124,12 +132,12 @@
   }
  ],
  "summary": {
-  "total": 15,
+  "total": 16,
   "hawkish": 5,
-  "dovish": 6,
+  "dovish": 7,
   "neutral": 4,
-  "score": -2,
-  "tilt": "方向分歧"
+  "score": -4,
+  "tilt": "偏降息"
  },
  "scenario": {
   "name": "通膨未解",
@@ -139,10 +147,10 @@
   "lean": "hawkish"
  },
  "readings": {
-  "payrolls_latest": 162.0,
-  "payrolls_3m": 71.33333333333333,
-  "breakeven": 80.24272666666666,
-  "unemployment": 4.1,
+  "payrolls_latest": 29.0,
+  "payrolls_3m": 50.666666666666664,
+  "breakeven": 76.62036099999999,
+  "unemployment": 4.2,
   "core_cpi": 2.4459799375700753,
   "core_pce": 3.0075959761856064,
   "supercore": 3.1040978972467492,
@@ -150,11 +158,11 @@
   "real_ten_year": 2.93,
   "policy_upper": 4.0,
   "curve_10_2": 0.41000000000000014,
-  "recession_gauge": 39.6975674867509,
-  "composite_labor": -5.943479604955723
+  "recession_gauge": 39.971854558697125,
+  "composite_labor": -6.944558839401137
  },
  "as_of": {
-  "labor": "2026-08-01",
+  "labor": "2026-09-01",
   "inflation": "2026-08-01",
   "rates": "2026-09-30"
  }
