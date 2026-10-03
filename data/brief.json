@@ -1,26 +1,26 @@
 {
  "date": "2026-10-03",
- "generated_at": "2026-10-03T20:05:00+08:00",
+ "generated_at": "2026-10-03T22:20:00+08:00",
  "sections": [
   {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "美國 9 月就業成長明顯放緩，失業率 4.2%", "detail": "最新非農 +2.9 萬、三月均 +5.1 萬，低於損益兩平約 7.7 萬人。", "source": "CBS News、SCMP 2 家", "link": ""},
+   {"headline": "美國 9 月就業成長明顯放緩，失業率 4.2%", "detail": "最新非農 +2.9 萬、三月均 +5.1 萬，低於損益兩平約 7.7 萬人。", "source": "CBS News", "link": ""},
    {"headline": "10 年期美債殖利率 5.24%，仍在世代高位", "detail": "較前一日 5.29% 小幅回落，近三月仍升 75bp、曲線熊陡。", "source": "MarketWatch", "link": ""},
    {"headline": "歐元區通膨升幅超出預期，ECB 升息壓力不減", "detail": "能源價格推升，主要央行同步面對通膨再起。", "source": "Reuters Business 等 2 家", "link": ""}
   ]},
   {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "派拉蒙與華納兄弟探索合併後將定名 Skydance", "detail": "同時延攬 Ynon Kreiz 任共同執行長，媒體業整併落地。", "source": "CNBC、CNN 2 家", "link": ""},
+   {"headline": "美國政府傳將貸款 42 億美元給 Vistra 擴充核電", "detail": "鈾價創 19 年新高，政策資金直接進核電與電力供應鏈。", "source": "Reuters", "link": ""},
    {"headline": "FAA 認定波音 737 MAX 軟體瑕疵不構成飛安問題", "detail": "排除停飛疑慮，對波音交機與航空供應鏈是利空解除。", "source": "CNBC、Reuters 2 家", "link": ""},
-   {"headline": "美檢方起訴加州男子走私 3 億美元 AI 硬體至中國", "detail": "出口管制執法升溫，AI 伺服器供應鏈的合規風險上升。", "source": "LA Times、ABC7 2 家", "link": ""}
+   {"headline": "美檢方逮捕加州男子，涉走私 3 億美元 AI 硬體至中國", "detail": "出口管制執法升溫，AI 伺服器供應鏈的合規風險上升。", "source": "ABC7", "link": ""}
   ]},
   {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "G7 同意釋出 1 億桶原油與柴油儲備", "detail": "川普以柴油出口禁令施壓後成局；WTI 96 美元、布蘭特 114 美元，傳導在油價。", "source": "BBC、Reuters 等 6 家", "link": ""},
-   {"headline": "阿曼外海油輪遭不明拋射物擊中，荷莫茲風險未解", "detail": "川普稱伊朗戰事很快結束，但航道事件仍支撐油價風險溢價。", "source": "Reuters Energy", "link": ""},
-   {"headline": "北韓試射中程彈道飛彈，中國對歐盟化學品啟動反傾銷調查", "detail": "前者推升亞洲避險需求，後者是中歐貿易摩擦擴大到化工供應鏈。", "source": "Reuters Asia、FT 等", "link": ""}
+   {"headline": "G7 同意釋出 1 億桶原油與柴油儲備", "detail": "川普以柴油出口禁令施壓後成局；WTI 96 美元、布蘭特 114 美元，傳導在油價。", "source": "AP、BBC、Reuters 等 7 家", "link": ""},
+   {"headline": "川普稱伊朗戰事很快結束，同時增兵中東", "detail": "荷莫茲 LNG 出貨回到開戰後新高、沙烏地東西管線恢復八成，油價風險溢價鬆動。", "source": "CBS News、Reuters 等", "link": ""},
+   {"headline": "北韓試射彈道飛彈，川普威脅對南韓關稅加倍", "detail": "前者推升亞洲避險需求，後者以阿拉斯加 LNG 出資為條件，壓在韓元與貿易。", "source": "Reuters Asia、Guardian 等", "link": ""}
   ]},
   {"key": "taiwan", "title": "台灣", "items": [
    {"headline": "台股週末休市，10/2 加權指數收 48,475.74、漲 0.3%", "detail": "櫃買指數漲 1.9%，中小型股強於權值股。", "source": "儀表板報價", "link": ""},
    {"headline": "台積電 10/2 收 2,500 元、跌 0.4%，AI 權值股普遍小跌", "detail": "鴻海跌 1.2%、聯發科跌 0.6%、台達電跌 1.0%。", "source": "儀表板報價", "link": ""},
-   {"headline": "首批兩架 F-16V 戰機抵台", "detail": "軍購交付進度恢復，屬兩岸風險的背景變數。", "source": "Reuters、Defense News 2 家", "link": ""}
+   {"headline": "美軍首度在最靠近台灣的日本島嶼部署反艦飛彈，首批 F-16V 抵台", "detail": "第一島鏈部署與軍購交付同步推進，屬兩岸風險的背景變數。", "source": "SCMP、Reuters、Defense News", "link": ""}
   ]}
  ],
  "synthesis": "與本期判斷的交集：油價高到要動用儲備、歐元區通膨再升，支持「通膨優先」；就業放緩則壓在偏降息那一側，九宮格維持通膨未解。"
