@@ -1,27 +1,27 @@
 {
- "date": "2026-10-03",
- "generated_at": "2026-10-03T22:20:00+08:00",
+ "date": "2026-10-04",
+ "generated_at": "2026-10-04T14:19:15+08:00",
  "sections": [
   {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "美國 9 月就業成長明顯放緩，失業率 4.2%", "detail": "最新非農 +2.9 萬、三月均 +5.1 萬，低於損益兩平約 7.7 萬人。", "source": "CBS News", "link": ""},
-   {"headline": "10 年期美債殖利率 5.24%，仍在世代高位", "detail": "較前一日 5.29% 小幅回落，近三月仍升 75bp、曲線熊陡。", "source": "MarketWatch", "link": ""},
-   {"headline": "歐元區通膨升幅超出預期，ECB 升息壓力不減", "detail": "能源價格推升，主要央行同步面對通膨再起。", "source": "Reuters Business 等 2 家", "link": ""}
+   {"headline": "G7 宣布再釋出 1 億桶原油與柴油儲備，IEA 稱累計已釋出 3.25 億桶", "detail": "WTI 96.16 美元、近一月 +13.7%，位於十年 94 百分位；釋儲能否壓住油價，決定總體 CPI 未來一兩個月的上行幅度。", "source": "AP、BBC、Foreign Policy、Oil & Gas 等 4 家", "link": ""},
+   {"headline": "沙烏地重啟東西向輸油管，布蘭特跌回 100 美元以下，中東原油出口接近戰前水準", "detail": "供給面最壞情況在緩解，但成品油出口仍落後，零售汽油 4.46 美元仍在十年 97 百分位。", "source": "Oil & Gas（Energies Media、TradingView）", "link": ""},
+   {"headline": "10/28 FOMC 市場定價不變 88%、降息 12%，期貨隱含到 2027/7 累計升息 36bp", "detail": "10 年期 5.24%、近一月 +45bp，曲線熊陡化、期限溢酬 +1.24 個百分點；今天沒有重大數據或政策決議。", "source": "儀表板讀數", "link": ""}
   ]},
   {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "美國政府傳將貸款 42 億美元給 Vistra 擴充核電", "detail": "鈾價創 19 年新高，政策資金直接進核電與電力供應鏈。", "source": "Reuters", "link": ""},
-   {"headline": "FAA 認定波音 737 MAX 軟體瑕疵不構成飛安問題", "detail": "排除停飛疑慮，對波音交機與航空供應鏈是利空解除。", "source": "CNBC、Reuters 2 家", "link": ""},
-   {"headline": "美檢方逮捕加州男子，涉走私 3 億美元 AI 硬體至中國", "detail": "出口管制執法升溫，AI 伺服器供應鏈的合規風險上升。", "source": "ABC7", "link": ""}
+   {"headline": "FAA 認定波音 737 MAX 軟體瑕疵不構成飛安問題", "detail": "排除停飛或交機延後的風險，對波音與航空供應鏈是利空解除。", "source": "CNBC、Reuters 2 家", "link": ""},
+   {"headline": "軟銀的 AI 投資規模已超出自身資產負債表所能支撐", "detail": "AI 資本支出愈來愈靠舉債，是 AI 供應鏈訂單能見度的潛在風險；同日 FT 也報導華爾街 IPO 熱度因估值疑慮降溫。", "source": "Financial Times", "link": ""},
+   {"headline": "甲骨文簽下核電供電協議，電力成為算力擴張的新瓶頸", "detail": "資料中心的限制從晶片轉向電力，受惠的是核電、鈾礦與電力設備鏈。", "source": "Nuclear Energy（forkast.news）", "link": ""}
   ]},
   {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "G7 同意釋出 1 億桶原油與柴油儲備", "detail": "川普以柴油出口禁令施壓後成局；WTI 96 美元、布蘭特 114 美元，傳導在油價。", "source": "AP、BBC、Reuters 等 7 家", "link": ""},
-   {"headline": "川普稱伊朗戰事很快結束，同時增兵中東", "detail": "荷莫茲 LNG 出貨回到開戰後新高、沙烏地東西管線恢復八成，油價風險溢價鬆動。", "source": "CBS News、Reuters 等", "link": ""},
-   {"headline": "北韓試射彈道飛彈，川普威脅對南韓關稅加倍", "detail": "前者推升亞洲避險需求，後者以阿拉斯加 LNG 出資為條件，壓在韓元與貿易。", "source": "Reuters Asia、Guardian 等", "link": ""}
+   {"headline": "川普稱對伊朗「所有選項都在桌上」，美軍再增派一艘航母與一萬兵力，胡塞宣稱攻擊利雅德石油設施", "detail": "傳導路徑是油價與避險：荷莫茲仍受阻，伊拉克油輪載 200 萬桶通過顯示航道並非全斷，但戰事升級的尾部風險仍在。", "source": "Iran International、gCaptain、Reuters Energy、CBS", "link": ""},
+   {"headline": "川普威脅對外國企業課最高 300% 關稅，南韓在對美投資上受壓", "detail": "傳導路徑是供應鏈與匯率：關稅再升級會推高進口價格，也壓抑亞洲出口國貨幣。", "source": "Asia News（Korea Herald）", "link": ""},
+   {"headline": "北韓試射中程彈道飛彈，飛行約 700 公里，朝鮮半島因地雷爆炸事件升溫", "detail": "傳導路徑是東北亞避險情緒與韓元、日圓波動。", "source": "Asia News、Guardian、SCMP、Reuters Asia", "link": ""}
   ]},
   {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "台股週末休市，10/2 加權指數收 48,475.74、漲 0.3%", "detail": "櫃買指數漲 1.9%，中小型股強於權值股。", "source": "儀表板報價", "link": ""},
-   {"headline": "台積電 10/2 收 2,500 元、跌 0.4%，AI 權值股普遍小跌", "detail": "鴻海跌 1.2%、聯發科跌 0.6%、台達電跌 1.0%。", "source": "儀表板報價", "link": ""},
-   {"headline": "美軍首度在最靠近台灣的日本島嶼部署反艦飛彈，首批 F-16V 抵台", "detail": "第一島鏈部署與軍購交付同步推進，屬兩岸風險的背景變數。", "source": "SCMP、Reuters、Defense News", "link": ""}
+   {"headline": "週日無新交易日：台股上一交易日收 48,410.45 點、跌 0.1%，櫃買 425.52 點、跌 0.3%", "detail": "報價為上一個交易日收盤；同期美股標普 500 收 7,747.71、漲 1.1%，那斯達克漲 1.4%。", "source": "儀表板報價", "link": ""},
+   {"headline": "台積電收 2,505 元、漲 0.2%，聯發科 4,925 元跌 0.5%，廣達 330 元跌 0.6%", "detail": "權值股持平、AI 伺服器組裝小幅回檔，指數在高檔整理。", "source": "儀表板報價", "link": ""},
+   {"headline": "美軍將首度在最靠近台灣的日本島嶼部署 NMESIS 反艦飛彈系統", "detail": "台海周邊軍事部署升級，影響的是台股風險溢價與新台幣的地緣折價。", "source": "Asia News、SCMP 2 家", "link": ""}
   ]}
  ],
- "synthesis": "與本期判斷的交集：油價高到要動用儲備、歐元區通膨再升，支持「通膨優先」；就業放緩則壓在偏降息那一側，九宮格維持通膨未解。"
+ "synthesis": "與本期判斷的交集：G7 釋儲與沙烏地復管讓布蘭特跌回 100 美元以下，但 WTI 近一月仍漲逾一成、伊朗戰事未解，「油價上行推升總體 CPI」的訊號還在，加上 10 年期 5.24% 與市場定價升息，通膨優先的判斷不變。"
 }
