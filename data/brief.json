@@ -1,27 +1,27 @@
 {
- "date": "2026-10-05",
- "generated_at": "2026-10-05T22:21:06+08:00",
+ "date": "2026-10-06",
+ "generated_at": "2026-10-06T22:40:00+08:00",
  "sections": [
   {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "油價回落：中東原油出口回到戰前水準、G7 將釋出原油與柴油庫存", "detail": "WTI 96.16 美元、近一月仍 +13.7%，布蘭特 113.96 美元；回落尚不足以扭轉油價推升 CPI 的訊號。", "source": "Reuters、WSJ 等 3 家", "link": ""},
-   {"headline": "OPEC+ 七國維持 11 月產量配額不變，沙烏地阿美下調亞洲售價至六年低點", "detail": "阿美執行長稱全球庫存回補需兩年，供給端緩衝仍薄，油價底部被墊高。", "source": "Reuters、FT、CNBC 等 5 家", "link": ""},
-   {"headline": "美債殖利率週初續升、歐元跌至 17 個月低點，市場等待 Fed 會議紀要", "detail": "10 年期 5.24%、近一月 +45bp，曲線熊陡化；期貨定價 10/28 維持不變 88%、到 2027/7 累計升息 36bp。", "source": "CNBC、FT、Reuters 等 4 家", "link": ""}
+   {"headline": "美國貿易逆差擴大到 1,056 億美元，為去年關稅上路前以來最寬", "detail": "進口回升拖累淨出口，美元指數近一月 +2.4%。", "source": "CNBC", "link": ""},
+   {"headline": "標普、那斯達克再創新高，殖利率回落、油價走低", "detail": "10 年期仍在 5.28%、近一月 +49bp；WTI 96 美元、近一月 +13.7%。", "source": "FT、Reuters 等 3 家", "link": ""},
+   {"headline": "Fed 會議紀要明日公布，市場找升息線索", "detail": "期貨定價 10/28 不變 88%，到 2027/7 累計升息 36bp。", "source": "MarketWatch", "link": ""}
   ]},
   {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "Cenovus 以約 40 億美元收購 Athabasca Oil，擴大加拿大油砂版圖", "detail": "高油價下上游整併加速，加拿大同時支持 440 億加元的太平洋出口油管。", "source": "Reuters、MarketWatch", "link": ""},
-   {"headline": "Baker Hughes 簽下委內瑞拉油氣與 LNG 開發協議", "detail": "油服業者重返委內瑞拉，中期增加非中東供給來源。", "source": "Reuters Energy 等 2 家", "link": ""},
-   {"headline": "輝達逼近 6 兆美元市值，選擇權市場開始定價達標時點", "detail": "輝達收 233.95 美元（+1.3%），AI 權值股仍是美股主要支撐。", "source": "CNBC", "link": ""}
+   {"headline": "Google 與 Constellation 接近敲定十億美元級核電合約，Constellation 漲 12%", "detail": "AI 資料中心搶電，帶動 Vistra、Talen 等獨立電廠同漲。", "source": "Bloomberg、24/7 Wall St.", "link": ""},
+   {"headline": "Baker Hughes 簽下委內瑞拉油氣與 LNG 開發協議", "detail": "美系油服重返委國，中期增加原油與天然氣供給。", "source": "Reuters、Oil & Gas 2 家", "link": ""},
+   {"headline": "英國監管機構依《網路安全法》首度對 Meta 立案調查", "detail": "平台業者在歐洲的法遵與罰款風險升高。", "source": "Reuters 2 則", "link": ""}
   ]},
   {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "葉門政府軍發動全面攻勢並稱控制曼德海峽，胡塞宣稱襲擊利雅德阿美設施", "detail": "紅海航道與沙烏地設施風險升高，傳導路徑是油價與運費的風險溢酬。", "source": "Reuters、Guardian、CBS 等 6 家", "link": ""},
-   {"headline": "美軍因安全威脅撤走英國 Fairford 基地全部轟炸機", "detail": "與伊朗相關的安全疑慮擴及歐洲基地，支撐避險需求與能源風險溢酬。", "source": "AP、CNN、CBS 等 7 家", "link": ""},
-   {"headline": "巴西總統大選進入第二輪、里爾與巴西資產大漲；西班牙宣布 11/29 提前大選", "detail": "新興市場匯率與歐元區政治風險重新定價，歐元同日走弱。", "source": "AP、Reuters、FT 等 8 家", "link": ""}
+   {"headline": "沙烏地支持的葉門部隊奪回曼德海峽周邊，聯軍稱已空襲 324 個目標", "detail": "傳導：紅海航道與運費、油價風險溢酬。", "source": "AP、Guardian、PBS 等 5 家", "link": ""},
+   {"headline": "保加利亞外海貨船遭無人機擊沉、船員失蹤", "detail": "傳導：黑海航運保費與穀物出口，小麥近一月 +14.6%。", "source": "BBC、Reuters、gCaptain 3 家", "link": ""},
+   {"headline": "德國加入法國，要求歐盟建立對中貿易防衛工具", "detail": "傳導：歐中關稅升級，影響電動車與機械供應鏈。", "source": "SCMP 等 2 家", "link": ""}
   ]},
   {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "台股加權指數收 49,712 點、大漲 2.6%，台積電 2,575 元（+3.0%）", "detail": "台達電 +6.4%、聯發科 +4.3% 領漲，AI 與電源供應鏈帶動；櫃買 +1.3%。", "source": "儀表板報價", "link": ""},
-   {"headline": "美國 FBI 逮捕涉嫌為中國監控台灣總統家人的加州女子", "detail": "兩岸情報戰延伸到美國本土，屬台海風險的邊際訊號。", "source": "Reuters、NPR、Guardian 等 4 家", "link": ""},
-   {"headline": "台灣接收首批 F-16V Block 70 戰機", "detail": "對美軍購交付進度落地，國防支出與台美關係的實質進展。", "source": "Janes", "link": ""}
+   {"headline": "台股加權收 49,822.55 點、漲 0.2%，台積電 2,585 元、漲 0.4%", "detail": "台達電 +2.2% 領漲電源族群，櫃買指數 -0.4%。", "source": "儀表板報價", "link": ""},
+   {"headline": "聯發科重挫 4.7% 收 4,920 元，為權值股中最弱", "detail": "", "source": "儀表板報價", "link": ""},
+   {"headline": "FBI 逮捕涉嫌替中國監控台灣高層官員親屬的加州女子", "detail": "", "source": "DOJ、AP 等 3 家", "link": ""}
   ]}
  ],
- "synthesis": "與本期判斷的交集：油價雖因出口回升與 G7 釋儲回落，但 OPEC+ 不增產、庫存回補需兩年、紅海戰事升溫，加上 10 年期續升與曲線熊陡化，「通膨未解／通膨優先」與市場定價升息的判斷仍站得住。"
+ "synthesis": "與本期判斷的交集：油價仍在高檔（布蘭特 114 美元、近一月 +27%）加上紅海與黑海航道風險，支持「通膨優先」的重心，也與期貨定價升息一致。"
 }
