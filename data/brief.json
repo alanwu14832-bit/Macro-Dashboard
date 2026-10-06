@@ -1,27 +1,26 @@
 {
  "date": "2026-10-06",
- "generated_at": "2026-10-06T22:40:00+08:00",
+ "generated_at": "2026-10-06T22:42:00+08:00",
  "sections": [
   {"key": "macro", "title": "總經數據與事件", "items": [
-   {"headline": "美國貿易逆差擴大到 1,056 億美元，為去年關稅上路前以來最寬", "detail": "進口回升拖累淨出口，美元指數近一月 +2.4%。", "source": "CNBC", "link": ""},
-   {"headline": "標普、那斯達克再創新高，殖利率回落、油價走低", "detail": "10 年期仍在 5.28%、近一月 +49bp；WTI 96 美元、近一月 +13.7%。", "source": "FT、Reuters 等 3 家", "link": ""},
-   {"headline": "Fed 會議紀要明日公布，市場找升息線索", "detail": "期貨定價 10/28 不變 88%，到 2027/7 累計升息 36bp。", "source": "MarketWatch", "link": ""}
+   {"headline": "美國貿易逆差擴大至 1,056 億美元，為去年關稅上路前以來最寬", "detail": "進口回升使淨出口拖累成長，也削弱關稅縮小逆差的說法。", "source": "CNBC", "link": ""},
+   {"headline": "10 年期殖利率升至 5.28%，標普與那斯達克仍創新高", "detail": "近一月長端上行 49bp、期限溢酬 1.28 個百分點，AI 股暫時無視債市賣壓。", "source": "Financial Times、Reuters", "link": ""},
+   {"headline": "Fed 會議紀要明日公布，期貨定價到 2027 年 7 月累計升息 36bp", "detail": "10/28 會議不變機率 88%，市場要從紀要找升息討論的線索。", "source": "MarketWatch", "link": ""}
   ]},
   {"key": "company", "title": "公司新聞", "items": [
-   {"headline": "Google 與 Constellation 接近敲定十億美元級核電合約，Constellation 漲 12%", "detail": "AI 資料中心搶電，帶動 Vistra、Talen 等獨立電廠同漲。", "source": "Bloomberg、24/7 Wall St.", "link": ""},
-   {"headline": "Baker Hughes 簽下委內瑞拉油氣與 LNG 開發協議", "detail": "美系油服重返委國，中期增加原油與天然氣供給。", "source": "Reuters、Oil & Gas 2 家", "link": ""},
-   {"headline": "英國監管機構依《網路安全法》首度對 Meta 立案調查", "detail": "平台業者在歐洲的法遵與罰款風險升高。", "source": "Reuters 2 則", "link": ""}
+   {"headline": "Google 與 Constellation 接近十億美元級核電供應協議，Constellation 股價大漲 12%", "detail": "AI 資料中心用電需求持續外溢到核電與獨立電廠，Vistra、Talen 同步上漲。", "source": "Bloomberg、24/7 Wall St.", "link": ""},
+   {"headline": "Baker Hughes 簽下委內瑞拉油氣與 LNG 開發協議", "detail": "美國油服業者重返委內瑞拉，中期增加重質原油與天然氣供給。", "source": "2 家", "link": ""},
+   {"headline": "Anduril 與美國海軍合計投資 66 億美元擴充潛艦零組件產能", "detail": "國防供應鏈擴產由新創業者主導，造艦瓶頸成為資本支出焦點。", "source": "Defense News", "link": ""}
   ]},
   {"key": "geo", "title": "地緣政治", "items": [
-   {"headline": "沙烏地支持的葉門部隊奪回曼德海峽周邊，聯軍稱已空襲 324 個目標", "detail": "傳導：紅海航道與運費、油價風險溢酬。", "source": "AP、Guardian、PBS 等 5 家", "link": ""},
-   {"headline": "保加利亞外海貨船遭無人機擊沉、船員失蹤", "detail": "傳導：黑海航運保費與穀物出口，小麥近一月 +14.6%。", "source": "BBC、Reuters、gCaptain 3 家", "link": ""},
-   {"headline": "德國加入法國，要求歐盟建立對中貿易防衛工具", "detail": "傳導：歐中關稅升級，影響電動車與機械供應鏈。", "source": "SCMP 等 2 家", "link": ""}
+   {"headline": "沙烏地支持的葉門部隊奪回曼德海峽周邊多處據點，聯軍稱空襲 324 個目標", "detail": "傳導路徑：紅海航道與油輪保費，布蘭特近一月已漲 27%。", "source": "5 家", "link": ""},
+   {"headline": "保加利亞外海一艘船遭無人機擊沉、船員失蹤", "detail": "傳導路徑：黑海航運保險與穀物出口，小麥近一月漲 14.6%。", "source": "3 家", "link": ""},
+   {"headline": "德國加入法國，推動歐盟建立對中國的貿易防衛工具", "detail": "傳導路徑：歐中貿易摩擦升溫，影響電動車與工業品供應鏈。", "source": "2 家", "link": ""}
   ]},
   {"key": "taiwan", "title": "台灣", "items": [
-   {"headline": "台股加權收 49,822.55 點、漲 0.2%，台積電 2,585 元、漲 0.4%", "detail": "台達電 +2.2% 領漲電源族群，櫃買指數 -0.4%。", "source": "儀表板報價", "link": ""},
-   {"headline": "聯發科重挫 4.7% 收 4,920 元，為權值股中最弱", "detail": "", "source": "儀表板報價", "link": ""},
-   {"headline": "FBI 逮捕涉嫌替中國監控台灣高層官員親屬的加州女子", "detail": "", "source": "DOJ、AP 等 3 家", "link": ""}
+   {"headline": "台股加權收 49,822.55 點、漲 0.2%，聯發科重挫 4.7%", "detail": "台積電 2,585 元漲 0.4%、台達電漲 2.2%，權值股分歧。", "source": "儀表板報價", "link": ""},
+   {"headline": "FBI 逮捕加州女子，涉嫌替中國監控台灣高層官員在美親屬", "detail": "", "source": "AP、美國司法部", "link": ""}
   ]}
  ],
- "synthesis": "與本期判斷的交集：油價仍在高檔（布蘭特 114 美元、近一月 +27%）加上紅海與黑海航道風險，支持「通膨優先」的重心，也與期貨定價升息一致。"
+ "synthesis": "與本期判斷的交集：油價高檔加上紅海與黑海航道風險、長端殖利率續升，支持「通膨優先」與期限溢酬偏高的訊號；貿易逆差擴大則呼應成長面偏弱。"
 }
