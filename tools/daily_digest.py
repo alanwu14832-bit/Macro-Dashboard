@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from macro import archive, cbc_board, clock, data, fomc, http, paths
 from macro.sources import fomc_text
-from macro.compute import (commodities, debt, equities, events, fedfunds, freshness,
+from macro.compute import (commodities, debt, equities, events, expectations, fedfunds, freshness,
                            growth, inflation, labor, market, news, rates,
                            scenario, signals, taiwan, world)
 
@@ -31,6 +31,7 @@ MODULES = [
     ("fedfunds", fedfunds), ("debt", debt), ("growth", growth),
     ("market", market), ("world", world), ("commodities", commodities),
     ("equities", equities), ("news", news), ("freshness", freshness),
+    ("expectations", expectations),
 ]
 
 # 第 3 點「跟昨天比」要盯的讀數。archive.reading_changes 自己有一套，
@@ -433,6 +434,27 @@ def section_taiwan(ctx, found):
                       f"{num(c['now'], c.get('digits', 2))} {c.get('unit', '')}")
 
 
+def section_expectations(ctx):
+    head("8. 公布前的預期（模型與期貨；引用時一定要寫明來源，不能寫成「市場預期」或「共識」）")
+    ff = (ctx.get("fedfunds") or {}).get("next") or {}
+    if ff.get("probs"):
+        probs = ff["probs"]
+        print(f"FOMC {ff.get('label')}　期貨定價：不動 {probs.get('hold', 0) * 100:.0f}%、"
+              f"降息 {(probs.get('cut25', 0) + probs.get('cut50', 0)) * 100:.0f}%、"
+              f"升息 {(probs.get('hike25', 0) + probs.get('hike50', 0)) * 100:.0f}%")
+    ex = ctx.get("expectations") or {}
+    if ex.get("error"):
+        print(f"模型預估這一輪沒有取得：{ex['error']}——不要引用舊的預估。")
+    for item in (ex.get("items") or {}).values():
+        before, after = expectations.before(item), expectations.after(item)
+        if before:
+            stamp = (item.get("next") or {}).get("as_of")
+            print(f"  下一次　模型預估 {before}（{item['source']}" + (f"，{stamp} 的估計" if stamp else "") + "）")
+        if after:
+            print(f"  上一次　{after}")
+    print("非農、失業率、零售銷售等沒有公開的預期來源——不要寫「優於／不如預期」。")
+
+
 def main() -> int:
     print(f"At the Margin 每日摘要　產生於 {clock.now():%Y-%m-%d %H:%M}（台北）")
     bundle, ctx = load_context()
@@ -445,6 +467,7 @@ def main() -> int:
     section_news(ctx)
     section_today(ctx)
     section_taiwan(ctx, found)
+    section_expectations(ctx)
     print(f"\n{RULE}\n摘要結束。接下來：寫 data/brief.json → "
           f"python3 build.py --offline --no-archive --quiet → commit & push\n{RULE}")
     return 0

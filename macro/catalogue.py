@@ -194,6 +194,9 @@ DEBT: dict[str, Spec] = {
 GROWTH: dict[str, Spec] = {
     "GDPC1":          ("實質 GDP", "十億美元", "q", LONG_START),
     "A191RL1Q225SBEA": ("實質 GDP 年化季增", "%", "q", LONG_START),
+    # 亞特蘭大聯準銀行的即時預估：還沒公布的那一季是最新的預估，已公布的是公布前最後一次。
+    # 它是模型，不是統計——只給「公布前的預期」用（compute/expectations.py）。
+    "GDPNOW":         ("GDPNow 即時預估", "%", "q", "2011-07-01"),
     "INDPRO":         ("工業生產", "指數", "m", LONG_START),
     "TCU":            ("產能利用率", "%", "m", LONG_START),
     "RSAFS":          ("零售銷售", "百萬美元", "m", "1992-01-01"),

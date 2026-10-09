@@ -218,12 +218,14 @@ def transition_thresholds(labor: dict, inflation: dict, employment_state: str,
                 "need": f"核心 PCE 需降至 {INFLATION_BANDS['high']:.1f}% 以下",
                 "gap": core_pce - INFLATION_BANDS["high"],
                 "unit": "個百分點",
+                "series": "PCEPILFE", "line": INFLATION_BANDS["high"], "cross": "below",
             })
             out.append({
                 "name": "通膨由「高」轉「低」",
                 "need": f"核心 PCE 需降至 {INFLATION_BANDS['low']:.1f}% 以下",
                 "gap": core_pce - INFLATION_BANDS["low"],
                 "unit": "個百分點",
+                "series": "PCEPILFE", "line": INFLATION_BANDS["low"], "cross": "below",
             })
         elif inflation_state == "mid":
             out.append({
@@ -231,6 +233,7 @@ def transition_thresholds(labor: dict, inflation: dict, employment_state: str,
                 "need": f"核心 PCE 需降至 {INFLATION_BANDS['low']:.1f}% 以下",
                 "gap": core_pce - INFLATION_BANDS["low"],
                 "unit": "個百分點",
+                "series": "PCEPILFE", "line": INFLATION_BANDS["low"], "cross": "below",
             })
 
     out.extend(_payroll_thresholds(labor, employment_state, employment_detail))

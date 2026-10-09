@@ -8,7 +8,9 @@
 打開一樣為真，因為數字是烘進 HTML 的，不是載入後才抓的。
 
 刻意不做的三件事，全部寫在頁尾而不是藏起來：
-  · 不補市場共識預期——本站沒有那份付費資料，所以只能跟前值與自己的節奏比
+  · 不補市場共識預期——本站沒有那份付費資料。通膨與 GDP 有聯準銀行公開的模型預估
+    （compute/expectations.py），照實標成「模型預估」並附上它的成績單；其餘的發布
+    只能跟前值與自己的節奏比
   · 不做因果歸因——「因為 CPI 低於預期所以期貨漲」是敘事，不是量測
   · 市場反應只有一次量測，基準是前一交易日收盤，不是公布前一刻
 """
@@ -54,6 +56,67 @@ SPECS = {
 
 NO_CONSENSUS = ("本站沒有市場共識預期（那是付費資料），所以這一頁只跟前值與"
                 "這個數字自己的近期節奏比，不說「優於／低於預期」。")
+MODEL_NOT_CONSENSUS = ("本站沒有市場共識預期（那是付費資料）。下面的「公布前的預期」是聯準銀行"
+                       "公開的模型預估，不是共識，也不是市場定價；它平常差多少列在旁邊。")
+
+
+def _signed(value: float, digits: int = 2) -> str:
+    return fmt(value, digits, signed=True)
+
+
+def _expectation_block(ctx: dict, sid: str) -> str:
+    """公布前的預期：模型預估多少、上一次差多少、這個模型平常差多少。
+
+    沒有來源的發布回空字串（頁面照舊寫「沒有共識」）。有來源但這一輪沒抓到，
+    講明沒抓到，不留一個看起來像「沒有預期」的空白。
+    """
+    from ...compute import expectations as ex
+    if not ex.has_source(sid):
+        return ""
+    items = ex.for_release(ctx.get("expectations"), sid)
+    if not items:
+        reason = (ctx.get("expectations") or {}).get("error") or "模型預估這一輪沒有取得"
+        return section("expectation", "公布前的預期",
+                       f'<p class="muted">{esc(reason)}。這一格留白，不拿前值代替。</p>')
+    parts = []
+    for item in items:
+        gdp = item["key"] == "gdp"
+        lines = []
+        nxt, last, track = item.get("next"), item.get("last"), item.get("track") or {}
+        if nxt:
+            stamp = (f'（{nxt["as_of"].month}/{nxt["as_of"].day} 的估計）' if nxt.get("as_of") else "")
+            lines.append(f'<p><strong>下一次公布</strong>　模型預估 {esc(ex.before(item))}{stamp}</p>')
+        if last:
+            lines.append(f'<p><strong>上一次</strong>　{esc(ex.after(item))}</p>')
+        rows = []
+        for h in reversed(item.get("history") or []):
+            if len(rows) >= 6:
+                break
+            if gdp:
+                rows.append([ex.quarter_label(h["target"]), pct(h["nowcast"], 1), pct(h["actual"], 1),
+                             _signed(h["error"], 1)])
+            else:
+                rows.append([f'{h["target"][0]}-{h["target"][1]:02d}',
+                             pct(h["mom_nowcast"], 2), pct(h["mom_actual"], 2), _signed(h["mom_error"]),
+                             pct(h["yoy_nowcast"], 2), pct(h["yoy_actual"], 2), _signed(h["yoy_error"])])
+        if rows:
+            head = (["季", "預估", "現在的數字", "差"] if gdp else
+                    ["月份", "月增預估", "月增實際", "差", "年增預估", "年增實際", "差"])
+            foot = ""
+            if track:
+                foot = (f'近 {track["n"]} 期平均差：{fmt(track["mae"], 1)} 個百分點（最大一次 '
+                        f'{_signed(track["worst"], 1)}）。實際值用的是現在的數字，包含初值之後的修正。'
+                        if gdp else
+                        f'近 {track["n"]} 期平均差：月增 {fmt(track["mom_mae"], 2)}、年增 '
+                        f'{fmt(track["yoy_mae"], 2)} 個百分點（年增最大一次 {_signed(track["yoy_worst"])}）。'
+                        "年增率的實際值會受歷史修正影響，月增比較乾淨。")
+            lines.append(table(head, rows, foot=foot))
+        parts.append(f'<div class="card"><h3 class="fd-h">{esc(item["name"])}</h3>{"".join(lines)}'
+                     f'<p class="mc-foot-note">來源：<a href="{esc(item["source_url"])}" target="_blank" '
+                     f'rel="noopener noreferrer">{esc(item["source"])}</a>。'
+                     "這是模型，不是市場共識，也不是市場定價。</p></div>")
+    return section("expectation", "公布前的預期", "".join(parts),
+                   note="模型預估與它的成績單——差距算不算大，要看這個模型平常就差多少")
 
 
 def _reading(series, spec: dict) -> dict | None:
@@ -141,6 +204,11 @@ def _reaction_card(snap: dict | None) -> str:
               f'因為兩者在不同時間量。不做因果歸因。</p>')
 
 
+def _has_model(sid: str) -> bool:
+    from ...compute import expectations
+    return expectations.has_source(sid)
+
+
 def render_one(ctx: dict, sid: str, *, scenario: dict,
                prior_snapshot: dict | None = None) -> str:
     from ...compute import freshness
@@ -180,8 +248,11 @@ def render_one(ctx: dict, sid: str, *, scenario: dict,
         + (f'<p class="muted" style="margin:6px 0 0">{esc(spec["note"])}</p>'
            if spec.get("note") else "")
         + '</div>'
-        + f'<p class="chg-scope">{esc(NO_CONSENSUS)}</p>'
+        + f'<p class="chg-scope">'
+          f'{esc(MODEL_NOT_CONSENSUS if _has_model(sid) else NO_CONSENSUS)}</p>'
         + _threshold_rows(sid, spec, reading, scenario)))
+
+    body.append(_expectation_block(ctx, sid))
 
     if reading["chart"] is not None:
         target = None

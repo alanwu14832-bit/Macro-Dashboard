@@ -172,7 +172,7 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
     us_signals = [s for s in signals if not is_tw(s)]
     us_summary = signals_mod.summarise(us_signals) if us_signals else {**summary, "total": 0, "neutral": 0}
     us_diff = _only(diff, lambda s: not is_tw(s))
-    us_events = events_mod.for_region(ev, "美國")
+    us_events = front.with_expectations(ctx, events_mod.for_region(ev, "美國"))
     us_top, us_changed = front.hero(ctx, scenario, us_summary, us_diff, reading_changes, prior,
                                     events=us_events, story=brief_module.story(curated, "us"))
     us_rest = "".join([

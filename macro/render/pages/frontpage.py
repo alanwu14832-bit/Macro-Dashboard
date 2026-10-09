@@ -95,10 +95,13 @@ def data_lede(event: dict, bundle) -> dict:
                 "figure": "", "deck": event.get("detail", ""),
                 "href": f"/release/{series_id}/" if series_id else "/freshness/"}
     feeds = spec.get("feeds")
+    # expect：公布前的模型預估或實際對預估的差距（front_blocks.expected 補的；沒有來源就沒有）
+    expect = f'{event["expect"]}。' if event.get("expect") else ""
     return {
         "kind": "data", "eyebrow": event["tag"], "headline": headline,
         "figure": _figure(reading["value"], spec, series_id),
-        "deck": _change_phrase(reading, spec, series_id) + (f"它餵的是：{feeds}。" if feeds else ""),
+        "deck": (_change_phrase(reading, spec, series_id) + expect
+                 + (f"它餵的是：{feeds}。" if feeds else "")),
         "href": f"/release/{series_id}/",
     }
 

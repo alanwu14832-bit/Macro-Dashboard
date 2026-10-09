@@ -664,7 +664,8 @@ thead th {
   border-bottom: 1px solid var(--axis); position: sticky; top: 0; background: var(--surface);
 }
 td.num, th.num { font-variant-numeric: tabular-nums; }
-tfoot td { color: var(--ink-muted); font-size: var(--t-13); line-height: var(--lh-13); border-bottom: 0; }
+/* 表尾的說明是一整句話：不換行的話，它會把整張表撐得比手機螢幕寬，欄位明明放得下也得橫向捲 */
+tfoot td { color: var(--ink-muted); font-size: var(--t-13); line-height: var(--lh-13); border-bottom: 0; white-space: normal; }
 .pos { color: var(--delta-up); }
 .neg { color: var(--critical); }
 

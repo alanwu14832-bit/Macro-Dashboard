@@ -736,6 +736,51 @@ def _event_row(event: dict) -> str:
     return row(body, cls="nx ln rv", tag="article")
 
 
+def released_period(ctx: dict, series_id: str) -> tuple[int, int] | None:
+    """本站手上這檔序列最新一期是哪個月（季資料是季初那個月）。"""
+    bundle = ctx.get("_bundle")
+    series = bundle[series_id] if bundle is not None else None
+    when = series.last_date if series else None
+    return (when.year, when.month) if when else None
+
+
+def expected(ctx: dict, event: dict) -> dict:
+    """今天的一件事，補上公布前的預期。回傳加了 expect（那一句話）的事件；沒有就原樣回傳。
+
+    還沒公布：模型預估，或期貨定價（FOMC）。
+    已經公布：實際比預估高低多少——但只在預估來源已經登錄「同一期」的實際值時才寫。
+    聯準銀行的檔案隔天才更新，公布當晚它記的還是上個月；那時只列公布前的預估，
+    不自己拿兩邊口徑不同的數字相減，更不能把上個月的成績當成今天的。
+    沒有來源的發布什麼都不加——不寫「優於預期」「不如預期」。
+    """
+    from ...compute import expectations
+    extra = ""
+    if event.get("kind") == "policy" and event.get("region") == "美國":
+        if event.get("policy") == "待公布":
+            extra = futures_pricing(ctx.get("fedfunds"))
+    elif event.get("kind") == "data" and event.get("id"):
+        items = expectations.for_release(ctx.get("expectations"), event["id"])
+        if "已公布" not in (event.get("tag") or ""):
+            extra = model_estimate(ctx, event["id"])
+        elif items:
+            period, item = released_period(ctx, event["id"]), items[0]
+            if item.get("last") and item["last"]["target"] == period:
+                extra = "模型預估對實際：" + expectations.after(item)
+            elif item.get("next") and item["next"]["target"] == period:
+                extra = "公布前的" + model_estimate(ctx, event["id"])
+    if not extra:
+        return event
+    return {**event, "expect": extra, "detail": (event.get("detail") or "") + extra + "。"}
+
+
+def with_expectations(ctx: dict, events: dict | None) -> dict:
+    """整份事件清單補上公布前的預期（頭條與「今天」共用同一份，只補一次）。"""
+    events = events or {}
+    if not events.get("events"):
+        return events
+    return {**events, "events": [expected(ctx, e) for e in events["events"]]}
+
+
 def _update_rows(ctx: dict) -> list[str]:
     """今天更新的序列：頁邊是較前值的變動——它們今天才到，所以上色。"""
     freshness = ctx.get("freshness") or {}
@@ -850,18 +895,77 @@ def _next_opex() -> dict | None:
     return None
 
 
+# ------------------------------------------------------ 公布前的預期 ----
+# 三種來源、三種性質，頁面上各寫各的名字，不混成一個「預期」：
+#   期貨定價（市場）、模型預估（聯準銀行的即時預估）、沒有（其餘的發布）。
+
+def futures_pricing(fedfunds: dict | None) -> str:
+    """下一次 FOMC 的期貨隱含機率，一句話。只列超過 0.5% 的結果。"""
+    nxt = (fedfunds or {}).get("next") or {}
+    probs = nxt.get("probs") or {}
+    if not probs:
+        return ""
+    names = [("hike50", "升息 2 碼"), ("hike25", "升息 1 碼"), ("hold", "不動"),
+             ("cut25", "降息 1 碼"), ("cut50", "降息 2 碼")]
+    parts = [f'{name} {probs[key] * 100:.0f}%' for key, name in names if probs.get(key, 0) >= 0.005]
+    return "期貨定價：" + "、".join(parts) if parts else ""
+
+
+def model_estimate(ctx: dict, series_id: str | None) -> str:
+    """某一項發布公布前的模型預估，一句話。沒有來源或沒有下一期的預估就回空字串。"""
+    from ...compute import expectations
+    parts = [expectations.before(item)
+             for item in expectations.for_release(ctx.get("expectations"), series_id or "")]
+    parts = [part for part in parts if part]
+    return "模型預估：" + "；".join(parts) if parts else ""
+
+
+def gate_outlook(ctx: dict, transition: dict) -> str:
+    """一道門檻旁邊的一句：哪一天會知道、模型預估下一個讀數在門檻的哪一邊。
+
+    「還差 0.21」只有距離。讀者要判斷這件事近不近，還需要知道下一個會動它的數字
+    哪天公布、公布前的預估落在哪裡。預估是模型的，照實寫是模型預估。
+    """
+    from ...compute import expectations
+    series_id = transition.get("series")
+    if not series_id:
+        return ""
+    row = next((r for r in ((ctx.get("freshness") or {}).get("rows") or [])
+                if r.get("id") == series_id and r.get("next_release")), None)
+    text = ""
+    if row:
+        when = row["next_release"]
+        text = f'下一次公布 {when.month}/{when.day}（{_when(row["days_away"])}）。'
+    item = next(iter(expectations.for_release(ctx.get("expectations"), series_id)), None)
+    nxt = (item or {}).get("next")
+    if nxt and transition.get("line") is not None:
+        line = transition["line"]
+        crossed = nxt["yoy"] < line if transition.get("cross") == "below" else nxt["yoy"] > line
+        side = (f"已經越過 {line:.1f}% 這條線" if crossed else
+                f'仍在 {line:.1f}% 這條線的{"上方" if nxt["yoy"] > line else "下方"}')
+        text += (f'模型預估 {expectations.month_label(nxt["target"])} {item["name"]} 年增 '
+                 f'{nxt["yoy"]:.2f}%，{side}')
+        mae = (item.get("track") or {}).get("yoy_mae")
+        if mae:
+            text += f'（這個模型平常差 {mae:.2f} 個百分點）'
+        text += "。"
+    return text
+
+
 def upcoming(ctx: dict, fomc: dict | None) -> list[dict]:
     """未來會來的事。回傳 [{days, kind, what}]，days 可能是 None（日期未定）。"""
     from ...sources import treasury
     items: list[dict] = []
     if fomc:
         items.append({"days": fomc["days"], "kind": "央行",
-                      "what": f'FOMC 利率決策（{fomc["date"].month}/{fomc["date"].day}）'})
+                      "what": f'FOMC 利率決策（{fomc["date"].month}/{fomc["date"].day}）',
+                      "expect": futures_pricing(ctx.get("fedfunds"))})
     for item in ((ctx.get("freshness") or {}).get("imminent") or [])[:6]:
         # 日頻序列（公債殖利率）每個交易日都「今天公布」，列進來等於每天多一列雜訊
         if item.get("frequency") == "d":
             continue
-        items.append({"days": item.get("days_away"), "kind": "數據", "what": item["name"]})
+        items.append({"days": item.get("days_away"), "kind": "數據", "what": item["name"],
+                      "expect": model_estimate(ctx, item.get("id"))})
     for auction in treasury.upcoming():
         items.append({"days": auction["days"], "kind": "標售",
                       "what": f'{auction["term"]}{auction["type"]}標售'})
@@ -880,15 +984,18 @@ def upcoming(ctx: dict, fomc: dict | None) -> list[dict]:
 def next_up(ctx: dict, scenario: dict, fomc: dict | None, *, horizon: int = 30) -> str:
     """接下來：離門檻多遠、離公布幾天。直線是今天，橫條拉得越長離得越遠。"""
     out = [sec_open("next", "接下來", kind="",
-                    sub="直線是今天，線拉得越長離得越遠。"
-                        "沒有市場共識預期——那是付費資料，本站不做推估。")]
+                    sub="直線是今天，線拉得越長離得越遠。公布前的預期只有三種有："
+                        "利率決議看期貨定價，通膨與 GDP 看聯準銀行的模型預估；"
+                        "其餘沒有——市場共識是付費資料，本站不拿前值充數。")]
     gates = 0
     for transition in scenario.get("transitions") or []:
         if transition.get("gap") is None:
             continue
+        outlook = gate_outlook(ctx, transition) if gates == 0 else ""
         body = ('<p class="kind"><b>門檻</b></p>'
                 f'<div><h3>{esc(transition["name"])}</h3>'
-                f'<p class="det">{esc(transition.get("need", ""))}</p></div>')
+                f'<p class="det">{esc(transition.get("need", ""))}'
+                + (f'。{esc(outlook)}' if outlook else "") + '</p></div>')
         out.append(row(body, note(f'還差 <i>{fmt(abs(transition["gap"]), 2)}</i>',
                                   esc(transition.get("unit", ""))),
                        cls="nx ln rv", tag="article"))
@@ -909,12 +1016,15 @@ def next_up(ctx: dict, scenario: dict, fomc: dict | None, *, horizon: int = 30) 
             group = dated[days]
             kinds = "、".join(dict.fromkeys(item["kind"] for item in group))
             names = "、".join(item["what"] for item in group)
+            expects = "　".join(item["expect"] for item in group if item.get("expect"))
             margin = (note("今天") if days == 0 else note("明天") if days == 1
                       else note(f'<i>{days}</i> 天後'))
             out.append(row(
                 '<div class="run"><span class="bar" aria-hidden="true"></span>'
                 f'<div class="txt"><p class="kind"><b>{esc(kinds)}</b></p>'
-                f'<h3>{esc(names)}</h3></div></div>',
+                f'<h3>{esc(names)}</h3>'
+                + (f'<p class="expect">{esc(expects)}</p>' if expects else "")
+                + '</div></div>',
                 margin, cls="when rv", tag="article",
                 attrs=f' style="--days:{days};--span:{span}"'))
     undated = [item for item in items if item["days"] is None]

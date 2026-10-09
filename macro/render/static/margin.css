@@ -1116,3 +1116,11 @@ html.scanning .fp .story { opacity: .13; }
 @media (max-width: 699px) {
   .fp .story > p { font-size: 15.5px; line-height: 1.85; }
 }
+
+
+/* ---- 公布前的預期：事件名稱底下的一行（期貨定價或模型預估）-------------------- */
+.fp .txt .expect {
+  flex-basis: 100%; margin-top: .15em;
+  font-size: 13.5px; line-height: 1.55; color: var(--ink-2);
+}
+@media (max-width: 699px) { .fp .txt .expect { font-size: 13px; } }

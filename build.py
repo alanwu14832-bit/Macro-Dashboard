@@ -22,7 +22,7 @@ from macro import archive, cbc_board, clock, data, deepdive, fomc, paths
 from macro import http as http_layer
 from macro.sources import cbc as cbc_source, fomc_text
 from macro.sources import taiwan as dgbas_source
-from macro.compute import (commodities, debt, equities, fedfunds, freshness,
+from macro.compute import (commodities, debt, equities, expectations, fedfunds, freshness,
                            reaction, events,
                            growth, inflation, labor, market, news, rates,
                            scenario, signals, taiwan, world)
@@ -52,6 +52,7 @@ MODULES = [
     ("commodities", commodities), ("equities", equities),
     ("taiwan", taiwan),
     ("news", news), ("freshness", freshness),
+    ("expectations", expectations),
 ]
 
 
@@ -151,6 +152,12 @@ def main() -> int:
         print(f"   ⚠ 台灣 CPI：{dgbas_source.LAST_ERROR}", flush=True)
         if os.environ.get("GITHUB_ACTIONS"):
             print(f"::warning title=台灣 CPI 抓不到::{dgbas_source.LAST_ERROR}", flush=True)
+    # 公布前的模型預估抓不到時頁面會講明「這一輪沒有取得」，紀錄裡也要看得見
+    expect_error = (ctx.get("expectations") or {}).get("error")
+    if expect_error:
+        print(f"   ⚠ 公布前的預期：{expect_error}", flush=True)
+        if os.environ.get("GITHUB_ACTIONS"):
+            print(f"::warning title=模型預估抓不到::{expect_error}", flush=True)
     for host, source in http_layer.CHAINS_COMPLETED.items():
         print(f"   · {host} 沒有送中介憑證，已依憑證上的網址補上（{source}）；驗證照常", flush=True)
 
