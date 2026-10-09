@@ -4,8 +4,11 @@ FRED 沒有台灣的 CPI，OECD 也沒有（台灣非會員），所以直接接
 開放資料 XML。檔案約 15 MB 且含全部基本分類，這裡只留「總指數」與
 「核心指數」，其餘丟棄後再快取，避免每次建置都重新解析整份。
 
-DGBAS 的伺服器沒有送出中介憑證，OpenSSL 補不齊憑證鏈，因此走
-macro.http 的 curl 路徑 — 驗證仍由系統信任庫完整執行。
+DGBAS 的伺服器（ws.dgbas.gov.tw）沒有送出中介憑證，OpenSSL 補不齊憑證鏈。
+macro.http 會照憑證上的 AIA 網址把中介憑證補回來再驗——驗證沒有關。
+（2026-10-10 以前這裡走 curl，以為 curl 會自己補；雲端建置的 curl 不會，
+所以台灣 CPI 在 GitHub Actions 上一直是缺口，而且因為下面把例外吞掉，
+建置紀錄裡看不出原因。現在失敗的原因留在 LAST_ERROR，build.py 會印。）
 """
 from __future__ import annotations
 
@@ -20,6 +23,9 @@ from . import datagov
 CPI_DATASET = 6019
 CPI_XML = ("https://ws.dgbas.gov.tw/001/Upload/461/relfile/11525/230555/"
            "pr0101a1m.xml")
+
+# 最近一次 cpi() 失敗的原因；成功就是 None。頁面上只寫「抓不到」，原因印在建置紀錄。
+LAST_ERROR: str | None = None
 
 # 民國年 + 月 -> 西元 ISO 日期
 _PERIOD = re.compile(r"^(\d{4})M(\d{2})$")
@@ -43,13 +49,16 @@ def _iso(period: str) -> str | None:
 
 def cpi(*, ttl: float = 24 * 3600) -> dict[str, Series]:
     """回傳 {'index': 總指數, 'yoy': 年增率}。取不到就回空 Series。"""
+    global LAST_ERROR
+    LAST_ERROR = None
     empty = {"index": Series("TW_CPI", [], [], frequency="m"),
              "yoy": Series("TW_CPI_YOY", [], [], frequency="m")}
     try:
         target = datagov.download_url(CPI_DATASET, ext=".xml",
                                       fallback=CPI_XML, ttl=ttl)
         raw = get(target, ttl=ttl, namespace="taiwan", timeout=90, retries=2)
-    except Exception:
+    except Exception as exc:
+        LAST_ERROR = f"下載失敗：{exc}"
         return empty
 
     levels: list[tuple[str, float]] = []
@@ -74,6 +83,8 @@ def cpi(*, ttl: float = 24 * 3600) -> dict[str, Series]:
             growth.append((date, number))
 
     if not levels:
+        # 抓到了檔案卻讀不出「總指數」：多半是主計總處改了 XML 的欄位或項目名稱
+        LAST_ERROR = f"下載到 {len(raw):,} 個字元，但讀不出「總指數」的原始值（XML 格式可能改了）"
         return empty
     return {
         "index": Series.from_pairs("TW_CPI", levels, label="台灣 CPI",

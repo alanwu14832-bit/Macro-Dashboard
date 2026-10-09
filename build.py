@@ -21,6 +21,7 @@ from datetime import date, datetime
 from macro import archive, cbc_board, clock, data, deepdive, fomc, paths
 from macro import http as http_layer
 from macro.sources import cbc as cbc_source, fomc_text
+from macro.sources import taiwan as dgbas_source
 from macro.compute import (commodities, debt, equities, fedfunds, freshness,
                            reaction, events,
                            growth, inflation, labor, market, news, rates,
@@ -141,6 +142,17 @@ def main() -> int:
             ctx[name] = {}
             print(f"   ✗ {name}", flush=True)
             traceback.print_exc()
+
+    # 台灣的資料缺口不會讓建置失敗（頁面會標「缺」），但要在紀錄裡看得見——
+    # 台灣 CPI 曾經在雲端建置裡缺了很久，因為抓取的例外被吞掉、紀錄裡一個字都沒有。
+    for gap in (ctx.get("taiwan") or {}).get("gaps") or []:
+        print(f"   ⚠ 台灣：{gap}", flush=True)
+    if dgbas_source.LAST_ERROR:
+        print(f"   ⚠ 台灣 CPI：{dgbas_source.LAST_ERROR}", flush=True)
+        if os.environ.get("GITHUB_ACTIONS"):
+            print(f"::warning title=台灣 CPI 抓不到::{dgbas_source.LAST_ERROR}", flush=True)
+    for host, source in http_layer.CHAINS_COMPLETED.items():
+        print(f"   · {host} 沒有送中介憑證，已依憑證上的網址補上（{source}）；驗證照常", flush=True)
 
     # 台灣央行理監事會：決議在 taiwan 模組裡讀（它要用來校正重貼現率），
     # 會議日程從央行 RSS 的預定日期公告讀，狀態定義跟 FOMC 一樣。

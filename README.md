@@ -54,7 +54,7 @@ python3 -m http.server 8787 --directory site
 | FRED | 美國全部、國際公債殖利率、匯率、IMF 商品價格 | 需 `FRED_API_KEY` |
 | OECD SDMX | 各國 CPI 年增率 | 免金鑰 |
 | ECB Data Portal | 歐元區失業率、核心 HICP | 免金鑰 |
-| 行政院主計總處 | 台灣 CPI | 免金鑰；走 curl（見下） |
+| 行政院主計總處 | 台灣 CPI | 免金鑰；網址由政府資料開放平臺解析（見下） |
 | LBMA | 黃金、白銀官方定盤價 | 免金鑰 |
 | 證交所 mis.twse.com.tw | 台股加權／櫃買指數、個股與 ETF 報價 | 免金鑰 |
 | 證交所 www.twse.com.tw | 三大法人、融資融券、大盤日線與成交量 | 免金鑰，rwd JSON |
@@ -63,9 +63,10 @@ python3 -m http.server 8787 --directory site
 FRED 金鑰讀取順序：環境變數 `FRED_API_KEY` → `~/.config/fincept/keys.json`。
 金鑰不會進版控，快取寫入前也會 redact 掉 URL 中的金鑰參數。
 
-主計總處的伺服器沒有送出中介憑證，OpenSSL 補不齊憑證鏈（macOS 會透過憑證的
-AIA 欄位自動補，所以 curl 可以）。`macro/http.py` 的 `CURL_HOSTS` 讓這些主機
-改走 curl —— **TLS 驗證仍然完整開啟**，由系統信任庫執行，沒有關掉任何檢查。
+主計總處放 CPI 檔案的伺服器（`ws.dgbas.gov.tw`）沒有送出中介憑證，OpenSSL 補不齊
+憑證鏈。`macro/http.py` 遇到這個錯誤時，會照憑證上的 AIA 網址把中介憑證抓回來接上，
+跟瀏覽器做的一樣 —— **TLS 驗證仍然完整開啟**：根憑證只認系統信任庫裡的，
+抓回來的憑證只准用來接鏈。
 
 ## 股市報價
 

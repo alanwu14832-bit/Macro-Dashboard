@@ -40,7 +40,7 @@ python3 build.py              # 一般建置（6 小時內的快取直接用）
 python3 build.py --fresh      # 忽略快取全部重抓
 python3 build.py --offline    # 只用快取、不連網
 python3 build.py --ttl 3000   # 自訂快取有效期（排程用）
-python3 -m unittest discover tests   # 292 個測試，CI 會先跑這個
+python3 -m unittest discover tests   # 313 個測試，CI 會先跑這個
 ```
 
 **乾淨 clone 跑不動 `--offline`**：`data/cache/` 在 .gitignore 裡。第一次要用
@@ -90,8 +90,15 @@ git pull --rebase --autostash origin main
 - **中央銀行重貼現率**（`macro/sources/cbc.py`）。央行沒有把政策利率放進任何
   開放資料檔，只有 HTML 表格。它是**階梯函數**：月度展開要重複前值，
   不准內插——兩次理監事會議之間畫出斜線等於捏造從未存在的利率。
-- **主計總處 CPI**（`macro/sources/taiwan.py`）。DGBAS 的伺服器少送中介憑證，
-  所以走 `macro/http.py` 的 curl 路徑（驗證仍然完整執行，沒有關掉任何東西）。
+- **主計總處 CPI**（`macro/sources/taiwan.py`）。網址經政府資料開放平臺（資料集 6019）
+  解析，檔案在 `ws.dgbas.gov.tw`——這台伺服器少送中介憑證，Python 與 curl 都驗不過。
+  `macro/http.py` 的 `_open()` 會在遇到「找不到簽發者」時照憑證上的 AIA 網址把中介
+  憑證補回來再驗。**驗證沒有關**，靠三件事守住（`tests/test_http_chain.py` 釘死）：
+  只在那一個錯誤時才補、自己簽自己的憑證絕不收、「部分鏈」關著（Python 3.13 起預設
+  是開的）。不要為了「先讓它動」改成關驗證或 `curl -k`。
+  2026-10-10 以前這裡走 curl，以為 curl 會自己補——只有 macOS 舊版的會，所以
+  **台灣 CPI 在 GitHub Actions 上從來沒有抓到過**，而且例外被吞掉，紀錄裡一個字都
+  沒有。現在失敗原因會印在建置紀錄（`⚠ 台灣 CPI：…`），台灣的缺口也逐條印。
 - **各部會統計資料庫**（`macro/sources/statdb.py`）。主計總處、勞動部、財政部、
   內政部是**同一套 `webMain.aspx` 引擎**，一支解析器涵蓋四個部會：GDP、M1B／M2、
   美元計價外匯存底、積體電路與對美出口、無薪假都從這裡來。欄位位置要先查
@@ -335,7 +342,7 @@ bug：頁面上的「最後更新」標著台北卻差 8 小時；每日存檔�
 
 ## 測試
 
-292 個測試，CI 在建置前跑。新增測試時針對「壞了不會報錯、只會靜默給錯答案」
+313 個測試，CI 在建置前跑。新增測試時針對「壞了不會報錯、只會靜默給錯答案」
 那一類：時區、變動排序、分頁歸屬、追蹤清單與落點頁的同步、版面預算計數。
 
 寫批次修改腳本時**每個字串替換都要 `assert`**——`str.replace` 找不到目標時

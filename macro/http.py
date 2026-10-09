@@ -14,6 +14,8 @@ import json
 import os
 import random
 import re
+import socket
+import ssl
 import threading
 import time
 import urllib.error
@@ -57,12 +59,14 @@ class FetchError(RuntimeError):
     pass
 
 
-# Hosts whose TLS chain OpenSSL cannot complete on its own. Taiwan's DGBAS
-# server omits the intermediate certificate; macOS fetches it via the cert's
-# AIA extension, OpenSSL does not, so Python fails where curl succeeds.
-# These are fetched with curl, which means verification stays fully ON and is
-# performed by the system trust store — nothing is disabled.
-CURL_HOSTS = {"ws.dgbas.gov.tw", "nstatdb.dgbas.gov.tw"}
+# 主計總處總體統計資料庫照舊走 curl（它現在送得出完整的憑證鏈，curl 與 Python 都驗得過；
+# 這條路跑了很久沒出事，不動它）。驗證是開著的，由系統信任庫執行。
+#
+# ws.dgbas.gov.tw 原本也在這裡，理由是「macOS 的 curl 會自己補中介憑證」——那只對
+# 用 SecureTransport 驗證的 curl 成立。GitHub Actions 的 curl 是 OpenSSL，本機新版的
+# curl 是 LibreSSL，兩邊都補不了，所以台灣 CPI 在雲端建置裡從來沒有抓到過。
+# 現在改由下面的 _open() 照憑證上寫的網址把中介憑證補回來。
+CURL_HOSTS = {"nstatdb.dgbas.gov.tw"}
 
 
 def _curl(url: str, timeout: int) -> str:
@@ -75,6 +79,165 @@ def _curl(url: str, timeout: int) -> str:
         raise FetchError(f"curl failed ({result.returncode}): "
                          f"{result.stderr.decode('utf-8', 'replace')[:200]}")
     return result.stdout.decode("utf-8", errors="replace")
+
+
+# ---------------------------------------------------------------- 憑證鏈 ----
+#
+# 有些伺服器只送自己的憑證、不送簽發它的中介憑證（主計總處的 ws.dgbas.gov.tw）。
+# 瀏覽器會照憑證上的 AIA（Authority Information Access）網址把中介憑證抓回來接上，
+# OpenSSL 不會，於是 Python 與 curl 都回「unable to get local issuer certificate」。
+# 這裡做的是瀏覽器做的那件事，而且只在遇到那一個錯誤時才做。
+#
+# 驗證沒有關，也沒有放寬——這一點要靠三件事守住，少一件就等於信任了一張
+# 從明文 HTTP 抓來的憑證：
+#   1. 補進來的只准是中介憑證。自己簽自己的（根憑證）一律不收；根憑證只認
+#      系統信任庫裡的。
+#   2. 關掉「部分鏈」。Python 3.13 起 create_default_context() 預設開著它，
+#      開著的話信任庫裡任何一張憑證都能當鏈的終點——包括剛補進來的那張。
+#   3. 補完之後照常做完整驗證（簽章、效期、主機名），鏈的終點必須是系統的根憑證。
+
+MAX_CERT_BYTES = 64 * 1024
+MAX_CHAIN_DEPTH = 3
+# X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY、X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE：
+# 兩個都是「找不到簽發者」。過期（10）、主機名不符（62）不在這裡——那些補不了，也不該補。
+_MISSING_ISSUER = {20, 21}
+# AIA 裡「CA Issuers」這個存取方式的 OID（1.3.6.1.5.5.7.48.2）
+_CA_ISSUERS_OID = bytes.fromhex("06082b06010505073002")
+
+_chain_contexts: dict[str, ssl.SSLContext] = {}
+# 這一輪替哪些主機補過憑證鏈：{主機: 中介憑證的來源網址}。build.py 會印出來。
+CHAINS_COMPLETED: dict[str, str] = {}
+
+
+def _tlv(data: bytes, at: int) -> tuple[int, int, int]:
+    """DER 的一個元素：回傳 (標籤, 內容起點, 內容終點)。"""
+    tag, first = data[at], data[at + 1]
+    if first < 0x80:
+        start = at + 2
+        return tag, start, start + first
+    size = first & 0x7F
+    start = at + 2 + size
+    return tag, start, start + int.from_bytes(data[at + 2:at + 2 + size], "big")
+
+
+def cert_names(der: bytes) -> tuple[bytes, bytes]:
+    """憑證的 (簽發者, 主體)，各是一段原始的 DER。只走到 tbsCertificate 的前幾欄。"""
+    _tag, at, _end = _tlv(der, 0)               # Certificate
+    _tag, at, end = _tlv(der, at)               # tbsCertificate
+    fields = []
+    while at < end and len(fields) < 6:
+        tag, _start, stop = _tlv(der, at)
+        fields.append((tag, der[at:stop]))
+        at = stop
+    if fields and fields[0][0] == 0xA0:         # [0] version，v1 憑證沒有這一欄
+        fields = fields[1:]
+    # serialNumber, signature, issuer, validity, subject
+    return fields[2][1], fields[4][1]
+
+
+def self_issued(der: bytes) -> bool:
+    issuer, subject = cert_names(der)
+    return issuer == subject
+
+
+def issuer_urls(der: bytes) -> list[str]:
+    """憑證上寫的「簽發者憑證在哪裡」。只收 http(s)；OCSP 的網址不算。"""
+    urls, at = [], 0
+    while True:
+        at = der.find(_CA_ISSUERS_OID, at)
+        if at < 0:
+            return urls
+        at += len(_CA_ISSUERS_OID)
+        try:
+            tag, start, stop = _tlv(der, at)
+        except IndexError:
+            return urls
+        if tag == 0x86:                         # GeneralName: uniformResourceIdentifier
+            url = der[start:stop].decode("ascii", "replace")
+            if url.lower().startswith(("http://", "https://")):
+                urls.append(url)
+
+
+def _strict_context() -> ssl.SSLContext:
+    context = ssl.create_default_context()
+    context.verify_flags &= ~getattr(ssl, "VERIFY_X509_PARTIAL_CHAIN", 0)
+    return context
+
+
+def _peer_cert(host: str, port: int, timeout: int) -> bytes:
+    """伺服器送來的那一張憑證。這條連線不驗證、也不傳任何資料，只為了讀憑證上的網址；
+    讀到的東西不被信任——信不信要等補完鏈之後的完整驗證決定。"""
+    probe = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    probe.check_hostname = False
+    probe.verify_mode = ssl.CERT_NONE
+    with socket.create_connection((host, port), timeout=timeout) as raw:
+        with probe.wrap_socket(raw, server_hostname=host) as tls:
+            return tls.getpeercert(binary_form=True)
+
+
+def _fetch_cert(url: str, timeout: int) -> bytes:
+    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        blob = response.read(MAX_CERT_BYTES + 1)
+    if len(blob) > MAX_CERT_BYTES:
+        raise FetchError(f"{url} 不像一張憑證（超過 {MAX_CERT_BYTES} bytes）")
+    if b"-----BEGIN CERTIFICATE-----" in blob:
+        return ssl.PEM_cert_to_DER_cert(blob.decode("ascii", "replace"))
+    return blob
+
+
+def _verifies(host: str, port: int, context: ssl.SSLContext, timeout: int) -> bool:
+    try:
+        with socket.create_connection((host, port), timeout=timeout) as raw:
+            with context.wrap_socket(raw, server_hostname=host):
+                return True
+    except ssl.SSLError:
+        return False
+
+
+def complete_chain(host: str, port: int, timeout: int) -> tuple[ssl.SSLContext, list[str]]:
+    """系統信任庫＋這台主機漏送的中介憑證。回傳 (驗證用的 context, 補了哪些網址)。
+
+    一層一層往上補，補到驗得過為止；遇到自己簽自己的就停——那是根憑證，
+    根憑證不是抓來的東西可以決定的。
+    """
+    context = _strict_context()
+    der = _peer_cert(host, port, timeout)
+    added: list[str] = []
+    for _ in range(MAX_CHAIN_DEPTH):
+        urls = issuer_urls(der)
+        if not urls:
+            break
+        der = _fetch_cert(urls[0], timeout)
+        if self_issued(der):
+            break
+        context.load_verify_locations(cadata=ssl.DER_cert_to_PEM_cert(der))
+        added.append(urls[0])
+        if _verifies(host, port, context, timeout):
+            return context, added
+    raise FetchError(f"{host} 的憑證鏈補不起來（補了 {len(added)} 張中介憑證仍驗不過）")
+
+
+def chain_incomplete(exc: BaseException) -> bool:
+    """這個錯誤是不是「伺服器漏送中介憑證」。其他的憑證錯誤一律照原樣失敗。"""
+    reason = getattr(exc, "reason", exc)
+    return (isinstance(reason, ssl.SSLCertVerificationError)
+            and getattr(reason, "verify_code", None) in _MISSING_ISSUER)
+
+
+def _open(request: urllib.request.Request, timeout: int):
+    """urlopen；伺服器漏送中介憑證時補上再試一次。同一台主機一輪只補一次。"""
+    parsed = urllib.parse.urlparse(request.full_url)
+    context = _chain_contexts.get(parsed.netloc)
+    try:
+        return urllib.request.urlopen(request, timeout=timeout, context=context)
+    except urllib.error.URLError as exc:
+        if context is not None or parsed.scheme != "https" or not chain_incomplete(exc):
+            raise
+    context, added = complete_chain(parsed.hostname, parsed.port or 443, timeout)
+    _chain_contexts[parsed.netloc] = context
+    CHAINS_COMPLETED[parsed.netloc] = added[0]
+    return urllib.request.urlopen(request, timeout=timeout, context=context)
 
 
 def _throttle(host: str) -> None:
@@ -177,7 +340,7 @@ def get(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
             url, headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip",
                           **(headers or {})})
         try:
-            with urllib.request.urlopen(request, timeout=timeout) as response:
+            with _open(request, timeout) as response:
                 raw = response.read()
                 if response.headers.get("Content-Encoding") == "gzip":
                     raw = gzip.decompress(raw)
@@ -240,7 +403,7 @@ def get_bytes(url: str, *, ttl: float = 6 * 3600, namespace: str = "http",
         _throttle(host)
         request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
         try:
-            with urllib.request.urlopen(request, timeout=timeout) as response:
+            with _open(request, timeout) as response:
                 raw = response.read()
             tmp = path + ".tmp"
             with gzip.open(tmp, "wb") as fh:
