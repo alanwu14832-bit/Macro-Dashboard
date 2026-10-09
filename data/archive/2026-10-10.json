@@ -1,6 +1,6 @@
 {
  "date": "2026-10-10",
- "generated_at": "2026-10-10T01:10:29+08:00",
+ "generated_at": "2026-10-10T02:09:49+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -152,6 +152,17 @@
   "curve_10_2": 0.5100000000000007,
   "recession_gauge": 42.53408173157917,
   "composite_labor": -6.919585947647573
+ },
+ "readings_tw": {
+  "score": 41.0,
+  "light": "紅",
+  "exports_yoy": 60.9,
+  "orders_yoy": 61.9,
+  "cpi": null,
+  "unemployment": 3.41,
+  "policy": 2.0,
+  "gdp": 12.93,
+  "m1b_m2": -0.08
  },
  "as_of": {
   "labor": "2026-09-01",

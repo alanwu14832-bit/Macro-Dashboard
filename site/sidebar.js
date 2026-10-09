@@ -682,7 +682,9 @@
     const measure = () => {
       // 用視窗座標換算，不用 offsetTop：內頁的區塊包在有定位的容器裡，
       // offsetTop 量到的是離那個容器多遠，不是離頁首多遠。
+      // 頭版另一個版的段落是 display:none，量出來的位置是 0——不能算進來
       marks = targets
+        .filter(([node]) => node.getClientRects().length)
         .map(([node, links]) => [node.getBoundingClientRect().top + window.scrollY, links])
         .sort((a, b) => a[0] - b[0]);
     };
