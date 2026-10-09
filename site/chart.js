@@ -345,9 +345,10 @@
           const y = Yv(v), x = X(d) - barW / 2;
           const h = Math.abs(y - zero);
           const up = v >= 0;
+          // 右軸的柱子（成交量）是背景資訊，退成灰；主角是壓在上面的價格線
           const fill = s.signColor
             ? cssVar(v >= 0 ? "--" + s.signColor[0] : "--" + s.signColor[1])
-            : color;
+            : (useRight ? cssVar("--axis") : color);
           // 4px rounded data-end, square at the baseline
           const r = Math.min(4, barW / 2, h);
           const top = up ? y : zero;
