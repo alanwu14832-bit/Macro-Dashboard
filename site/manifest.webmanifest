@@ -1,13 +1,13 @@
 {
-  "name": "總經儀表板",
-  "short_name": "總經儀表板",
-  "description": "把勞動、通膨、利率、債務、成長、全球與市場七個面向，收斂成一個可追蹤的判斷。",
+  "name": "邊際　At the Margin",
+  "short_name": "邊際",
+  "description": "跟昨天比，變了什麼。美國與台灣的總經，每個判斷都寫著它的門檻。",
   "lang": "zh-Hant",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f9f9f7",
-  "theme_color": "#f9f9f7",
+  "background_color": "#f3f4f1",
+  "theme_color": "#f3f4f1",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
