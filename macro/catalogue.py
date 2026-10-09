@@ -340,6 +340,10 @@ COMMODITY_GROUPS = [
               "PFOODINDEXM", "PRAWMINDEXM"]),
 ]
 
+# 模型的預估，不是統計數據。它們每天都在動、一季一個值，「這一季的預估減上一季的預估」
+# 也不是誰公布了什麼——所以不進「今天更新的序列」，只給公布前的預期用。
+MODEL_SERIES = {"GDPNOW"}
+
 ALL_GROUPS = {
     "labor": LABOR, "inflation": INFLATION, "rates": RATES, "debt": DEBT,
     "growth": GROWTH, "global": GLOBAL_SERIES, "market": MARKET,

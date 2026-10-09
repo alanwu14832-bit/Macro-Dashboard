@@ -1,4 +1,9 @@
-"""observed_updates：資料日期推進才算新、第一次建置不標、同一天持續標。"""
+"""observed_updates：資料日期推進才算新、第一次建置不標、同一天持續標。
+
+新加進目錄的序列第一次出現也不標，模型的預估永遠不標——這兩個是 2026-10-10
+上線「公布前的預期」之後在正式站看到的：頭版「今天更新的序列」多了 GDPNow
+（這一季的預估減上一季的預估，還上了黃色）和兩個月前就公布的招聘數。
+"""
 import unittest
 from datetime import date
 
@@ -32,6 +37,28 @@ class TestObservedUpdates(unittest.TestCase):
         # 隔天就不算了
         tomorrow, _ = observed_updates(b, state, date(2026, 9, 8))
         self.assertEqual(tomorrow, [])
+
+    def test_a_series_new_to_the_catalogue_is_not_an_update(self):
+        """狀態檔裡有別的序列、沒有這一檔：它是剛加進目錄的，不是今天才公布的。"""
+        state = {"OTHER": {"date": "2026-08-01", "seen": "2026-09-01"}}
+        b = bundle_with([("2026-07-01", 1.0), ("2026-08-01", 1.5)])
+        updates, new_state = observed_updates(b, state, date(2026, 9, 7))
+        self.assertEqual(updates, [])
+        self.assertEqual(new_state["X"], {"date": "2026-08-01", "seen": None})
+        # 之後它的資料日期真的往前推，才算
+        later = bundle_with([("2026-08-01", 1.5), ("2026-09-01", 1.6)])
+        updates, _ = observed_updates(later, new_state, date(2026, 10, 7))
+        self.assertEqual([u["id"] for u in updates], ["X"])
+
+    def test_a_model_estimate_is_never_listed_as_a_data_update(self):
+        """GDPNow 一季一個值：「3.59 對前值 1.54」是兩季的預估相減，不是誰公布了什麼。"""
+        b = Bundle()
+        b.add("GDPNOW", Series.from_pairs("GDPNOW", [("2026-04-01", 1.54), ("2026-07-01", 3.59)],
+                                          label="GDPNow 即時預估", unit="%", frequency="q"))
+        state = {"GDPNOW": {"date": "2026-04-01", "seen": None}}
+        updates, new_state = observed_updates(b, state, date(2026, 10, 10))
+        self.assertEqual(updates, [])
+        self.assertEqual(new_state["GDPNOW"]["date"], "2026-07-01")   # 狀態照記
 
     def test_unchanged_is_not_new(self):
         state = {"X": {"date": "2026-07-01", "seen": "2026-09-01"}}

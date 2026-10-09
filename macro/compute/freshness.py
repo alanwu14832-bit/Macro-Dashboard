@@ -13,7 +13,7 @@ import json
 import os
 from datetime import date, datetime
 
-from .. import clock, paths
+from .. import catalogue, clock, paths
 from ..data import Bundle
 from ..http import build_url, get_json
 from ..sources import fred
@@ -102,15 +102,18 @@ def observed_updates(bundle: Bundle, state: dict, today: date) -> tuple[list[dic
         if not series or series.last_date is None:
             continue
         last = series.last_date.isoformat()
-        prev = state.get(series_id) or {}
-        if not state:
+        prev = state.get(series_id)
+        if prev is None:
+            # 第一次建置，或這檔序列是剛加進目錄的：沒有上一輪可比，不知道它的資料
+            # 是哪天到的。2026-10-10 加了招聘數與 GDPNow，頭版就把兩個月前的數字
+            # 列進「今天更新的序列」還上了黃色。
             seen = None
         elif prev.get("date") != last:
             seen = stamp
         else:
             seen = prev.get("seen")
         new_state[series_id] = {"date": last, "seen": seen}
-        if seen != stamp:
+        if seen != stamp or series_id in catalogue.MODEL_SERIES:
             continue
         before = series.at(-2)
         updates.append({

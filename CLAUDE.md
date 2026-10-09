@@ -40,7 +40,7 @@ python3 build.py              # 一般建置（6 小時內的快取直接用）
 python3 build.py --fresh      # 忽略快取全部重抓
 python3 build.py --offline    # 只用快取、不連網
 python3 build.py --ttl 3000   # 自訂快取有效期（排程用）
-python3 -m unittest discover tests   # 438 個測試，CI 會先跑這個
+python3 -m unittest discover tests   # 440 個測試，CI 會先跑這個
 ```
 
 **乾淨 clone 跑不動 `--offline`**：`data/cache/` 在 .gitignore 裡。第一次要用
@@ -478,7 +478,7 @@ bug：頁面上的「最後更新」標著台北卻差 8 小時；每日存檔�
 
 ## 測試
 
-438 個測試，CI 在建置前跑。新增測試時針對「壞了不會報錯、只會靜默給錯答案」
+440 個測試，CI 在建置前跑。新增測試時針對「壞了不會報錯、只會靜默給錯答案」
 那一類：時區、變動排序、分頁歸屬、追蹤清單與落點頁的同步、版面預算計數。
 
 寫批次修改腳本時**每個字串替換都要 `assert`**——`str.replace` 找不到目標時
