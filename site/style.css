@@ -1,5 +1,5 @@
 /* ============================================================================
-   總經儀表板 — design tokens & components
+   At the Margin — design tokens & components
    Palette: the dataviz reference instance, validated in both modes
    (adjacent CVD ΔE 9.1 light / 8.4 dark; normal-vision 19.6 / 19.3).
    Light-mode aqua/yellow/magenta sit below 3:1 on the surface, so every chart
@@ -9,21 +9,27 @@
 :root {
   color-scheme: light;
 
-  /* surfaces & ink */
-  --page:            #f9f9f7;
-  --surface:         #fcfcfb;
-  --surface-sunken:  #f2f2ee;
-  --ink:             #0b0b0b;
-  --ink-2:           #52514e;
-  --ink-muted:       #6f6d67;
-  --flag:            #5a5852;
-  --grid:            #e1e0d9;
-  --axis:            #c3c2b7;
-  --border:          rgba(11, 11, 11, 0.10);
-  --border-strong:   rgba(11, 11, 11, 0.18);
+  /* 日報：新聞紙與墨。底色是中性偏冷的灰白，不是米白——米白配襯線字是套路。
+     全站只有一個非語意的顏色：螢光筆（--mark），只用來標「跟昨天不一樣」。
+     紅、藍、綠都有指定的意思（政策方向與漲跌），品牌不碰它們。 */
+  --page:            #f3f4f1;
+  --surface:         #fafaf8;
+  --surface-sunken:  #e9ebe7;
+  --ink:             #11151a;
+  --ink-2:           #414950;
+  --ink-muted:       #5f676f;
+  --flag:            #4c545b;
+  --grid:            #dde0da;
+  --axis:            #b7bcb5;
+  --border:          rgba(17, 21, 26, 0.11);
+  --border-strong:   rgba(17, 21, 26, 0.24);
+  --rule:            #11151a;                  /* 刊頭與頭條下的實線 */
+  --mark:            #ffd23b;                  /* 螢光筆 */
+  --mark-fill:       rgba(255, 210, 59, 0.86);
+  --mark-ink:        #11151a;
 
   /* categorical slots (fixed order, never cycled) */
-  --series-1: #2a78d6;  /* blue    */
+  --series-1: var(--ink);  /* 主序列＝墨色（2026-10 起；原本是藍） */
   --series-2: #eb6834;  /* orange  */
   --series-3: #1baf7a;  /* aqua    */
   --series-4: #eda100;  /* yellow  */
@@ -33,10 +39,10 @@
   --series-8: #e34948;  /* red     */
 
   /* diverging pair — policy direction is a polarity, not a status */
-  --hawkish:      #e34948;   /* 利升息 */
-  --hawkish-wash: rgba(227, 73, 72, 0.12);
-  --dovish:       #2a78d6;   /* 利降息 */
-  --dovish-wash:  rgba(42, 120, 214, 0.12);
+  --hawkish:      #c9302f;   /* 利升息；當文字用時在紙色上 4.8:1 */
+  --hawkish-wash: rgba(201, 48, 47, 0.10);
+  --dovish:       #1f64bd;   /* 利降息；5.3:1 */
+  --dovish-wash:  rgba(31, 100, 189, 0.10);
   --neutral:      #898781;   /* 中性 / 方向不明 */
   --neutral-wash: rgba(137, 135, 129, 0.12);
 
@@ -57,6 +63,11 @@
   --t-18: 18px; --lh-18: 26px;
   --t-22: 22px; --lh-22: 30px;
   --t-30: 30px; --lh-30: 34px;
+  /* 展示字級：只給刊頭、頭條與主數字。隨視窗寬度連續變化，手機與筆電各有合適的大小。
+     介面與內文仍然只能用上面七階。 */
+  --d-1: clamp(1.625rem, 1.28rem + 1.5vw, 2.5rem);     /* 26 → 40　區塊標題、次數字 */
+  --d-2: clamp(2.125rem, 1.35rem + 3.3vw, 4.25rem);    /* 34 → 68　頭條 */
+  --d-3: clamp(2.75rem, 1.5rem + 5.3vw, 6.5rem);       /* 44 → 104　刊頭、頭條數字 */
 
   /* 間距階梯：只有這八階，刻意跳過 20/28/36/40/56。
      卡片內部只能用 s1–s4，區塊之間只能用 s8/m12。 */
@@ -65,10 +76,16 @@
 
   --radius: 12px;
   --radius-sm: 8px;
-  --shadow: none;   /* 扁平：層次靠字級與留白，不靠陰影 */
+  --shadow: none;   /* 版面上的東西仍然是扁平的：層次靠字級與留白 */
+  /* 只有真的浮在頁面上的東西（抽屜、sheet、提示、回頂鈕）才有陰影，而且只有這一級。 */
+  --shadow-float: 0 1px 0 rgba(17, 21, 26, 0.05), 0 14px 34px -16px rgba(17, 21, 26, 0.32);
   --sans: system-ui, -apple-system, "Segoe UI", "PingFang TC", "Noto Sans TC",
           "Microsoft JhengHei", "Helvetica Neue", sans-serif;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  /* 明體只給標題；數字與英文用 Newsreader（自行託管），遇到中文自動落回明體。 */
+  --serif-zh: "Songti TC", "Noto Serif TC", "Source Han Serif TC", "Noto Serif CJK TC",
+              "PMingLiU", serif;
+  --serif: "Newsreader", var(--serif-zh);
   --measure: 1180px;        /* 資料網格 */
   --measure-prose: 680px;   /* 連續閱讀的文字：跟資料用不同的量測 */
 }
@@ -76,26 +93,32 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --page:           #0d0d0d;
-    --surface:        #1a1a19;
-    --surface-sunken: #131313;
-    --ink:            #ffffff;
-    --ink-2:          #c3c2b7;
-    --ink-muted:      #9d9b94;
-    --flag:           #b6b3aa;
-    --grid:           #2c2c2a;
-    --axis:           #383835;
-    --border:         rgba(255, 255, 255, 0.10);
-    --border-strong:  rgba(255, 255, 255, 0.20);
+    /* 夜報不是把日報反過來：晚上讀的時候，紙的顏色跑到字上。螢光筆變成發光的底線。 */
+    --page:           #14171c;
+    --surface:        #1b1f26;
+    --surface-sunken: #0c0e12;
+    --ink:            #ece8dc;
+    --ink-2:          #b9bab1;
+    --ink-muted:      #8f9397;
+    --flag:           #a6a8a0;
+    --grid:           #20262d;
+    --axis:           #363d46;
+    --border:         rgba(236, 232, 220, 0.10);
+    --border-strong:  rgba(236, 232, 220, 0.24);
+    --rule:           #ece8dc;
+    --mark:           #ffd84d;
+    --mark-fill:      rgba(255, 216, 77, 0.16);
+    --mark-ink:       #ffd84d;
+    --shadow-float:   0 0 0 1px rgba(236, 232, 220, 0.08), 0 18px 40px -14px rgba(0, 0, 0, 0.7);
 
-    --series-1: #3987e5;  --series-2: #d95926;  --series-3: #199e70;
+    --series-1: var(--ink);  --series-2: #d95926;  --series-3: #199e70;
     --series-4: #c98500;  --series-5: #d55181;  --series-6: #008300;
     --series-7: #9085e9;  --series-8: #e66767;
 
-    --hawkish:      #e66767;
-    --hawkish-wash: rgba(230, 103, 103, 0.16);
-    --dovish:       #3987e5;
-    --dovish-wash:  rgba(57, 135, 229, 0.16);
+    --hawkish:      #f07a79;
+    --hawkish-wash: rgba(240, 122, 121, 0.14);
+    --dovish:       #6aa5ee;
+    --dovish-wash:  rgba(106, 165, 238, 0.14);
     --neutral:      #898781;
     --neutral-wash: rgba(137, 135, 129, 0.16);
     --delta-up:     #0ca30c;
@@ -104,31 +127,50 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --page:           #0d0d0d;
-  --surface:        #1a1a19;
-  --surface-sunken: #131313;
-  --ink:            #ffffff;
-  --ink-2:          #c3c2b7;
-  --ink-muted:      #9d9b94;
-  --flag:           #b6b3aa;
-  --grid:           #2c2c2a;
-  --axis:           #383835;
-  --border:         rgba(255, 255, 255, 0.10);
-  --border-strong:  rgba(255, 255, 255, 0.20);
+  /* 夜報不是把日報反過來：晚上讀的時候，紙的顏色跑到字上。螢光筆變成發光的底線。 */
+  --page:           #14171c;
+  --surface:        #1b1f26;
+  --surface-sunken: #0c0e12;
+  --ink:            #ece8dc;
+  --ink-2:          #b9bab1;
+  --ink-muted:      #8f9397;
+  --flag:           #a6a8a0;
+  --grid:           #20262d;
+  --axis:           #363d46;
+  --border:         rgba(236, 232, 220, 0.10);
+  --border-strong:  rgba(236, 232, 220, 0.24);
+  --rule:           #ece8dc;
+  --mark:           #ffd84d;
+  --mark-fill:      rgba(255, 216, 77, 0.16);
+  --mark-ink:       #ffd84d;
+  --shadow-float:   0 0 0 1px rgba(236, 232, 220, 0.08), 0 18px 40px -14px rgba(0, 0, 0, 0.7);
 
-  --series-1: #3987e5;  --series-2: #d95926;  --series-3: #199e70;
+  --series-1: var(--ink);  --series-2: #d95926;  --series-3: #199e70;
   --series-4: #c98500;  --series-5: #d55181;  --series-6: #008300;
   --series-7: #9085e9;  --series-8: #e66767;
 
-  --hawkish:      #e66767;
-  --hawkish-wash: rgba(230, 103, 103, 0.16);
-  --dovish:       #3987e5;
-  --dovish-wash:  rgba(57, 135, 229, 0.16);
+  --hawkish:      #f07a79;
+  --hawkish-wash: rgba(240, 122, 121, 0.14);
+  --dovish:       #6aa5ee;
+  --dovish-wash:  rgba(106, 165, 238, 0.14);
   --neutral:      #898781;
   --neutral-wash: rgba(137, 135, 129, 0.16);
   --delta-up:     #0ca30c;
 }
 
+
+/* 拉丁襯線字自行託管（OFL，見 /newsreader-OFL.txt）。unicode-range 讓它只管英文與數字，
+   中文與全形標點不會被它攔下來再落回——那會讓整行的基線抖一下。 */
+@font-face {
+  font-family: "Newsreader"; font-style: normal; font-weight: 200 800; font-display: swap;
+  src: url("/newsreader-roman.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Newsreader"; font-style: italic; font-weight: 200 800; font-display: swap;
+  src: url("/newsreader-italic.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* ---------------------------------------------------------------- base ---- */
 *, *::before, *::after { box-sizing: border-box; }
@@ -150,9 +192,9 @@ body {
 
 /* 頂層層級靠級距，文字流內的層級靠粗體——兩者不混用。
    字重從 9 階收成 4 階：400 正文、550 標題、620 強調、680 只給展示數字。 */
-h1, h2 { font-weight: 550; }
+h1, h2 { font-family: var(--serif); font-weight: 700; }
 h3, h4 { font-weight: 600; }
-h1, h2, h3, h4 { line-height: 1.35; margin: 0; letter-spacing: -0.015em; }
+h1, h2, h3, h4 { line-height: 1.35; margin: 0; letter-spacing: -0.005em; }
 h1 { font-size: var(--t-22); line-height: var(--lh-22); }
 h2 { font-size: var(--t-18); line-height: var(--lh-18); }
 h3 { font-size: var(--t-15); line-height: var(--lh-15); }
@@ -2014,4 +2056,291 @@ thead.is-stuck th {
   border-bottom-color: transparent;
   backdrop-filter: none;
   background: var(--page);
+}
+
+
+/* ============================================================================
+   At the Margin — 刊物層（2026-10 改版）
+
+   刊名有三個具體的形狀：
+     頁邊    頭版右側有一條真的頁邊，正文講現況、頁邊講變化
+     螢光筆  全站唯一不帶語意的顏色（--mark），只標「跟上一期不一樣」
+     門檻尺  每個主數字畫在一把尺上：門檻、現在、上一期
+   紅藍綠都有指定的意思，這一層一律不拿它們當裝飾。
+   ========================================================================== */
+:root {
+  --radius: 4px;            /* 印刷品沒有大圓角；到處同一個圓角也是套路 */
+  --radius-sm: 3px;
+  --gut: clamp(24px, 3vw, 44px);
+  --focus: var(--ink);
+}
+
+/* ---- 數字用襯線 ---------------------------------------------------------- */
+.num, td.num, th.num, .stat .value, .key-v, .mc-value, .hero-figure, .trust time,
+.chg-title, .lg-fig, .call-v, .lede-fig {
+  font-family: var(--serif);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.stat .value, .key-v, .mc-value { font-weight: 500; letter-spacing: -0.01em; }
+.hero-figure { font-weight: 700; letter-spacing: 0; }
+td.num, th.num { font-size: var(--t-15); }
+
+.eyebrow {
+  margin: 0; font-size: var(--t-12); line-height: var(--lh-12); font-weight: 600;
+  letter-spacing: 0.16em; color: var(--ink-muted);
+}
+
+/* ---- 螢光筆 -------------------------------------------------------------- */
+.hl {
+  color: var(--mark-ink); padding: 0 0.3em; margin: 0 -0.12em; border-radius: 2px;
+  background: linear-gradient(var(--mark-fill), var(--mark-fill)) no-repeat 0 55% / 100% 78%;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+/* 夜報：螢光筆不是一塊暗掉的黃，而是一條發光的底線，字本身帶暖色 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .hl {
+    background: linear-gradient(var(--mark), var(--mark)) no-repeat 0 100% / 100% 2px;
+    padding: 0 0.1em 0.12em; margin: 0; border-radius: 0;
+    text-shadow: 0 0 22px rgba(242, 208, 78, 0.38);
+  }
+}
+:root[data-theme="dark"] .hl {
+  background: linear-gradient(var(--mark), var(--mark)) no-repeat 0 100% / 100% 2px;
+  padding: 0 0.1em 0.12em; margin: 0; border-radius: 0;
+  text-shadow: 0 0 22px rgba(242, 208, 78, 0.38);
+}
+
+/* ---- 外殼：目錄欄與刊名條 ------------------------------------------------ */
+.rail { background: var(--page); }
+.rail-head { border-bottom-color: var(--border-strong); }
+.rail-mark {
+  width: 22px; height: 22px; border-radius: 0; box-shadow: none; border: 1px solid var(--ink);
+  background: linear-gradient(90deg, var(--mark) 0 9px, var(--ink) 9px 10.5px, var(--page) 10.5px);
+}
+.rail-name { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: var(--t-18); letter-spacing: 0; }
+.nav-group { letter-spacing: 0.16em; }
+.nav-item[aria-current="page"] { background: none; }
+.nav-item[aria-current="page"]::before { background: var(--ink); width: 2px; height: 20px; }
+.nav-item[aria-current="page"] .nav-icon { color: var(--ink); }
+.nav-item:focus-visible, .icon-btn:focus-visible { outline-color: var(--focus); }
+
+.topbar { background: color-mix(in srgb, var(--page) 88%, transparent); gap: var(--s3); }
+.topbar-title { font-weight: 600; }
+.nameplate {
+  display: none; font-family: var(--serif); font-style: italic; font-weight: 500; font-size: var(--t-18);
+  line-height: 1; letter-spacing: 0; color: var(--ink); text-decoration: none; white-space: nowrap;
+  padding-right: var(--s3); border-right: 1px solid var(--border-strong);
+}
+:root.rail-collapsed .nameplate { display: block; }
+.icon-btn { background: transparent; border-color: var(--border-strong); letter-spacing: 0.08em; }
+#theme-toggle { font-family: var(--serif-zh); font-weight: 700; letter-spacing: 0.2em; padding-left: 12px; }
+
+/* 內頁的信任列：不是一個盒子，是一行日期欄 */
+.trust {
+  background: none; border: 0; border-bottom: 1px solid var(--border); border-radius: 0;
+  padding: 0 0 10px; margin-bottom: var(--s6); letter-spacing: 0.02em;
+}
+.trust.stale { background: none; border-color: var(--hawkish); color: var(--hawkish); }
+
+.page-head { margin-bottom: var(--s8); }
+.page-head h1 { font-size: var(--d-1); line-height: 1.2; margin-bottom: 10px; }
+.page-head .lede { font-size: var(--t-15); line-height: 1.8; max-width: 40em; }
+
+/* ---- 區塊標題 ------------------------------------------------------------ */
+section { border-top-color: var(--border-strong); padding: var(--m12) 0 var(--s8); }
+.section-head { margin-bottom: var(--s6); }
+.section-head h2 { font-size: var(--t-22); line-height: var(--lh-22); gap: 12px; }
+section:not(.sub-section) > .section-head h2::before {
+  font-family: var(--serif); font-style: italic; font-weight: 400;
+  font-size: var(--t-15); letter-spacing: 0; color: var(--ink-muted);
+}
+.fd-h {
+  font-size: var(--t-12); line-height: var(--lh-12); font-weight: 600; letter-spacing: 0.16em;
+  color: var(--ink-muted); margin: var(--s8) 0 var(--s3);
+}
+.more { margin: var(--s4) 0 0; font-size: var(--t-14); }
+.more a, .chg-more { color: var(--ink); text-underline-offset: 4px; }
+
+/* ---- 表格 ---------------------------------------------------------------- */
+thead th { background: var(--page); border-bottom-color: var(--ink-2); letter-spacing: 0.1em; }
+th, td { border-bottom-color: var(--border); }
+.card { background: var(--surface); }
+.callout.key { font-family: var(--serif-zh); font-size: var(--t-18); line-height: 1.7; color: var(--ink); }
+
+/* ---- 門檻尺（頭版的「四個數字」用；色票與版面在 front.css）---------------- */
+/* 門檻尺。由上到下三排：小旗與參考點｜尺本身｜門檻數字與格位名稱 */
+.ruler { position: relative; min-width: 0; padding: 36px 0 30px; }
+.ruler-empty { padding: 0; }
+.ruler i { font-style: normal; }
+.ruler-track { position: relative; height: 1px; background: var(--ink); }
+/* 小刻度掛在尺的下緣。只有門檻尺有：區間尺的兩端不是規則，沒有刻度可言 */
+.ruler-threshold .ruler-track::before {
+  content: ""; position: absolute; left: var(--first, 0%); right: 0; top: 1px; height: 5px;
+  background: linear-gradient(90deg, var(--axis) 1px, transparent 1px) 0 0 / var(--step, 10%) 100% repeat-x;
+}
+.ruler-range .ruler-track { background: none; border-top: 1px dashed var(--axis); }
+
+.rt, .rr, .rz, .rm, .rm-move { position: absolute; left: var(--p); }
+.rt { top: -5px; width: 1px; height: 13px; background: var(--ink); }
+.ruler-range .rt { background: var(--axis); top: -4px; height: 9px; }
+.rt b, .rz {
+  top: 18px; white-space: nowrap; font-weight: 400;
+  font-size: var(--t-12); line-height: 1; color: var(--ink-2);
+}
+.rt b {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-family: var(--serif); font-variant-numeric: lining-nums; top: 20px;
+}
+.rz { top: 14px; transform: translateX(-50%); letter-spacing: 0.12em; color: var(--ink-muted); }
+.rz.on { color: var(--ink); font-weight: 700; }
+/* 參考點：不是本站的門檻，所以畫成空心 */
+.rr {
+  top: -4px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%;
+  border: 1px solid var(--ink); background: var(--page);
+}
+.rr b {
+  position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+  font-weight: 400; font-size: var(--t-12); line-height: 1; letter-spacing: 0.06em; color: var(--ink-2);
+}
+.rm-now { top: -13px; width: 3px; height: 27px; margin-left: -1.5px; background: var(--ink); border-radius: 1px; }
+.rm-now b {
+  position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); white-space: nowrap;
+  font: 600 var(--t-13)/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; color: var(--ink);
+}
+.rm-prev { top: -8px; width: 1px; height: 17px; background: var(--ink-2); }
+.rm-move { left: var(--a); width: var(--w); top: -8px; height: 17px; background: var(--mark); transform-origin: 0 50%; }
+:is(.rt, .rr, .rm-now).at-start b { left: 0; transform: none; }
+:is(.rt, .rr, .rm-now).at-end b { left: auto; right: 0; transform: none; }
+
+/* ---- 邊際／今天：一列一件事，不裝在盒子裡 -------------------------------- */
+.chg-stack { background: none; border: 0; border-top: 1px solid var(--rule); border-radius: 0; gap: 0; }
+.chg-row {
+  background: none; padding: 14px 0; border-bottom: 1px solid var(--border);
+  grid-template-columns: 20px minmax(0, 1fr) 14px; transition: padding var(--dur-2) var(--ease-out);
+}
+.chg-tag { letter-spacing: 0.14em; }
+.chg-title { font-size: var(--t-18); line-height: 1.5; font-weight: 600; font-family: var(--serif); }
+.chg-none { background: none; border: 0; border-top: 1px solid var(--rule); border-radius: 0; padding: 14px 0 0; font-family: var(--serif-zh); font-size: var(--t-18); color: var(--ink); }
+/* 邊際這一塊的差額就是全站最該被劃到的東西 */
+#changes .chg-title .num {
+  color: var(--mark-ink); padding: 0 0.3em; margin-left: 0.2em; border-radius: 2px;
+  background: linear-gradient(var(--mark-fill), var(--mark-fill)) no-repeat 0 55% / 100% 78%;
+}
+
+/* ---- 手機 ---------------------------------------------------------------- */
+@media (max-width: 767px) {
+  .nameplate { display: block; border-right: 0; padding-right: 0; margin-right: auto; }
+  .topbar-title, .topbar-guide { display: none; }
+  .topbar .icon-btn { border-color: transparent; padding: 5px 6px; }
+  .topbar #theme-toggle { border-color: var(--border-strong); padding: 4px 6px 4px 10px; }
+  section { padding: var(--s8) 0 var(--s6); }
+}
+
+/* ---- hover：只給有滑鼠的裝置 --------------------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+  .chg-row:hover { background: none; padding-left: 8px; }
+  .more a:hover { text-decoration-thickness: 2px; }
+}
+.chg-row:active { background: var(--surface-sunken); }
+
+
+/* ---- 全站共用的小元件 ------------------------------------------------------ */
+/* 圖表：不裝在盒子裡。上面一條線、明體標題、襯線數字；主序列是墨色 */
+.chart-card { background: none; border: 0; border-top: 1px solid var(--rule); border-radius: 0; padding: 14px 0 6px; }
+.chart-title { font-family: var(--serif-zh); font-size: var(--t-18); line-height: var(--lh-18); font-weight: 700; }
+.chart-sub { color: var(--ink-2); max-width: 46em; margin-top: 2px; }
+.range-group { border: 0; border-radius: 0; gap: 2px; }
+.range-group button {
+  border-right: 0; border-bottom: 2px solid transparent; padding: 3px 7px;
+  font-family: var(--serif); font-variant-numeric: lining-nums;
+}
+.range-group button[aria-pressed="true"] { background: none; border-bottom-color: var(--ink); }
+.chart-svg text { font-family: var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.chart-svg .tick { font-size: 11.5px; fill: var(--ink-2); }
+.chart-svg .end-label { font-size: 12.5px; fill: var(--ink); }
+.chart-svg .axis-line { stroke: var(--ink-2); }
+.chart-svg .band { fill: var(--ink); opacity: 0.06; }
+.legend { font-size: var(--t-12); letter-spacing: 0.04em; }
+
+.sheet { background: var(--page); border: 1px solid var(--rule); border-radius: 0; box-shadow: var(--shadow-float); }
+.sheet-title { font-family: var(--serif-zh); font-size: var(--t-22); line-height: 1.4; font-weight: 700; }
+.sheet-eyebrow, .sheet-k { letter-spacing: 0.16em; }
+.sheet-foot { background: none; border-top: 1px solid var(--border-strong); }
+
+/* 分頁列與焦點環不用品牌藍：這個站沒有品牌色，只有墨色與一支螢光筆 */
+.tab[aria-current="page"] { color: var(--ink); font-weight: 600; }
+.tab { position: relative; }
+.tab[aria-current="page"]::before {
+  content: ""; position: absolute; top: 0; left: 50%; width: 22px; height: 2px; margin-left: -11px; background: var(--ink);
+}
+:focus-visible { outline-color: var(--ink); }
+
+/* 方向標籤：不是藥丸，是一枚小章。顏色只有政策方向這一個意思 */
+.tag {
+  background: none; border: 1px solid currentColor; border-radius: 2px;
+  padding: 0 5px; font-weight: 600; letter-spacing: 0.08em; color: var(--ink-2);
+}
+.tag.hawkish { background: none; color: var(--hawkish); }
+.tag.dovish { background: none; color: var(--dovish); }
+
+/* 規則訊號：一則一則的短訊，不是卡片 */
+.sig-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 var(--gut); }
+.sig-card {
+  background: none; border: 0; border-top: 1px solid var(--rule); border-radius: 0;
+  padding: 14px 0 22px; overflow: visible;
+}
+.sig-card::before { display: none; }
+.sig-top { margin-bottom: 10px; }
+.sig-mod { letter-spacing: 0.16em; }
+.sig-head {
+  font-family: var(--serif-zh); font-size: var(--t-18); line-height: 1.5; font-weight: 700;
+  margin-bottom: 8px; text-wrap: pretty;
+}
+.sig-why { font-size: var(--t-14); line-height: 1.75; }
+.sig-evi {
+  margin-top: 10px; padding: 0 0 0 var(--s3); border-top: 0; border-left: 1px solid var(--border-strong);
+  font-family: var(--serif); font-size: var(--t-14); line-height: 1.6; color: var(--ink);
+  font-variant-numeric: lining-nums;
+}
+.sig-sev { padding-top: 14px; letter-spacing: 0.08em; }
+.sig-card.sev-high .sig-sev { color: var(--critical); }
+.sig-card.sev-medium .sig-sev { color: var(--ink-2); }
+.sig-open { color: var(--ink-muted); letter-spacing: 0; }
+.sig-card:focus-visible, .bf-d > summary.bf-h:focus-visible, .to-top:focus-visible { outline-color: var(--focus); }
+@media (max-width: 900px) { .sig-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .sig-grid { grid-template-columns: 1fr; } }
+
+/* 表格：文字欄靠左；黏住的首欄跟紙同色 */
+th.txt, td.txt { text-align: left; }
+td.txt { font-family: var(--sans); font-size: var(--t-14); white-space: normal; }
+.table-wrap th:first-child, .table-wrap td:first-child { background: var(--page); }
+td:first-child { font-weight: 500; }
+.acc > summary { letter-spacing: 0.04em; }
+
+/* 別人怎麼說 */
+.bf-group { margin-bottom: var(--s6); }
+.bf-k { letter-spacing: 0.16em; margin-bottom: 2px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
+.bf-list li { border-bottom-color: var(--border); }
+.bf-list li:last-child { border-bottom: 1px solid var(--border); }
+.bf-h { font-family: var(--serif-zh); font-size: var(--t-18); line-height: 1.55; font-weight: 600; }
+.bf-d > summary.bf-h { padding: 11px 28px 11px 0; }
+.bf-d > summary.bf-h::after { top: 12px; font-family: var(--sans); }
+.bf-detail { max-width: var(--measure-prose); }
+.bf-m { font-size: var(--t-12); letter-spacing: 0.06em; color: var(--ink-muted); }
+.bf-syn { font-size: var(--t-15); line-height: 1.85; max-width: var(--measure-prose); }
+#voices > .chg-scope { margin-bottom: var(--s6); }
+
+/* 今日價格的讀數格 */
+.stat { border-top-color: var(--rule); padding-top: 12px; gap: 3px; }
+.stat .label { letter-spacing: 0.1em; }
+
+/* 版權頁 */
+footer.site { border-top: 2px solid var(--rule); background: none; }
+footer.site .foot-main { font-family: var(--serif-zh); font-size: var(--t-15); line-height: 1.8; color: var(--ink); }
+
+@media (hover: hover) and (pointer: fine) {
+  .sig-card:hover { border-color: var(--rule); }
+  .sig-card:hover .sig-head { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+  .sig-card:hover .sig-open { color: var(--ink); }
+  .bf-d > summary.bf-h:hover { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
 }

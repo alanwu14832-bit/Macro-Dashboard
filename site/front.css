@@ -1,0 +1,885 @@
+/* ============================================================================
+   邊際 At the Margin — 頭版
+
+   只有 / 這一頁載入。版面只有一個主意：左邊一條頁邊，一條直線從頭畫到尾。
+   正文（線的右邊）講現況；頁邊（線的左邊）只寫變化。
+
+   顏色的規矩（改任何一條之前先讀 front_blocks.py 的檔頭）：
+     --mark   螢光筆。只標「跟上一期不一樣」，其他任何地方都不准用——
+              連 hover 都不借。頁邊是黃的＝今天有東西變了；是白的＝沒有。
+     紅／藍   聯準會的政策方向（--hawkish／--dovish），畫成小斜線。
+     綠／紅   價格的漲跌（--up／--down），只出現在「今日價格」的頁邊。
+     斜線底   本站規則的輸出（判定框、圖上高於門檻的區域）。
+   ========================================================================== */
+:root {
+  --hair: rgba(17, 21, 26, 0.17);
+  --hatch: rgba(17, 21, 26, 0.06);
+  --band: var(--mark);  --band-ink: #11151a;  --band-ink-2: #4a4322;
+  --mrule: var(--ink);  --delta: #11151a;
+  --hl-bg: var(--mark); --hl-ink: #11151a;
+  --up: #0b7a3e;        --down: #c4302b;
+  --thr: var(--ink);
+  --show-day: inline;   --show-night: none;
+  --smooth: auto;       --fp-text: var(--ink);  --wnum: 500;
+
+  --latin: "Newsreader", "Charter", "Iowan Old Style", "Times New Roman";
+  --ming: var(--latin), "Songti TC", "Noto Serif TC", "Source Han Serif TC", "PMingLiU", serif;
+  --hei: var(--latin), "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --m: clamp(164px, 17vw, 256px);          /* 頁邊寬：夠放一個變動數字，不佔掉四分之一的畫面 */
+  --edge: clamp(14px, 1.5vw, 22px);        /* 頁邊左緣 */
+  --mpad: clamp(13px, 1.4vw, 20px);        /* 批註到直線的距離 */
+  --pad: clamp(20px, 2.3vw, 34px);         /* 直線到正文的距離 */
+  --padr: clamp(20px, 3.2vw, 48px);
+  --tick: 14px;
+  --c1: 11.5rem; --c2: 10.5rem; --gap: 1.75rem;
+  --sec: clamp(36px, 3.6vw, 54px);
+  --nn: 24px; --nz: 15px;                  /* 批註：數字／中文 */
+  --h1: clamp(36px, calc((100vw - var(--m) - var(--pad) - var(--padr)) / 16.4), 68px);
+  --fx: cubic-bezier(.2, .7, .1, 1);
+  --wgap: clamp(5px, .55vw, 9px);
+  --wm: clamp(26px, 2.9vw, 42px);
+  --wh: clamp(16px, 1.35vw, 19px);
+  --bar-dy: -3px;
+  --tools: 216px;                          /* 右上角工具列佔的寬度 */
+  --mast-h: calc(clamp(12px, 1.4vw, 20px) + var(--wm) + clamp(8px, .9vw, 13px));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --hair: rgba(236, 232, 220, 0.16);
+    --hatch: rgba(236, 232, 220, 0.05);
+    --band: #07080b;      --band-ink: #ece8dc;  --band-ink-2: #a9a599;
+    --delta: var(--mark);
+    --hl-bg: transparent; --hl-ink: var(--mark);
+    --up: #4fce88;        --down: #ff7d72;
+    --show-day: none;     --show-night: inline;
+    --smooth: antialiased; --fp-text: #d9d5c9;  --wnum: 400;
+  }
+}
+:root[data-theme="dark"] {
+  --hair: rgba(236, 232, 220, 0.16);
+  --hatch: rgba(236, 232, 220, 0.05);
+  --band: #07080b;      --band-ink: #ece8dc;  --band-ink-2: #a9a599;
+  --delta: var(--mark);
+  --hl-bg: transparent; --hl-ink: var(--mark);
+  --up: #4fce88;        --down: #ff7d72;
+  --show-day: none;     --show-night: inline;
+  --smooth: antialiased; --fp-text: #d9d5c9;  --wnum: 400;
+}
+@media (max-width: 1199px) { :root { --c1: 9.5rem; --c2: 9.5rem; --gap: 1.4rem; } }
+@media (max-width: 699px) {
+  :root {
+    --m: 70px; --edge: 6px; --mpad: 8px; --pad: 13px; --padr: 14px; --tick: 8px;
+    --nn: 17px; --nz: 12.5px; --wh: 16px; --bar-dy: 0px; --tools: 132px;
+    --h1: clamp(28px, calc((100vw - 70px - 13px - 14px) / 7.3), 52px);
+    --wm: 23px; --wgap: 4px; --sec: 34px;
+    --mast-h: 50px;
+  }
+}
+
+/* ---- 外殼：頭版沒有常駐側欄，選單收成抽屜；工具列疊在刊頭右上角 ---------- */
+.is-front .app, :root.rail-collapsed .is-front .app { display: block; }
+.is-front .shell { display: block; }
+.is-front .content { padding-top: 0; }
+.is-front .content .wrap { max-width: none; padding: 0; }
+.is-front footer.site { display: none; }
+
+.is-front .topbar {
+  position: fixed; inset: 0 0 auto 0; z-index: 50; height: var(--mast-h);
+  padding: 0 var(--padr) 0 var(--edge); gap: 6px; justify-content: flex-end;
+  pointer-events: none;
+  transition: height .3s var(--fx), background-color .25s ease, border-color .25s ease;
+}
+.is-front .topbar > * { pointer-events: auto; }
+:root:not(.masthead-gone) .is-front .topbar {
+  background: transparent; border-bottom-color: transparent; backdrop-filter: none;
+}
+:root.masthead-gone .is-front .topbar {
+  height: var(--topbar-h);
+  background: color-mix(in srgb, var(--page) 90%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px); border-bottom-color: var(--border-strong);
+}
+.is-front .topbar-title, .is-front .topbar-meta, .is-front .topbar-guide { display: none; }
+.is-front .nameplate {
+  display: block; margin-right: auto; border-right: 0; padding-right: 0;
+  font-size: 19px; letter-spacing: 0;
+  opacity: 0; transform: translateY(6px); pointer-events: none;
+  transition: opacity .25s ease, transform .3s var(--fx);
+}
+:root.masthead-gone .is-front .nameplate { opacity: 1; transform: none; pointer-events: auto; }
+.is-front .topbar .icon-btn {
+  border-color: transparent; background: none; color: var(--ink);
+  min-width: 40px; min-height: 40px; display: grid; place-items: center; padding: 0 8px;
+}
+.is-front .topbar #theme-toggle {
+  border: 1.5px solid var(--ink); border-radius: 0; min-height: 30px; padding: 0 8px 0 11px;
+  font: 700 13px/1 var(--ming); letter-spacing: .28em;
+}
+.is-front .drawer-btn { display: grid; order: 9; }
+.is-front .drawer-btn svg { width: 22px; height: 22px; }
+
+@media (min-width: 768px) {
+  .is-front .rail {
+    position: fixed; inset: 0 auto 0 0; width: min(300px, 82vw); z-index: 70;
+    transform: translateX(-100%); transition: transform .3s var(--fx);
+    box-shadow: none; border-right: 1px solid var(--border-strong);
+  }
+  :root.drawer-open .is-front .rail { transform: translateX(0); box-shadow: var(--shadow-float); }
+  :root.drawer-open .is-front .rail-scrim { opacity: 1; }
+  .is-front .rail-toggle { display: none; }
+  /* 抽屜永遠是展開樣式，其他頁記住的「收合」不該滲進來 */
+  :root.rail-collapsed .is-front .nav-label,
+  :root.rail-collapsed .is-front .nav-group span { opacity: 1; }
+  :root.rail-collapsed .is-front .nav-group { height: auto; padding: 16px 10px 6px; }
+  :root.rail-collapsed .is-front .nav-item { justify-content: flex-start; padding-left: 10px; padding-right: 10px; }
+  .is-front .nav-tip { display: none !important; }
+}
+
+/* ---- 基本排版 ------------------------------------------------------------- */
+.fp {
+  font: 400 15px/1.7 var(--hei); color: var(--fp-text);
+  font-variant-numeric: lining-nums tabular-nums; font-kerning: normal;
+  -webkit-font-smoothing: var(--smooth); line-break: strict; overflow-wrap: break-word;
+}
+.fp:not(.has-changes) { --band: transparent; --band-ink: var(--ink); --band-ink-2: var(--ink-2); }
+.fp :is(h1, h2, h3, p, ol, ul, dl, dd, figure) { margin: 0; }
+.fp :is(h1, h2, h3) { color: var(--ink); letter-spacing: 0; }
+.fp :is(ol, ul) { padding: 0; list-style: none; }
+.fp a { color: inherit; text-decoration: none; }
+.fp i { font-style: italic; }
+.fp :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.fp ::selection { background: var(--mark); color: #11151a; }
+/* 收起來的抽屜不該把陰影漏進畫面左緣 */
+@media (max-width: 767px) {
+  .is-front .rail { box-shadow: none; }
+  :root.drawer-open .is-front .rail { box-shadow: 0 0 40px rgba(0, 0, 0, 0.28); }
+}
+/* 全站的 section 有上框線與內距；頭版的段落自己管 */
+.fp section { margin: 0; padding: 0; border: 0; }
+
+.fp p,.fp ul,.fp dl,.fp dd,.fp figure{margin:0}
+.fp ul{padding:0;list-style:none}
+.fp .dash{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;letter-spacing:-.02em}
+/* ───────── 頁面與那條直線 ───────── */
+.fp{position:relative;max-width:1640px;margin:0 auto}
+.fp::after{content:"";position:absolute;top:0;bottom:0;left:var(--m);width:1px;background:var(--mrule);pointer-events:none;z-index:3}
+.fp .row{display:grid;grid-template-columns:var(--m) minmax(0,1fr);align-items:baseline}
+.fp .row>.b{grid-column:2;grid-row:1;min-width:0;padding-left:var(--pad);padding-right:var(--padr);max-width:calc(1080px + var(--pad) + var(--padr))}
+.fp .row>.m{grid-column:1;grid-row:1;min-width:0;padding-right:var(--mpad);text-align:right;position:relative}
+/* 批註：頁邊唯一的語氣。數字用斜體，中文用明體。 */
+.fp .mn{display:block;font-size:var(--nz);line-height:1}
+.fp .mn .k{--kx:0em;display:inline-block;position:relative;font:700 var(--nz)/1 var(--ming);color:var(--ink);
+  padding:.4em var(--kx) .32em;margin-right:calc(-1*var(--kx));white-space:nowrap}
+.fp .mn .k i{font:italic 500 var(--nn)/.8 var(--latin),serif;letter-spacing:-.012em}
+.fp .mn small{display:block;margin-top:8px;font-size:12.5px;line-height:1.4;color:var(--ink-2)}
+.fp .mn .k::after{content:"";position:absolute;right:calc(var(--kx) - var(--mpad) - var(--tick)/2);top:50%;
+  width:var(--tick);height:1px;background:var(--mrule);transform-origin:right center;transition:width .35s var(--fx)}
+.fp .mn.chg .k{--kx:.44em;background:var(--hl-bg);color:var(--hl-ink)}
+.fp .mn.up .k{color:var(--up)}
+.fp .mn.dn .k{color:var(--down)}
+.fp .mn.na .k{color:var(--ink-2)}
+.fp .mn.na .k i{font-style:normal;font-weight:400}
+@media (hover:hover) and (pointer:fine){.fp .row:hover>.m .mn .k::after{width:calc(var(--tick) + var(--mpad) - var(--kx) - 4px)}}
+/* ───────── 刊頭 ───────── */
+.fp .top{position:relative}
+.fp .top::before{content:"";position:absolute;top:0;bottom:0;left:-50vw;width:calc(50vw + var(--m));background:var(--band);transform-origin:top}
+.fp .top>*{position:relative;z-index:1}
+.fp .mast{padding-top:clamp(16px,2.1vw,30px);padding-bottom:clamp(10px,1.2vw,18px)}
+.fp .mast>.m{padding-right:var(--wgap)}
+.fp .mast>.b{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px clamp(12px,1.5vw,22px);padding-left:var(--wgap);max-width:none}
+.fp .wm-c{font:700 var(--wm)/1 "Songti TC","Noto Serif TC","Source Han Serif TC","PMingLiU",serif;display:inline-block}
+.fp .mast>.m .wm-c{color:var(--band-ink)}
+.fp .wm-en{font:italic 400 clamp(15px,1.75vw,25px)/1 var(--latin),serif;white-space:nowrap;letter-spacing:.005em}
+.fp .ed{position:absolute;left:var(--edge);bottom:.5em;font:700 13px/1 var(--ming);letter-spacing:.34em;color:var(--band-ink);white-space:nowrap}
+.fp .ed em{font:italic 400 13px/1 var(--latin),serif;letter-spacing:.02em;margin-left:.2em;color:var(--band-ink-2)}
+.fp .ed-d{display:var(--show-day)}
+.fp .ed-n{display:var(--show-night)}
+.fp .dateline{margin-left:auto;display:flex;flex-wrap:wrap;gap:0 1.3em;font-size:13.5px;line-height:1.4;color:var(--ink-2)}
+.fp .dateline time{color:var(--ink);font-weight:600}
+/* ───────── 頭條 ───────── */
+.fp .hero{display:grid;grid-template-columns:var(--m) minmax(0,1fr);grid-template-rows:auto 1fr}
+.fp .lead-head{grid-column:2;grid-row:1;padding:clamp(26px,4.2vw,64px) var(--padr) 0 var(--pad);min-width:0}
+.fp .lead-note{grid-column:2;grid-row:2;padding:clamp(26px,3.4vw,52px) var(--padr) clamp(44px,6vw,92px) var(--pad);min-width:0}
+.fp .hero-m{grid-column:1;grid-row:1/3;padding:clamp(26px,4.2vw,64px) var(--mpad) clamp(22px,2.6vw,38px) var(--edge);
+  text-align:right;display:flex;flex-direction:column;color:var(--band-ink);min-width:0}
+.fp .eyebrow{display:flex;flex-wrap:wrap;align-items:baseline;gap:.3em 1.5em;margin-bottom:clamp(14px,2vw,28px);font-size:13.5px;line-height:1.5;color:var(--ink-2)}
+.fp .eyebrow b{font:700 15px/1.5 var(--ming);letter-spacing:.3em;color:var(--ink);white-space:nowrap}
+.fp .hero h1{font:700 var(--h1)/1.15 var(--ming);letter-spacing:.012em}
+.fp .hero h1 .l{display:inline-block}
+.fp .hero h1 .l1{display:block}
+.fp .sub{margin-top:clamp(14px,2vw,28px);font:400 clamp(17px,2vw,28px)/1.5 var(--ming)}
+.fp .sub .cl,.fp .tagline .cl{display:inline-block}
+.fp .lead-note{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:var(--gap);align-content:start;max-width:calc(900px + var(--pad) + var(--padr))}
+.fp .gist h2{font:700 13px/1.4 var(--ming);letter-spacing:.3em;color:var(--ink-2);margin-bottom:.7em;display:flex;align-items:center;gap:.8em}
+.fp .gist h2::after{content:"";height:1px;flex:1;background:var(--hair)}
+.fp .gist p{font-size:16px;line-height:1.85}
+.fp .gist strong{font-weight:600}
+/* 頁邊的標題與「自昨天以來」 */
+.fp .tagline{font:700 clamp(17px,1.6vw,23px)/1.4 var(--ming)}
+.fp .since h2{font:400 13px/1.5 var(--hei);letter-spacing:.06em;color:var(--band-ink-2);margin-top:.35em}
+.fp .since ol{margin-top:clamp(20px,2.7vw,38px);display:grid;gap:clamp(14px,1.9vw,27px)}
+.fp .since .d{display:block;position:relative;font:italic 500 clamp(44px,5.05vw,76px)/.92 var(--latin),serif;letter-spacing:-.022em;color:var(--delta)}
+.fp .since .d::after{content:"";position:absolute;right:calc(-1*var(--mpad) - var(--tick)/2);top:47%;width:var(--tick);height:1px;background:var(--mrule);transform-origin:right center;transition:width .35s var(--fx)}
+@media (hover:hover) and (pointer:fine){.fp .since li:hover .d::after{width:calc(var(--tick) + var(--mpad) - 8px)}}
+.fp .since .w{display:block;margin-top:9px;font-size:14px;line-height:1.5;color:var(--band-ink-2)}
+.fp .since .w b{font:700 15px/1.5 var(--ming);color:var(--band-ink);margin-right:.7em}
+.fp .since .ft{white-space:nowrap}
+.fp .since .ft em{font-style:normal;font-weight:600;color:var(--band-ink)}
+.fp .scan{margin-top:auto;align-self:flex-end;font:700 13px/1.2 var(--ming);letter-spacing:.08em;color:var(--band-ink);background:none;
+  border:1.5px solid currentColor;padding:8px 11px 7px;cursor:pointer;display:inline-flex;align-items:center;gap:.7em;transition:background-color .25s,color .25s}
+.fp .scan::before{content:"";width:9px;height:9px;border:1.5px solid currentColor;transition:background-color .2s}
+.fp .scan[aria-pressed="true"]::before{background:currentColor}
+.fp .scan kbd{font:400 11px/1 var(--latin),serif;border:1px solid currentColor;padding:2px 4px 1px;opacity:.7}
+@media (hover:hover) and (pointer:fine){.fp .scan:hover{background:var(--band-ink);color:var(--band)}}
+.fp .hero-m .scan{margin-top:clamp(22px,3vw,44px)}
+.fp .hero-m .since{margin-bottom:auto}
+/* 只看頁邊 */
+.fp .b,.fp .lead-head,.fp .lead-note>*,.fp .mast .dateline{transition:opacity .35s ease}
+html.scanning .fp .row>.b,html.scanning .fp .lead-head,html.scanning .fp .lead-note>*,html.scanning .fp .dateline{opacity:.13}
+html.scanning .fp .mast>.b{opacity:1}
+/* ───────── 段落標題：直線上的主刻度 ───────── */
+.fp .sec{padding-top:var(--sec)}
+.fp .sh{margin-bottom:clamp(12px,2vw,26px)}
+.fp .sh>.b{position:relative;padding-top:clamp(18px,2.1vw,28px)}
+.fp .sh>.b::before{content:"";position:absolute;left:calc(var(--tick)*-.5);top:0;width:calc(var(--tick)*.5 + var(--pad) + 2.1em);height:4px;background:var(--mrule)}
+.fp .sh h2{font:700 clamp(22px,2.35vw,33px)/1.3 var(--ming);letter-spacing:.01em}
+.fp .sh p{margin-top:.5em;font-size:14px;line-height:1.6;color:var(--ink-2);max-width:40em}
+.fp .seal{display:inline-grid;place-items:center;width:1.55em;height:1.55em;font:700 .54em/1 "Songti TC","Noto Serif TC","Source Han Serif TC","PMingLiU",serif;
+  letter-spacing:0;vertical-align:.3em;margin-right:.75em;border:1.5px solid currentColor;color:var(--ink)}
+.fp .s-fact{background:var(--ink);color:var(--page);border-color:var(--ink)}
+.fp .s-said{border-style:dashed}
+.fp .eyebrow .seal{font-size:11.5px;vertical-align:.08em;margin-right:.9em;letter-spacing:0}
+/* 正文列的細線只畫在正文裡，不碰直線 */
+.fp .ln>.b{background:linear-gradient(var(--hair),var(--hair)) no-repeat var(--pad) 0/calc(100% - var(--pad) - var(--padr)) 1px}
+/* ───────── 圖 ───────── */
+.fp .gchart{align-items:start;margin-top:clamp(8px,1.4vw,20px)}
+.fp .gchart>.b{padding-left:0}
+.fp .plot{position:relative;min-height:270px}
+.fp .plot svg{display:block;overflow:visible}
+.fp .plot text{font-family:var(--hei);font-size:13.5px;fill:var(--ink-2)}
+.fp .plot .g{stroke:var(--hair);stroke-width:1}
+.fp .plot .goal{stroke:var(--ink-muted);stroke-width:1}
+.fp .plot .thr{stroke:var(--thr);stroke-width:1.25;stroke-dasharray:5 4}
+.fp .plot .area{fill:url(#gate-hatch)}
+.fp .plot .ln{fill:none;stroke:var(--ink);stroke-width:2.75;stroke-linejoin:round;stroke-linecap:round}
+.fp .plot .dot{fill:var(--ink);stroke:var(--page);stroke-width:2.5}
+.fp .plot .m3{fill:var(--page);stroke:var(--ink);stroke-width:1.75}
+.fp .plot .conn{stroke:var(--ink-muted);stroke-width:1.25;stroke-dasharray:1 4;stroke-linecap:round}
+.fp .plot .br{fill:none;stroke:var(--ink);stroke-width:1.25}
+.fp .plot .endv{font:600 27px/1 var(--latin),serif;fill:var(--ink);letter-spacing:-.01em}
+.fp .plot .gapr{fill:none}
+.fp .plot .gapt{font:700 13.5px/1 var(--ming);fill:var(--ink)}
+.fp .plot .gapt .num{font:italic 500 17px/1 var(--latin),serif}
+.fp .plot .lab{fill:var(--ink)}
+.fp .plot .xt{stroke:var(--ink-muted);stroke-width:1}
+.fp .yax{align-self:stretch}
+.fp .yl{position:absolute;right:var(--mpad);transform:translateY(-50%);white-space:nowrap;font:400 13px/1 var(--hei);color:var(--ink-2)}
+.fp .yl i{font:italic 500 16px/1 var(--latin),serif;color:var(--ink)}
+.fp .yl::after{content:"";position:absolute;right:calc(-1*var(--mpad) - var(--tick)/2);top:50%;width:var(--tick);height:1px;background:var(--mrule)}
+.fp .yl.key{font:700 13px/1 var(--ming);color:var(--ink)}
+.fp .yl.key i{color:inherit;font-size:19px}
+.fp .fig-src{margin-top:10px;font-size:12.5px;line-height:1.6;color:var(--ink-2);max-width:46em}
+/* ───────── 四個數字 ───────── */
+.fp .fact>.b{display:grid;grid-template-columns:var(--c1) var(--c2) minmax(0,1fr);column-gap:var(--gap);align-items:baseline;padding-top:clamp(16px,1.9vw,24px);padding-bottom:clamp(16px,1.9vw,24px)}
+.fp .fact h3{font:700 clamp(17px,1.5vw,21px)/1.35 var(--ming)}
+.fp .fact h3 a,.fp .px h3 a{background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/0 1.5px;transition:background-size .3s var(--fx);padding-bottom:2px}
+@media (hover:hover) and (pointer:fine){.fp .fact h3 a:hover,.fp .px h3 a:hover{background-size:100% 1.5px}}
+.fp .val{font:var(--wnum) clamp(42px,4.5vw,66px)/1 var(--latin),serif;color:var(--ink);letter-spacing:-.018em;white-space:nowrap}
+.fp .val .u{font-size:.5em;letter-spacing:0;margin-left:.05em}
+.fp .read p{font-size:14px;line-height:1.7;color:var(--ink-2)}
+/* ───────── 兩個判定：框起來的才是本站的話 ───────── */
+.fp .calls{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);border:1.5px solid var(--ink);
+  background:repeating-linear-gradient(-45deg,transparent 0 7px,var(--hatch) 7px 8px)}
+.fp .call{padding:clamp(18px,2.3vw,32px);min-width:0}
+.fp .call+.call{border-left:1.5px solid var(--ink)}
+.fp .call h3{font:400 13.5px/1.4 var(--hei);letter-spacing:.06em;color:var(--ink-2);margin-bottom:.9em}
+.fp .call h3 i{font:italic 500 17px/1 var(--latin),serif;color:var(--ink)}
+.fp .big{font:700 clamp(26px,3.3vw,46px)/1.2 var(--ming);letter-spacing:.02em}
+.fp .split{display:flex;flex-wrap:wrap;gap:.1em 1.1em;font:700 clamp(19px,2vw,27px)/1.3 var(--ming)}
+.fp .split i{font:italic 500 1.5em/1 var(--latin),serif;margin-right:.12em}
+.fp .tally{display:flex;align-items:center;gap:6px;height:26px;margin-top:14px}
+.fp .tally i{display:block;flex:0 1 19px;min-width:0;height:3px;background:var(--ink-muted)}
+.fp .tally .dv{background:var(--dovish);transform:rotate(34deg)}
+.fp .tally .hk{background:var(--hawkish);transform:rotate(-34deg)}
+.fp .tally .gp{flex:none;width:1px;height:16px;background:var(--hair);margin:0 5px}
+.fp .tkey{display:flex;flex-wrap:wrap;gap:.2em 1.4em;margin-top:8px;font-size:12.5px;color:var(--ink-2)}
+/* 方向：小斜線＝利率的走向。紅藍只在這裡出現。 */
+.fp .dir{white-space:nowrap}
+.fp .dir::before{content:"";display:inline-block;width:13px;height:2.5px;vertical-align:.3em;margin-right:.5em;background:var(--ink-muted)}
+.fp .dir.hk::before{background:var(--hawkish);transform:rotate(-34deg)}
+.fp .dir.dv::before{background:var(--dovish);transform:rotate(34deg)}
+/* 嚴重度：形狀＋濃淡 */
+.fp .sv{white-space:nowrap}
+.fp .sv::before{content:"";display:inline-block;width:.62em;height:.62em;margin-right:.5em;background:currentColor;vertical-align:.04em}
+.fp .sv-1{color:var(--ink)}
+.fp .sv-2{color:var(--ink-2)}
+.fp .sv-2::before{clip-path:polygon(50% 4%,100% 100%,0 100%);width:.72em;height:.66em}
+.fp .sv-3{color:var(--ink-2)}
+.fp .sv-3::before{border-radius:50%;background:var(--ink-muted)}
+/* ───────── 訊號 ───────── */
+.fp .sig>.b{display:grid;grid-template-columns:var(--c1) minmax(0,1fr);column-gap:var(--gap);align-items:baseline;padding-top:clamp(18px,2.2vw,28px);padding-bottom:clamp(18px,2.2vw,28px)}
+.fp .tags{display:flex;flex-direction:column;gap:5px;font-size:13.5px;line-height:1.5;color:var(--ink-2)}
+.fp .tags .sv{font:700 16px/1.5 var(--ming);letter-spacing:.14em}
+.fp .tags .sv-1{color:var(--ink)}
+.fp .tags .meta{display:flex;flex-wrap:wrap;gap:0 1.1em}
+.fp .sig h3{font:700 clamp(19px,2.05vw,28px)/1.4 var(--ming);text-wrap:balance}
+.fp .sig .det{margin-top:.45em;font-size:15px;line-height:1.7;color:var(--ink-2)}
+/* ───────── 本週稍早／接下來 ───────── */
+.fp .nx>.b{display:grid;grid-template-columns:var(--c1) minmax(0,1fr);column-gap:var(--gap);align-items:baseline;padding-top:clamp(13px,1.5vw,19px);padding-bottom:clamp(13px,1.5vw,19px)}
+.fp .kind{font-size:13.5px;line-height:1.5;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:0 1.1em}
+.fp .kind b{font:700 15px/1.5 var(--ming);letter-spacing:.14em;color:var(--ink)}
+.fp .nx h3{font:700 clamp(17px,1.6vw,21px)/1.45 var(--ming)}
+.fp .nx .det{margin-top:.2em;font-size:14px;line-height:1.65;color:var(--ink-2)}
+/* 日期：直線是今天，離直線多遠就是還有幾天 */
+.fp .axis{margin-top:clamp(10px,1.4vw,18px)}
+.fp .axis>.b{padding-left:0;display:flex;gap:0;font-size:12px;line-height:1.3;letter-spacing:.08em;color:var(--ink-2)}
+.fp .axis>.b span:first-child{padding:0 9px 0 8px;flex:none}
+.fp .axis>.b span:last-child{padding-left:9px;border-left:1px solid var(--ink-muted)}
+.fp .when>.b{padding-left:0;padding-top:clamp(9px,1.15vw,14px);padding-bottom:clamp(9px,1.15vw,14px);max-width:none}
+.fp .run{display:flex;align-items:baseline}
+.fp .bar{flex:none;align-self:flex-start;margin-top:calc((1.45*var(--wh) - 11px)/2);position:relative;width:max(2px,calc(var(--days)*var(--u)));height:11px;transform-origin:left center;translate:0 var(--bar-dy,0px);
+  background:linear-gradient(var(--mrule),var(--mrule)) no-repeat 0 50%/100% 1px,
+    repeating-linear-gradient(90deg,transparent 0 calc(var(--u) - 1px),var(--ink-muted) calc(var(--u) - 1px) var(--u)) no-repeat 0 50%/100% 7px}
+.fp .bar::after{content:"";position:absolute;right:-5px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--ink)}
+.fp .txt{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .9em;padding-left:20px;min-width:0}
+.fp .when h3{font:700 var(--wh)/1.45 var(--ming)}
+/* ───────── 價格 ───────── */
+.fp .px>.b{display:grid;grid-template-columns:var(--c1) var(--c2) minmax(0,1fr);column-gap:var(--gap);align-items:baseline;padding-top:11px;padding-bottom:11px}
+.fp .px h3{font:700 17px/1.4 var(--ming)}
+.fp .px .lv{font:var(--wnum) clamp(22px,2.1vw,28px)/1.1 var(--latin),serif;color:var(--ink);letter-spacing:-.008em;white-space:nowrap}
+.fp .px .lv .u{font-size:.62em;margin-left:.12em}
+.fp .px .cap{font-size:13.5px;color:var(--ink-2)}
+/* ───────── 別人怎麼說：直線在這裡變虛線 ───────── */
+.fp .said{position:relative}
+.fp .said::before{content:"";position:absolute;left:var(--m);top:var(--sec);bottom:0;width:1px;z-index:4;
+  background:repeating-linear-gradient(180deg,var(--page) 0 5px,transparent 5px 10px)}
+/* ───────── 目錄 ───────── */
+.fp .toc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(22px,3vw,40px) var(--gap)}
+.fp .toc h3{font:400 13px/1.4 var(--hei);letter-spacing:.1em;color:var(--ink-2);padding-bottom:.75em;border-bottom:1.5px solid var(--ink);margin-bottom:.5em}
+.fp .toc a{display:flex;align-items:baseline;gap:.7em;font:700 clamp(16px,1.45vw,19px)/1.4 var(--ming);padding:.42em 0}
+.fp .toc a i{font:italic 400 13px/1 var(--latin),serif;color:var(--ink-2);width:1.5em;flex:none}
+.fp .toc a span{background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/0 1.5px;transition:background-size .3s var(--fx);padding-bottom:2px}
+.fp .toc a::after{content:"→";font-family:"PingFang TC","Noto Sans TC",sans-serif;font-weight:400;opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .25s var(--fx);color:var(--ink-2)}
+.fp .toc a:focus-visible span{background-size:100% 1.5px}
+@media (hover:hover) and (pointer:fine){.fp .toc a:hover span{background-size:100% 1.5px}}
+.fp .toc a:focus-visible::after{opacity:1;transform:none}
+@media (hover:hover) and (pointer:fine){.fp .toc a:hover::after{opacity:1;transform:none}}
+/* ───────── 頁尾 ───────── */
+.fp .foot{padding-top:var(--sec)}
+.fp .howto{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,2.4vw,32px) var(--gap);font-size:13.5px;line-height:1.75;color:var(--ink-2)}
+.fp .howto dt{font:700 14px/1.5 var(--ming);letter-spacing:.14em;color:var(--ink);margin-bottom:.45em}
+.fp .howto dd{display:flex;flex-direction:column;gap:.15em}
+.fp .howto .seal{font-size:11px;vertical-align:.1em;margin-right:.6em}
+.fp .howto .hlx{font:italic 500 16px/1 var(--latin),serif;background:var(--hl-bg);color:var(--hl-ink);padding:.12em .3em .04em;margin-right:.5em}
+.fp .howto .cu{color:var(--up);font-weight:600}
+.fp .howto .cd{color:var(--down);font-weight:600}
+.fp .colo{margin-top:clamp(44px,5vw,72px);position:relative}
+.fp .colo::before{content:"";position:absolute;top:0;bottom:0;left:-50vw;width:calc(50vw + var(--m));background:var(--surface-sunken)}
+.fp .colo>*{position:relative;z-index:1}
+.fp .colo>.m{padding:clamp(22px,2.8vw,40px) var(--wgap) clamp(26px,3vw,44px) 0}
+.fp .colo>.b{padding-top:clamp(22px,2.8vw,40px);padding-bottom:clamp(26px,3vw,44px);padding-left:var(--wgap);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px clamp(14px,2vw,30px);max-width:none}
+.fp .colo .m .wm-c{color:var(--ink)}
+.fp .colo .fine{font-size:13.5px;line-height:1.75;color:var(--ink-2);max-width:34em;margin-left:auto}
+.fp .colo .fine strong{color:var(--ink);font-weight:600}
+/* ───────── 中等寬度 ───────── */
+@media (max-width:1023px){
+  .fp .lead-note{grid-template-columns:1fr;gap:1.4em}
+  .fp .fact>.b{grid-template-columns:minmax(0,10.5rem) minmax(0,1fr);grid-template-areas:"n r" "v r"}
+  .fp .fact h3{grid-area:n}
+  .fp .fact .val{grid-area:v;margin-top:.12em}
+  .fp .fact .read{grid-area:r}
+  .fp .px>.b{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n v" "c c"}
+  .fp .px h3{grid-area:n}
+  .fp .px .lv{grid-area:v;text-align:right}
+  .fp .px .cap{grid-area:c;margin-top:2px}
+  .fp .px .cap:empty{display:none}
+  .fp .sig>.b,.fp .nx>.b{grid-template-columns:1fr}
+  .fp .tags{flex-direction:row;flex-wrap:wrap;gap:0 1.1em;align-items:baseline;margin-bottom:.5em}
+  .fp .kind{margin-bottom:.15em}
+  .fp .toc{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fp .howto{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fp .dateline{order:3;width:100%;margin-left:0;padding-left:0}
+}
+/* ───────── 手機：頁邊縮成貼在左緣的一條細欄，但不消失 ───────── */
+@media (max-width:699px){
+  .fp .mast{padding-top:14px;padding-bottom:12px}
+  .fp .mast>.b{gap:6px 9px;padding-right:var(--padr)}
+  .fp .wm-en{font-size:15.5px}
+  .fp .ed{left:var(--edge);bottom:auto;top:.15em;font-size:11px;letter-spacing:.12em;writing-mode:vertical-rl}
+  .fp .ed em{display:none}
+  .fp .dateline{font-size:12px;gap:0 .9em;padding-left:calc(var(--pad) - var(--wgap))}
+  .fp .hero{grid-template-rows:auto auto auto}
+  .fp .hero-m{display:contents}
+  .fp .lead-head{padding-top:22px;padding-bottom:26px}
+  .fp .eyebrow{font-size:12.5px;gap:.2em 1em;margin-bottom:14px}
+  .fp .eyebrow b{font-size:13.5px;letter-spacing:.24em}
+  .fp .hero h1{line-height:1.17}
+  .fp .hero h1 .l{display:block}
+  .fp .sub{font-size:17.5px;line-height:1.55;margin-top:14px}
+  .fp .tagline{grid-column:1;grid-row:1;writing-mode:vertical-rl;justify-self:center;align-self:start;margin-top:24px;
+    font-size:15px;line-height:1;letter-spacing:.22em;color:var(--band-ink);text-align:left}
+  .fp .tagline .cl{display:inline}
+  .fp .since{grid-column:1/3;grid-row:2;padding-bottom:20px;text-align:left}
+  .fp .hero-m .since{margin-bottom:0}
+  .fp .since h2{margin:0 0 6px;padding-left:calc(var(--m) + var(--pad));color:var(--ink-2);font-size:12.5px}
+  .fp .since ol{margin-top:0;gap:0}
+  .fp .since li{display:grid;grid-template-columns:var(--m) minmax(0,1fr);align-items:baseline;padding:9px 0}
+  .fp .since .d{grid-column:1;text-align:right;padding-right:var(--mpad);font-size:26px;font-weight:600;letter-spacing:-.03em;line-height:1}
+  .fp .since .d::after{right:calc(var(--tick)/-2)}
+  @media (hover:hover) and (pointer:fine){.fp .since li:hover .d::after{width:var(--tick)}}
+  .fp .since .w{grid-column:2;margin:0;padding:0 var(--padr) 0 var(--pad);color:var(--ink-2);display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0 .6em}
+  .fp .since .w b{font-size:16.5px;color:var(--ink);margin:0}
+  .fp .since .ft{font-size:15px}
+  .fp .since .ft em{color:var(--ink)}
+  .fp .hero-m .scan{grid-column:2;grid-row:2;justify-self:end;align-self:start;margin:-5px var(--padr) 0 0;z-index:2;padding:5px 8px 4px;font-size:12px;color:var(--ink)}
+  .fp .scan kbd{display:none}
+  @media (hover:hover) and (pointer:fine){.fp .scan:hover{background:var(--ink);color:var(--page)}}
+  .fp .lead-note{grid-column:1/3;grid-row:3;background:var(--page);padding:24px var(--padr) 6px calc(var(--m) + var(--pad))}
+  .fp .gist p{font-size:15.5px;line-height:1.8}
+  .fp .sh h2{font-size:22px}
+  .fp .sh p{font-size:13px}
+  .fp .mn small{font-size:11px;margin-top:5px;line-height:1.35}
+  .fp .mn.chg .k{--kx:.4em}
+  @media (hover:hover) and (pointer:fine){.fp .row:hover>.m .mn .k::after{width:var(--tick)}}
+  .fp .fact>.b{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n v" "r r";column-gap:.9em;padding-top:15px;padding-bottom:17px;align-items:end}
+  .fp .fact h3{font-size:16.5px}
+  .fp .fact .val{font-size:44px;margin:0}
+  .fp .calls{grid-template-columns:1fr}
+  .fp .call{padding:17px 15px 18px}
+  .fp .call+.call{border-left:0;border-top:1.5px solid var(--ink)}
+  .fp .tally{gap:4px}
+  .fp .tally i{flex-basis:11px;height:2.5px}
+  .fp .tally .gp{margin:0 2px}
+  .fp .sig h3{font-size:19.5px}
+  .fp .sig .det{font-size:13.5px}
+  .fp .tags .sv{font-size:14.5px}
+  .fp .tags,.fp .kind{font-size:12.5px}
+  .fp .kind b{font-size:13.5px}
+  .fp .nx h3{font-size:17px}
+  .fp .nx .det{font-size:13px}
+  .fp .px>.b{padding-top:10px;padding-bottom:10px}
+  .fp .px h3{font-size:16px}
+  .fp .px .lv{font-size:21px}
+  .fp .px .cap{font-size:12px}
+  .fp .axis>.b span:first-child{padding-left:var(--pad)}
+  .fp .run{flex-direction:column;align-items:flex-start}
+  .fp .bar{margin-top:0}
+  .fp .txt{padding:8px 0 0 var(--pad)}
+  .fp .when>.b{padding-top:12px;padding-bottom:10px}
+  .fp .toc{gap:26px 16px}
+  .fp .toc a{font-size:16px;gap:.5em}
+  .fp .toc a::after{display:none}
+  .fp .howto{grid-template-columns:1fr;font-size:13px}
+  .fp .colo .fine{margin:10px 0 0;font-size:12.5px;padding-left:calc(var(--pad) - var(--wgap));width:100%}
+  .fp .yl{font-size:11.5px}
+  .fp .yl i{font-size:14px}
+  .fp .yl.key{font-size:11.5px}
+  .fp .yl.key i{font-size:15px}
+  .fp .plot text{font-size:11.5px}
+  .fp .plot .ln{stroke-width:2.4}
+  .fp .plot .endv{font-size:22px}
+  .fp .plot .gapt{font-size:12px}
+  .fp .plot .gapt .num{font-size:14.5px}
+  .fp .fig-src{font-size:12px}
+}
+/* ───────── 動效：進場有編排，圖第一次出現時畫一遍；不劫持捲動 ───────── */
+html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transition:background-color .4s ease,color .4s ease,border-color .4s ease,fill .4s ease,stroke .4s ease !important}
+@media (prefers-reduced-motion:no-preference){
+  @keyframes fp-drawY{from{transform:scaleY(0)}}
+  @keyframes fp-rise{from{opacity:0;transform:translateY(.42em)}}
+  @keyframes fp-fade{from{opacity:0}}
+  @keyframes fp-fromL{from{opacity:0;transform:translateX(-14px)}}
+  @keyframes fp-fromR{from{opacity:0;transform:translateX(14px)}}
+  @keyframes fp-tickIn{from{transform:scaleX(0)}}
+  html.js:not(.still) .fp::after{transform-origin:top;animation:fp-drawY 1.25s cubic-bezier(.65,0,.2,1) both}
+  html.js:not(.still) .fp .top::before{animation:fp-drawY .95s cubic-bezier(.65,0,.2,1) .08s both}
+  html.js:not(.still) .fp .mast .m .wm-c{animation:fp-fromL .8s var(--fx) .3s both}
+  html.js:not(.still) .fp .mast .b .wm-c{animation:fp-fromR .8s var(--fx) .3s both}
+  html.js:not(.still) .fp .wm-en,html.js:not(.still) .fp .ed{animation:fp-fade .8s ease .65s both}
+  html.js:not(.still) .fp .dateline{animation:fp-fade .8s ease .8s both}
+  html.js:not(.still) .fp .eyebrow{animation:fp-fade .8s ease .5s both}
+  html.js:not(.still) .fp .hero h1 .l{animation:fp-rise 1s var(--fx) both}
+  html.js:not(.still) .fp .hero h1 .l1{animation-delay:.55s}
+  html.js:not(.still) .fp .hero h1 .l2{animation-delay:.67s}
+  html.js:not(.still) .fp .hero h1 .l3{animation-delay:.79s}
+  html.js:not(.still) .fp .sub{animation:fp-rise .9s var(--fx) .98s both}
+  html.js:not(.still) .fp .lead-note{animation:fp-fade 1s ease 1.2s both}
+  html.js:not(.still) .fp .tagline{animation:fp-fade .8s ease .75s both}
+  html.js:not(.still) .fp .since h2{animation:fp-fade .8s ease .9s both}
+  html.js:not(.still) .fp .since li{animation:fp-fromL .8s var(--fx) both}
+  html.js:not(.still) .fp .since li:nth-child(1){animation-delay:1.05s}
+  html.js:not(.still) .fp .since li:nth-child(2){animation-delay:1.2s}
+  html.js:not(.still) .fp .since li:nth-child(3){animation-delay:1.35s}
+  html.js:not(.still) .fp .since .d::after{animation:fp-tickIn .5s var(--fx) both}
+  html.js:not(.still) .fp .since li:nth-child(1) .d::after{animation-delay:1.45s}
+  html.js:not(.still) .fp .since li:nth-child(2) .d::after{animation-delay:1.6s}
+  html.js:not(.still) .fp .since li:nth-child(3) .d::after{animation-delay:1.75s}
+  html.js:not(.still) .fp .scan{animation:fp-fade .8s ease 1.8s both}
+  /* 手機：同一套編排，但快一拍 */
+  @media (max-width:699px){
+    html.js:not(.still) .fp::after{animation-duration:.9s}
+    html.js:not(.still) .fp .top::before{animation-duration:.7s;animation-delay:0s}
+    html.js:not(.still) .fp .mast .m .wm-c,html.js:not(.still) .fp .mast .b .wm-c{animation-delay:.1s;animation-duration:.6s}
+    html.js:not(.still) .fp .wm-en,html.js:not(.still) .fp .ed,html.js:not(.still) .fp .dateline,html.js:not(.still) .fp .eyebrow{animation-delay:.3s;animation-duration:.6s}
+    html.js:not(.still) .fp .hero h1 .l{animation-duration:.8s}
+    html.js:not(.still) .fp .hero h1 .l1{animation-delay:.2s}
+    html.js:not(.still) .fp .hero h1 .l2{animation-delay:.29s}
+    html.js:not(.still) .fp .hero h1 .l3{animation-delay:.38s}
+    html.js:not(.still) .fp .sub{animation-delay:.55s}
+    html.js:not(.still) .fp .tagline{animation-delay:.45s}
+    html.js:not(.still) .fp .since h2,html.js:not(.still) .fp .scan{animation-delay:.6s}
+    html.js:not(.still) .fp .since li:nth-child(1){animation-delay:.65s}
+    html.js:not(.still) .fp .since li:nth-child(2){animation-delay:.75s}
+    html.js:not(.still) .fp .since li:nth-child(3){animation-delay:.85s}
+    html.js:not(.still) .fp .since li:nth-child(1) .d::after{animation-delay:.95s}
+    html.js:not(.still) .fp .since li:nth-child(2) .d::after{animation-delay:1.05s}
+    html.js:not(.still) .fp .since li:nth-child(3) .d::after{animation-delay:1.15s}
+    html.js:not(.still) .fp .lead-note{animation-delay:.8s}
+  }
+  /* 同一個工作階段第二次進來：刊頭不再演一遍 */
+  html.again .fp::after,html.again .fp .top::before,html.again .fp .top *,html.again .fp .top *::after{animation:none !important}
+  /* 捲到才出現：先正文，批註晚一拍「寫上去」 */
+  html.js:not(.still) .fp .rv>.b{opacity:0;transform:translateY(14px);transition:opacity .7s ease var(--rd,0ms),transform .9s var(--fx) var(--rd,0ms)}
+  html.js:not(.still) .fp .rv>.m .mn,html.js:not(.still) .fp .rv>.m .yl{opacity:0;translate:-10px 0;transition:opacity .6s ease calc(var(--rd,0ms) + 220ms),translate .7s var(--fx) calc(var(--rd,0ms) + 220ms)}
+  html.js:not(.still) .fp .rv>.m .mn .k::after,html.js:not(.still) .fp .rv>.m .yl::after{transform:scaleX(0);transition:transform .5s var(--fx) calc(var(--rd,0ms) + 480ms),width .35s var(--fx)}
+  html.js:not(.still) .fp .rv.seen>.b{opacity:1;transform:none}
+  html.js:not(.still) .fp .rv.seen>.m .mn,html.js:not(.still) .fp .rv.seen>.m .yl{opacity:1;translate:0 0}
+  html.js:not(.still) .fp .rv.seen>.m .mn .k::after,html.js:not(.still) .fp .rv.seen>.m .yl::after{transform:none}
+  html.js:not(.still).scanning .fp .rv.seen>.b{opacity:.13}
+  html.js:not(.still) .fp .rv .bar{scale:0 1;transition:scale 1s cubic-bezier(.5,0,.15,1) calc(var(--rd,0ms) + 150ms)}
+  html.js:not(.still) .fp .rv .bar::after{opacity:0;transition:opacity .3s ease calc(var(--rd,0ms) + 1050ms)}
+  html.js:not(.still) .fp .rv .txt{opacity:0;transition:opacity .6s ease calc(var(--rd,0ms) + 900ms)}
+  html.js:not(.still) .fp .rv.seen .bar{scale:1 1}
+  html.js:not(.still) .fp .rv.seen .bar::after,html.js:not(.still) .fp .rv.seen .txt{opacity:1}
+  /* 圖：線畫一遍，然後才標值 */
+  html.js:not(.still) .fp .gchart .ln{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset 1.7s cubic-bezier(.5,0,.2,1) .25s}
+  html.js:not(.still) .fp .gchart .area{opacity:0;transition:opacity .9s ease 1.25s}
+  html.js:not(.still) .fp .gchart .late{opacity:0;transition:opacity .6s ease 1.8s}
+  html.js:not(.still) .fp .gchart .late2{opacity:0;transition:opacity .6s ease 2.15s}
+  html.js:not(.still) .fp .gchart.seen .ln{stroke-dashoffset:0}
+  html.js:not(.still) .fp .gchart.seen .area,html.js:not(.still) .fp .gchart.seen .late,html.js:not(.still) .fp .gchart.seen .late2{opacity:1}
+}
+@media print{
+  .fp .scan{display:none}
+}
+
+
+/* ============================================================================
+   以下是接上真實資料之後才需要的元件
+   ========================================================================== */
+
+/* ---- 刊頭：右上角讓給工具列；信任列併進日期行 ---------------------------- */
+.fp .mast { min-height: var(--mast-h); }
+.fp .mast > .b { padding-right: calc(var(--padr) + var(--tools)); }
+.fp .dateline .trust {
+  display: inline-flex; align-items: baseline; gap: .45em; margin: 0; padding: 0;
+  border: 0; background: none; font: inherit; color: inherit; letter-spacing: 0;
+}
+.fp .dateline .trust time { font-weight: 400; color: inherit; font-family: inherit; }
+.fp .dateline .trust-dot { align-self: center; }
+.fp .dateline .trust-go { display: none; }
+.fp .dateline .trust.stale { color: var(--critical); }
+
+/* ---- 頭條 ----------------------------------------------------------------- */
+.fp .hero h1 a { display: block; }
+.fp .lede-fig {
+  margin-top: .32em; font: var(--wnum) clamp(26px, 3.7vw, 56px)/1.12 var(--latin), serif;
+  letter-spacing: -.012em; color: var(--ink);
+}
+.fp .lede-gap .eyebrow b { color: var(--critical); }
+.fp .lead-note:has(.gist:nth-child(3)) { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; }
+.fp .gist a, .fp .call-s a, .fp .fig-src a, .fp .fine a, .fp .more a, .fp .bf-m a, .fp .mc-foot-note a {
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
+}
+.fp .fig-src a, .fp .fine a { margin-left: .6em; white-space: nowrap; }
+
+/* 頁邊：沒有變動的那一天，這一欄是白紙 */
+.fp .since-none {
+  margin-top: clamp(20px, 2.7vw, 38px); font: 400 15px/1.75 var(--ming); color: var(--band-ink-2);
+}
+.fp .since-more {
+  display: inline-block; margin-top: 1.3em; font: 700 13px/1.4 var(--ming); letter-spacing: .06em;
+  color: var(--band-ink); border-bottom: 1px solid currentColor;
+}
+.fp .since .d-t { font: 700 clamp(26px, 3vw, 44px)/1.15 var(--ming); letter-spacing: .02em; }
+.fp .since .ft { white-space: normal; }
+.fp .since .ft-t { display: block; margin-top: 2px; text-wrap: balance; }
+.fp .eyebrow { font-weight: 400; letter-spacing: 0; }
+.fp .mn small .wide { display: inline; }
+
+/* ---- 小標 ----------------------------------------------------------------- */
+.fp .sub-h {
+  padding-top: clamp(22px, 3vw, 40px); padding-bottom: .5em;
+  font: 700 13px/1.4 var(--ming); letter-spacing: .3em; color: var(--ink-2);
+}
+.fp .seal.s-mkt { border-radius: 50%; }
+.fp .seal.s-gap { border-color: var(--critical); color: var(--critical); }
+.fp .sh h2 { display: flex; align-items: center; }
+.fp .sh h2 .seal { flex: none; vertical-align: 0; }
+.fp .quiet { font-size: 14px; line-height: 1.75; color: var(--ink-2); max-width: 46em; padding: 6px 0; }
+.fp .gapnote { font-size: 14px; line-height: 1.7; color: var(--critical); padding: 8px 0; }
+.fp .gapnote .seal { font-size: 11px; margin-right: .7em; vertical-align: .1em; }
+.fp .na { color: var(--ink-2); }
+
+/* ---- 四個數字：第三欄是一把尺 --------------------------------------------- */
+.fp .fact > .b { align-items: center; }
+.fp .read { min-width: 0; }
+.fp .read .rd { font: 700 15px/1.5 var(--ming); color: var(--ink); margin-right: .9em; white-space: nowrap; }
+.fp .ruler { padding: 34px 0 30px; }
+.fp .ruler-track::before { opacity: .9; }
+.fp .rr { background: var(--page); }
+.fp .ruler i, .fp .gridmap i, .fp .tally i { font-style: normal; }
+
+/* ---- 本站的判定 ----------------------------------------------------------- */
+@media (min-width: 700px) { .fp .calls { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); } }
+.fp .call-regime { display: flex; align-items: flex-start; justify-content: space-between; gap: clamp(14px, 1.6vw, 24px); }
+.fp .big { font-size: clamp(26px, 2.9vw, 42px); white-space: nowrap; }
+.fp .call-s { margin-top: .8em; font-size: 13.5px; line-height: 1.65; color: var(--ink-2); }
+.fp .gridmap {
+  flex: none; display: grid; grid-template-columns: auto auto; gap: 5px 7px;
+  font: 400 11.5px/1 var(--hei); color: var(--ink-2); --cell: clamp(20px, 2vw, 28px);
+}
+.fp .gx { grid-column: 2; display: grid; grid-template-columns: repeat(3, var(--cell)); gap: 2px; text-align: center; }
+.fp .gx b { grid-column: 1 / -1; font-weight: 400; letter-spacing: .3em; text-indent: .3em; padding-bottom: 4px; }
+.fp .gy { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: auto auto; grid-template-rows: repeat(3, var(--cell)); gap: 2px 5px; align-items: center; }
+.fp .gy b { grid-row: 1 / -1; font-weight: 400; writing-mode: vertical-rl; letter-spacing: .3em; }
+.fp .gcells { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: repeat(3, var(--cell)); grid-auto-rows: var(--cell); gap: 2px; }
+.fp .gc { display: block; border: 1px solid var(--ink-muted); background: var(--page); }
+.fp .gc.on { background: var(--ink); border-color: var(--ink); }
+
+.fp .sig-btn {
+  font: inherit; color: inherit; letter-spacing: inherit; text-align: left; text-wrap: inherit;
+  background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.fp .sig .evi {
+  margin-top: .65em; padding-left: .9em; border-left: 1px solid var(--ink-muted);
+  font-size: 14px; line-height: 1.65; color: var(--ink);
+}
+.fp .acc { margin-top: clamp(14px, 2vw, 24px); border-top: 1px solid var(--hair); }
+.fp .acc > summary { padding: 14px 0; font: 700 15px/1.4 var(--ming); letter-spacing: .1em; cursor: pointer; }
+.fp .more { margin-top: 1em; font: 700 15px/1.5 var(--ming); }
+
+/* ---- 今天：更新的序列跟價格同一種列 --------------------------------------- */
+.fp .sv-gap { color: var(--critical); }
+.fp .nx h3 a, .fp .sig-btn { background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1.5px; transition: background-size .3s var(--fx); padding-bottom: 2px; }
+.fp .new-badge { margin-left: .6em; vertical-align: .15em; }
+
+/* ---- 接下來：一格一天，單位寬度跟著這一段的天數走 ------------------------- */
+.fp .axis, .fp .when {
+  --u: clamp(6px, calc((min(100vw, 1640px) - var(--m) - var(--padr) - 320px) / var(--span, 19)), 34px);
+}
+
+/* ---- 今日價格底下的四行補充 ----------------------------------------------- */
+.fp .also {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1em var(--gap);
+  margin-top: clamp(20px, 2.6vw, 34px); font-size: 14px; line-height: 1.7; color: var(--ink-2);
+}
+.fp .also dt { font: 700 13px/1.5 var(--ming); letter-spacing: .2em; color: var(--ink); margin-bottom: .2em; }
+
+/* ---- 別人怎麼說：沿用要聞清單，線改成虛線 --------------------------------- */
+.fp .said-b > .b { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gap); align-items: start; }
+.fp .said-b .bf-group { margin: 0 0 clamp(16px, 2vw, 26px); }
+.fp .said-b .bf-k { font: 700 13px/1.4 var(--ming); letter-spacing: .3em; color: var(--ink-2); border-bottom: 1px dashed var(--ink-muted); padding-bottom: .6em; margin: 0; }
+.fp .said-b .bf-list li, .fp .said-b .bf-list li:last-child { border-bottom: 1px dashed var(--hair); }
+.fp .said-b .bf-h { font: 600 17px/1.6 var(--ming); color: var(--ink); }
+.fp .said-b .bf-d > summary.bf-h { padding: 12px 28px 12px 0; }
+.fp .said-b .bf-detail { font-size: 14px; line-height: 1.75; }
+.fp .said-b .bf-syn, .fp .said-b .mc-foot-note, .fp .said-b > .b > p, .fp .said-b .digest { grid-column: 1 / -1; }
+.fp .said-b .bf-syn { margin-top: 0; font-size: 15px; line-height: 1.85; max-width: 46em; color: var(--fp-text); }
+.fp .said-b .mc-foot-note { margin-top: 1em; font-size: 12.5px; color: var(--ink-2); }
+
+/* ---- 目錄 ----------------------------------------------------------------- */
+.fp .toc a { flex-wrap: wrap; }
+.fp .toc a span { white-space: nowrap; }
+.fp .toc-new {
+  flex-basis: 100%; margin: 1px 0 0 calc(1.5em + .7em); order: 3;
+  font: 400 12px/1.4 var(--hei); font-style: normal; letter-spacing: .04em; color: var(--ink-2);
+}
+.fp .toc a::after { margin-left: .2em; }
+
+@media (hover: hover) and (pointer: fine) {
+  .fp .hero h1 a:hover .l { text-decoration: underline; text-decoration-thickness: .035em; text-underline-offset: .14em; }
+  .fp .nx h3 a:hover, .fp .sig-btn:hover { background-size: 100% 1.5px; }
+  .fp .acc > summary:hover { text-decoration: underline; text-underline-offset: 5px; }
+}
+
+@media (max-width: 1023px) {
+  .fp .lead-note:has(.gist:nth-child(3)) { grid-template-columns: 1fr; }
+  .fp .call-regime { flex-direction: column; }
+  .fp .said-b > .b { grid-template-columns: 1fr; }
+}
+@media (max-width: 699px) {
+  /* 手機：第一行只有刊名與工具列，英文刊名與日期各自往下排 */
+  .fp .mast > .b { padding-right: var(--padr); row-gap: 3px; }
+  .fp .dateline { padding-right: 0; flex-direction: column; gap: 0; }
+  .fp .dateline .trust { white-space: nowrap; }
+  .fp .mn small .wide { display: none; }
+  .fp .since-none { margin: 0; padding: 0 var(--padr) 4px calc(var(--m) + var(--pad)); font-size: 14.5px; color: var(--ink-2); text-align: left; }
+  .fp .since-more { margin: 4px 0 0 calc(var(--m) + var(--pad)); color: var(--ink); }
+  .fp .since .d-t { font-size: 17px; }
+  .fp .lede-fig { font-size: clamp(22px, 6.6vw, 30px); }
+  .fp .fact .read { grid-area: r; }
+  .fp .fact h3 { align-self: end; }
+  .fp .ruler { padding: 32px 0 28px; }
+  .fp .read .rd { display: block; margin: 0 0 .1em; }
+  .fp .read p { font-size: 13px; }
+  .fp .sig .evi { font-size: 13px; }
+  .fp .axis, .fp .when { --u: calc((100vw - var(--m) - var(--padr) - 14px) / var(--span, 19)); }
+  .fp .also { grid-template-columns: 1fr; font-size: 13.5px; }
+  .fp .said-b .bf-h { font-size: 16px; }
+  .fp .gridmap { --cell: 24px; }
+  .fp .sub-h { font-size: 12.5px; letter-spacing: .24em; }
+}
+
+/* ---- 圖上的補充：第二道門檻、缺口的橋、斜線底 ----------------------------- */
+.fp .plot .thr2 { stroke: var(--ink-muted); stroke-width: 1; stroke-dasharray: 2 4; }
+.fp .plot .bridge { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 4; opacity: .6; }
+.fp .plot .lone { fill: var(--ink); }
+.fp .plot .hz-bg { fill: var(--hatch); }
+.fp .plot .hz { stroke: var(--ink); stroke-width: 1; opacity: .26; }
+.fp .plot .xl { font-family: var(--latin), serif; font-size: 13.5px; }
+.fp .read .rd.dir.nt::before { background: var(--ink-muted); }
+
+
+/* ============================================================================
+   密度（2026-10-10）：第一版留白太多，頁邊佔掉四分之一的畫面，沒有變動的日子
+   整欄是空的，版面往右偏。頁邊收窄、段距與列距收緊、字級降一階。
+   ========================================================================== */
+/* 刊名：英文、襯線斜體，兩個字跨在直線兩側 */
+.fp .wm-c { font: italic 500 var(--wm)/1 var(--latin), serif; letter-spacing: -.012em; white-space: nowrap; }
+.fp .mast { padding-top: clamp(12px, 1.4vw, 20px); padding-bottom: clamp(8px, .9vw, 13px); }
+.fp .mast > .b { align-items: baseline; }
+.fp .ed { bottom: .45em; font-size: 12px; }
+.fp .ed em { display: none; }       /* 刊名變成英文之後，旁邊再放一行英文會打架 */
+.fp .dateline { font-size: 13px; }
+
+/* 頭條 */
+.fp .lead-head { padding-top: clamp(18px, 2.2vw, 34px); }
+.fp .hero-m { padding-top: clamp(18px, 2.2vw, 34px); padding-bottom: clamp(16px, 1.8vw, 26px); }
+.fp .eyebrow { margin-bottom: clamp(8px, 1vw, 14px); font-size: 13px; }
+.fp .eyebrow b { font-size: 14px; }
+.fp .hero h1 { line-height: 1.18; }
+.fp .sub { margin-top: clamp(8px, 1vw, 14px); font-size: clamp(16px, 1.5vw, 21px); line-height: 1.55; }
+.fp .lead-note { padding-top: clamp(16px, 1.8vw, 26px); padding-bottom: clamp(20px, 2.4vw, 36px); gap: var(--gap); }
+.fp .gist h2 { margin-bottom: .45em; font-size: 12.5px; }
+.fp .gist p { font-size: 15px; line-height: 1.7; }
+.fp .tagline { font-size: clamp(15px, 1.25vw, 18px); }
+.fp .since h2 { font-size: 12.5px; }
+.fp .since ol { margin-top: clamp(12px, 1.4vw, 20px); gap: clamp(8px, 1vw, 14px); }
+.fp .since .d { font-size: clamp(34px, 3.5vw, 52px); }
+.fp .since .w { margin-top: 5px; font-size: 13px; line-height: 1.45; }
+.fp .since .w b { font-size: 14px; margin-right: .6em; }
+.fp .since-none { margin-top: clamp(10px, 1.2vw, 16px); font-size: 14px; line-height: 1.65; text-wrap: balance; }
+.fp .hero-m .scan { margin-top: clamp(14px, 1.6vw, 22px); padding: 6px 9px 5px; font-size: 12px; }
+
+/* 段落標題 */
+.fp .sh { margin-bottom: clamp(6px, .8vw, 12px); }
+.fp .sh > .b { padding-top: clamp(11px, 1.2vw, 17px); }
+.fp .sh > .b::before { height: 3px; }
+.fp .sh h2 { font-size: clamp(20px, 1.8vw, 26px); }
+.fp .sh p { margin-top: .3em; font-size: 13.5px; line-height: 1.55; max-width: 48em; }
+.fp .sub-h { padding-top: clamp(12px, 1.5vw, 20px); padding-bottom: .35em; font-size: 12.5px; }
+.fp .mn small { margin-top: 5px; font-size: 12px; }
+
+/* 圖 */
+.fp .gchart { margin-top: 4px; }
+.fp .fig-src { margin-top: 6px; }
+.fp .yl { font-size: 12px; }
+.fp .yl i { font-size: 15px; }
+.fp .yl.key { font-size: 12px; }
+.fp .yl.key i { font-size: 17px; }
+.fp .plot .endv { font-size: 23px; }
+
+/* 四個數字 */
+.fp .fact > .b { padding-top: clamp(6px, .7vw, 10px); padding-bottom: clamp(6px, .7vw, 10px); }
+.fp .fact h3 { font-size: clamp(16px, 1.3vw, 19px); }
+.fp .val { font-size: clamp(36px, 3.3vw, 50px); }
+.fp .ruler { padding: 27px 0 33px; }
+.fp .read p { font-size: 13.5px; line-height: 1.55; }
+.fp .read .rd { font-size: 14.5px; }
+
+/* 本站的判定 */
+.fp .call { padding: clamp(13px, 1.4vw, 20px) clamp(14px, 1.6vw, 24px); }
+.fp .call h3 { margin-bottom: .55em; font-size: 13px; }
+.fp .big { font-size: clamp(24px, 2.3vw, 34px); }
+.fp .split { font-size: clamp(16px, 1.5vw, 21px); }
+.fp .tally { height: 20px; margin-top: 8px; }
+.fp .tkey { margin-top: 5px; }
+.fp .call-s { margin-top: .5em; font-size: 13px; }
+.fp .sig > .b { padding-top: clamp(11px, 1.2vw, 16px); padding-bottom: clamp(11px, 1.2vw, 16px); }
+.fp .sig h3 { font-size: clamp(18px, 1.55vw, 22px); line-height: 1.35; }
+.fp .sig .det { margin-top: .3em; font-size: 14px; line-height: 1.6; }
+.fp .sig .evi { margin-top: .45em; font-size: 13.5px; line-height: 1.55; }
+.fp .tags { font-size: 13px; gap: 3px; }
+.fp .tags .sv { font-size: 15px; }
+.fp .acc { margin-top: clamp(10px, 1.2vw, 16px); }
+.fp .acc > summary { padding: 10px 0; font-size: 14px; }
+.fp .more { margin-top: .6em; font-size: 14px; }
+
+/* 今天／接下來／價格：一列一行，不撐高 */
+.fp .nx > .b { padding-top: clamp(8px, .85vw, 12px); padding-bottom: clamp(8px, .85vw, 12px); }
+.fp .nx h3 { font-size: clamp(16px, 1.35vw, 19px); }
+.fp .nx .det { font-size: 13.5px; line-height: 1.55; }
+.fp .kind { font-size: 13px; }
+.fp .kind b { font-size: 14px; }
+.fp .axis { margin-top: clamp(8px, 1vw, 12px); }
+.fp .when > .b { padding-top: clamp(5px, .55vw, 8px); padding-bottom: clamp(5px, .55vw, 8px); }
+.fp .px > .b { padding-top: 6px; padding-bottom: 6px; }
+.fp .px h3 { font-size: 15.5px; }
+.fp .px .lv { font-size: clamp(19px, 1.6vw, 23px); }
+.fp .px .cap { font-size: 13px; }
+.fp .also { margin-top: clamp(14px, 1.6vw, 22px); gap: .7em var(--gap); font-size: 13.5px; line-height: 1.6; }
+.fp .quiet { font-size: 13.5px; padding: 4px 0; }
+
+/* 別人怎麼說／目錄／頁尾 */
+.fp .said-b .bf-group { margin-bottom: clamp(10px, 1.2vw, 16px); }
+.fp .said-b .bf-h { font-size: 16px; line-height: 1.5; }
+.fp .said-b .bf-d > summary.bf-h { padding: 8px 26px 8px 0; }
+.fp .said-b .bf-d > summary.bf-h::after { top: 9px; }
+.fp .said-b .bf-syn { font-size: 14.5px; line-height: 1.75; }
+.fp .toc { gap: clamp(16px, 2vw, 28px) var(--gap); }
+.fp .toc h3 { padding-bottom: .5em; margin-bottom: .3em; }
+.fp .toc a { padding: .26em 0; font-size: clamp(15px, 1.25vw, 17px); }
+.fp .howto { gap: clamp(12px, 1.5vw, 20px) var(--gap); font-size: 13px; line-height: 1.65; }
+.fp .howto dt { margin-bottom: .25em; font-size: 13.5px; }
+.fp .colo { margin-top: clamp(28px, 3vw, 44px); }
+.fp .colo > .m { padding-top: clamp(14px, 1.6vw, 22px); padding-bottom: clamp(16px, 1.8vw, 26px); }
+.fp .colo > .b { padding-top: clamp(14px, 1.6vw, 22px); padding-bottom: clamp(16px, 1.8vw, 26px); }
+.fp .colo .fine { font-size: 13px; line-height: 1.65; }
+
+@media (max-width: 699px) {
+  .fp .mast { padding-top: 11px; padding-bottom: 8px; }
+  .fp .mast > .b { row-gap: 2px; }
+  .fp .ed { display: none; }                 /* 手機的頁邊放不下；右上角的按鈕已經寫著日報／夜報 */
+  .fp .dateline { font-size: 11.5px; }
+  .fp .lead-head { padding-top: 16px; padding-bottom: 18px; }
+  .fp .eyebrow { margin-bottom: 9px; font-size: 12px; }
+  .fp .eyebrow b { font-size: 13px; }
+  .fp .sub { font-size: 16px; line-height: 1.5; margin-top: 10px; }
+  .fp .tagline { margin-top: 18px; font-size: 13.5px; }
+  .fp .since { padding-bottom: 14px; }
+  .fp .since li { padding: 6px 0; }
+  .fp .since .d { font-size: 22px; }
+  .fp .since .w b { font-size: 15px; }
+  .fp .since .ft { font-size: 13.5px; }
+  .fp .lead-note { padding-top: 16px; padding-bottom: 4px; gap: 1em; }
+  .fp .gist p { font-size: 14.5px; line-height: 1.7; }
+  .fp .sh h2 { font-size: 20px; }
+  .fp .sh p { font-size: 12.5px; }
+  .fp .fact > .b { padding-top: 10px; padding-bottom: 10px; }
+  .fp .fact h3 { font-size: 15.5px; }
+  .fp .fact .val { font-size: 38px; }
+  .fp .ruler { padding: 26px 0 32px; }
+  .fp .call { padding: 13px 13px 14px; }
+  .fp .sig h3 { font-size: 17.5px; }
+  .fp .sig .det { font-size: 13px; }
+  .fp .nx h3 { font-size: 15.5px; }
+  .fp .px > .b { padding-top: 7px; padding-bottom: 7px; }
+  .fp .px h3 { font-size: 15px; }
+  .fp .px .lv { font-size: 19px; }
+  .fp .when > .b { padding-top: 8px; padding-bottom: 7px; }
+  .fp .txt { padding-top: 5px; }
+  .fp .said-b .bf-h { font-size: 15.5px; }
+  .fp .mn small { font-size: 10.5px; margin-top: 3px; }
+  .fp .plot .endv { font-size: 19px; }
+}

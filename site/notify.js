@@ -80,7 +80,7 @@
       }
       mark("通知權限");
       if (await Notification.requestPermission() !== "granted") {
-        alert("通知權限未開啟。到 設定 → 通知 → 總經儀表板 開啟後再試。");
+        alert("通知權限未開啟。到 設定 → 通知 → At the Margin 開啟後再試。");
         return;
       }
       mark("建立訂閱");
