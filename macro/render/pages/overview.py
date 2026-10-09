@@ -163,6 +163,8 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
     from ..layout import _trust_row
     is_tw = lambda s: s.get("module") == TAIWAN
     ev = ctx.get("events") or {}
+    # 螢光筆只標該看的變動：判定、訊號、機構數據、政策利率。殖利率這類每天都動的不算。
+    reading_changes = archive.decision_grade(reading_changes)
     # 要聞與今日導讀都來自同一個檔（排程任務寫的 data/brief.json）
     curated = brief_module.load()
 

@@ -34,7 +34,10 @@ from . import frontpage
 
 WEEKDAYS = "一二三四五六日"
 INFLATION_TARGET = 2.0
-RESTRICTIVE_REAL_RATE = 1.0     # 實質政策利率高於此＝具限制性
+RESTRICTIVE_REAL_RATE = 1.0     # 本站的分類門檻：實質政策利率高於此，尺上標成「限制性」
+# 離門檻不到這個距離就不判定落在哪一邊。核心 PCE 年增率只到小數一兩位、每月還會修正，
+# 0.99 與 1.01 的差別在資料誤差裡；讓標籤跟著它翻面，等於把雜訊當成判定。
+NEAR_THRESHOLD = 0.10
 MINUS = "−"                # 頁邊的數字用真的負號，不用連字號
 
 DIR_CLASS = {"hawkish": "hk", "dovish": "dv"}
@@ -387,7 +390,7 @@ def ruler(*, lo: float, hi: float, now: float | None, prev: float | None = None,
           refs: list[tuple[float, str]] | None = None,
           zones: list[tuple[float, float, str]] | None = None,
           kind: str = "threshold", flag: str = "", step: float | None = None,
-          label: str = "", dense: bool = False) -> str:
+          label: str = "", dense: bool = False, undecided: bool = False) -> str:
     """一把尺。kind：threshold（寫死的門檻）或 range（只是區間，沒有規則）。
 
     ticks  規則裡寫死的門檻，畫成長刻度，數字標在尺下
@@ -404,7 +407,7 @@ def ruler(*, lo: float, hi: float, now: float | None, prev: float | None = None,
     marks = []
     for start, end, name in zones or []:
         left, right = _pos(max(start, lo), lo, hi), _pos(min(end, hi), lo, hi)
-        on = " on" if start <= now < end else ""
+        on = " on" if (start <= now < end and not undecided) else ""
         marks.append(f'<i class="rz{on}" style="--p:{(left + right) / 2:.2f}%">{esc(name)}</i>')
     for value, text in ticks or []:
         position = _pos(value, lo, hi)
@@ -520,6 +523,11 @@ def figure_rows(ctx: dict, scenario: dict, reading_changes: list[dict]) -> list[
     if stance.get("policy_source"):
         sub = "依聯準會聲明，FRED 尚未更新。" + sub
     real_lo, real_hi = min(-0.5, (real or 0) - 0.5), max(2.5, (real or 0) + 0.5)
+    near = real is not None and abs(RESTRICTIVE_REAL_RATE - real) < NEAR_THRESHOLD
+    if near:
+        sub = (f"實質利率貼著 {RESTRICTIVE_REAL_RATE:.1f}% 的門檻，差距在資料誤差內，"
+               "不判定落在哪一邊。") + sub
+    sub += "。這是用過去一年的通膨算的回顧值，門檻是本站的分類，不是聯準會的定義"
     rows.append({
         "name": "政策利率上緣", "href": "/fed/", "value": pct(policy, 2),
         "read": f"實質 {pct(real, 2)}", "dir": "", "sub": sub,
@@ -529,8 +537,12 @@ def figure_rows(ctx: dict, scenario: dict, reading_changes: list[dict]) -> list[
                       ticks=[(RESTRICTIVE_REAL_RATE, f"{RESTRICTIVE_REAL_RATE:.1f}")],
                       zones=[(real_lo - 1, RESTRICTIVE_REAL_RATE, "中性或偏寬鬆"),
                              (RESTRICTIVE_REAL_RATE, real_hi + 1, "限制性")],
-                      label=f"實質政策利率 {pct(real, 2)}；高於 {RESTRICTIVE_REAL_RATE:.0f}% 視為具限制性"),
-        "gap": ({"value": fmt(abs(RESTRICTIVE_REAL_RATE - real), 2), "what": "離限制性門檻",
+                      undecided=near,
+                      label=f"實質政策利率 {pct(real, 2)}；本站以 {RESTRICTIVE_REAL_RATE:.0f}% 為分類門檻"
+                            + ("，現在貼著門檻不判定" if near else "")),
+        "gap": ({"word": "只差" if near else "還差",
+                 "value": fmt(abs(RESTRICTIVE_REAL_RATE - real), 2),
+                 "what": "貼著門檻，不判定" if near else "離限制性門檻",
                  "unit": "個百分點"} if real is not None else None),
     })
 
@@ -544,9 +556,14 @@ def figure_rows(ctx: dict, scenario: dict, reading_changes: list[dict]) -> list[
         "read": f'實質 {pct(decomp.get("real"), 2)}', "dir": "",
         "sub": (f'近三月 {fmt(decomp.get("chg_3m"), 2, suffix=" pp", signed=True)}。'
                 "沒有寫死的門檻，只標近一年區間"),
-        "change": changed.get("10 年期公債"),
+        # 市場價格每個交易日都在動，不標「跟上一期不一樣」。頁邊寫近一月累計了多少——
+        # 2026 年 8 到 10 月它從 4.72% 升到 5.28%，是 37 次小變動堆出來的，
+        # 每天標一次看不出這件事。
+        "change": None,
+        "trend": ({"value": _signed(decomp["chg_1m"], 2), "what": "近一月", "unit": "個百分點"}
+                  if decomp.get("chg_1m") is not None else None),
         "ruler": dict(lo=lo - (hi - lo) * 0.04, hi=hi + (hi - lo) * 0.04, now=ten,
-                      prev=prev_of("10 年期公債", ten), kind="range", flag=fmt(ten, 2),
+                      prev=None, kind="range", flag=fmt(ten, 2),
                       ticks=[(lo, f"{lo:.2f} 一年低點"), (hi, f"{hi:.2f} 一年高點")],
                       label=f"10 年期公債 {pct(ten, 2)}；近一年區間 {lo:.2f}% 到 {hi:.2f}%。"
                             f"這是區間，不是門檻"),
@@ -573,6 +590,11 @@ def _fact_note(item: dict, base: str | None, comparable: bool = True) -> str:
                     f'{esc(gap["what"])}<span class="wide">，{esc(gap["unit"])}</span>')
     if item.get("missing"):
         return note("<i>—</i>", "沒有資料", kind="na")
+    trend = item.get("trend")
+    if trend:
+        # 累計變動：不是「跟上一期不一樣」，所以不上色
+        return note(f'<i>{trend["value"]}</i>',
+                    f'{esc(trend["what"])}<span class="wide">，{esc(trend["unit"])}</span>')
     if not comparable:
         return note("<i>—</i>", "上期未記", kind="na")
     return note("未變", esc(since), kind="na")
@@ -1065,8 +1087,10 @@ def colophon(updated: str) -> str:
     from ..layout import colophon as shared
     legend = (
         '<dl class="howto">'
-        '<div><dt>頁邊與正文</dt><dd><span><span class="hlx">+0.01</span>有螢光筆的＝跟上一期不一樣。</span>'
-        '<span>沒上色的頁邊是離門檻多遠、離公布幾天；空白就是沒變。</span></dd></div>'
+        '<div><dt>頁邊與正文</dt><dd><span><span class="hlx">+0.01</span>有螢光筆的＝判定、訊號或機構數據'
+        '跟上一期不一樣。</span>'
+        '<span>每天都在動的市場價格不標（它們在「今日價格」）；沒上色的頁邊是離門檻多遠、'
+        '近一月累計、離公布幾天；空白就是沒變。</span></dd></div>'
         f'<div><dt>誰說的</dt><dd><span>{seal("實")}機構發布的數字</span><span>{seal("判")}本站固定規則的判定</span>'
         f'<span>{seal("市")}市場價格</span><span>{seal("聞")}別人的報導，責任在報導者</span>'
         f'<span>{seal("摘")}語言模型寫的摘要（每日排程），只轉述、不另下判斷</span></dd></div>'

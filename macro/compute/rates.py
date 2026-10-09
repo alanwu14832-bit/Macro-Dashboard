@@ -259,8 +259,10 @@ def health_checks(bundle: Bundle, shape: dict, decomp: dict,
     if stance.get("real_policy") is not None:
         real = stance["real_policy"]
         state = "watch" if real < 0.5 else "normal" if real < 2.5 else "alert"
+        # 離 1% 的分類門檻不到 0.1 就不判定——那個差距在資料誤差裡
         add("實質政策利率", state, f"{real:+.2f}%",
-            "政策仍具限制性" if real > 1.0 else "政策接近中性或偏寬鬆")
+            "貼著本站 1% 的分類門檻，不判定" if abs(real - 1.0) < 0.10
+            else "高於本站 1% 的分類門檻" if real > 1.0 else "低於本站 1% 的分類門檻")
 
     if stance.get("market_gap") is not None:
         add("2年期 vs 政策利率", "normal", f"{stance['market_gap']:+.2f}%",

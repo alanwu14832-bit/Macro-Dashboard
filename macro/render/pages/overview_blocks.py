@@ -460,7 +460,7 @@ def fed_stance(ctx: dict, scenario: dict, fomc: dict | None) -> str:
     if stance.get("real_policy") is not None:
         tiles.append(stat("實質政策利率", pct(stance["real_policy"], 2),
                           delta="政策利率減核心 PCE", direction=None,
-                          asof="正值代表政策具限制性"))
+                          asof="回顧值；本站以 1% 為分類門檻"))
     if stance.get("market_implies"):
         tiles.append(stat("市場定價", esc(stance["market_implies"].replace("市場定價", "")),
                           delta=f'2 年期減政策利率 {fmt(stance.get("market_gap"), 2, suffix=" pp", signed=True)}',

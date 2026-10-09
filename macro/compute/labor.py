@@ -182,25 +182,36 @@ def sector_contributions(bundle: Bundle) -> dict:
         change_12m = (s.change_over(12) or 0) / 12
         if change is None:
             continue
+        parent = catalogue.LABOR_SECTOR_PARENTS.get(series_id)
         rows.append({
             "id": series_id, "name": name, "value": change,
             "avg3": change_3m, "avg12": change_12m,
             "level": s.last,
             "yoy": s.yoy().last,
+            # 這個行業是哪個行業的一部分（有的話）。明細不進加總、擴散與排名。
+            "parent": catalogue.LABOR_SECTORS.get(parent) if parent else None,
         })
     rows.sort(key=lambda r: r["value"], reverse=True)
 
-    expanding = sum(1 for r in rows if r["value"] > 0)
-    diffusion = expanding / len(rows) * 100 if rows else None
+    # 互不重疊的那一層：擴散指數、排名、與非農總數對帳都只用它
+    top_level = [r for r in rows if not r["parent"]]
+    expanding = sum(1 for r in top_level if r["value"] > 0)
+    diffusion = expanding / len(top_level) * 100 if top_level else None
 
     # 三個月擴散：更能看出動能是集中在少數行業還是全面性
-    expanding_3m = sum(1 for r in rows if r["avg3"] > 0)
+    expanding_3m = sum(1 for r in top_level if r["avg3"] > 0)
+
+    # 跟非農總變動對帳：行業加總少掉的是本站沒有收的行業（公用事業）與四捨五入
+    covered = sum(r["value"] for r in top_level)
+    total = bundle["PAYEMS"].change_over(1)
     return {
         "rows": rows,
         "diffusion": diffusion,
-        "diffusion_3m": expanding_3m / len(rows) * 100 if rows else None,
-        "top": rows[:3], "bottom": rows[-3:],
-        "n": len(rows),
+        "diffusion_3m": expanding_3m / len(top_level) * 100 if top_level else None,
+        "top": top_level[:3], "bottom": top_level[-3:],
+        "n": len(top_level),
+        "covered": covered, "total": total,
+        "uncovered": (total - covered) if total is not None else None,
     }
 
 

@@ -199,7 +199,7 @@ def render(ctx: dict, signals: list[dict]) -> str:
                    if stance.get("policy_source")
                    else f'{zh_date(d["as_of"], freq="d")} 資料')),
         stat("實質政策利率", pct(stance["real_policy"], 2),
-             delta="政策利率減核心 PCE", asof="正值代表政策具限制性"),
+             delta="政策利率減核心 PCE", asof="回顧值；本站以 1% 為分類門檻"),
         stat("10 年期公債", pct(decomposition["nominal"], 2),
              delta=f'近三月 {fmt(decomposition["chg_3m"], 2, suffix=" pp", signed=True)}',
              spark=[(dt.isoformat(), v) for dt, v in

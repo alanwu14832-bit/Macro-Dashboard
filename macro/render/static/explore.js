@@ -18,8 +18,8 @@
   const MAX_SERIES = 4;
   const TRANSFORMS = {
     level: { label: "原始值", needsBase: false },
-    yoy: { label: "年增率 %", needsBase: true, suffix: "%" },
-    ann3: { label: "近三月年化 %", needsBase: true, suffix: "%" },
+    yoy: { label: "跟一年前比（年增率；比率類算百分點）", needsBase: true, suffix: "%" },
+    ann3: { label: "跟三個月前比（年化；比率類算百分點）", needsBase: true, suffix: "%" },
     index: { label: "指數化（起點=100）", needsBase: true },
     zscore: { label: "z 分數", needsBase: true },
   };
@@ -46,11 +46,47 @@
     return year + "-" + String(month).padStart(2, "0");
   }
 
+  // 本身就是百分比的序列（失業率、利率、利差）。它們的「變動」是百分點，不是變動率：
+  // 失業率從 4.3% 到 4.2% 是 −0.1 個百分點，不是 −2.3%。
+  function isRate(meta) {
+    return /^(%|pp|bp|個百分點)$/.test((meta.unit || "").trim());
+  }
+
+  // 這個轉換對這條序列實際算的是什麼——寫進圖例，免得同一張圖上兩條線各算各的卻看不出來
+  function transformLabel(meta, mode) {
+    if (mode === "yoy") return isRate(meta) ? "一年變動，百分點" : "年增率 %";
+    if (mode === "ann3") return isRate(meta) ? "三個月變動，百分點" : "近三月年化 %";
+    return "";
+  }
+
   function transform(series, meta, mode) {
     const { dates, values } = series;
     const per = PER_YEAR[meta.freq] || 12;
 
     if (mode === "level") return { dates, values };
+
+    if ((mode === "yoy" || mode === "ann3") && isRate(meta)) {
+      // 比率類：跟 12（或 3）個月前相減，單位是百分點。月季年頻照日曆找基期。
+      const months = mode === "yoy" ? 12 : 3;
+      const d = [], v = [];
+      if (meta.freq === "m" || meta.freq === "q" || meta.freq === "a") {
+        const byMonth = new Map();
+        dates.forEach((date, i) => byMonth.set(date.slice(0, 7), values[i]));
+        for (let i = 0; i < values.length; i++) {
+          const base = byMonth.get(monthsBefore(dates[i], months));
+          if (base === undefined || base === null) continue;
+          d.push(dates[i]);
+          v.push(values[i] - base);
+        }
+        return { dates: d, values: v };
+      }
+      const periods = mode === "yoy" ? per : Math.max(1, Math.round(per / 4));
+      for (let i = periods; i < values.length; i++) {
+        d.push(dates[i]);
+        v.push(values[i] - values[i - periods]);
+      }
+      return { dates: d, values: v };
+    }
 
     if (mode === "yoy" || mode === "ann3") {
       const months = mode === "yoy" ? 12 : 3;
@@ -242,17 +278,29 @@
       if (!raw) continue;
       const shaped = clip(transform(raw, item, mode), state.years);
       if (!shaped.dates.length) continue;
+      const how = transformLabel(item, mode);
       series.push({
-        name: item.name + (mode === "level" && item.unit ? `（${item.unit}）` : ""),
+        name: item.name + (mode === "level" && item.unit ? `（${item.unit}）` : "")
+          + (how ? `（${how}）` : ""),
         color: `series-${index + 1}`,
         data: shaped.dates.map((d, i) => [d, Math.round(shaped.values[i] * 10000) / 10000]),
       });
     }
     if (!series.length) return;
 
+    // 年增率與年化：比率類算的是百分點，其餘是百分比。混在一起時軸上不標單位，看圖例。
+    const changes = mode === "yoy" || mode === "ann3";
+    const rates = state.selected.filter((s) => isRate(s)).length;
+    if (changes && rates) {
+      note.textContent += (note.textContent ? " " : "")
+        + "失業率、利率這類本身就是百分比的序列，這裡算的是百分點的變動，不是變動率"
+        + "（失業率從 4.3% 到 4.2% 是 −0.1 個百分點，不是 −2.3%）。";
+    }
+    const suffix = !changes ? (TRANSFORMS[mode].suffix || "")
+      : rates === state.selected.length ? " pp" : rates ? "" : "%";
     const spec = {
       type: "line", series, defaultYears: 0,
-      suffix: TRANSFORMS[mode].suffix || "",
+      suffix,
       freq: state.selected[0].freq || "m",
       height: 320, digits: mode === "level" ? undefined : 2,
     };

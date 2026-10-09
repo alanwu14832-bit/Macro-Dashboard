@@ -71,8 +71,9 @@ def render(ctx: dict, signals: list[dict]) -> str:
                    asof="總資產 − 兩個抽水池")
             + "</div>"
             + callout("QT 縮表抽走的錢，可能被財政部帳戶下降或逆回購資金回流"
-                      "抵銷——單看縮表會誤判，要看淨額。淨流動性收縮而股市"
-                      "仍漲，代表漲勢靠的是獲利或估值，不是錢變多。"),
+                      "抵銷——單看縮表會誤判，要看淨額。這個淨額只涵蓋聯準會資產負債表"
+                      "這一塊，不是市場上全部的流動性；它跟股市走勢不一致時，"
+                      "不能據此判斷漲勢靠的是什麼。"),
             note=f'{zh_date(liq["as_of"], freq="d")} 資料，週頻'))
 
     # ---- 股債相關性 ----
@@ -85,11 +86,12 @@ def render(ctx: dict, signals: list[dict]) -> str:
             f'<div class="hero-figure">{fmt(stock_bond["latest"], 2, signed=True)}'
             f'<span style="font-size:.3em;color:var(--ink-muted)"> 近一年</span></div>'
             + table(["期間", "標普報酬 vs 10 年殖利率變動的相關係數"], rows)
-            + callout(f'判定：<strong>{esc(stock_bond["verdict"])}</strong>。'
-                      f'殖利率上升時股票同步下跌（負相關）＝通膨主導，'
-                      f'債券無法對沖股票，傳統 60/40 的分散效果下降。', key=True)
+            + callout(f'觀察：<strong>{esc(stock_bond["verdict"])}</strong>。'
+                      f'常見的解釋：通膨與利率預期主導行情時兩者同向，成長疑慮主導時反向。'
+                      f'相關係數分不出是哪一種——要驗證，看殖利率的變動來自通膨補償還是'
+                      f'實質利率（<a href="/fed/#decomposition">長端利率拆解</a>）。', key=True)
             + "</div>",
-            note="這是總經體制最直接的市場證據",
+            note="相關係數只描述兩者一起動的程度，不說明原因",
         terms=["stock_bond_correlation"]))
 
     # ---- 實質利率張力 ----
@@ -117,10 +119,11 @@ def render(ctx: dict, signals: list[dict]) -> str:
                        [{"name": r["name"], "value": r["pct10y"]}
                         for r in volatility["rows"] if r["pct10y"] is not None],
                        suffix="%", digits=0, label_width=100, sign_color=None,
-                       sub="百分位低＝市場對該資產的風險定價不足")
+                       sub="百分位低＝這個市場的隱含波動在自己十年的歷史裡偏低；不等於風險被低估")
             + table(["市場", "目前", "近一年均", "十年百分位"], rows)
-            + callout(f'判定：<strong>{esc(volatility["verdict"])}</strong>。'
-                      f'低波動本身不是賣訊，但代表壞消息來時的重定價幅度會較大。'),
+            + callout(f'觀察：<strong>{esc(volatility["verdict"])}</strong>。'
+                      f'隱含波動低不是賣訊，也不代表風險被低估——那要跟實際波動比，'
+                      f'本站沒有這項比較。低波動時期遇到意外，重新定價的幅度通常比較大。'),
         terms=["vix", "percentile_rank"]))
 
     # ---- 商品 ----

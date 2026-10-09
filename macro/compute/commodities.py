@@ -1,7 +1,7 @@
 """大宗商品。
 
 不只列價格。放進總經儀表板的理由是這三條關係：
-  銅金比   — 銅反映實體需求、黃金反映避險，比值是最乾淨的成長預期讀數
+  銅金比   — 銅偏實體需求、黃金偏避險，比值常被當成成長預期的代理（也受供給與買盤影響）
   金銀比   — 白銀有工業用途，比值拉高代表市場在買純避險而非買景氣
   黃金 vs 實質利率 — 持有黃金的機會成本就是實質利率，兩者長期反向
 
@@ -107,7 +107,7 @@ def gold_real_rate(bundle: Bundle, gold: Series) -> dict:
         "corr_daily_1y": corr_1y, "corr_yoy_5y": corr_5y,
         "real_series": real,
         "verdict": ("黃金與實質利率維持典型的反向關係" if corr_5y is not None and corr_5y < -0.3
-                    else "黃金與實質利率的反向關係鬆脫，多半是避險或央行買盤主導"
+                    else "黃金與實質利率的反向關係鬆脫"
                     if corr_5y is not None else "資料不足"),
     }
 

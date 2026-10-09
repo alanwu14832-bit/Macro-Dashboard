@@ -483,8 +483,9 @@ def stock_bond_correlation_positive(ctx):
         return None
     return _signal(
         "stock_bond_correlation_positive",
-        "股債同向，債券失去對沖股票的功能",
-        "這是通膨主導的典型特徵，傳統 60/40 配置的分散效果會下降",
+        "股債同向，債券對股票的對沖效果變差",
+        "近一年殖利率上升的日子股票多半下跌。常見的解釋是通膨或利率預期在主導行情，"
+        "但相關係數分不出原因；它只說明這段期間債券沒有發揮對沖",
         f"標普報酬與10年殖利率變動相關 {latest:+.2f}（近一年）",
         "neutral", "medium", "市場")
 
@@ -493,13 +494,15 @@ def stock_bond_correlation_positive(ctx):
 def volatility_complacent(ctx):
     vol = ctx["market"]["volatility"]
     vix = vol.get("vix")
-    if vix is None or vix > 15:
+    # 連續五個交易日在門檻同一側才換邊（market.persistent_side）；只看最新一天會天天翻面
+    if vix is None or not vol.get("vix_low"):
         return None
     return _signal(
         "volatility_complacent",
-        "波動率處於低檔，市場對總經風險定價不足",
-        "低波動本身不是賣訊，但代表壞消息來時的重定價幅度會較大",
-        f"VIX {vix:.1f}",
+        "VIX 連續一週在 15 以下，隱含波動處於低檔",
+        "這只說明選擇權隱含的波動低；它便不便宜要跟實際波動比，本站沒有這項比較。"
+        "低波動時期遇到意外，重新定價的幅度通常比較大",
+        f"VIX {vix:.1f}（連續 5 個交易日在 15 以下才成立，連續 5 日回到 15 以上才解除）",
         "neutral", "low", "市場")
 
 

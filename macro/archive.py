@@ -152,26 +152,36 @@ def reading_changes(current: dict, prior: dict | None) -> list[dict]:
     """關鍵讀數的變化，供總覽頁的『跟上期比什麼變了』。"""
     if not prior:
         return []
+    # kind：data＝機構發布、一個月才動一兩次的讀數；market＝每個交易日都在動的價格。
+    # 頭版的螢光筆只標 data（見 decision_grade）。2026-08 到 10 月的存檔裡，頁邊有 41/58 天
+    # 是黃的，其中 23 天只是殖利率或衰退刻度每天的小波動（10 年期中位數才 0.04 個百分點）
+    # ——天天都亮的燈分不出哪一天真的有事。market 仍然留在這份清單裡，存檔頁照列。
     labels = {
-        "policy_upper": ("政策利率上緣", "%", 1),
-        "payrolls_3m": ("三月均非農", "千人", 10),
-        "unemployment": ("失業率", "%", 1),
-        "core_pce": ("核心 PCE", "%", 1),
-        "core_cpi": ("核心 CPI", "%", 1),
-        "supercore": ("核心服務除住房", "%", 1),
-        "ten_year": ("10 年期公債", "%", 1),
-        "real_ten_year": ("10 年實質利率", "%", 1),
-        "recession_gauge": ("衰退風險刻度", "", 1),
+        "policy_upper": ("政策利率上緣", "%", 1, "data"),
+        "payrolls_3m": ("三月均非農", "千人", 10, "data"),
+        "unemployment": ("失業率", "%", 1, "data"),
+        "core_pce": ("核心 PCE", "%", 1, "data"),
+        "core_cpi": ("核心 CPI", "%", 1, "data"),
+        "supercore": ("核心服務除住房", "%", 1, "data"),
+        "ten_year": ("10 年期公債", "%", 1, "market"),
+        "real_ten_year": ("10 年實質利率", "%", 1, "market"),
+        "recession_gauge": ("衰退風險刻度", "", 1, "market"),
     }
     out = []
-    for key, (name, unit, divisor) in labels.items():
+    for key, (name, unit, divisor, kind) in labels.items():
         now = (current.get("readings") or {}).get(key)
         was = (prior.get("readings") or {}).get(key)
         if now is None or was is None or now == was:
             continue
         out.append({
-            "name": name, "unit": unit,
+            "name": name, "unit": unit, "kind": kind,
             "now": now / divisor, "was": was / divisor,
             "change": (now - was) / divisor,
         })
     return out
+
+
+def decision_grade(changes: list[dict] | None) -> list[dict]:
+    """頭版要標出來的讀數變動：機構數據與政策利率。每天都在動的市場價格不算——
+    它們在「今日價格」那一段，用綠漲紅跌標，不借螢光筆。"""
+    return [c for c in changes or [] if c.get("kind") != "market"]

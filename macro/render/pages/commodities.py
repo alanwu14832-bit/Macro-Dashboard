@@ -78,11 +78,12 @@ def render(ctx: dict) -> str:
     # ---- 銅金比 ----
     if cg.get("series"):
         body.append(section(
-            "copper-gold", "銅金比：市場定價的成長預期",
+            "copper-gold", "銅金比：常用的成長預期代理",
             line_chart("銅金比 vs 10 年公債殖利率",
                        [(cg["series"], "銅金比", "series-2")],
                        years=25, default_years=10, digits=4, freq="m",
-                       sub="銅反映實體需求、黃金反映避險，比值是最乾淨的成長預期讀數")
+                       sub="銅偏實體需求、黃金偏避險，比值常被當成成長預期的代理；"
+                           "它也受銅的供給與黃金買盤影響，不是單一原因的讀數")
             + f'<div class="card" style="margin-top:14px">' + kv([
                 ("目前銅金比", fmt(cg["ratio"], 4)),
                 ("十年平均", fmt(cg["avg10y"], 4)),
@@ -106,8 +107,8 @@ def render(ctx: dict) -> str:
                 ("年增率相關（近五年）", fmt(gr["corr_yoy_5y"], 2, signed=True)),
             ]) + callout(
                 f'{esc(gr.get("verdict", ""))}。持有黃金不孳息，機會成本就是實質利率，'
-                f'所以兩者長期反向。這個關係鬆脫時，多半代表央行買盤或地緣避險'
-                f'蓋過了利率因素。') + "</div>",
+                f'所以兩者長期反向。這個關係鬆脫時，常見的解釋是央行買盤或地緣避險，'
+                f'但本站沒有買盤的資料，分不出是哪一個。') + "</div>",
         terms=["gold_real_rates", "real_rate"]))
 
     # ---- 分類明細 ----

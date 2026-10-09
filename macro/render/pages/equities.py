@@ -275,9 +275,9 @@ def render_us(ctx: dict) -> str:
         body.append(section(
             "em-etfs", "新興市場 ETF（美元計價）",
             _quote_table(em["etfs"])
-            + callout("以美元計價的 ETF 同時含匯率效果。當地指數漲但 ETF 跌，"
-                      "代表那個國家的貨幣正在貶值——這是美元強弱對新興市場"
-                      "最直接的傳導管道。<br><br>"
+            + callout("以美元計價的 ETF 同時含匯率效果。當地指數與 ETF 方向不同時，"
+                      "匯率是可能的原因之一；但兩者的成分、交易時段、股利與折溢價也不一樣，"
+                      "不能把差距直接當成匯率變動。<br><br>"
                       "中國以 FXI 與 ASHR 兩檔 ETF 代表：上證與深證指數在這個"
                       "資料來源取不到，本站不以其他指數替代充數。"),
             terms=["dollar_index"]))

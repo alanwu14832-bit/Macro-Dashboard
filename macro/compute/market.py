@@ -41,6 +41,33 @@ def _ytd(s: Series):
     return ((s.last / start - 1) * 100) if start else None
 
 
+VIX_LOW, VIX_HIGH = 15.0, 25.0
+# 連續幾個交易日在門檻同一側才算換邊。回放 2026-10 以前的 60 個交易日：
+# 只看當天翻 14 次、3 天翻 6 次、5 天（一週）翻 0 次；近 250 個交易日是 20／8／2 次。
+PERSIST_DAYS = 5
+
+
+def persistent_side(series, threshold: float, days: int = PERSIST_DAYS) -> str | None:
+    """最近一次「連續 days 個交易日都在門檻同一側」是哪一側："below" 或 "above"。
+
+    門檻設在讀數平常就在晃的地方時，只看最新一天會天天翻面：2026 年 8 到 9 月
+    VIX 貼著 15 上下 0.7 點，「波動率低檔」這條訊號 58 天裡進出了 10 次，
+    佔全部訊號變動的四成——那是門檻在雜訊裡，不是風險定價在變。
+    改成要連續 days 天站在同一側才算換邊；中間來回的日子維持上一次的狀態。
+    不需要另外存狀態：往回找最近一段連續 days 天同側的就是答案。
+    """
+    side, run = None, 0
+    for value in reversed(series.values):
+        now = "below" if value <= threshold else "above"
+        if now == side:
+            run += 1
+        else:
+            side, run = now, 1
+        if run >= days:
+            return side
+    return None
+
+
 def volatility(bundle: Bundle) -> dict:
     rows = []
     for series_id, name in [("VIXCLS", "VIX 股市"), ("VXNCLS", "那斯達克"),
@@ -55,17 +82,23 @@ def volatility(bundle: Bundle) -> dict:
             "series": s,
         })
     vix = bundle["VIXCLS"]
+    low = persistent_side(vix, VIX_LOW) == "below" if vix else False
+    high = persistent_side(vix, VIX_HIGH) == "above" if vix else False
     return {
         "rows": rows, "vix": vix.last,
         "vix_series": vix,
-        "verdict": ("市場對風險幾乎沒有定價" if vix.last is not None and vix.last < 15
-                    else "波動率偏高，市場已在避險" if vix.last is not None and vix.last > 25
+        "vix_low": low, "vix_high": high,
+        # 只描述隱含波動在哪裡。它便不便宜要跟實際波動比，本站沒有那項比較，
+        # 所以不寫「風險定價不足」「市場已在避險」這類替市場下的結論。
+        "verdict": (f"VIX 連續 {PERSIST_DAYS} 個交易日在 {VIX_LOW:.0f} 以下，隱含波動處於低檔" if low
+                    else f"VIX 連續 {PERSIST_DAYS} 個交易日在 {VIX_HIGH:.0f} 以上，隱含波動偏高" if high
                     else "波動率處於常態區間"),
     }
 
 
 def stock_bond(bundle: Bundle) -> dict:
-    """股債相關性。轉正代表通膨主導，債券不再是股票的避險工具。"""
+    """股債相關性：標普報酬對 10 年殖利率變動。負值＝殖利率升的日子股票多半跌（股債同向）。
+    只描述兩者一起動的程度；為什麼同向，相關係數自己答不出來。"""
     sp500 = bundle["SP500"]
     ten = bundle["DGS10"]
     if not (sp500 and ten):
@@ -84,8 +117,10 @@ def stock_bond(bundle: Bundle) -> dict:
     return {
         "windows": windows,
         "latest": latest,
-        "verdict": ("股債同向：通膨主導，債券無法對沖股票" if latest is not None and latest < -0.1
-                    else "股債反向：成長主導，債券仍具避險功能" if latest is not None and latest > 0.1
+        "verdict": ("股債同向：殖利率上升的日子股票多半下跌，債券對股票的對沖效果較差"
+                    if latest is not None and latest < -0.1
+                    else "股債反向：殖利率下跌的日子股票多半下跌，債券有對沖效果"
+                    if latest is not None and latest > 0.1
                     else "股債相關性接近零"),
     }
 

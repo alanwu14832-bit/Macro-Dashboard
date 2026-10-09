@@ -8,6 +8,11 @@ from ..html import (accordion, callout, delta_span, esc, fmt, kv, pct, section,
 from ...compute.labor import to_wan
 
 
+def _sector_name(row: dict) -> str:
+    """明細行業前面加「其中」：它是上一層的一部分，不是並列的另一個行業。"""
+    return f'其中：{row["name"]}（屬{row["parent"]}）' if row.get("parent") else row["name"]
+
+
 def render(ctx: dict, signals: list[dict]) -> str:
     d = ctx["labor"]
     payrolls = d["payrolls"]
@@ -160,20 +165,31 @@ def render(ctx: dict, signals: list[dict]) -> str:
     if sectors.get("rows"):
         chart_html = hbar_chart(
             "行業別對本月非農的貢獻",
-            [{"name": r["name"], "value": r["value"]} for r in sectors["rows"]],
-            suffix=" 千人", digits=0, label_width=120,
+            [{"name": _sector_name(r), "value": r["value"]} for r in sectors["rows"]],
+            suffix=" 千人", digits=0, label_width=150,
             sub=f'擴散指數 {fmt(sectors["diffusion"], 0)}%'
-                f'（{sectors["n"]} 個行業中增加就業的比例）')
-        rows = [[esc(r["name"]),
+                f'（{sectors["n"]} 個互不重疊的行業中增加就業的比例）。'
+                "標「其中」的是上一層行業的一部分，不能跟它相加")
+        rows = [[esc(_sector_name(r)),
                  thousands_to_wan(r["value"]),
                  thousands_to_wan(r["avg3"]),
                  thousands_to_wan(r["avg12"]),
                  pct(r["yoy"], 1)]
                 for r in sectors["rows"]]
+        reconcile = ""
+        if sectors.get("total") is not None:
+            gap = sectors["uncovered"]
+            reconcile = (
+                f'{sectors["n"]} 個互不重疊的行業合計 {thousands_to_wan(sectors["covered"])}，'
+                f'非農總變動 {thousands_to_wan(sectors["total"])}；'
+                + ("兩者對得上。" if abs(gap) < 0.5 else
+                   f'差額 {thousands_to_wan(gap)} 是本站沒有收的行業（公用事業）'
+                   "與各行業分別季節調整造成的出入。"))
         body.append(section(
             "sectors", "行業別貢獻分解",
-            chart_html + accordion("展開 17 個行業的完整數字",
-                                   table(["行業", "本月", "三月均", "十二月均", "年增"], rows)),
+            chart_html + accordion(f'展開 {len(rows)} 列的完整數字',
+                                   table(["行業", "本月", "三月均", "十二月均", "年增"], rows,
+                                         foot=reconcile)),
             note=f'三月擴散指數 {fmt(sectors["diffusion_3m"], 0)}%',
         terms=["diffusion"]))
 
