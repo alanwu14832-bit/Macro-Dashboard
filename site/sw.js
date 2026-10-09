@@ -21,7 +21,7 @@ self.addEventListener("push", (event) => {
   let data = {};
   try { data = event.data.json(); } catch (_) { /* 非 JSON 就用預設 */ }
   event.waitUntil(self.registration.showNotification(
-    data.title || "邊際",
+    data.title || "At the Margin",
     {
       body: data.body || "",
       icon: "/icon-192.png",
