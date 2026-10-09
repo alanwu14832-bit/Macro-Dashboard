@@ -20,10 +20,11 @@ from datetime import date, datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from macro import archive, clock, data, paths
-from macro.compute import (commodities, debt, equities, fedfunds, freshness,
+from macro import archive, cbc_board, clock, data, fomc, http, paths
+from macro.sources import fomc_text
+from macro.compute import (commodities, debt, equities, events, fedfunds, freshness,
                            growth, inflation, labor, market, news, rates,
-                           scenario, signals, world)
+                           scenario, signals, taiwan, world)
 
 MODULES = [
     ("labor", labor), ("inflation", inflation), ("rates", rates),
@@ -97,6 +98,24 @@ def load_context():
         except Exception as exc:  # 單一模組壞掉不該讓整份摘要消失
             ctx[name] = {}
             print(f"   ✗ {name} 計算失敗：{exc}", file=sys.stderr)
+    # 台灣與「今天的事件」：頭版台灣版的導讀要用。台灣各來源的快取期限各不相同
+    # （央行 RSS 只有半小時），所以這一段強制只讀快取——這支腳本的承諾是不連網。
+    was_offline, http.OFFLINE = http.OFFLINE, True
+    try:
+        for name, build in (("taiwan", lambda: taiwan.compute(bundle)),
+                            ("fomc", lambda: fomc.decision_states(
+                                fomc_text.latest_decision(ttl=float("inf")))),
+                            ("cbc", lambda: cbc_board.decision_states(
+                                (ctx.get("taiwan") or {}).get("cbc_decision"),
+                                cbc_board.meetings((ctx.get("taiwan") or {}).get("cbc_schedule") or []))),
+                            ("events", lambda: events.compute(ctx))):
+            try:
+                ctx[name] = build()
+            except Exception as exc:
+                ctx[name] = {} if name in ("taiwan", "events") else []
+                print(f"   ✗ {name} 計算失敗：{exc}", file=sys.stderr)
+    finally:
+        http.OFFLINE = was_offline
     return bundle, ctx
 
 
@@ -315,6 +334,98 @@ def section_news(ctx):
             print(f"    · [{it.get('source','')}] {it.get('title','')}")
 
 
+def _dated(value, when, *, unit="", digits=2, signed=False) -> str:
+    """一個讀數加上它自己的資料期。台灣各項統計的月份不一致，每一個都要帶。"""
+    if value is None:
+        return "—（這一輪沒有取得）"
+    text = f"{value:+,.{digits}f}" if signed else f"{value:,.{digits}f}"
+    return f"{text}{unit}（資料期 {str(when)[:7] if when else '不明'}）"
+
+
+def section_today(ctx):
+    head("6. 今天的事件（美國版與台灣版各看各的）")
+    ev = ctx.get("events") or {}
+    if not ev:
+        print("今天的事件這一輪沒有算出來。")
+        return
+    for region in ("美國", "台灣"):
+        mine = events.for_region(ev, region)
+        sub(f"{region}：{mine.get('verdict')}")
+        for e in mine.get("events") or []:
+            when = "今天" if e.get("today") else "本週稍早"
+            at = e.get("at")
+            print(f"  [{when}] {e.get('tag')}｜{e.get('title')}"
+                  + (f"　（台北 {at:%m/%d %H:%M}）" if at is not None else ""))
+            if e.get("detail"):
+                print(f"         {e['detail']}")
+        if not mine.get("events"):
+            print("  （無）")
+
+
+def section_taiwan(ctx, found):
+    head("7. 台灣（台灣版導讀只用這一段與第 4 段的台股、第 5 段的台灣新聞）")
+    tw = ctx.get("taiwan") or {}
+    if not tw:
+        print("台灣總經模組這一輪沒有計算成功——台灣版導讀不要寫。")
+        return
+    cycle, ext = tw.get("cycle") or {}, tw.get("external") or {}
+    lab, money, out = tw.get("labour") or {}, tw.get("money") or {}, tw.get("output") or {}
+    print("本站沒有為台灣訂情境規則（沒有九宮格）。景氣燈號是國發會的，不是本站的判定。")
+    light = cycle.get("light")
+    print(f"景氣對策信號：{_dated(cycle.get('score'), cycle.get('score_date'), unit=' 分', digits=0)}"
+          + (f"　{light}燈（{cycle.get('light_meaning')}），同色連續 {cycle.get('light_streak')} 個月" if light else ""))
+    print(f"領先指標　　：連升 {cycle.get('leading_up')} 個月／連降 {cycle.get('leading_down')} 個月")
+    print(f"出口年增　　：{_dated(ext.get('customs_yoy'), ext.get('customs_date'), unit='%', digits=1, signed=True)}　財政部，美元計")
+    print(f"外銷訂單金額：年增 {_dated(ext.get('orders_amount_yoy'), ext.get('orders_amount_date'), unit='%', digits=1, signed=True)}"
+          f"；動向指數 {num(ext.get('orders'), 1)}（50 為分界）")
+    print(f"積體電路出口：年增 {_dated(ext.get('ic_yoy'), ext.get('ic_date'), unit='%', digits=1, signed=True)}"
+          f"，佔總出口 {num(ext.get('ic_share'), 1)}%")
+    print(f"CPI 年增　　：{_dated(lab.get('cpi_yoy'), lab.get('cpi_date'), unit='%')}")
+    print(f"失業率　　　：{_dated(lab.get('unemployment'), lab.get('unemployment_date'), unit='%')}"
+          f"　近 12 個月低點 {num(lab.get('unemployment_low_12m'))}%")
+    print(f"經濟成長率　：{_dated(out.get('gdp_growth'), out.get('gdp_date'), unit='%')}　季頻")
+    print(f"重貼現率　　：{num(money.get('policy'), 3)}%，已 {money.get('policy_unchanged_months')} 個月未調整"
+          f"；台美政策利差 {num(money.get('spread_vs_fed'))} pp")
+    today = clock.today()
+    upcoming = [m for m in cbc_board.meetings(tw.get("cbc_schedule") or []) if m >= today]
+    if upcoming:
+        print(f"下次理監事會：{upcoming[0]}（{(upcoming[0] - today).days} 天後）")
+    print(f"M1B 減 M2　：{num(money.get('m1b_m2_spread'))} pp（{str(money.get('m1b_m2_date'))[:7]}）")
+    print(f"美元兌新台幣：{num(money.get('twd'), 3)}（{money.get('twd_date')}）")
+
+    sub("這一輪沒有取得的台灣資料")
+    for gap in tw.get("gaps") or ["（無）"]:
+        print(f"  · {gap}")
+
+    sub("台灣觸發的規則（一律沒有升降息方向）")
+    mine = [s for s in found if s.get("module") == "台灣"]
+    for s in mine:
+        print(f"  [{s.get('severity','?'):<6}] {s.get('headline','')}")
+        if s.get("evidence"):
+            print(f"           證據：{s['evidence']}")
+    if not mine:
+        print("  （沒有觸發）")
+
+    sub("跟上一份存檔比（台灣讀數）")
+    snaps = sorted(f for f in os.listdir(paths.ARCHIVE_DIR) if f.endswith(".json"))
+    prev = None
+    if len(snaps) >= 2:
+        with open(os.path.join(paths.ARCHIVE_DIR, snaps[-2]), encoding="utf-8") as fh:
+            prev = json.load(fh)
+    changes = archive.taiwan_changes(archive.taiwan_readings(ctx), prev)
+    if changes is None:
+        print("  上一份存檔沒有記台灣讀數，這一輪比不了——導讀不要寫「與昨天相同」，也不要寫變動。")
+    elif not changes:
+        print("  與上一份相同。")
+    else:
+        for c in changes:
+            if c.get("text"):
+                print(f"  ＊ {c['name']}：{c['text']}")
+            else:
+                print(f"  ＊ {c['name']}：{num(c['was'], c.get('digits', 2))} → "
+                      f"{num(c['now'], c.get('digits', 2))} {c.get('unit', '')}")
+
+
 def main() -> int:
     print(f"At the Margin 每日摘要　產生於 {clock.now():%Y-%m-%d %H:%M}（台北）")
     bundle, ctx = load_context()
@@ -325,6 +436,8 @@ def main() -> int:
     section_readings(ctx)
     section_markets(ctx)
     section_news(ctx)
+    section_today(ctx)
+    section_taiwan(ctx, found)
     print(f"\n{RULE}\n摘要結束。接下來：寫 data/brief.json → "
           f"python3 build.py --offline --no-archive --quiet → commit & push\n{RULE}")
     return 0

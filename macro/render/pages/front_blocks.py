@@ -10,6 +10,8 @@
             離門檻多遠、幾天後公布也寫在頁邊，但不上色——它們不是變化。
   誰說的    每一段開頭有一枚印：實＝機構發布的數字、判＝本站固定規則的判定、
             市＝市場價格、聞＝別人的報導。四種責任不並排、不混色。
+            頭條底下的「今日導讀」是第五種：摘＝排程任務（語言模型）寫的摘要，
+            只轉述前四種、不另下判斷，而且永遠帶著寫的時間。
   尺        有寫死門檻的畫門檻尺（實線、有刻度）；沒有門檻的只能畫區間尺
             （虛線），不能讓一個區間的端點看起來像一條規則。
 
@@ -68,8 +70,9 @@ def note(key: str, small: str = "", *, kind: str = "") -> str:
 
 
 def seal(kind: str) -> str:
-    """責任印。實＝機構事實、判＝本站規則、市＝市場價格、聞＝別人的報導、缺＝本站沒拿到。"""
-    cls = {"實": "s-fact", "聞": "s-said", "缺": "s-gap", "市": "s-mkt"}.get(kind, "")
+    """責任印。實＝機構事實、判＝本站規則、市＝市場價格、聞＝別人的報導、缺＝本站沒拿到、
+    摘＝排程任務寫的摘要。"""
+    cls = {"實": "s-fact", "聞": "s-said", "缺": "s-gap", "市": "s-mkt", "摘": "s-sum"}.get(kind, "")
     return f'<span class="seal {cls}" aria-hidden="true">{kind}</span>'
 
 
@@ -185,8 +188,48 @@ def since_block(items: list[dict], prior: dict | None, first_run: bool, *, shown
 
 # ------------------------------------------------------------------ 頭條 ----
 
+DECIDED = {"轉向", "變動", "調整", "不變", "遺漏"}
+
+
+def story_block(story: dict | None, events: dict | None = None) -> str:
+    """頭條底下的今日導讀：兩段，排程任務寫的。
+
+    它是全頁唯一不是由程式從資料算出來的文字，所以三件事不能省：
+      - 印「摘」，不借「實」「判」的印——它不是機構的數字，也不是本站規則的判定
+      - 寫的時間永遠在標題列上（不是今天寫的就連日期一起寫）
+      - 寫完之後才公布的決議或數據，文章不可能提到：點名講出來，
+        不讓讀者以為文章已經把它算進去了
+    story 是 brief.story() 的結果；None 就整塊不出現，不放佔位的字。
+    """
+    if not story:
+        return ""
+    written = story["written"].astimezone(clock.TAIPEI)
+    stamp = f"{written:%H:%M}"
+    if written.date() != clock.today():
+        stamp = f"{written.month}/{written.day} {stamp}"
+    later = [e for e in (events or {}).get("events") or []
+             if e.get("today") and e.get("at") is not None and e["at"] > written
+             and ("已公布" in (e.get("tag") or "") or e.get("policy") in DECIDED)]
+    note = "語言模型讀完本站數據與新聞後寫的摘要：只轉述，不另下判斷。"
+    if later:
+        names = "、".join(dict.fromkeys(e["title"].split("　")[0] for e in later[:3]))
+        note += f'<strong>寫在「{esc(names)}」公布之前，沒有提到它。</strong>'
+    body = "".join(f"<p>{esc(paragraph)}</p>" for paragraph in story["paragraphs"])
+    return ('<article class="story">'
+            f'<h2 class="story-k">{seal("摘")}今日導讀'
+            f'<time datetime="{esc(written.isoformat(timespec="minutes"))}">寫於 {esc(stamp)}</time></h2>'
+            f'{body}<p class="story-n">{note}</p></article>')
+
+
+def lead_note(gists: str, story: str = "") -> str:
+    """頭條底下那一區。有導讀時導讀佔主欄，原本那幾句短的（本站規則、市場）排到旁邊。"""
+    if story:
+        return f'<div class="lead-note has-story">{story}<div class="gists">{gists}</div></div>'
+    return f'<div class="lead-note">{gists}</div>'
+
+
 def gist_blocks(scenario: dict, summary: dict, stance: dict, futures: dict | None,
-                standing: dict | None) -> str:
+                standing: dict | None, story: str = "") -> str:
     """頭條底下的兩三句：本站規則怎麼說、市場怎麼定價。兩者責任不同，所以分兩欄。"""
     rule = f"訊號 {summary['dovish']} 條偏降息、{summary['hawkish']} 條偏升息"
     first = next((t for t in (scenario.get("transitions") or []) if t.get("gap") is not None), None)
@@ -207,7 +250,7 @@ def gist_blocks(scenario: dict, summary: dict, stance: dict, futures: dict | Non
         market.append(f'期貨定價 {esc(nxt["label"])} {esc(nxt["headline"])}')
     if market:
         blocks.append(f'<div class="gist"><h2>市場</h2><p>{"；".join(market)}。</p></div>')
-    return f'<div class="lead-note">{"".join(blocks)}</div>'
+    return lead_note("".join(blocks), story)
 
 
 def hero_shell(lede: dict, since_html: str, gist_html: str, *, prefix: str = "",
@@ -233,18 +276,20 @@ def hero_shell(lede: dict, since_html: str, gist_html: str, *, prefix: str = "",
 
 def hero(ctx: dict, scenario: dict, summary: dict, diff: dict,
          reading_changes: list[dict], prior: dict | None, *,
-         events: dict | None = None) -> tuple[str, bool]:
+         events: dict | None = None, story: dict | None = None) -> tuple[str, bool]:
     """頭條＋頁邊的變動欄。回傳 (HTML, 有沒有變動)。
 
     events：這一版要看的事件（美國版傳 events.for_region(…, "美國")）。沒給就用全部。
+    story：這一版的今日導讀（brief.story 的結果），沒有就不出現。
     """
-    lede = frontpage.lede(ctx.get("events") if events is None else events,
-                          scenario, ctx.get("_bundle"))
+    events = ctx.get("events") if events is None else events
+    lede = frontpage.lede(events, scenario, ctx.get("_bundle"))
     items = since_items(diff, reading_changes, scenario, prior)
     stance = (ctx.get("rates") or {}).get("stance") or {}
     standing = frontpage.verdict_lede(scenario) if lede["kind"] != "verdict" else None
     body = hero_shell(lede, since_block(items, prior, bool(diff.get("first_run"))),
-                      gist_blocks(scenario, summary, stance, ctx.get("fedfunds"), standing))
+                      gist_blocks(scenario, summary, stance, ctx.get("fedfunds"), standing,
+                                  story_block(story, events)))
     return body, bool(items)
 
 
@@ -989,7 +1034,8 @@ def colophon(updated: str) -> str:
         '<div><dt>頁邊與正文</dt><dd><span><span class="hlx">+0.01</span>有螢光筆的＝跟上一期不一樣。</span>'
         '<span>沒上色的頁邊是離門檻多遠、離公布幾天；空白就是沒變。</span></dd></div>'
         f'<div><dt>誰說的</dt><dd><span>{seal("實")}機構發布的數字</span><span>{seal("判")}本站固定規則的判定</span>'
-        f'<span>{seal("市")}市場價格</span><span>{seal("聞")}別人的報導，責任在報導者</span></dd></div>'
+        f'<span>{seal("市")}市場價格</span><span>{seal("聞")}別人的報導，責任在報導者</span>'
+        f'<span>{seal("摘")}語言模型寫的摘要（每日排程），只轉述、不另下判斷</span></dd></div>'
         '<div><dt>嚴重度</dt><dd><span class="sv sv-1">嚴重</span><span class="sv sv-2">留意</span>'
         '<span class="sv sv-3">參考</span></dd></div>'
         '<div><dt>聯準會方向</dt><dd><span class="dir hk">利升息（紅）</span><span class="dir dv">利降息（藍）</span>'

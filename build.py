@@ -348,6 +348,11 @@ def main() -> int:
 
     # 總覽的版面預算。結構超標＝建置失敗（只有改程式才會動）；字數超標只警告
     # （它隨訊號條數與新聞長度浮動，用硬失敗擋它會讓網站因為版面而停止更新）。
+    # 今日導讀沒有上版的原因（太長、沒帶時間、太舊）：排程寫完會跑這支建置，
+    # 這一行是它知道要回頭修的唯一線索，所以 --quiet 也照印。
+    from macro import brief as brief_module
+    for problem in brief_module.problems(brief_module.load()):
+        print(f"   ⚠ {problem}", flush=True)
     hard, soft = overview.budget_report(bodies.get("/", ""))
     for line in soft:
         print(f"   ⚠ 總覽版面：{line}", flush=True)

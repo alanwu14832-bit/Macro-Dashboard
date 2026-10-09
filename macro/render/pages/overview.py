@@ -72,14 +72,20 @@ def _curated_brief(brief: dict, region: str = "") -> str:
               f'<a href="/news/">看原始的今日焦點與分類 →</a></p>')
 
 
-def market_brief(ctx: dict, *, limit: int = 6, region: str = "") -> str:
+_UNSET = object()
+
+
+def market_brief(ctx: dict, *, limit: int = 6, region: str = "", curated=_UNSET) -> str:
     """今日資本市場要聞。
 
     有整理過的 data/brief.json 就用它（中文 headline、四類）；沒有或過期時
     退回關鍵字挑出的原始標題，並在頁面上明講這是未整理的版本。
+
+    curated：已經讀好的 brief（頭版一次建置要用它四次，只讀一次檔）；沒給就自己讀。
     """
     from ... import brief as brief_module
-    curated = brief_module.load()
+    if curated is _UNSET:
+        curated = brief_module.load()
     if curated:
         return _curated_brief(curated, region)
     if region == TAIWAN:
@@ -151,9 +157,12 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
     #
     # 兩個版：美國｜台灣，同一個網址，刊頭底下切換。兩版的段落一一對應，
     # 各自受同一份版面預算（BUDGET）約束——每一版都是八個區塊。
+    from ... import brief as brief_module
     from ..layout import _trust_row
     is_tw = lambda s: s.get("module") == TAIWAN
     ev = ctx.get("events") or {}
+    # 要聞與今日導讀都來自同一個檔（排程任務寫的 data/brief.json）
+    curated = brief_module.load()
 
     # ---- 美國版：九宮格只吃美國的就業與通膨，所以訊號條數也只算美國的 ----
     us_signals = [s for s in signals if not is_tw(s)]
@@ -161,7 +170,7 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
     us_diff = _only(diff, lambda s: not is_tw(s))
     us_events = events_mod.for_region(ev, "美國")
     us_top, us_changed = front.hero(ctx, scenario, us_summary, us_diff, reading_changes, prior,
-                                    events=us_events)
+                                    events=us_events, story=brief_module.story(curated, "us"))
     us_rest = "".join([
         front.gate_chart(ctx, scenario),                          # 頭條的圖，不另算區塊
         front.facts(ctx, scenario, reading_changes, prior),       # 2 四個數字（機構事實）
@@ -169,7 +178,7 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
         front.today(ctx, events=us_events),                       # 4 今天
         front.next_up(ctx, scenario, next_meeting()),             # 5 接下來
         front.prices(ctx),                                        # 6 今日價格
-        front.said(market_brief(ctx, region="美國")),             # 7 別人怎麼說
+        front.said(market_brief(ctx, region="美國", curated=curated)),   # 7 別人怎麼說
     ])
 
     # ---- 台灣版：同樣的七段，沒有九宮格 ----
@@ -177,7 +186,8 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
     tw_diff = _only(diff, is_tw)
     tw_events = events_mod.for_region(ev, TAIWAN)
     tw_changes = archive.taiwan_changes(archive.taiwan_readings(ctx), prior)
-    tw_top, tw_changed = front_tw.hero(ctx, tw_signals, tw_diff, tw_changes, prior, tw_events)
+    tw_top, tw_changed = front_tw.hero(ctx, tw_signals, tw_diff, tw_changes, prior, tw_events,
+                                       story=brief_module.story(curated, "tw"))
     tw_rest = "".join([
         front_tw.signal_chart(ctx),
         front_tw.facts(ctx, tw_changes, prior),
@@ -185,7 +195,8 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
         front_tw.today(ctx, tw_events),
         front_tw.next_up(ctx, tw_events),
         front_tw.prices(ctx),
-        front.said(market_brief(ctx, region=TAIWAN), anchor="tw-voices", nav="台灣｜別人怎麼說"),
+        front.said(market_brief(ctx, region=TAIWAN, curated=curated),
+                   anchor="tw-voices", nav="台灣｜別人怎麼說"),
     ])
 
     # 頁邊的色帶跟著「這一版有沒有變動」：兩版各有各的旗標
@@ -222,7 +233,11 @@ BUDGET = {
     "cells": 22,
 }
 NEWS_DISCLOSURES = 12     # 要聞四類各 3 則，每則一個行內展開；具名例外
-VISIBLE_CHARS_SOFT = 2600  # 重構當下實測 2,537，留 2.5% 餘裕
+# 2026-10-10 使用者要在頭條底下加一篇「今日導讀」，篇幅選的是兩段約 250 字（已告知
+# 這會讓頭版字數接近上限）。這是具名的額度，不是把上限悄悄調高：導讀自己的硬上限
+# 在 brief.STORY_HARD，超過就不上版；加上標題列與那行說明約 60 字。
+STORY_ALLOWANCE = 420
+VISIBLE_CHARS_SOFT = 2600 + STORY_ALLOWANCE  # 2600 是沒有導讀時的額度（重構當下實測 2,537）
 
 
 EDITION_RE = re.compile(r"<!--ed:(\w+)-->(.*?)<!--/ed:\1-->", re.S)

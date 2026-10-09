@@ -110,7 +110,8 @@ def since_items(diff: dict, changes: list[dict] | None) -> list[dict]:
 
 # ------------------------------------------------------------------ 頭條 ----
 
-def gist_blocks(taiwan: dict, signals: list[dict], equities: dict, standing: dict | None) -> str:
+def gist_blocks(taiwan: dict, signals: list[dict], equities: dict, standing: dict | None,
+                story: str = "") -> str:
     """頭條底下的三句：央行（或目前位置）、本站規則、市場。責任不同，所以分欄。"""
     money = taiwan.get("money") or {}
     blocks = []
@@ -146,13 +147,12 @@ def gist_blocks(taiwan: dict, signals: list[dict], equities: dict, standing: dic
         market.append(f'外資 {_signed(foreign, 1)} 億')
     if market:
         blocks.append(("市場", "；".join(market) + "。"))
-    return ('<div class="lead-note">'
-            + "".join(f'<div class="gist"><h2>{esc(name)}</h2><p>{text}</p></div>'
-                      for name, text in blocks) + '</div>')
+    return fb.lead_note("".join(f'<div class="gist"><h2>{esc(name)}</h2><p>{text}</p></div>'
+                                for name, text in blocks), story)
 
 
 def hero(ctx: dict, signals: list[dict], diff: dict, changes: list[dict] | None,
-         prior: dict | None, events: dict | None) -> tuple[str, bool]:
+         prior: dict | None, events: dict | None, *, story: dict | None = None) -> tuple[str, bool]:
     """台灣版的頭條＋頁邊的變動欄。回傳 (HTML, 有沒有變動)。
 
     changes 是 None 代表上一期的存檔沒有記台灣讀數——比不了，要明講。
@@ -173,7 +173,8 @@ def hero(ctx: dict, signals: list[dict], diff: dict, changes: list[dict] | None,
         lede,
         fb.since_block(items, prior, bool(diff.get("first_run")), prefix="tw-",
                        none_text=none_text),
-        gist_blocks(taiwan, signals, (ctx.get("equities") or {}).get("tw") or {}, standing),
+        gist_blocks(taiwan, signals, (ctx.get("equities") or {}).get("tw") or {}, standing,
+                    fb.story_block(story, events)),
         prefix="tw-", nav="台灣｜頭條")
     return body, bool(items)
 
