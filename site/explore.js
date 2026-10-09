@@ -39,6 +39,13 @@
   const $ = (sel) => root.querySelector(sel);
 
   /* ------------------------------------------------------------- 轉換 ---- */
+  // "2026-08-01" 往前 n 個月的年月："2025-08"
+  function monthsBefore(iso, n) {
+    let year = Number(iso.slice(0, 4)), month = Number(iso.slice(5, 7)) - n;
+    while (month <= 0) { month += 12; year -= 1; }
+    return year + "-" + String(month).padStart(2, "0");
+  }
+
   function transform(series, meta, mode) {
     const { dates, values } = series;
     const per = PER_YEAR[meta.freq] || 12;
@@ -46,9 +53,29 @@
     if (mode === "level") return { dates, values };
 
     if (mode === "yoy" || mode === "ann3") {
+      const months = mode === "yoy" ? 12 : 3;
+      const d = [], v = [];
+      // 月、季、年頻照日曆找基期（去年同月、三個月前），不能往回數筆數：
+      // 2025-10 的 CPI 因政府關門停發，序列少一格，「往回數 12 筆」會除到 13 個月前，
+      // 年增率整個偏高（核心 CPI 這裡曾經顯示 2.76%，通膨頁是 2.45%）。
+      // 找不到基期的那一點留白。跟 macro/series.py 的 yoy()／annualised() 同一個算法。
+      if (meta.freq === "m" || meta.freq === "q" || meta.freq === "a") {
+        const byMonth = new Map();
+        dates.forEach((date, i) => byMonth.set(date.slice(0, 7), values[i]));
+        const power = 12 / months;
+        for (let i = 0; i < values.length; i++) {
+          const base = byMonth.get(monthsBefore(dates[i], months));
+          if (!base) continue;
+          const ratio = values[i] / base;
+          if (ratio <= 0) continue;
+          d.push(dates[i]);
+          v.push((Math.pow(ratio, power) - 1) * 100);
+        }
+        return { dates: d, values: v };
+      }
+      // 日、週頻沒有「同月」可對，維持以筆數近似一年（252 個交易日、52 週）
       const periods = mode === "yoy" ? per : Math.max(1, Math.round(per / 4));
       const power = mode === "yoy" ? 1 : per / periods;
-      const d = [], v = [];
       for (let i = periods; i < values.length; i++) {
         const base = values[i - periods];
         if (!base) continue;
