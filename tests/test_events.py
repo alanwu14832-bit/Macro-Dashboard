@@ -15,7 +15,7 @@ from datetime import date, datetime, time
 
 from macro.clock import NEW_YORK, TAIPEI
 from macro.compute import events
-from macro.render.pages.overview import today_section
+from macro.render.pages.front_blocks import today as today_section
 from macro.sources import twcal
 
 
@@ -189,7 +189,7 @@ class Verdict(unittest.TestCase):
     def test_overview_first_sentence_is_the_answer(self):
         ev = events.build(FOMC_HIKE, CBC_CREDIT, {}, [], tpe(2026, 9, 17, 18), tw_ok=True)
         html = today_section({"events": ev})
-        self.assertLess(html.find("今天有政策轉向"), html.find('class="chg-row"'))
+        self.assertLess(html.find("今天有政策轉向"), html.find('class="row nx '))
 
 
 if __name__ == "__main__":

@@ -327,6 +327,10 @@
       .sort((a, b) => (spec.series[b].kind === "bar" ? 0 : 1)
                     - (spec.series[a].kind === "bar" ? 0 : 1));
 
+    // 終點標籤先收起來，全部序列畫完再一起放：三條線收在同一帶時，標籤會疊成
+    // 一團看不出任何一個數字。
+    const endLabels = [];
+
     order.forEach((si) => {
       const s = spec.series[si];
       const color = seriesColor(s.color, si);
@@ -416,12 +420,31 @@
           stroke: cssVar("--surface"), "stroke-width": 2, "data-fade": "",
         }, svg);
         if (spec.endLabels !== false) {
-          el("text", { class: "end-label", x: X(ld) + 9, y: Yv(lv) + 4,
-                       "data-fade": "" }, svg)
-            .textContent = fmtVal(lv, spec);
+          endLabels.push({ x: X(ld) + 9, y: Yv(lv) + 4, text: fmtVal(lv, spec), color });
         }
       }
     });
+
+    // 由上到下排開，彼此至少隔一行；整組超出下緣就往上推回來。位置只挪標籤，
+    // 不挪線上的圓點——圓點才是值的位置。
+    const GAP = 13;
+    endLabels.sort((a, b) => a.y - b.y);
+    for (let i = 1; i < endLabels.length; i++) {
+      if (endLabels[i].y - endLabels[i - 1].y < GAP) endLabels[i].y = endLabels[i - 1].y + GAP;
+    }
+    const overflow = endLabels.length ? endLabels[endLabels.length - 1].y - (m.t + ih) : 0;
+    if (overflow > 0) {
+      for (let i = endLabels.length - 1; i >= 0; i--) {
+        const limit = i === endLabels.length - 1 ? m.t + ih : endLabels[i + 1].y - GAP;
+        endLabels[i].y = Math.min(endLabels[i].y, limit);
+      }
+    }
+    for (const label of endLabels) {
+      // 多條線時標籤跟著線的顏色走，才認得出哪個數字是哪條線
+      el("text", { class: "end-label", x: label.x, y: label.y, "data-fade": "",
+                   style: endLabels.length > 1 ? `fill:${label.color}` : null }, svg)
+        .textContent = label.text;
+    }
 
     attachCrosshair(svg, spec, data, dates, X, m, ih, iw, isBar, barW,
                     (v, si) => (isRight(si) ? YR(v) : Y(v)));

@@ -167,6 +167,7 @@ def us_data_events(freshness: dict, now: datetime) -> list[dict]:
             released = min(released, local_ny).astimezone(TAIPEI)
             if released.date() in (today, today - timedelta(days=1)):
                 out.append({
+                    "id": row.get("id"),
                     "kind": "data", "region": "美國", "today": released.date() == today,
                     "sev": "medium", "tag": "美國數據　已公布", "title": row["name"],
                     "detail": f"台北 {released.month}/{released.day} {released:%H:%M} 公布。",
@@ -186,7 +187,8 @@ def us_data_events(freshness: dict, now: datetime) -> list[dict]:
         else:
             tag = "美國數據　公布時間已過"
             detail = f"台北 {at:%H:%M} 應已公布，本站資料尚未更新。"
-        out.append({"kind": "data", "region": "美國", "today": True, "sev": "medium",
+        out.append({"id": row.get("id"),
+                    "kind": "data", "region": "美國", "today": True, "sev": "medium",
                     "tag": tag, "title": row["name"], "detail": detail,
                     "href": "/freshness/", "at": at})
     return out

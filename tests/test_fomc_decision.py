@@ -21,7 +21,8 @@ from macro import fomc
 from macro.clock import NEW_YORK, TAIPEI
 from macro.compute import events, fedfunds
 from macro.data import Bundle
-from macro.render.pages.overview import changes_top, today_section
+from macro.render.pages import front_blocks
+from macro.render.pages.front_blocks import today as today_section
 from macro.series import Series
 from macro.sources import fomc_text
 
@@ -283,7 +284,7 @@ class OverviewNeverOmits(unittest.TestCase):
                     states = fomc.decision_states(decision, now)
                     ev = events.build(states, None, {}, [], now.astimezone(TAIPEI), tw_ok=True)
                     html = today_section({"events": ev})
-                    self.assertIn('class="chg-tag">FOMC', html,
+                    self.assertIn('">FOMC</b>', html,
                                   f"{meeting} +{days_after}d {decision.get('status')}")
 
     def test_unscheduled_meeting_surfaces_too(self):
@@ -293,7 +294,7 @@ class OverviewNeverOmits(unittest.TestCase):
             now = ny(2026, 10, 9, 21)
             ev = events.build(fomc.decision_states(decision, now), None, {}, [],
                               now.astimezone(TAIPEI), tw_ok=True)
-            self.assertIn('class="chg-tag">FOMC', today_section({"events": ev}))
+            self.assertIn('">FOMC</b>', today_section({"events": ev}))
 
     def test_missing_decision_is_first(self):
         states = fomc.decision_states({"status": "unavailable", "reason": "抓不到"}, ny(2026, 9, 17))
@@ -303,12 +304,14 @@ class OverviewNeverOmits(unittest.TestCase):
         self.assertEqual(ev["events"][0]["tag"], "FOMC　決議遺漏")
         self.assertIn("決議遺漏 1 項", ev["verdict"])
 
-    def test_changes_stack_no_longer_repeats_the_decision(self):
-        """決議只在「今天」出現一次，「自上次以來」只放本站判定的比對。"""
-        html = changes_top({"fomc": [{"state": "announced"}]}, {"same": True}, [],
-                           {"employment_label": "放緩", "inflation_label": "偏高",
-                            "regime_label": "通膨優先"}, {"date": "x", "scenario": {}})
-        self.assertNotIn("FOMC", html)
+    def test_margin_changes_never_repeat_the_decision(self):
+        """決議只在「今天」出現一次。頁邊的「自上一期以來」只放本站判定的比對——
+        它的輸入根本沒有央行決議，所以不可能重複。"""
+        scenario = {"employment_label": "放緩", "inflation_label": "偏高", "regime_label": "通膨優先"}
+        prior = {"date": "2026-09-16", "scenario": {}}
+        items = front_blocks.since_items({"same": True}, [], scenario, prior)
+        self.assertEqual(items, [])
+        self.assertNotIn("FOMC", front_blocks.since_block(items, prior, False))
 
 
 class Catalogue(unittest.TestCase):

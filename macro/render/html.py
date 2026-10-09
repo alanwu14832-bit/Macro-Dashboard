@@ -331,26 +331,38 @@ def terms_block(keys: list[str], *, title: str = "這一段的名詞與意義") 
 
 
 def section(anchor: str, title: str, body: str, *, note: str = "",
-            terms: list[str] | None = None, sub: bool = False) -> str:
+            terms: list[str] | None = None, sub: bool = False,
+            cls: str = "", hide_head: bool = False) -> str:
     """sub=True 的區塊在側欄目錄裡是「小小標」，縮排列在前一個小標下。
 
     頁面本身的呈現不變——這個旗標只影響側欄大綱的層級，讓區塊很多的
     頁（如股市報價）不會把側欄撐成一長串同級項目。
     """
     note_html = f'<p class="note">{esc(note)}</p>' if note else ""
-    cls = ' class="sub-section"' if sub else ""
-    return (f'<section id="{esc(anchor)}"{cls}>'
-            f'<div class="section-head"><h2>{esc(title)}</h2>{note_html}</div>'
+    classes = " ".join(c for c in ("sub-section" if sub else "", cls) if c)
+    class_attr = f' class="{esc(classes)}"' if classes else ""
+    # hide_head：標題只給側欄目錄、尋找索引與螢幕閱讀器，版面上不佔位置
+    # （頭版的頭條自己就是標題，不需要再掛一個「頭條」）。
+    head_cls = "section-head sr-only" if hide_head else "section-head"
+    return (f'<section id="{esc(anchor)}"{class_attr}>'
+            f'<div class="{head_cls}"><h2>{esc(title)}</h2>{note_html}</div>'
             f'{body}{terms_block(terms) if terms else ""}</section>')
 
 
 def table(headers: list[str], rows: list[list[str]], *, foot: str = "",
-          align_first_left: bool = True) -> str:
-    head = "".join(f"<th>{esc(h)}</th>" for h in headers)
+          align_first_left: bool = True, text_cols: tuple[int, ...] = ()) -> str:
+    """text_cols：除了第一欄以外，還有哪幾欄是文字（靠左）。預設其餘欄都當數字靠右——
+    事件名稱被當成數字靠右排，整張表就會讀起來像對不齊。"""
+    def cls(i: int) -> str:
+        if i in text_cols:
+            return "txt"
+        return "" if i == 0 and align_first_left else "num"
+
+    head = "".join(f'<th class="{cls(i)}">{esc(h)}</th>' if cls(i) == "txt"
+                   else f"<th>{esc(h)}</th>" for i, h in enumerate(headers))
     body = "".join(
-        "<tr>" + "".join(
-            f'<td class="{"" if i == 0 and align_first_left else "num"}">{cell}</td>'
-            for i, cell in enumerate(row)) + "</tr>"
+        "<tr>" + "".join(f'<td class="{cls(i)}">{cell}</td>'
+                         for i, cell in enumerate(row)) + "</tr>"
         for row in rows)
     tfoot = (f'<tfoot><tr><td colspan="{len(headers)}">{foot}</td></tr></tfoot>'
              if foot else "")

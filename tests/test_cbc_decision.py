@@ -170,7 +170,7 @@ class Reconcile(unittest.TestCase):
 class OverviewNeverOmits(unittest.TestCase):
     def test_every_board_meeting_surfaces_a_decision_or_a_gap(self):
         from macro.compute import events
-        from macro.render.pages.overview import today_section
+        from macro.render.pages.front_blocks import today as today_section
 
         for meeting in SCHEDULE:
             for days_after in (0, 1, 3, 7):
@@ -182,7 +182,7 @@ class OverviewNeverOmits(unittest.TestCase):
                                  ok((meeting - timedelta(days=91)).isoformat())):
                     state = cbc_board.decision_status(decision, SCHEDULE, now)
                     html = today_section({"events": events.build(None, state, {}, [], now)})
-                    self.assertIn('class="chg-tag">台灣央行', html,
+                    self.assertIn('">台灣央行</b>', html,
                                   f"{meeting} +{days_after}d {decision.get('status')}")
 
 

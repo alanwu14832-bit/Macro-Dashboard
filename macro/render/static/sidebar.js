@@ -300,10 +300,17 @@
   /* ---------------------------------------------------------- 主題切換 --- */
   const themeButton = document.getElementById("theme-toggle");
   if (themeButton) {
+    // 按鈕寫的是「你正在讀哪一版」，不是「按下去會變成什麼」——刊物的版別是狀態。
     const label = () => {
-      const current = root.getAttribute("data-theme");
-      themeButton.textContent =
-        current === "dark" ? "淺色" : current === "light" ? "深色" : "主題";
+      const current = root.getAttribute("data-theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const night = current === "dark";
+      themeButton.textContent = night ? "夜報" : "日報";
+      themeButton.setAttribute("aria-label",
+        night ? "目前是夜報，切換到日報" : "目前是日報，切換到夜報");
+      document.querySelectorAll("[data-edition]").forEach((el) => {
+        el.textContent = night ? "夜報" : "日報";
+      });
     };
     label();
     const applyTheme = (next) => {
@@ -585,10 +592,21 @@
   /* -------------------------------------- topbar 三態與寬表的水平凍結 --- */
   // 都用 class 切換而不是在捲動處理器裡讀版面：讀 offsetTop 會強迫重算，
   // 那正是捲動掉帧的來源（scroll spy 那邊已經踩過一次）。
+  // 頭版：刊頭還在畫面上時，右上角只有工具、沒有底色；刊頭捲走之後才變成一條
+  // 帶刊名的列。刊頭多高只在載入與改變寬度時量一次——捲動處理器裡不讀版面。
+  const masthead = document.querySelector(".fp .mast");
+  let mastheadEnd = 0;
+  const measureMasthead = () => {
+    mastheadEnd = masthead ? Math.max(0, masthead.offsetHeight - 20) : 0;
+  };
+  measureMasthead();
+  window.addEventListener("resize", measureMasthead, { passive: true });
+
   let edgeTick = false;
   const paintEdge = () => {
     edgeTick = false;
     root.classList.toggle("topbar-stuck", window.scrollY > 1);
+    if (masthead) root.classList.toggle("masthead-gone", window.scrollY > mastheadEnd);
   };
   window.addEventListener("scroll", () => {
     if (!edgeTick) { edgeTick = true; requestAnimationFrame(paintEdge); }

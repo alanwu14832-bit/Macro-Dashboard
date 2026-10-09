@@ -245,7 +245,7 @@ def main() -> int:
     if verbose and synced:
         print(f"   深度專題同步 {len(synced)} 個檔案", flush=True)
     pages = [
-        ("/", "總覽", "",
+        ("/", "頭版", "",
          "把勞動、通膨、利率、債務、成長、全球與市場七個面向，收斂成一個可追蹤的判斷。",
          lambda: overview.render(ctx, found, summary, scenario_data, diff,
                                  reading_changes, updated, prior=prior)),
