@@ -1081,3 +1081,38 @@ html.js[data-ed="tw"] .nav-sub a[href^="/#"]:not([href^="/#tw-"]):not([href="/#c
 /* 換燈（黃紅→紅）比換格（高→中）長：字級小一號，留在一行裡 */
 .fp .since .d-t.d-long { font-size: clamp(20px, 2.15vw, 31px); letter-spacing: 0; }
 @media (max-width: 699px) { .fp .since .d-t.d-long { font-size: 13px; } }
+
+
+/* ============================================================================
+   今日導讀：頭條底下的一篇短文（排程任務寫的），原本那幾句短的排到旁邊
+   ========================================================================== */
+.fp .lead-note.has-story,
+.fp .lead-note.has-story:has(.gist:nth-child(3)) {
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); max-width: calc(1080px + var(--pad) + var(--padr));
+}
+.fp .gists { display: grid; gap: 1.5em; align-content: start; min-width: 0; }
+.fp .story { min-width: 0; max-width: 39em; }
+/* 標題列跟旁邊「本站規則」「市場」同一個畫法（小標＋一條細線），所以三塊排成一組 */
+.fp .story-k {
+  display: flex; align-items: center; gap: .8em; margin-bottom: .7em;
+  font: 700 13px/1.4 var(--ming); letter-spacing: .3em; color: var(--ink-2);
+}
+.fp .story-k .seal { font-size: 11.5px; margin-right: 0; letter-spacing: 0; vertical-align: 0; }
+.fp .story-k::after { content: ""; order: 1; height: 1px; flex: 1; background: var(--hair); }
+.fp .story-k time { order: 2; font: 400 12.5px/1.4 var(--hei); letter-spacing: .04em; white-space: nowrap; }
+.fp .story > p { font-size: 16px; line-height: 1.9; color: var(--fp-text); text-wrap: pretty; }
+.fp .story > p + p { margin-top: .75em; }
+.fp .story > .story-n { margin-top: 1em; font-size: 12.5px; line-height: 1.6; color: var(--ink-2); }
+.fp .story-n strong { font-weight: 600; color: var(--critical); margin-left: .4em; }
+/* 摘＝語言模型寫的摘要：只有上下兩條線、沒有框。四枚有框的印（機構、本站、市場、報導）
+   各自為一句話負責；這一枚只是轉述它們，所以不圍起來 */
+.fp .seal.s-sum { border-width: 1.5px 0; width: auto; padding: 0 .12em; }
+html.scanning .fp .story { opacity: .13; }
+@media (max-width: 899px) {
+  .fp .lead-note.has-story,
+  .fp .lead-note.has-story:has(.gist:nth-child(3)) { grid-template-columns: 1fr; }
+  .fp .story { max-width: none; }
+}
+@media (max-width: 699px) {
+  .fp .story > p { font-size: 15.5px; line-height: 1.85; }
+}
