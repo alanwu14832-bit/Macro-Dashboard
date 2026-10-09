@@ -73,8 +73,10 @@ NAV = [
     ("/archive/", "存檔", "archive", "判讀與紀錄"),
 ]
 
-SITE_NAME = "邊際"
-SITE_NAME_EN = "At the Margin"
+# 刊名只有英文（2026-10-10 使用者決定：留 At the Margin 就好，不寫中文刊名）。
+# 頭版的刊頭把它拆成兩半跨在直線上：「At the」在頁邊，「Margin」在正文。
+SITE_NAME = "At the Margin"
+WORDMARK = ("At the", "Margin")
 TAGLINE = "跟昨天比，變了什麼。"
 
 # 刊徽：一頁紙、一條頁邊線、頁邊上一筆螢光筆。16px 時仍然認得出來。
@@ -94,6 +96,8 @@ SUPABASE_ANON_KEY = "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"
 BOOT = """
 (function(){var d=document.documentElement;d.classList.add('js');try{
 if(/[?&]still(?:[&=]|$)/.test(location.search))d.classList.add('still');
+// 進場與「捲到才出現」要靠 front.js 把內容放出來；它三秒內沒跑起來就整頁直接顯示
+setTimeout(function(){if(!window.__fp)d.classList.add('still')},3000);
 try{if(sessionStorage.getItem('seen'))d.classList.add('again');else sessionStorage.setItem('seen','1')}catch(e){}
 var t=localStorage.getItem('theme'),q=location.search.match(/[?&]theme=(dark|light)(?:&|$)/);if(q)t=q[1];
 if(t==='dark'||t==='light')d.setAttribute('data-theme',t);
@@ -153,7 +157,7 @@ def _sidebar(path: str, sections: dict[str, list[tuple[str, str]]] | None = None
     <div class="rail-head">
       <a class="rail-brand" href="/">
         <span class="rail-mark" aria-hidden="true"></span>
-        <span class="nav-label rail-name">{esc(SITE_NAME)}<i>{esc(SITE_NAME_EN)}</i></span>
+        <span class="nav-label rail-name" lang="en">{esc(SITE_NAME)}</span>
       </a>
       <button type="button" class="rail-toggle" id="rail-toggle"
               aria-expanded="true" aria-controls="rail" aria-label="收合側邊選單">
@@ -282,8 +286,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
     """
     version = asset_version()
     front = path == "/"
-    page_title = (f"{SITE_NAME}\u3000{SITE_NAME_EN}" if front
-                  else f"{title}｜{SITE_NAME}")
+    page_title = SITE_NAME if front else f"{title}｜{SITE_NAME}"
 
     head_block = ""
     if heading:
@@ -325,7 +328,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
-      <a class="nameplate" href="/" aria-label="{esc(SITE_NAME)}　回到頭版">{esc(SITE_NAME)}</a>
+      <a class="nameplate" href="/" lang="en" aria-label="{esc(SITE_NAME)}，回到頭版">{esc(SITE_NAME)}</a>
       <div class="topbar-title">{esc(title)}</div>
       <a class="topbar-guide" href="/guide/">使用講義</a>
       <div class="topbar-meta">{esc(updated)}</div>
