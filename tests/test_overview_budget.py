@@ -22,7 +22,7 @@ class Measure(unittest.TestCase):
         body = SECTION.format(
             '<table><tr></tr></table>'
             '<div class="stat"></div><div class="key"></div>'
-            '<div class="mc-cell"></div>'
+            '<div class="lg-row"></div>'
             '<details class="acc"><summary>s</summary>'
             '<div class="acc-body">收起來的內容</div></details>')
         used = overview.measure(body)

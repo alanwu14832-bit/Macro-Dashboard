@@ -23,15 +23,6 @@ def _ind(name: str, en: str, where: str, body: str, imply: list | None = None) -
             f'{body}{imply_html}</div>')
 
 
-def _chain(*nodes: str) -> str:
-    parts = []
-    for i, node in enumerate(nodes):
-        if i:
-            parts.append('<span class="gd-arr">→</span>')
-        parts.append(f'<span class="gd-node">{node}</span>')
-    return f'<div class="gd-chain">{"".join(parts)}</div>'
-
-
 def _table(headers: list[str], rows: list[list[str]]) -> str:
     head = "".join(f"<th>{h}</th>" for h in headers)
     body = "".join(
@@ -81,23 +72,29 @@ def render(ctx: dict) -> str:
         sub=True))
 
     body.append(section(
-        "reading-overview", "總覽頁的讀法",
-        '<p>總覽不是資料堆，是一條<strong>因果鏈</strong>——每一段是下一段的原因，'
-        '從上往下讀完，你能回答「為什麼現在是這樣、接下來看什麼會變」：</p>'
-        + _chain("現在的狀況", "就業＋通膨", "聯準會怎麼反應", "公債利率",
-                 "市場定價", "對股市的含義", "今日觀察清單")
-        + '<ol>'
-          '<li><strong>先看最上面的情境卡</strong>——情境名、三欄一眼板、「方向」'
-          '一句話。三十秒抓到全局。</li>'
-          '<li><strong>就業與通膨兩張卡</strong>是雙目標的詳細數據。四格裡'
-          '<strong>帶綠邊的那一格</strong>是九宮格判定實際採用的口徑（就業用失業率、'
-          '通膨用核心 PCE），其餘三格是脈絡。</li>'
-          '<li><strong>聯準會段</strong>看三件事：政策現在站在哪、上次聲明改了'
-          '什麼字、什麼數字到了判定才會換檔。</li>'
-          '<li><strong>公債利率段</strong>回答「殖利率動了，是成長還是通膨在動」'
-          '——這決定對股市是哪一種壓力。</li>'
-          '<li>最後掃<strong>今日觀察清單</strong>：數據、標售、財報、期權到期。</li>'
-          '</ol>',
+        "reading-overview", "頭版的讀法",
+        '<p>頭版左邊有一條<strong>頁邊</strong>，中間一條直線從頭畫到尾。'
+        '<strong>正文</strong>（線的右邊）講現況；<strong>頁邊</strong>（線的左邊）只寫'
+        '變化——跟上一期比動了多少、離門檻還差多少、離公布還有幾天。'
+        '沿著那條線掃一遍，就是今天。</p>'
+        '<ol>'
+        '<li><strong>先看頁邊是不是黃的。</strong>黃色只有一個意思：跟上一期不一樣。'
+        '頭條旁邊那一欄是黃的，代表判斷或關鍵讀數今天動了，最大的幾個數字就是動了多少；'
+        '是白的，代表都沒變。往下每一列也一樣：有螢光筆的才是變動，沒上色的頁邊註記'
+        '是「離門檻多遠」或「幾天後」。</li>'
+        '<li><strong>頭條只有一則。</strong>當天有央行決議或重大數據，頭條就是那件事；'
+        '平靜的日子，頭條退回目前的情境判定。決議該到卻沒拿到時，頭條是紅色的缺口。</li>'
+        '<li><strong>看每一段開頭那枚印</strong>，它說的是誰負責：'
+        '<strong>實</strong>＝機構發布的數字、<strong>判</strong>＝本站固定規則的判定、'
+        '<strong>市</strong>＝市場價格、<strong>聞</strong>＝別人的報導。'
+        '「別人怎麼說」那一段直線畫成虛線，因為那不是本站的話。</li>'
+        '<li><strong>四個數字各有一把尺。</strong>實線、有刻度的是門檻尺：長刻度是本站寫死的'
+        '門檻，粗黑線是現在的位置。10 年期公債沒有寫死的門檻，所以只畫虛線的區間尺。'
+        '那張大圖的 Y 軸就是版面那條直線，刻度寫在頁邊。</li>'
+        '<li><strong>「接下來」的直線是今天</strong>，橫條拉得越長離得越遠。</li>'
+        '</ol>'
+        '<p>按 <kbd>M</kbd>（或頁邊底下的「只看頁邊」）可以把正文調淡，只沿著頁邊讀今天的變化。'
+        '右上角切換日報與夜報：美國數據台北晚上公布、FOMC 在凌晨，夜報是為那個時間設計的。</p>',
         sub=True))
 
     body.append(section(

@@ -44,7 +44,7 @@ ICONS = {
 
 # (href, label, icon, group). Grouping is what makes 15 items scannable.
 NAV = [
-    ("/", "總覽", "overview", None),
+    ("/", "頭版", "overview", None),
 
     ("/labor/", "勞動市場", "labor", "美國總經"),
     ("/inflation/", "通膨", "inflation", "美國總經"),
@@ -73,7 +73,16 @@ NAV = [
     ("/archive/", "存檔", "archive", "判讀與紀錄"),
 ]
 
-SITE_NAME = "總經儀表板"
+SITE_NAME = "邊際"
+SITE_NAME_EN = "At the Margin"
+TAGLINE = "跟昨天比，變了什麼。"
+
+# 刊徽：一頁紙、一條頁邊線、頁邊上一筆螢光筆。16px 時仍然認得出來。
+MARK_SVG = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>"
+            "<rect width='32' height='32' fill='%23f3f4f1'/>"
+            "<rect width='13' height='32' fill='%23ffd23b'/>"
+            "<rect x='13' width='2' height='32' fill='%2311151a'/>"
+            "<rect x='8' y='15' width='12' height='2' fill='%2311151a'/></svg>")
 
 # Supabase（帳號與自選清單同步）。anon key 是「設計上就公開」的前端金鑰，
 # 資料隔離靠資料庫的 Row Level Security，不靠把 key 藏起來。
@@ -83,8 +92,11 @@ SUPABASE_ANON_KEY = "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"
 
 # Theme and rail state are applied before first paint so neither flashes.
 BOOT = """
-(function(){var d=document.documentElement;try{
-var t=localStorage.getItem('theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);
+(function(){var d=document.documentElement;d.classList.add('js');try{
+if(/[?&]still(?:[&=]|$)/.test(location.search))d.classList.add('still');
+try{if(sessionStorage.getItem('seen'))d.classList.add('again');else sessionStorage.setItem('seen','1')}catch(e){}
+var t=localStorage.getItem('theme'),q=location.search.match(/[?&]theme=(dark|light)(?:&|$)/);if(q)t=q[1];
+if(t==='dark'||t==='light')d.setAttribute('data-theme',t);
 if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
 }catch(e){}})();
 """
@@ -141,7 +153,7 @@ def _sidebar(path: str, sections: dict[str, list[tuple[str, str]]] | None = None
     <div class="rail-head">
       <a class="rail-brand" href="/">
         <span class="rail-mark" aria-hidden="true"></span>
-        <span class="nav-label">{esc(SITE_NAME)}</span>
+        <span class="nav-label rail-name">{esc(SITE_NAME)}<i>{esc(SITE_NAME_EN)}</i></span>
       </a>
       <button type="button" class="rail-toggle" id="rail-toggle"
               aria-expanded="true" aria-controls="rail" aria-label="收合側邊選單">
@@ -161,7 +173,7 @@ def _sidebar(path: str, sections: dict[str, list[tuple[str, str]]] | None = None
 # 這是文件導覽，不是頁內分頁；tablist 會讓螢幕閱讀器宣告成同一份文件裡的
 # 分頁切換，而每一次點擊其實是整頁載入。
 TABS = [
-    ("/", "今日", "tab-today"),
+    ("/", "頭版", "tab-today"),
     ("/scenario/", "判定", "tab-verdict"),
     ("/tw/", "台股", "tab-tw"),
     ("/find/", "尋找", "tab-find"),
@@ -233,17 +245,19 @@ def asset_version() -> str:
     keeps yesterday's chart.js against today's markup.
     """
     stamp = 0.0
-    for name in ("style.css", "chart.js", "sidebar.js", "quotes.js",
-                 "explore.js", "account.js", "expense.js"):
+    for name in ("style.css", "front.css", "front.js", "chart.js", "sidebar.js",
+                 "quotes.js", "explore.js", "account.js", "expense.js"):
         candidate = os.path.join(paths.STATIC_DIR, name)
         if os.path.exists(candidate):
             stamp = max(stamp, os.path.getmtime(candidate))
     return str(int(stamp))
 
 
+# 兩種寫法都認：一般頁面的 section-head，以及頭版的 data-title（頭版的標題列
+# 帶責任印，h2 裡不是純文字）。
 SECTION_RE = re.compile(
-    r'<section id="([^"]+)"( class="sub-section")?>'
-    r'<div class="section-head"><h2>([^<]+)</h2>')
+    r'<section id="([^"]+)"(?: class="([^"]*)")?(?: data-title="([^"]*)")?[^>]*>'
+    r'(?:<div class="section-head(?: sr-only)?"><h2>([^<]+)</h2>)?')
 
 
 def extract_sections(body: str) -> list[tuple[str, str, int]]:
@@ -251,8 +265,10 @@ def extract_sections(body: str) -> list[tuple[str, str, int]]:
 
     層級 1 是小標、2 是小小標（section(sub=True) 的區塊）。
     """
-    return [(anchor, html_module.unescape(title), 2 if sub else 1)
-            for anchor, sub, title in SECTION_RE.findall(body)]
+    return [(anchor, html_module.unescape(named or title),
+             2 if "sub-section" in classes.split() else 1)
+            for anchor, classes, named, title in SECTION_RE.findall(body)
+            if (named or title)]
 
 
 def page(*, title: str, path: str, body: str, lede: str = "",
@@ -265,6 +281,9 @@ def page(*, title: str, path: str, body: str, lede: str = "",
     否則讀者一點進文章，側欄就整個失去位置感。
     """
     version = asset_version()
+    front = path == "/"
+    page_title = (f"{SITE_NAME}\u3000{SITE_NAME_EN}" if front
+                  else f"{title}｜{SITE_NAME}")
 
     head_block = ""
     if heading:
@@ -279,31 +298,34 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{esc(title)}｜{esc(SITE_NAME)}</title>
+<title>{esc(page_title)}</title>
 <meta name="description" content="{esc(description or lede)}">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f4f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0f13" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="總經儀表板">
+<meta name="apple-mobile-web-app-title" content="{esc(SITE_NAME)}">
+<link rel="preload" href="/newsreader-roman.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/style.css?v={version}">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>📊</text></svg>">
+{f'<link rel="stylesheet" href="/front.css?v={version}">' if front else ""}
+<link rel="icon" href="data:image/svg+xml,{MARK_SVG}">
 <script>{BOOT}</script>
 </head>
-<body>
+<body{' class="is-front"' if front else ""}>
 <a class="skip" href="#content">跳到主要內容</a>
 <div class="app">
 {_sidebar(nav_path or path, sections)}
   <div class="shell">
     <header class="topbar">
       <button type="button" class="icon-btn drawer-btn" id="rail-open"
-              aria-label="開啟選單" aria-controls="rail" aria-expanded="false">
+              aria-label="{'目錄' if front else '開啟選單'}" aria-controls="rail" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
+      <a class="nameplate" href="/" aria-label="{esc(SITE_NAME)}　回到頭版">{esc(SITE_NAME)}</a>
       <div class="topbar-title">{esc(title)}</div>
       <a class="topbar-guide" href="/guide/">使用講義</a>
       <div class="topbar-meta">{esc(updated)}</div>
@@ -315,11 +337,11 @@ def page(*, title: str, path: str, body: str, lede: str = "",
       </button>
       <button type="button" class="icon-btn" id="push-toggle" hidden
               aria-label="每日財經推播" aria-pressed="false">通知</button>
-      <button type="button" class="icon-btn" id="theme-toggle" aria-label="切換深淺色">主題</button>
+      <button type="button" class="icon-btn" id="theme-toggle" aria-label="切換日報與夜報">日報</button>
     </header>
     <main class="content" id="content">
       <div class="wrap">
-{_trust_row(updated)}
+{"" if front else _trust_row(updated)}
 {head_block}
 {body}
       </div>
@@ -354,6 +376,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 <script src="/quotes.js?v={version}" defer></script>
 <script src="/explore.js?v={version}" defer></script>
 <script src="/notify.js?v={version}" defer></script>
+{f'<script src="/front.js?v={version}" defer></script>' if front else ""}
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
 </html>
