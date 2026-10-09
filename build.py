@@ -59,7 +59,7 @@ def taipei_stamp() -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="建置總經儀表板")
+    parser = argparse.ArgumentParser(description="建置 At the Margin")
     parser.add_argument("--fresh", action="store_true", help="忽略快取，全部重抓")
     parser.add_argument("--offline", action="store_true", help="只用快取，不連網")
     parser.add_argument("--ttl", type=int, default=None, metavar="秒",

@@ -66,7 +66,7 @@ def render(ctx: dict) -> str:
         note="發布日程取自 FRED 官方行事曆"))
 
     # ---- 為什麼沒有即時 ----
-    body.append(section("why", "為什麼總經儀表板沒有「即時」", f'<div class="card">'
+    body.append(section("why", "為什麼這裡沒有「即時」", f'<div class="card">'
         + table(["頻率", "指標", "實際更新節奏"], [
             ["季", "GDP、生產力、放款標準調查、債務存量", "每季一次，且初值後還有兩次修正"],
             ["月", "非農、CPI、PCE、零售、工業生產、JOLTS", "每月一次，JOLTS 還額外延遲一個月"],

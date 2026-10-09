@@ -316,7 +316,7 @@ def section_news(ctx):
 
 
 def main() -> int:
-    print(f"總經儀表板每日摘要　產生於 {clock.now():%Y-%m-%d %H:%M}（台北）")
+    print(f"At the Margin 每日摘要　產生於 {clock.now():%Y-%m-%d %H:%M}（台北）")
     bundle, ctx = load_context()
     print(f"序列 {len(bundle.series)} 檔，缺漏 {len(bundle.missing)} 檔"
           + (f"：{', '.join(sorted(bundle.missing))}" if bundle.missing else ""))

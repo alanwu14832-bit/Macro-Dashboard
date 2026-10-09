@@ -92,3 +92,57 @@ class Sections(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HeroRendersEveryKindOfLede(unittest.TestCase):
+    """頭條有六種來源。平常只走得到「情境判定」那一條，其餘五條要等到決議日或數據日
+    才會執行——那正是網站最不能壞的日子，所以每一種都先在這裡畫一遍。"""
+
+    SCENARIO = {"name": "通膨未解", "regime": "inflation_first",
+                "regime_explain": "通膨回到目標前，就業轉弱不會單獨換來降息",
+                "employment_label": "中", "inflation_label": "高", "regime_label": "通膨優先",
+                "transitions": [{"name": "通膨由「高」轉「中」", "need": "核心 PCE 需降至 2.8% 以下",
+                                 "gap": 0.21, "unit": "個百分點"}]}
+    SUMMARY = {"total": 15, "dovish": 7, "hawkish": 4, "neutral": 4}
+
+    def render(self, *events, verdict="今天沒有重大數據或政策決議。"):
+        from macro.data import Bundle
+        ctx = {"events": {"events": list(events), "verdict": verdict}, "_bundle": Bundle(),
+               "rates": {"stance": {"market_implies": "市場定價未來一至二年升息"}}, "fedfunds": None}
+        return front.hero(ctx, self.SCENARIO, self.SUMMARY, {}, [], {"date": "2026-10-09"})
+
+    @staticmethod
+    def event(kind, tag, title, **extra):
+        return {"kind": kind, "tag": tag, "title": title, "today": True, "detail": "細節。",
+                "href": "/fed/", **extra}
+
+    def test_quiet_day_is_the_verdict_with_the_quiet_line(self):
+        html, changed = self.render()
+        self.assertIn("lede-verdict", html)
+        self.assertIn("今天沒有重大數據或政策決議。", html)
+        self.assertIn(">判</span>", html)
+        self.assertFalse(changed)
+
+    def test_decision_takes_the_headline_and_the_verdict_moves_below(self):
+        html, _ = self.render(self.event("policy", "FOMC　政策轉向",
+                                         "聯準會升息 1 碼　3.50%–3.75% → 3.75%–4.00%", policy="轉向"))
+        self.assertIn("lede-policy", html)
+        self.assertIn("聯準會升息 1 碼", html)
+        self.assertIn("3.50%–3.75% → 3.75%–4.00%", html)
+        self.assertIn(">實</span>", html)
+        self.assertIn("目前情境", html)                 # 常設的判定沒有消失，退到頭條底下
+        self.assertIn("通膨未解，聯準會的重心仍在物價。", html)
+
+    def test_missing_decision_is_marked_as_a_gap(self):
+        html, _ = self.render(self.event("policy", "FOMC　決議遺漏", "9/16 FOMC決議本站沒有取得",
+                                         policy="遺漏"))
+        self.assertIn("lede-gap", html)
+        self.assertIn(">缺</span>", html)
+
+    def test_pending_decision_and_data_days_render(self):
+        for event in (self.event("policy", "FOMC　今晚公布", "FOMC利率決議", policy="待公布"),
+                      self.event("data", "美國數據　已公布", "CPI", id="CPIAUCSL"),
+                      self.event("data", "美國數據　今晚公布", "非農就業", id="PAYEMS")):
+            html, _ = self.render(event)
+            self.assertIn(event["title"], html)
+            self.assertIn('id="lede"', html)
