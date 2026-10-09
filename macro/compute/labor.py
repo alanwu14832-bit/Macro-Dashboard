@@ -103,7 +103,15 @@ def revision_tracking(bundle: Bundle, months: int = 14) -> dict:
 def unemployment_decomposition(bundle: Bundle) -> dict:
     """失業率上升是因為分子（失業人數）還是分母（勞動力）在動？
 
-    Δu ≈ (ΔU - u·ΔL) / L ，把變動拆成「失業人數效果」與「勞動力效果」。
+    Δu ≈ ΔU/L₀ − u₀·ΔL/L₀（以期初為基期的一階近似），把變動拆成「失業人數效果」
+    與「勞動力效果」。符號：失業人數增加＝正；勞動力**增加**＝負（分母變大），
+    勞動力**減少**＝正。差額（residual）是近似誤差加上失業率只公布到小數一位的
+    四捨五入。
+
+    這是總量的拆解，看不出誰在失業、就業、非勞動力之間移動；頁面與規則都不能把
+    「勞動力效果」直接讀成「有人退出」。
+
+    期間照日曆對齊（Series.months_ago）：2025-10 缺一格，往回數筆數會多算一個月。
     """
     unemployed = bundle["UNEMPLOY"]
     labor_force = bundle["CLF16OV"]
@@ -113,9 +121,9 @@ def unemployment_decomposition(bundle: Bundle) -> dict:
 
     out = []
     for lag, name in ((1, "上月"), (3, "三個月"), (12, "一年")):
-        u0, u1 = unemployed.at(-1 - lag), unemployed.last
-        l0, l1 = labor_force.at(-1 - lag), labor_force.last
-        r0, r1 = rate.at(-1 - lag), rate.last
+        u0, u1 = unemployed.months_ago(lag), unemployed.last
+        l0, l1 = labor_force.months_ago(lag), labor_force.last
+        r0, r1 = rate.months_ago(lag), rate.last
         if None in (u0, u1, l0, l1, r0, r1):
             continue
         numerator_effect = (u1 - u0) / l0 * 100
@@ -126,6 +134,39 @@ def unemployment_decomposition(bundle: Bundle) -> dict:
             "residual": (r1 - r0) - numerator_effect - denominator_effect,
         })
     return {"rows": out}
+
+
+# ------------------------------------------------------------------ JOLTS ----
+THOUSANDS_PER_WAN = 10          # 千 → 萬
+
+
+def to_wan(thousands: float | None) -> float | None:
+    """千（人、個）換成萬。None 留著是 None——沒有資料不是 0。"""
+    return None if thousands is None else thousands / THOUSANDS_PER_WAN
+
+
+def jolts(bundle: Bundle) -> dict:
+    """職缺與人力流動。人數的原始單位是「千」；率是百分比。
+
+    每一格缺了就是 None，不補 0：職缺對失業比的分子缺了還照算，會算出 0.00，
+    看起來像「完全沒有職缺」，下游的規則也會照樣判。
+    """
+    openings, hires, unemployed = bundle["JTSJOL"], bundle["JTSHIL"], bundle["UNEMPLOY"]
+    ratio = None
+    if openings.last is not None and unemployed.last:
+        ratio = openings.last / unemployed.last
+    return {
+        "openings": openings.last,                 # 千個
+        "hires": hires.last,                       # 千人
+        "hires_as_of": hires.last_date,
+        "hires_rate": bundle["JTSHIR"].last,       # %
+        "quits": bundle["JTSQUR"].last,
+        "layoffs": bundle["JTSLDR"].last,
+        "openings_series": openings,
+        "quits_series": bundle["JTSQUR"],
+        "as_of": openings.last_date,
+        "vu_ratio": ratio,
+    }
 
 
 # ------------------------------------------------------------ 行業別貢獻 ----
@@ -365,6 +406,9 @@ def compute(bundle: Bundle) -> dict:
             "prime_epop_change": bundle["LNS12300060"].change_over(12),
             "prime_epop_series": bundle["LNS12300060"],
             "emratio": bundle["EMRATIO"].last,
+            "emratio_change": bundle["EMRATIO"].change_over(12),
+            "emratio_change_3m": bundle["EMRATIO"].change_over(3),
+            "rate_change_3m": bundle["CIVPART"].change_over(3),
             "population_growth": bundle["CNP16OV"].diff(1).tail(12).mean()
                                  if len(bundle["CNP16OV"]) >= 13 else None,
             "labor_force_growth": bundle["CLF16OV"].diff(1).tail(12).mean()
@@ -386,17 +430,7 @@ def compute(bundle: Bundle) -> dict:
             "continued_series": bundle["CCSA"],
             "as_of": bundle["ICSA"].last_date,
         },
-        "jolts": {
-            "openings": bundle["JTSJOL"].last,
-            "hires": bundle["JTSHIR"].last,
-            "quits": bundle["JTSQUR"].last,
-            "layoffs": bundle["JTSLDR"].last,
-            "openings_series": bundle["JTSJOL"],
-            "quits_series": bundle["JTSQUR"],
-            "as_of": bundle["JTSJOL"].last_date,
-            "vu_ratio": ((bundle["JTSJOL"].last or 0) / (bundle["UNEMPLOY"].last or 1))
-                        if bundle["JTSJOL"] and bundle["UNEMPLOY"] else None,
-        },
+        "jolts": jolts(bundle),
         "duration": {
             "median": bundle["UEMPMED"].last,
             "mean": bundle["UEMPMEAN"].last,

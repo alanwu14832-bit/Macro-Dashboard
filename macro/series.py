@@ -283,8 +283,34 @@ class Series:
             return None, None
         return min(self.values), max(self.values)
 
+    def months_ago(self, months: int) -> Number:
+        """最新一期往回 `months` 個月的那一期的值；那個月沒有資料就是 None。
+
+        月、季、年頻要用日曆找，不能往回數筆數：2025-10 因政府關門停發，FRED 的
+        序列少一格，「往回數 12 筆」其實是 13 個月前。yoy() 與 annualised() 早就
+        照日曆算了；這個方法給「跟 N 個月前比」的水準比較用。
+        """
+        if self.last_date is None:
+            return None
+        year, month = self.last_date.year, self.last_date.month - months
+        while month <= 0:
+            month += 12
+            year -= 1
+        for d, v in zip(reversed(self.dates), reversed(self.values)):
+            if (d.year, d.month) == (year, month):
+                return v
+            if (d.year, d.month) < (year, month):
+                return None
+        return None
+
     def change_over(self, periods: int) -> Number:
-        prior = self.at(-1 - periods)
+        """最新值減 `periods` 期前的值。月、季、年頻照日曆對齊（見 months_ago），
+        那一期缺資料就回 None——留白比拿錯基期好。日、週頻維持往回數筆數。"""
+        if self.frequency in ("m", "q", "a"):
+            per = {"m": 1, "q": 3, "a": 12}[self.frequency]
+            prior = self.months_ago(periods * per)
+        else:
+            prior = self.at(-1 - periods)
         if prior is None or self.last is None:
             return None
         return self.last - prior

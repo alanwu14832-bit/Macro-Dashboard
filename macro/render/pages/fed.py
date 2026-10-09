@@ -51,12 +51,14 @@ def _statement_block(st: dict, decision: dict | None = None) -> str:
                        + '<div class="card"><p class="muted">'
                        '目前取不到聯準會的聲明全文。</p></div>')
 
-    vote_changed = st["vote"] and st["vote"] != st["vote_prev"]
+    from ...sources.fomc_text import describe_vote_change
+    vote_note = describe_vote_change(st["vote"], st["vote_prev"],
+                                     st.get("dissent"), st.get("dissent_prev"))
     tiles = "".join([
         stat("聲明日期", esc(st["date"]), asof=f'對照 {esc(st["prev_date"])}'),
         stat("表決", esc(st["vote"] or "—"),
              delta=(f'上次 {esc(st["vote_prev"])}' if st["vote_prev"] else ""),
-             direction="hawkish" if vote_changed else None,
+             direction=None,          # 異議變多變少不是升降息方向，不上色
              asof="第二個數字是異議票"),
         stat("句子改動", f'{len(st["changed"])} 句改寫',
              delta=f'新增 {len(st["added"])}　刪除 {len(st["removed"])}',
@@ -65,12 +67,10 @@ def _statement_block(st: dict, decision: dict | None = None) -> str:
 
     parts = [_decision_callout(decision), f'<div class="grid grid-3">{tiles}</div>']
 
-    if vote_changed:
+    if vote_note:
         parts.append(callout(
-            f'<strong>表決結構變了</strong>：{esc(st["prev_date"])} 是 '
-            f'{esc(st["vote_prev"])}，這次是 {esc(st["vote"])}。'
-            f'異議票數是聲明裡最直接的分歧訊號——委員會內部對下一步的'
-            f'看法不再一致。', key=True))
+            f'<strong>表決變了</strong>：{esc(st["prev_date"])} 是 '
+            f'{esc(st["vote_prev"])}，這次是 {esc(st["vote"])}。{esc(vote_note)}', key=True))
 
     if st["same"]:
         parts.append('<p class="muted">這次聲明與上次逐句相同。'
@@ -252,7 +252,7 @@ def render(ctx: dict, signals: list[dict]) -> str:
         ("10 年名目", pct(decomposition["nominal"], 2)),
         ("　實質利率（TIPS）", pct(decomposition["real"], 2)),
         ("　通膨補償", pct(decomposition["inflation_comp"], 2)),
-        ("期限溢酬（近似）", fmt(decomposition["term_premium"], 2, suffix="%", signed=True)),
+        ("10 年期減政策利率", fmt(decomposition["ten_minus_policy"], 2, suffix=" pp", signed=True)),
         ("30 年名目", pct(decomposition["nominal_30"], 2)),
         ("30 年實質", pct(decomposition["real_30"], 2)),
         ("實質利率近三月變動", fmt(decomposition["real_chg_3m"], 2, suffix=" pp", signed=True)),
@@ -261,8 +261,9 @@ def render(ctx: dict, signals: list[dict]) -> str:
         "長端上行如果來自通膨補償，那是通膨預期問題；如果來自實質利率，"
         "那是成長預期或供給問題。兩者對股債的意義完全不同。")
         + '<p class="muted" style="font-size:.82rem">'
-          '期限溢酬為近似值：10 年實質利率減去「政策利率減通膨補償」的短期實質利率，'
-          '不等同 ACM 或 Kim-Wright 模型的估計。</p></div>',
+          '「10 年期減政策利率」同時包含市場對未來短率的預期與期限溢酬，本站拆不開，'
+          '所以它不是期限溢酬，也不能用來判斷供給或財政壓力。期限溢酬要靠模型估計'
+          '（例如紐約聯準銀行的 ACM），本站沒有接這個來源。</p></div>',
                         terms=["real_rate", "breakeven_inflation", "term_premium"]))
 
     body.append(section("real", "實質利率與通膨補償", line_chart(

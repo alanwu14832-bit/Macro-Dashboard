@@ -1,7 +1,7 @@
 """利率、殖利率曲線與信用。
 
 比參考站多做的：完整 11 個期限的曲線快照與三個月前對照、長端拆解成
-實質利率＋通膨補償＋期限溢酬（期限溢酬用 10 年名目減去預期短率路徑近似）、
+實質利率＋通膨補償（另列 10 年期減政策利率，但不把它當期限溢酬）、
 曲線形態自動分類（牛陡／熊平…）、以及金融情勢的百分位定位。
 """
 from __future__ import annotations
@@ -90,11 +90,7 @@ def curve_shape(bundle: Bundle) -> dict:
 
 
 def long_end_decomposition(bundle: Bundle) -> dict:
-    """長端利率＝實質利率 ＋ 通膨補償；再看期限溢酬佔多少。
-
-    期限溢酬用 10 年名目減 2 年名目的一部分近似不夠嚴謹，這裡改用
-    10 年名目 − （政策利率 + 通膨補償調整）的殘差，並標明是近似值。
-    """
+    """長端利率＝實質利率＋通膨補償。另外算出 10 年期減政策利率，只當曲線的描述用。"""
     ten = bundle["DGS10"]
     real10 = bundle["DFII10"]
     breakeven = bundle["T10YIE"]
@@ -106,15 +102,18 @@ def long_end_decomposition(bundle: Bundle) -> dict:
     real = real10.last
     inflation_comp = breakeven.last
 
-    # 期限溢酬近似：10 年實質利率 − 短期實質利率（政策利率減通膨補償）
-    term_premium = None
-    if real is not None and policy and policy.last is not None and inflation_comp is not None:
-        short_real = policy.last - inflation_comp
-        term_premium = real - short_real
+    # 10 年期殖利率減政策利率上緣。
+    # 2026-10-10 以前這個數字叫「期限溢酬（近似）」，算法寫成「10 年實質利率減
+    # （政策利率減通膨補償）」——化簡後就是名目殖利率減政策利率。它同時包含市場對
+    # 未來短率的預期與期限溢酬，本站拆不開，所以不能叫期限溢酬，也不能拿它推論
+    # 供給或財政壓力。真正的期限溢酬要靠模型（紐約聯準銀行的 ACM），本站沒有接。
+    ten_minus_policy = None
+    if nominal is not None and policy and policy.last is not None:
+        ten_minus_policy = nominal - policy.last
 
     return {
         "nominal": nominal, "real": real, "inflation_comp": inflation_comp,
-        "term_premium": term_premium,
+        "ten_minus_policy": ten_minus_policy,
         "nominal_30": thirty.last, "real_30": real30.last,
         "policy": policy.last if policy else None,
         "real_series": real10, "breakeven_series": breakeven,
@@ -242,11 +241,10 @@ def health_checks(bundle: Bundle, shape: dict, decomp: dict,
         add("10年實質利率", state, f"{real:.2f}%",
             "實質利率偏高，對估值構成壓力" if real > 1.8 else "實質利率溫和")
 
-    if decomp.get("term_premium") is not None:
-        premium = decomp["term_premium"]
-        state = "alert" if premium > 1.5 else "watch" if premium > 0.8 else "normal"
-        add("期限溢酬（近似）", state, f"{premium:+.2f}%",
-            "長端要求更高補償＝供給壓力" if premium > 0.8 else "長端補償要求不高")
+    if decomp.get("ten_minus_policy") is not None:
+        # 只列出來，不判定：這個差距分不出是市場預期短率走高，還是期限溢酬
+        add("10 年期減政策利率", "normal", f'{decomp["ten_minus_policy"]:+.2f} pp',
+            "含未來短率預期與期限溢酬，本站拆不開")
 
     hy = next((r for r in credit_data["rows"] if r["name"] == "高收益"), None)
     if hy and hy["value"] is not None:

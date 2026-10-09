@@ -20,7 +20,7 @@ def render(ctx: dict, signals: list[dict]) -> str:
     tiles = [
         stat("核心 PCE", pct(headline["core_pce"], 1),
              delta=f'距目標 {fmt(headline["gap_to_target"], 1, suffix=" pp", signed=True)}',
-             asof=f'{zh_date(d["pce_as_of"])} 資料　聯準會的政策標的',
+             asof=f'{zh_date(d["pce_as_of"])} 資料　聯準會的 2% 目標指整體 PCE，核心是判讀趨勢用的',
              spark=[(dt.isoformat(), v) for dt, v in
                     headline["core_pce_series"].tail(36).pairs()]),
         stat("核心 CPI", pct(headline["core_cpi"], 1),

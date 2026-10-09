@@ -144,6 +144,20 @@ def _watchlist(market: str) -> str:
         f'（localStorage），換裝置或清瀏覽資料就會不見。</p></div>')
 
 
+def _expired_note(rows: list[dict]) -> str:
+    """停更的報價：留著看得到，但講明它是哪一天的、不在今天的比較裡。"""
+    if not rows:
+        return ""
+    days = sorted({r["quoted_at"].date().isoformat() for r in rows if r.get("quoted_at")})
+    when = "、".join(days) if days else "不明日期"
+    items = "、".join(f'{esc(r["name"])} {fmt(r["price"], 2)}' for r in rows[:12])
+    more = f"等 {len(rows)} 檔" if len(rows) > 12 else ""
+    return callout(
+        f'<strong>歷史快照，不是今天的行情</strong>：以下報價停在 {esc(when)}，'
+        f'這個來源之後沒有再更新（原始指數只有本機建置拿得到，雲端建置拿不到）。'
+        f'它們不列入本頁與頭版今天的漲跌、強弱與輪動比較：{items}{more}。', key=True)
+
+
 def _status_note(status: str, source: str) -> str:
     return (f'<p class="muted" style="font-size:.83rem;margin:-4px 0 12px">'
             f'狀態：{esc(status)}　·　來源：{esc(source)}</p>')
@@ -181,6 +195,10 @@ def render_us(ctx: dict) -> str:
 
     # ================================================================ 美股 ==
     us = d["us"]
+    if not us["indices"] and us.get("expired"):
+        body.append(section("us", "美股", _expired_note(us["expired"])
+                            + '<p class="muted">標普 500 與那斯達克的每日收盤見'
+                              '<a href="/market/">市場面</a>（取自 FRED，晚一個交易日）。</p>'))
     if us["indices"]:
         tiles = [
             stat(r["name"], fmt(r["price"], 2),
@@ -204,7 +222,7 @@ def render_us(ctx: dict) -> str:
             "us", "美股",
             _status_note(us["status"], "Fincept Terminal")
             + f'<div class="grid grid-3">{"".join(tiles)}</div>'
-            + earnings_html,
+            + earnings_html + _expired_note(us.get("expired") or []),
             note=f'報價時間 {_stamp(us["indices"])}',
             terms=["drawdown", "vix"]))
 
@@ -240,6 +258,8 @@ def render_us(ctx: dict) -> str:
 
     # ========================================================== 新興市場 ==
     em = d["em"]
+    if not em["indices"] and em.get("expired"):
+        body.append(section("em", "其他新興市場指數", _expired_note(em["expired"])))
     if em["indices"]:
         body.append(section(
             "em", "其他新興市場指數",

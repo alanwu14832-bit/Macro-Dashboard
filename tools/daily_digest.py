@@ -89,6 +89,10 @@ def sub(title):
 
 
 def load_context():
+    # 這支腳本的承諾是不連網。以前靠各模組把快取期限設成無限大，但新加的來源各有
+    # 自己的短期限（期貨報價、央行 RSS），照樣會連出去——期貨報價被限流時，退避重試
+    # 會讓整支腳本卡上好幾分鐘。直接把抓取層切到離線：只讀快取，沒有快取就當作沒有。
+    http.OFFLINE = True
     bundle = data.load(verbose=False, ttl=float("inf"))
     news.TTL_OVERRIDE = float("inf")
     ctx: dict = {"_bundle": bundle}
@@ -98,24 +102,19 @@ def load_context():
         except Exception as exc:  # 單一模組壞掉不該讓整份摘要消失
             ctx[name] = {}
             print(f"   ✗ {name} 計算失敗：{exc}", file=sys.stderr)
-    # 台灣與「今天的事件」：頭版台灣版的導讀要用。台灣各來源的快取期限各不相同
-    # （央行 RSS 只有半小時），所以這一段強制只讀快取——這支腳本的承諾是不連網。
-    was_offline, http.OFFLINE = http.OFFLINE, True
-    try:
-        for name, build in (("taiwan", lambda: taiwan.compute(bundle)),
-                            ("fomc", lambda: fomc.decision_states(
-                                fomc_text.latest_decision(ttl=float("inf")))),
-                            ("cbc", lambda: cbc_board.decision_states(
-                                (ctx.get("taiwan") or {}).get("cbc_decision"),
-                                cbc_board.meetings((ctx.get("taiwan") or {}).get("cbc_schedule") or []))),
-                            ("events", lambda: events.compute(ctx))):
-            try:
-                ctx[name] = build()
-            except Exception as exc:
-                ctx[name] = {} if name in ("taiwan", "events") else []
-                print(f"   ✗ {name} 計算失敗：{exc}", file=sys.stderr)
-    finally:
-        http.OFFLINE = was_offline
+    # 台灣與「今天的事件」：頭版台灣版的導讀要用。
+    for name, build in (("taiwan", lambda: taiwan.compute(bundle)),
+                        ("fomc", lambda: fomc.decision_states(
+                            fomc_text.latest_decision(ttl=float("inf")))),
+                        ("cbc", lambda: cbc_board.decision_states(
+                            (ctx.get("taiwan") or {}).get("cbc_decision"),
+                            cbc_board.meetings((ctx.get("taiwan") or {}).get("cbc_schedule") or []))),
+                        ("events", lambda: events.compute(ctx))):
+        try:
+            ctx[name] = build()
+        except Exception as exc:
+            ctx[name] = {} if name in ("taiwan", "events") else []
+            print(f"   ✗ {name} 計算失敗：{exc}", file=sys.stderr)
     return bundle, ctx
 
 
@@ -298,6 +297,14 @@ def section_markets(ctx):
                       f"　{num(r.get('change')):>10}　{pct(r.get('change_percent')):>8}"
                       f"　昨收 {num(r.get('previous_close'))}"
                       f"　{r.get('market_status','')}")
+        for region, label in [("us", "美股"), ("tw", "台股"), ("em", "新興市場")]:
+            old = (eq.get(region) or {}).get("expired") or []
+            if old:
+                names = "、".join(str(r.get("name", "")) for r in old[:10])
+                when = str(old[0].get("quoted_at"))[:10]
+                print(f"  ［{label}］停更的報價（停在 {when}，是歷史快照，**不要引用**）：{names}"
+                      + (f" 等 {len(old)} 檔" if len(old) > 10 else ""))
+        print("  美股指數的每日收盤以上面「市場面」那幾行為準（取自 FRED）。")
 
 
 def section_news(ctx):

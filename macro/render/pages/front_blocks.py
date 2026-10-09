@@ -143,7 +143,18 @@ def since_items(diff: dict, reading_changes: list[dict], scenario: dict,
         more = f"等 {len(removed)} 條" if len(removed) > 1 else ""
         items.append({"big": f"{MINUS}{len(removed)}", "name": "不再觸發", "long": True,
                       "ft": esc(removed[0].get("headline") or "") + more})
+    items.extend(retired_items(diff))
     return items
+
+
+def retired_items(diff: dict) -> list[dict]:
+    """本站停用的規則。它跟「不再觸發」分開列：這是規則變了，不是數據變了。"""
+    retired = diff.get("retired") or []
+    if not retired:
+        return []
+    more = f"等 {len(retired)} 條" if len(retired) > 1 else ""
+    return [{"big": f"{MINUS}{len(retired)}", "name": "本站停用規則", "long": True,
+             "ft": esc(retired[0].get("headline") or "") + more + "（規則改了，不是數據變了）"}]
 
 
 def since_block(items: list[dict], prior: dict | None, first_run: bool, *, shown: int = 4,
@@ -234,7 +245,7 @@ def gist_blocks(scenario: dict, summary: dict, stance: dict, futures: dict | Non
     rule = f"訊號 {summary['dovish']} 條偏降息、{summary['hawkish']} 條偏升息"
     first = next((t for t in (scenario.get("transitions") or []) if t.get("gap") is not None), None)
     if first:
-        rule += (f'；但規則上要等{esc(first["name"])}政策重心才會換'
+        rule += (f'；依本站規則要等{esc(first["name"])}，分類才會換'
                  f'<span class="dash">——</span><strong>還差 {fmt(abs(first["gap"]), 2)} '
                  f'{esc(first["unit"])}</strong>')
     blocks = []
@@ -352,6 +363,8 @@ def gate_chart(ctx: dict, scenario: dict) -> str:
           '<div class="m yax" aria-hidden="true"></div></figure>'
         + row(f'<p class="fig-src">資料：BEA 核心 PCE 物價指數年增率，至 {esc(last_period)}。'
               f'斜線區是高於 {high:.1f}%（判定為「高」）的時段；沒有資料的月份不連線。'
+              f'{low:.1f}% 與 {high:.1f}% 是本站的分類門檻，不是聯準會的決策門檻；'
+              f'聯準會的 {INFLATION_TARGET:.0f}% 目標指的是整體 PCE。'
               '<a href="/inflation/">看完整通膨拆解 →</a></p>')
         + '</div>')
 
@@ -894,6 +907,10 @@ def next_up(ctx: dict, scenario: dict, fomc: dict | None, *, horizon: int = 30) 
 
 # -------------------------------------------------------------- 今日價格 ----
 
+# 頭版列的兩檔美股指數，以及報價來源沒有今天的資料時改用的 FRED 每日收盤序列
+US_INDEX_CLOSES = [("標普 500", "SP500"), ("那斯達克綜合", "NASDAQCOM")]
+
+
 def price_rows(ctx: dict) -> list[dict]:
     """今日價格的資料列。chg＝(值, 小數位, 單位, 說明)；沒有變動資料就是 None，不補值。"""
     eq = ctx.get("equities") or {}
@@ -907,10 +924,26 @@ def price_rows(ctx: dict) -> list[dict]:
     credit = {c["name"]: c for c in (rates.get("credit") or {}).get("rows") or []}
 
     rows: list[dict] = []
-    for item in (us.get("indices") or [])[:2]:
-        rows.append({"name": item["name"], "href": "/equities/", "level": fmt(item["price"], 2),
-                     "cap": f'昨收 {fmt(item["previous_close"], 2)}',
-                     "chg": (item.get("change_percent"), 2, "%", "")})
+    live = {item["name"]: item for item in us.get("indices") or []}
+    bundle = ctx.get("_bundle")
+    for name, series_id in US_INDEX_CLOSES:
+        item = live.get(name)
+        if item:
+            rows.append({"name": name, "href": "/equities/", "level": fmt(item["price"], 2),
+                         "cap": f'昨收 {fmt(item["previous_close"], 2)}',
+                         "chg": (item.get("change_percent"), 2, "%", "")})
+            continue
+        # 沒有今天的報價（equities.split_expired 已經把停更的存檔分出去了）：
+        # 退回 FRED 的每日收盤，日期寫明。兩個收盤價都要有才算得出漲跌。
+        series = bundle[series_id] if bundle is not None else None
+        if not series or series.last is None:
+            continue
+        before = series.at(-2)
+        change = (series.last / before - 1) * 100 if before else None
+        when = series.last_date
+        rows.append({"name": name, "href": "/market/", "level": fmt(series.last, 2),
+                     "cap": f"{when.month}/{when.day} 收盤，取自 FRED",
+                     "chg": (change, 2, "%", "") if change is not None else None})
     ten = curve.get("10Y")
     if ten:
         rows.append({"name": "10 年期公債", "href": "/fed/", "level": fmt(ten["value"], 2),
@@ -981,7 +1014,8 @@ def prices(ctx: dict) -> str:
                       f'近三月 {fmt(liquidity.get("chg_3m"), 0, suffix=" 十億", signed=True)}'))
     return price_section(
         price_rows(ctx), lines, anchor="prices",
-        sub="頁邊是漲跌。美股與利率為前一交易日收盤；沒有變動資料的畫「—」。")
+        sub="頁邊是漲跌。美股與利率為最近一個交易日收盤，各列寫明日期或昨收；"
+            "沒有變動資料的畫「—」。")
 
 
 # ---------------------------------------------------------- 別人怎麼說 ----

@@ -96,34 +96,42 @@ def narrow_job_growth(ctx):
 
 @rule
 def unemployment_falling_for_wrong_reason(ctx):
-    """失業率下降，但分母（勞動力）在萎縮 — 這不是改善。"""
+    """失業率下降，但同一段期間就業人口比與勞參率也在下降。
+
+    三個條件看的是同一個 12 個月，而且全部用「率」：失業率下降、勞參率下降、
+    就業人口比沒有上升。用率不用人數，是因為家庭調查每年 1 月換人口基準，
+    跨 1 月的人數水準不能直接相減。
+
+    2026-10-10 以前這條規則的標題是「失業率下降來自勞動力萎縮，不是就業改善」、
+    嚴重度是嚴重，條件卻是「近 12 個月平均每月勞動力減少」加上「一年失業率變動
+    不超過 +0.1」——失業率上升 0.1 也會觸發，而且標題下的是因果。總量資料看不出
+    是誰離開了勞動力，所以現在只陳述三個率同時發生的事，不說原因。
+    """
     labor = ctx["labor"]
     participation = labor["participation"]
-    population_growth = participation.get("population_growth")
-    labor_force_growth = participation.get("labor_force_growth")
-    prime_change = participation.get("prime_epop_change")
     rows = (labor.get("decomposition") or {}).get("rows") or []
     year = next((r for r in rows if r["window"] == "一年"), None)
-
-    if (population_growth is None or labor_force_growth is None
-            or labor_force_growth >= 0 or population_growth <= 0):
+    rate_change = participation.get("rate_change")           # 勞參率 12 個月
+    epop_change = participation.get("emratio_change")        # 就業人口比 12 個月
+    if year is None or rate_change is None or epop_change is None:
         return None
-    # 失業率持平或下降時才成立；若失業率已在上升，那是另一條規則的事。
-    if year is None or year["total"] > 0.1:
+    if not (year["total"] < 0 and rate_change < 0 and epop_change <= 0):
         return None
 
-    evidence = (f"人口月增 {population_growth / 10:+.1f} 萬、勞動力月增 "
-                f"{labor_force_growth / 10:+.1f} 萬")
-    if prime_change is not None:
-        evidence += f"；黃金年齡就業率 12 個月 {prime_change:+.1f} 個百分點"
+    evidence = (f"近 12 個月失業率 {year['total']:+.1f}、勞參率 {rate_change:+.1f}、"
+                f"就業人口比 {epop_change:+.1f} 個百分點")
+    recent_rate = participation.get("rate_change_3m")
+    recent_epop = participation.get("emratio_change_3m")
+    if recent_rate is not None and recent_epop is not None:
+        evidence += f"；近 3 個月勞參率 {recent_rate:+.1f}、就業人口比 {recent_epop:+.1f}"
 
     return _signal(
         "unemployment_falling_for_wrong_reason",
-        "失業率下降來自勞動力萎縮，不是就業改善",
-        "人口在增加而勞動力在減少，代表失業率是被「退出勞動力」壓下去的；"
-        "這種下降不代表勞動市場變好，也不該被讀成升息的理由",
+        "失業率下降，但就業人口比與勞參率也在下降",
+        "失業率下降的同時有工作的人口比例沒有增加，這種下降不能直接讀成勞動市場轉強。"
+        "總量資料看不出是誰離開了勞動力，所以這裡只陳述現象，不說原因",
         evidence,
-        "dovish", "high", "就業")
+        "dovish", "medium", "就業")
 
 
 @rule
@@ -188,7 +196,8 @@ def core_pce_above_target(ctx):
     return _signal(
         "core_pce_above_target",
         "核心 PCE 顯著高於目標",
-        "核心 PCE 是聯準會的政策標的，未回到目標前降息的門檻就高",
+        "聯準會的 2% 目標指整體 PCE，核心 PCE 是它判讀趨勢最常引用的指標；"
+        "離目標越遠，維持利率的理由越多",
         f"核心 PCE {core_pce:.1f}%，距 2% 目標 {gap:+.1f} 個百分點",
         "hawkish", severity, "物價")
 
@@ -373,17 +382,9 @@ def real_rate_restrictive(ctx):
         "dovish", "medium", "利率")
 
 
-@rule
-def term_premium_elevated(ctx):
-    premium = ctx["rates"]["decomposition"].get("term_premium")
-    if premium is None or premium < 0.8:
-        return None
-    return _signal(
-        "term_premium_elevated",
-        "期限溢酬偏高，長端在要求額外補償",
-        "溢酬上升多半來自供給與財政疑慮，降息也不一定壓得下長端",
-        f"期限溢酬（近似）{premium:+.2f} 個百分點",
-        "hawkish", "medium", "利率")
+# 2026-10-10 拿掉 term_premium_elevated（「期限溢酬偏高，來自供給與財政疑慮」）。
+# 它用的數字其實是 10 年期殖利率減政策利率，分不出短率預期與期限溢酬，
+# 撐不起「供給與財政」這個原因。沒有可靠的期限溢酬估計之前，不重新加回來。
 
 
 @rule
@@ -656,6 +657,12 @@ def diff(current: list[dict], previous: list[dict] | None) -> dict:
     now_keys = {s["key"] for s in current}
     old_keys = {s["key"] for s in previous}
     added = [s for s in current if s["key"] not in old_keys]
-    removed = [s for s in previous if s["key"] not in now_keys]
-    return {"added": added, "removed": removed,
-            "same": not added and not removed, "first_run": False}
+    gone = [s for s in previous if s["key"] not in now_keys]
+    # 上一期有、這一期沒有的訊號有兩種：規則還在但條件不成立了（數據變了），
+    # 或者規則本身被本站停用了（程式變了）。後者不能寫成「不再觸發」——
+    # 那會讓讀者以為是資料在動。
+    rule_keys = {fn.__name__ for fn in RULES}
+    removed = [s for s in gone if s["key"] in rule_keys]
+    retired = [s for s in gone if s["key"] not in rule_keys]
+    return {"added": added, "removed": removed, "retired": retired,
+            "same": not added and not removed and not retired, "first_run": False}

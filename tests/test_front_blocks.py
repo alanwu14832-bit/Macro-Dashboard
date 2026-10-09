@@ -100,7 +100,7 @@ class HeroRendersEveryKindOfLede(unittest.TestCase):
     才會執行——那正是網站最不能壞的日子，所以每一種都先在這裡畫一遍。"""
 
     SCENARIO = {"name": "通膨未解", "regime": "inflation_first",
-                "regime_explain": "通膨回到目標前，就業轉弱不會單獨換來降息",
+                "regime_explain": "依本站規則通膨仍屬高（核心 PCE 年增 3.0%），但近三月年化 2.0% 已經降溫；這是本站的分類，不是聯準會的決策門檻",
                 "employment_label": "中", "inflation_label": "高", "regime_label": "通膨優先",
                 "transitions": [{"name": "通膨由「高」轉「中」", "need": "核心 PCE 需降至 2.8% 以下",
                                  "gap": 0.21, "unit": "個百分點"}]}
@@ -132,7 +132,7 @@ class HeroRendersEveryKindOfLede(unittest.TestCase):
         self.assertIn("3.50%–3.75% → 3.75%–4.00%", html)
         self.assertIn(">實</span>", html)
         self.assertIn("目前情境", html)                 # 常設的判定沒有消失，退到頭條底下
-        self.assertIn("通膨未解，聯準會的重心仍在物價。", html)
+        self.assertIn("通膨未解，物價仍是主要矛盾。", html)
 
     def test_missing_decision_is_marked_as_a_gap(self):
         html, _ = self.render(self.event("policy", "FOMC　決議遺漏", "9/16 FOMC決議本站沒有取得",

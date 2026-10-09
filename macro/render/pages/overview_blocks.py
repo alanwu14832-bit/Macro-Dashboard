@@ -66,7 +66,7 @@ def rate_structure(ctx: dict) -> str:
          delta_span(real_chg, 2, suffix=" pp", good_is_up=False)],
         ["　通膨補償（breakeven）", pct(decomp.get("inflation_comp"), 2),
          delta_span(be_chg, 2, suffix=" pp", good_is_up=False)],
-        ["期限貼水", pct(decomp.get("term_premium"), 2), "—"],
+        ["10 年期減政策利率", fmt(decomp.get("ten_minus_policy"), 2, suffix=" pp", signed=True), "—"],
     ]
 
     credit_rows = [
@@ -129,9 +129,9 @@ def _pricing_map(ctx: dict, curve: dict, decomp: dict) -> str:
          pct(expectations.get("t5y5y"), 2),
          "長期通膨錨；聯準會盯這個判斷預期有沒有脫錨，2.0–2.5% 算錨住"],
         # ---- 債務風險 ----
-        ["<strong>債務風險</strong>", "期限貼水（近似）",
-         pct(decomp.get("term_premium"), 2),
-         "持有長債要求的額外補償——公債供給與財政風險的價格"],
+        ["<strong>債務風險</strong>", "10 年期減政策利率",
+         fmt(decomp.get("ten_minus_policy"), 2, suffix=" pp", signed=True),
+         "含未來短率預期與期限溢酬，拆不開；不是公債供給或財政風險的價格"],
         ["", "30 年減 10 年",
          fmt(shape.get("slope_30_10"), 2, suffix=" pp", signed=True),
          "最長端的斜率；財政與供給擔憂通常先反映在這裡"],

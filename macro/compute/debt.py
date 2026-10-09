@@ -68,21 +68,54 @@ def fiscal(bundle: Bundle) -> dict:
     }
 
 
+MILLIONS_PER_TRILLION = 1_000_000
+BILLIONS_PER_TRILLION = 1_000
+
+
+def _at(series, when):
+    """某一季的值；那一季沒有就是 None。佔比的分子分母一定要同一季——
+    兩檔序列的最新一季常常不同（外國持有比債務總額晚一季公布）。"""
+    for d, v in zip(reversed(series.dates), reversed(series.values)):
+        if d == when:
+            return v
+        if d < when:
+            return None
+    return None
+
+
 def holders(bundle: Bundle) -> dict:
-    """誰在吃這些債。"""
-    foreign = bundle["FDHBFIN"]
-    private = bundle["FDHBPIN"]
-    total = bundle["GFDEBTN"]
+    """誰持有這些債。金額一律換成「兆美元」再交出去。
 
-    foreign_share = None
-    if foreign.last and total.last:
-        foreign_share = foreign.last / total.last * 100
+    三檔序列的單位不一樣（GFDEBTN 是百萬美元，FDHBFIN／FDHBPIN 是十億美元），
+    最新一季也不一樣。2026-10-10 以前這裡把三檔都當百萬美元、而且拿各自的最新一季
+    相除——外國持有 9.355 兆被印成 0.01 兆、佔比 0.0%。
 
+    三個數字不是互斥的分類：債務總額＝公眾持有＋政府內部持有（社安基金等）；
+    民間持有＝公眾持有扣掉聯準會；外國持有是民間持有的一部分。所以不能相加，
+    也不能拿「外國＋民間」去對總額。
+    """
+    foreign, private, total = bundle["FDHBFIN"], bundle["FDHBPIN"], bundle["GFDEBTN"]
+
+    def trillions(value, per):
+        return None if value is None else value / per
+
+    def share(when):
+        """外國持有佔債務總額，同一季才算。"""
+        f, t = _at(foreign, when), _at(total, when)
+        if f is None or not t:
+            return None
+        return (f / BILLIONS_PER_TRILLION) / (t / MILLIONS_PER_TRILLION) * 100
+
+    # 分子分母都有的最新一季
+    common = next((d for d in reversed(foreign.dates) if _at(total, d)), None)
+    five_years_ago = common.replace(year=common.year - 5) if common else None
     return {
-        "foreign": foreign.last, "private": private.last, "total": total.last,
-        "foreign_share": foreign_share,
-        "foreign_share_5y_ago": ((foreign.at(-21) / total.at(-21) * 100)
-                                 if foreign.at(-21) and total.at(-21) else None),
+        "total": trillions(total.last, MILLIONS_PER_TRILLION), "total_as_of": total.last_date,
+        "foreign": trillions(foreign.last, BILLIONS_PER_TRILLION), "foreign_as_of": foreign.last_date,
+        "private": trillions(private.last, BILLIONS_PER_TRILLION), "private_as_of": private.last_date,
+        "foreign_share": share(common) if common else None,
+        "foreign_share_as_of": common,
+        "foreign_share_5y_ago": share(five_years_ago) if five_years_ago else None,
         "foreign_series": foreign,
         "foreign_yoy": foreign.yoy().last if foreign else None,
     }

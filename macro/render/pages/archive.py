@@ -30,6 +30,14 @@ def changes_block(diff: dict, reading_changes: list[dict]) -> str:
                                    f'<div><div class="headline">{esc(s["headline"])}</div></div>'
                                    f'<div class="side">{tag(s.get("direction","neutral"))}</div></div>'
                                    for s in diff["removed"]) + "</div>")
+        if diff.get("retired"):
+            parts.append("<p><strong>本站停用的規則</strong>（規則改了，不是數據變了）</p>")
+            parts.append('<div class="signal-list">'
+                         + "".join(f'<div class="signal">'
+                                   f'<div class="sev low">－</div>'
+                                   f'<div><div class="headline">{esc(s["headline"])}</div></div>'
+                                   f'<div class="side"></div></div>'
+                                   for s in diff["retired"]) + "</div>")
         if reading_changes:
             rows = [[esc(c["name"]),
                      fmt(c["was"], 2, suffix=c["unit"]),

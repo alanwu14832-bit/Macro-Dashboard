@@ -140,7 +140,9 @@ def _only(diff: dict, keep) -> dict:
     """訊號的增減只留某一邊的。"""
     added = [s for s in diff.get("added") or [] if keep(s)]
     removed = [s for s in diff.get("removed") or [] if keep(s)]
-    return {**diff, "added": added, "removed": removed, "same": not added and not removed}
+    retired = [s for s in diff.get("retired") or [] if keep(s)]
+    return {**diff, "added": added, "removed": removed, "retired": retired,
+            "same": not added and not removed and not retired}
 
 
 def edition(key: str, html: str) -> str:

@@ -35,10 +35,12 @@ POLICY_RANK = {"轉向": 0, "變動": 1, "調整": 2, "不變": 3}
 
 # 情境判定當頭條時的後半句。前半句是九宮格的格名（通膨未解、軟著陸邊緣…）。
 # 每一句拆成兩段：頭條的字很大，中文沒有空格，斷行點只能自己給。
+# 這一句講的是本站的分類（頭條旁邊印的是「判」），不是聯準會的重心在哪裡——
+# 2026-10-10 以前寫的是「聯準會的重心仍在物價」，那是替央行說話。
 REGIME_PHRASES = {
-    "inflation_first": ("聯準會的重心", "仍在物價"),
-    "employment_first": ("聯準會的重心", "已轉向就業"),
-    "balanced": ("兩個目標", "互相牽制"),
+    "inflation_first": ("物價仍是", "主要矛盾"),
+    "employment_first": ("就業成了", "主要矛盾"),
+    "balanced": ("通膨與就業", "互相牽制"),
 }
 REGIME_CLAUSE = {key: "".join(parts) for key, parts in REGIME_PHRASES.items()}
 

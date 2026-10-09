@@ -241,6 +241,37 @@ def _save_snapshot(groups: list[list[dict]]) -> None:
         pass
 
 
+# 存檔補上的報價最多舊到幾天還算「最近一個交易日」：週末兩天再加一天假。
+MAX_SNAPSHOT_AGE_DAYS = 4
+
+
+def split_expired(rows: list[dict], now: datetime) -> tuple[list[dict], list[dict]]:
+    """把報價分成 (今天可以用的, 已經過期的)。
+
+    只判斷「這次沒抓到、靠存檔補上」的那些（stale）：存檔本身如果已經超過
+    MAX_SNAPSHOT_AGE_DAYS 天，它就不是最近一個交易日的行情，而是歷史快照——
+    可以留著給人看，但不能進今天的漲跌、輪動與強弱比較。
+    雲端建置拿不到原始指數（那個來源只在本機有），2026-09-04 之後它們就一直靠
+    存檔補，頭版的「今日價格」於是把一個月前的漲跌當成今天的印了五個星期。
+
+    這次有抓到的報價不在這裡判斷：週末與休市拿到的本來就是最後交易日的資料，
+    那是正常的，不是故障。
+    """
+    live, expired = [], []
+    for row in rows:
+        if not row.get("stale"):
+            live.append(row)
+            continue
+        when = row.get("quoted_at")
+        if when is not None and when.tzinfo is None:
+            when = when.replace(tzinfo=clock.TAIPEI)
+        if when is None or (now - when).days > MAX_SNAPSHOT_AGE_DAYS:
+            expired.append({**row, "expired": True})
+        else:
+            live.append(row)
+    return live, expired
+
+
 def _fill_gaps(rows: list[dict], pairs: list[tuple[str, str]],
                region: str, snapshot: dict) -> list[dict]:
     """這次沒取到的代號，用存檔補上並標為 stale。"""
@@ -321,6 +352,21 @@ def compute(bundle=None) -> dict:
     em_indices = _fill_gaps(em_indices, EM_INDICES, "新興市場", snapshot)
     em_etfs = _fill_gaps(em_etfs, EM_ETFS, "新興市場", snapshot)
 
+    # 過期的報價從這裡分出去：下面所有的漲跌家數、類股強弱、輪動都只看沒過期的
+    now = clock.now()
+    expired: dict[str, list[dict]] = {"us": [], "tw": [], "em": []}
+
+    def keep(rows: list[dict], region: str) -> list[dict]:
+        live, old = split_expired(rows, now)
+        expired[region].extend(old)
+        return live
+
+    us_indices, us_proxies = keep(us_indices, "us"), keep(us_proxies, "us")
+    us_stocks, us_sectors = keep(us_stocks, "us"), keep(us_sectors, "us")
+    tw_index, tw_stocks = keep(tw_index, "tw"), keep(tw_stocks, "tw")
+    tw_etfs, tw_heat = keep(tw_etfs, "tw"), keep(tw_heat, "tw")
+    em_indices, em_etfs = keep(em_indices, "em"), keep(em_etfs, "em")
+
     tw_groups = _group_rows(TW_GROUPS, tw_heat)
     tw_ai = _group_rows(TW_AI_CHAIN, tw_heat)
     tw_semi = _group_rows(TW_SEMI_CHAIN, tw_heat)
@@ -363,8 +409,9 @@ def compute(bundle=None) -> dict:
                   + tw_index + tw_stocks + tw_etfs + em_indices + em_etfs)
 
     return {
-        "available": bool(everything),
+        "available": bool(everything) or any(expired.values()),
         "stale_count": sum(1 for r in everything if r.get("stale")),
+        "expired_count": sum(len(rows) for rows in expired.values()),
         "source_note": ("Fincept Terminal" if quotes.available()
                         else "Finnhub" if quotes.finnhub_key() else "存檔"),
         "fetched_at": clock.now(),
@@ -374,7 +421,8 @@ def compute(bundle=None) -> dict:
             "breadth": _breadth(us_stocks),
             "sector_breadth": _breadth(us_sectors),
             "earnings": earnings,
-            "status": _market_note(us_indices),
+            "status": _market_note(us_indices or us_proxies),
+            "expired": expired["us"],
         },
         "tw": {
             "index": tw_index, "stocks": tw_stocks, "etfs": tw_etfs,
@@ -388,10 +436,12 @@ def compute(bundle=None) -> dict:
             "margin": margin,
             "usdtwd": usdtwd,
             "status": _market_note(tw_stocks or tw_index),
+            "expired": expired["tw"],
         },
         "em": {
             "indices": em_indices, "etfs": em_etfs,
             "breadth": _breadth(em_indices),
-            "status": _market_note(em_indices),
+            "status": _market_note(em_indices or em_etfs),
+            "expired": expired["em"],
         },
     }

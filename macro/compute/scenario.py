@@ -53,11 +53,39 @@ REGIME_LABELS = {
     "employment_first": "就業優先",
     "balanced": "兩邊並重",
 }
+# 「政策重心」是本站依固定規則做的分類，不是聯準會說的話，也不是對它下一步的預測。
+# 2026-10-10 以前這裡寫的是「通膨回到目標前，就業轉弱不會單獨換來降息」這類句子——
+# 那是在替央行下結論：本站的分類門檻（2.3%／2.8%）不是 FOMC 的決策門檻，
+# 聯準會也曾在通膨仍高於目標時降息。現在只講本站怎麼分、依據是什麼。
 REGIME_EXPLAIN = {
-    "inflation_first": "通膨回到目標前，就業轉弱不會單獨換來降息",
-    "employment_first": "勞動市場惡化是決定性因素，通膨略高可以容忍",
-    "balanced": "哪一邊先出現極端值，哪一邊就主導",
+    "inflation_first": "依本站規則，通膨離目標比較遠，列為主要矛盾",
+    "employment_first": "依本站規則，就業轉弱比較明顯，列為主要矛盾",
+    "balanced": "依本站規則，通膨與就業都沒有到極端值",
 }
+NOT_THE_FED = "這是本站的分類，不是聯準會的決策門檻"
+
+
+def regime_evidence(regime: str, labor: dict, inflation: dict) -> str:
+    """頭條底下那一句：這個分類的依據，連同跟它相反的證據一起講。
+
+    只用已經算好的數字。通膨那一邊同時報年增率（水準）與近三月年化（動能）——
+    兩者方向不一致時，只報一個就是替讀者選邊。
+    """
+    headline = inflation.get("headline") or {}
+    core, ann3 = headline.get("core_pce"), (inflation.get("momentum") or {}).get("core_pce_3m")
+    if regime == "inflation_first" and core is not None:
+        text = f"依本站規則通膨仍屬高（核心 PCE 年增 {core:.1f}%）"
+        if ann3 is not None:
+            text += (f"，但近三月年化 {ann3:.1f}% 已經降溫" if ann3 < core - 0.25
+                     else f"，近三月年化 {ann3:.1f}% 仍在加速" if ann3 > core + 0.25
+                     else f"，近三月年化 {ann3:.1f}% 跟年增率差不多")
+        return f"{text}；{NOT_THE_FED}"
+    unemployment = labor.get("unemployment") or {}
+    rate, low = unemployment.get("rate"), unemployment.get("low12")
+    if regime == "employment_first" and rate is not None and low is not None:
+        return (f"依本站規則就業轉弱是主要矛盾（失業率 {rate:.1f}%，高出一年低點 "
+                f"{rate - low:.1f} 個百分點）；{NOT_THE_FED}")
+    return f"{REGIME_EXPLAIN[regime]}；{NOT_THE_FED}"
 
 # 固定收益部位對照：情境 -> 各部位方向
 POSITIONING = {
@@ -301,7 +329,7 @@ def compute(labor: dict, inflation: dict, rates: dict, debt: dict,
         "inflation_reasons": inflation_reasons,
         "regime": regime,
         "regime_label": REGIME_LABELS[regime],
-        "regime_explain": REGIME_EXPLAIN[regime],
+        "regime_explain": regime_evidence(regime, labor, inflation),
         "regime_reasons": regime_reasons,
         "name": name,
         "lean": lean,

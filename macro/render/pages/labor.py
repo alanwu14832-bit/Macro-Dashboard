@@ -5,6 +5,8 @@ from ..common import (bar_chart, checks_block, hbar_chart, legend_note,
                       line_chart, signals_block)
 from ..html import (accordion, callout, delta_span, esc, fmt, kv, pct, section,
                     stat, table, thousands_to_wan, zh_date)
+from ...compute.labor import to_wan
+
 
 def render(ctx: dict, signals: list[dict]) -> str:
     d = ctx["labor"]
@@ -136,14 +138,21 @@ def render(ctx: dict, signals: list[dict]) -> str:
         rows = [[esc(r["window"]),
                  delta_span(r["total"], 2, suffix=" pp", good_is_up=False),
                  fmt(r["numerator"], 2, suffix=" pp", signed=True),
-                 fmt(r["denominator"], 2, suffix=" pp", signed=True)]
+                 fmt(r["denominator"], 2, suffix=" pp", signed=True),
+                 fmt(r["residual"], 2, suffix=" pp", signed=True)]
                 for r in decomposition]
         body.append(section(
             "decomposition", "失業率變動分解",
-            table(["期間", "失業率變動", "失業人數效果", "勞動力效果"], rows)
-            + callout("失業人數效果為正＝真的有人失業；勞動力效果為負＝有人退出勞動力"
-                      "把失業率壓下去。後者不是好消息。"),
-            note="Δu ≈ (ΔU − u·ΔL) / L",
+            table(["期間", "失業率變動", "失業人數效果", "勞動力效果", "差額"], rows,
+                  foot="差額＝一階近似的誤差，加上失業率只公布到小數一位的四捨五入。")
+            + callout(
+                "<strong>失業人數效果</strong>：失業人數增加為正、減少為負。"
+                "<strong>勞動力效果</strong>：勞動力<strong>增加</strong>為負（分母變大，失業率被稀釋），"
+                "勞動力<strong>減少</strong>為正（分母變小，同樣的失業人數算出來的比率變高）。"
+                "失業的人離開勞動力時，兩個效果會同時出現：失業人數效果為負、勞動力效果為正。"
+                "這張表拆的是總量，看不出是哪些人在失業、就業與非勞動力之間移動；"
+                "要判斷失業率下降是不是因為有人找到工作，要另外看就業人口比與勞參率。"),
+            note="Δu ≈ ΔU/L₀ − u₀·ΔL/L₀（以期初為基期的一階近似）",
         terms=["unemployment_rate", "participation_rate"]))
 
     # ---- 行業別 ----
@@ -171,14 +180,16 @@ def render(ctx: dict, signals: list[dict]) -> str:
     # ---- JOLTS ----
     jolts = d["jolts"]
     tiles = [
-        stat("職缺數", fmt((jolts["openings"] or 0) / 100, 1, suffix=" 萬個"),
+        stat("職缺數", fmt(to_wan(jolts["openings"]), 1, suffix=" 萬個"),
              asof=f'{zh_date(jolts["as_of"])} 資料'),
         stat("職缺對失業人數比", fmt(jolts["vu_ratio"], 2),
              delta="低於 1 代表求職者多於職缺"),
         stat("主動離職率", pct(jolts["quits"], 1),
              delta="薪資增速的領先指標"),
         stat("裁員率", pct(jolts["layoffs"], 1),
-             delta=f'招聘 {fmt((jolts["hires"] or 0) / 100, 1, suffix=" 萬人")}'),
+             delta=f'招聘 {fmt(to_wan(jolts["hires"]), 1, suffix=" 萬人")}'
+                   + (f'（招聘率 {pct(jolts["hires_rate"], 1)}）'
+                      if jolts.get("hires_rate") is not None else "")),
     ]
     body.append(section("jolts", "JOLTS 職缺與人力流動",
                         f'<div class="grid grid-4">{"".join(tiles)}</div>',

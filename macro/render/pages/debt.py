@@ -78,16 +78,40 @@ def render(ctx: dict, signals: list[dict]) -> str:
                         terms=["debt_to_gdp", "interest_burden"]))
 
     # ---- 買盤 ----
-    body.append(section("holders", "誰在吃這些債", f'<div class="card">' + kv([
-        ("公債總額", fmt((holders["total"] or 0) / 1_000_000, 2, suffix=" 兆美元")),
-        ("外國持有", fmt((holders["foreign"] or 0) / 1_000_000, 2, suffix=" 兆美元")),
-        ("外國持有佔比", fmt(holders["foreign_share"], 1, suffix="%")),
-        ("五年前外國持有佔比", fmt(holders["foreign_share_5y_ago"], 1, suffix="%")),
+    def quarter(when):
+        return zh_date(when, freq="q") if when else "—"
+
+    share, prior = holders["foreign_share"], holders["foreign_share_5y_ago"]
+    if share is None:
+        # 佔比算不出來（分子分母沒有同一季）：不留一個 0.0% 讓下面那段話照講
+        reading = callout("外國持有與債務總額這一輪沒有同一季的資料，佔比不計算，"
+                          "也不對買盤結構下判斷。", key=True)
+    else:
+        move = ""
+        if prior is not None:
+            move = (f'五年前同一季是 {fmt(prior, 1, suffix="%")}，'
+                    f'{"下降" if share < prior else "上升"} {fmt(abs(share - prior), 1)} 個百分點。')
+        reading = callout(
+            f'{quarter(holders["foreign_share_as_of"])}外國持有佔債務總額 '
+            f'<strong>{fmt(share, 1, suffix="%")}</strong>。{move}'
+            "佔比下降代表同樣的發債量有更大的比例要由其他買方吸收；"
+            "這是買盤結構的描述，本站沒有資料可以判斷其他買方對價格有多敏感。")
+    body.append(section("holders", "誰持有這些債", f'<div class="card">' + kv([
+        (f'債務總額（{quarter(holders["total_as_of"])}）',
+         fmt(holders["total"], 2, suffix=" 兆美元")),
+        (f'民間持有（{quarter(holders["private_as_of"])}）',
+         fmt(holders["private"], 2, suffix=" 兆美元")),
+        (f'外國持有（{quarter(holders["foreign_as_of"])}）',
+         fmt(holders["foreign"], 2, suffix=" 兆美元")),
         ("外國持有年增", fmt(holders["foreign_yoy"], 1, suffix="%", signed=True)),
-        ("民間持有", fmt((holders["private"] or 0) / 1_000_000, 2, suffix=" 兆美元")),
-    ]) + callout(
-        "外國央行與主權基金是長端最穩定的買盤。這個佔比下降時，"
-        "同樣的發債量必須由對價格更敏感的本國買盤吸收，長端就需要更高的殖利率。")
+        (f'外國持有佔債務總額（{quarter(holders["foreign_share_as_of"])}）',
+         fmt(share, 1, suffix="%")),
+        ("五年前同一季的佔比", fmt(prior, 1, suffix="%")),
+    ]) + reading
+        + '<p class="muted" style="font-size:.83rem;margin-top:8px">'
+          "三個金額不是互斥的分類，不能相加：債務總額＝公眾持有＋政府內部持有（社安基金等）；"
+          "民間持有＝公眾持有扣掉聯準會；外國持有是民間持有的一部分。"
+          "各檔的最新一季不同，括號裡是各自的資料期；佔比只用分子分母都有的那一季。</p>"
         + "</div>",
                         terms=["foreign_holdings"]))
 

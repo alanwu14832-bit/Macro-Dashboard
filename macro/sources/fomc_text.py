@@ -264,6 +264,8 @@ def compare(*, ttl: float = 12 * 3600) -> dict:
         "dovish_prev": _count_terms(old_text, DOVISH_TERMS),
         "vote": _vote(new_text),
         "vote_prev": _vote(old_text),
+        "dissent": dissent_directions(new_text),
+        "dissent_prev": dissent_directions(old_text),
     }
 
 
@@ -284,3 +286,67 @@ def _vote(text: str) -> str:
     """票數，例如 "9 – 3 vote" → "9–3"。異議票數本身就是訊號。"""
     m = re.search(r"(\d+)\s*[–-]\s*(\d+)\s*vote", text)
     return f"{m.group(1)}–{m.group(2)}" if m else ""
+
+
+# 異議者偏好什麼。聲明的寫法是「Voting against this action were A, who preferred to
+# lower the target range…; and B, who preferred to maintain…」。只認得出這三種說法，
+# 認不出的歸「其他」（例如只反對縮表步調）——不猜。
+# 人名有縮寫（Stephen I. Miran），不能用句點切句；往後取一段，再用下面的說法去認。
+_AGAINST = re.compile(r"Voting against (?:this|the) (?:action|decision)\s+(?:was|were)\s+(.{0,700})",
+                      re.S | re.I)
+_PREFERENCES = [
+    ("lower", re.compile(r"prefer\w*\s+(?:to\s+)?(?:lower|reduc|cut|a\s+(?:lower|larger\s+(?:cut|reduction)))", re.I)),
+    ("higher", re.compile(r"prefer\w*\s+(?:to\s+)?(?:rais|increas|a\s+(?:higher|larger\s+increase))", re.I)),
+    ("hold", re.compile(r"prefer\w*\s+(?:to\s+)?(?:maintain|keep|leave|hold|no\s+change)", re.I)),
+]
+DISSENT_LABEL = {"lower": "偏好更低的利率", "higher": "偏好更高的利率",
+                 "hold": "偏好維持利率不變", "other": "其他理由"}
+
+
+def dissent_directions(text: str) -> list[str]:
+    """這份聲明裡異議者各自偏好的方向（去重、依出現順序）。沒有異議回空清單。"""
+    match = _AGAINST.search(text or "")
+    if not match:
+        return []
+    found: list[str] = []
+    tail = re.split(r"\n\s*\n|For media inquiries|Implementation Note", match.group(1))[0]
+    for clause in re.split(r";", tail):
+        if not re.search(r"\bwho\b|prefer", clause, re.I):
+            continue
+        kind = next((name for name, pattern in _PREFERENCES if pattern.search(clause)), "other")
+        if kind not in found:
+            found.append(kind)
+    return found
+
+
+def dissent_count(vote: str) -> int | None:
+    """"9–3" → 3。讀不出來就是 None，不當成 0。"""
+    m = re.fullmatch(r"\s*(\d+)\s*[–-]\s*(\d+)\s*", vote or "")
+    return int(m.group(2)) if m else None
+
+
+def describe_vote_change(vote: str, vote_prev: str, dissent: list[str] | None = None,
+                         dissent_prev: list[str] | None = None) -> str:
+    """這次表決跟上次比，差在哪裡。回空字串表示沒有值得說的差別。
+
+    只描述「這一次決議」：異議變多、變少、或方向變了。表決一致不代表委員會對
+    下一次決議的看法一致——那是另一件事，聲明裡看不出來，所以不推論。
+    （2026-10-10 以前，9–3 變 12–0 被寫成「委員會內部對下一步的看法不再一致」，
+    剛好說反。）
+    """
+    now, before = dissent_count(vote), dissent_count(vote_prev)
+    if now is None or before is None:
+        return ""
+    say = lambda kinds: "、".join(DISSENT_LABEL[k] for k in kinds or [])
+    if now < before:
+        text = f"異議票由 {before} 票減為 {now} 票"
+        text += "，這次決議表決一致。" if now == 0 else f"（{say(dissent)}）。" if dissent else "。"
+    elif now > before:
+        text = f"異議票由 {before} 票增為 {now} 票"
+        text += f"（{say(dissent)}），這次決議出現分歧。" if dissent else "，這次決議出現分歧。"
+    elif now > 0 and dissent and dissent_prev and set(dissent) != set(dissent_prev):
+        text = (f"異議票數相同（{now} 票），但方向變了：上次是{say(dissent_prev)}，"
+                f"這次是{say(dissent)}。")
+    else:
+        return ""
+    return text + "這只說明這一次決議的表決結果，不能據此推論委員會對下一次決議的看法。"

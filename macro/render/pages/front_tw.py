@@ -105,6 +105,7 @@ def since_items(diff: dict, changes: list[dict] | None) -> list[dict]:
         more = f"等 {len(removed)} 條" if len(removed) > 1 else ""
         items.append({"big": f"{MINUS}{len(removed)}", "name": "不再觸發", "long": True,
                       "ft": esc(removed[0].get("headline") or "") + more})
+    items.extend(fb.retired_items(diff))
     return items
 
 

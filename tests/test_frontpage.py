@@ -14,7 +14,7 @@ from macro.render.pages import frontpage
 from macro.series import Series
 
 SCENARIO = {"name": "通膨未解", "regime": "inflation_first",
-            "regime_explain": "通膨回到目標前，就業轉弱不會單獨換來降息"}
+            "regime_explain": "依本站規則通膨仍屬高（核心 PCE 年增 3.0%），但近三月年化 2.0% 已經降溫；這是本站的分類，不是聯準會的決策門檻"}
 
 
 def ev(kind, tag, title, *, today=True, policy=None, sid=None, detail="細節。", href="/x/"):
@@ -49,8 +49,8 @@ class Order(unittest.TestCase):
     def test_quiet_day_falls_back_to_the_verdict(self):
         out = frontpage.lede({"events": [], "verdict": "今天沒有重大數據或政策決議。"}, SCENARIO)
         self.assertEqual(out["kind"], "verdict")
-        self.assertEqual(out["headline"], "通膨未解，聯準會的重心仍在物價。")
-        self.assertEqual(out["deck"], "通膨回到目標前，就業轉弱不會單獨換來降息。")
+        self.assertEqual(out["headline"], "通膨未解，物價仍是主要矛盾。")
+        self.assertEqual(out["deck"], "依本站規則通膨仍屬高（核心 PCE 年增 3.0%），但近三月年化 2.0% 已經降溫；這是本站的分類，不是聯準會的決策門檻。")
         self.assertEqual(out["quiet"], "今天沒有重大數據或政策決議。")
 
     def test_failed_calendar_wording_is_carried_not_replaced(self):
