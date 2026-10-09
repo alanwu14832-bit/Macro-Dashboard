@@ -1,6 +1,6 @@
 {
  "date": "2026-10-10",
- "generated_at": "2026-10-10T05:22:51+08:00",
+ "generated_at": "2026-10-10T05:29:52+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -68,7 +68,7 @@
   },
   {
    "key": "stock_bond_correlation_positive",
-   "headline": "股債同向，債券失去對沖股票的功能",
+   "headline": "股債同向，債券對股票的對沖效果變差",
    "direction": "neutral",
    "severity": "medium",
    "evidence": "標普報酬與10年殖利率變動相關 -0.32（近一年）",
