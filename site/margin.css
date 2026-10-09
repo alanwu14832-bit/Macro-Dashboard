@@ -140,7 +140,9 @@
   font-variant-numeric: lining-nums tabular-nums; font-kerning: normal;
   -webkit-font-smoothing: var(--smooth); line-break: strict; overflow-wrap: break-word;
 }
-.fp:not(.has-changes) { --band: transparent; --band-ink: var(--ink); --band-ink-2: var(--ink-2); }
+/* 頁邊的色帶＝「這一版今天有變動」。兩個版各有各的旗標（us-chg／tw-chg），看的是哪一版就聽哪一個 */
+html:not([data-ed="tw"]) .fp:not(.us-chg),
+html[data-ed="tw"] .fp:not(.tw-chg) { --band: transparent; --band-ink: var(--ink); --band-ink-2: var(--ink-2); }
 .fp :is(h1, h2, h3, p, ol, ul, dl, dd, figure) { margin: 0; }
 .fp :is(h1, h2, h3) { color: var(--ink); letter-spacing: 0; }
 .fp :is(ol, ul) { padding: 0; list-style: none; }
@@ -986,3 +988,96 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
   .is-page .topbar-title { display: none; }
   .is-page .nameplate { border-right: 0; margin-right: auto; }
 }
+
+
+/* ============================================================================
+   版別：美國｜台灣
+   兩個版都在同一份 HTML 裡，<html data-ed> 決定顯示哪一個。沒有 JS 時兩版上下並排，
+   版別那一列就是兩個跳到各版頭條的連結。
+   ========================================================================== */
+html.js[data-ed="us"] .fp .edn[data-ed="tw"],
+html.js[data-ed="tw"] .fp .edn[data-ed="us"] { display: none; }
+
+/* 刊頭底下那一列：一條細線，現在這一版的名字上面壓一段粗線——跟段落標題的主刻度同一個畫法 */
+.fp .edrow { align-items: stretch; }
+.fp .edrow > .b {
+  padding-top: 0; padding-bottom: 0;
+  background: linear-gradient(var(--hair), var(--hair)) no-repeat var(--pad) 0 / calc(100% - var(--pad) - var(--padr)) 1px;
+}
+.fp .edrow > .m { display: flex; align-items: center; justify-content: flex-end; }
+.fp .edsw-k { font: 400 12.5px/1 var(--hei); letter-spacing: .24em; margin-right: -.24em; color: var(--band-ink-2); }
+.fp .edsw { display: flex; gap: clamp(20px, 2.2vw, 32px); }
+.fp .edt {
+  position: relative; display: inline-flex; align-items: baseline; min-height: 44px;
+  padding: 15px 0 12px; font: 700 clamp(16px, 1.35vw, 19px)/1 var(--ming); letter-spacing: .14em;
+  color: var(--ink-2); transition: color .2s ease;
+}
+.fp .edt span { margin-left: .12em; font-weight: 400; font-size: .74em; letter-spacing: .1em; }
+.fp .edt::before {
+  content: ""; position: absolute; left: 0; right: .14em; top: 0; height: 4px; background: var(--mrule);
+  transform: scaleX(0); transform-origin: left center; transition: transform .38s var(--fx);
+}
+html[data-ed="us"] .edt[data-ed-set="us"], html[data-ed="tw"] .edt[data-ed-set="tw"],
+html:not([data-ed]) .edt[data-ed-set="us"] { color: var(--ink); }
+html[data-ed="us"] .edt[data-ed-set="us"]::before, html[data-ed="tw"] .edt[data-ed-set="tw"]::before,
+html:not([data-ed]) .edt[data-ed-set="us"]::before { transform: none; }
+@media (hover: hover) and (pointer: fine) { .fp .edt:hover { color: var(--ink); } }
+html.scanning .fp .edrow > .b { opacity: 1; }
+
+/* 刊頭捲走之後，頂列裡留一份小的：捲到哪一段都能換版 */
+.mg .edsw-bar {
+  display: flex; gap: 2px; margin-right: auto; margin-left: 14px; padding-left: 14px;
+  border-left: 1px solid var(--border-strong);
+  opacity: 0; transform: translateY(6px); pointer-events: none;
+  transition: opacity .25s ease, transform .3s var(--fx);
+}
+:root.masthead-gone .mg .edsw-bar { opacity: 1; transform: none; pointer-events: auto; }
+.mg .topbar .nameplate:has(+ .edsw-bar) { margin-right: 0; }
+.mg .edsw-bar .edt {
+  display: inline-flex; align-items: center; min-height: 34px; padding: 0 9px;
+  font: 700 14px/1 var(--ming); letter-spacing: .12em; text-decoration: none;
+  color: var(--ink-2); border-bottom: 2px solid transparent; transition: color .2s ease, border-color .2s ease;
+}
+html[data-ed="us"] .mg .edsw-bar .edt[data-ed-set="us"], html[data-ed="tw"] .mg .edsw-bar .edt[data-ed-set="tw"] {
+  color: var(--ink); border-bottom-color: var(--ink);
+}
+.mg .edsw-bar .edt:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .mg .edsw-bar .edt:hover { color: var(--ink); } }
+@media (max-width: 560px) {
+  /* 窄螢幕的頂列放不下刊名＋版別＋工具：頭版的頂列讓版別當標題，刊名收起來 */
+  .mg.is-front .topbar .nameplate { display: none; }
+  .mg .edsw-bar { margin-left: 0; padding-left: 0; border-left: 0; }
+  .mg .edsw-bar .edt { min-height: 40px; padding: 0 10px; font-size: 15px; }
+}
+
+/* 抽屜裡頭版的小標只列現在這一版的（另一版的段落在畫面上不存在） */
+html.js[data-ed="us"] .nav-sub a[href^="/#tw-"] { display: none; }
+html.js[data-ed="tw"] .nav-sub a[href^="/#"]:not([href^="/#tw-"]):not([href="/#contents"]) { display: none; }
+
+/* 換版：新的一版淡進來。刊頭的進場編排只在第一次載入演（front.js 會加上 .again） */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fp-edIn { from { opacity: 0; transform: translateY(6px); } }
+  html.ed-swap .fp .edn { animation: fp-edIn .34s var(--fx) both !important; }
+}
+
+/* ---- 台灣版才有的元件 ------------------------------------------------------ */
+/* 圖：官方定義的區間塗灰底。斜線留給本站規則判定的區域 */
+.fp .plot .area.zone { fill: color-mix(in srgb, var(--ink) 10%, transparent); }
+/* 判定只有一格（台灣沒有情境傾向那一格） */
+.fp .calls.calls-1 { grid-template-columns: 1fr; }
+.fp .calls-1 .call-s { margin-top: 1em; max-width: 44em; }
+/* 五個燈號的尺：窄的時候刻度數字會跟格位名稱打架，只留名稱（小旗上還有實際分數） */
+@media (max-width: 760px) { .fp .ruler-dense .rt b { display: none; } }
+.fp .ruler-dense .rz { letter-spacing: 0; }
+
+/* 「沒有變動」那一句：斷行讓瀏覽器平均分，不要最後一行只剩一個字 */
+/* 「沒有變動」那一句：一個子句一塊，斷行只斷在逗號後面 */
+.fp .since-none span { display: inline-block; }
+@media (max-width: 699px) {
+  /* 手機上「只看頁邊」的按鈕壓在這一句的右邊，句子長的時候要讓開 */
+  .fp .since-none { padding-right: 7.4em; }
+}
+
+/* 換燈（黃紅→紅）比換格（高→中）長：字級小一號，留在一行裡 */
+.fp .since .d-t.d-long { font-size: clamp(20px, 2.15vw, 31px); letter-spacing: 0; }
+@media (max-width: 699px) { .fp .since .d-t.d-long { font-size: 13px; } }
