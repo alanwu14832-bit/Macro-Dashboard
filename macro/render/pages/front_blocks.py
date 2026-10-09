@@ -15,9 +15,13 @@
 
 每一列都是 .row：.b 是正文、.m 是頁邊。這裡只產生 HTML；樣式在 static/margin.css，
 圖與互動在 static/front.js。
+
+頭版有兩個版：美國版（這個檔）與台灣版（front_tw.py），同一個網址，刊頭底下切換。
+兩版的段落一一對應，所以切換時讀者停在同一段；台灣版的錨點都以 tw- 開頭。
 """
 from __future__ import annotations
 
+import math
 import re
 
 from ... import clock
@@ -69,12 +73,14 @@ def seal(kind: str) -> str:
     return f'<span class="seal {cls}" aria-hidden="true">{kind}</span>'
 
 
-def sec_open(anchor: str, title: str, *, kind: str = "", sub: str = "", cls: str = "") -> str:
-    """段落開頭。data-title 給側欄目錄與站內搜尋用（layout.extract_sections）。"""
+def sec_open(anchor: str, title: str, *, kind: str = "", sub: str = "", cls: str = "",
+             nav: str = "") -> str:
+    """段落開頭。data-title 給側欄目錄與站內搜尋用（layout.extract_sections）；
+    nav 是那裡要顯示的名字，沒給就用標題。"""
     classes = f"sec {cls}".strip()
     mark = seal(kind) if kind else ""
     lede = f"<p>{sub}</p>" if sub else ""
-    return (f'<section id="{esc(anchor)}" class="{classes}" data-title="{esc(title)}">'
+    return (f'<section id="{esc(anchor)}" class="{classes}" data-title="{esc(nav or title)}">'
             + row(f'<h2>{mark}{esc(title)}</h2>{lede}', cls="sh rv", tag="header"))
 
 
@@ -95,6 +101,13 @@ def masthead(trust_row: str) -> str:
     """刊頭全站共用，定義在 layout。"""
     from ..layout import masthead as shared
     return shared(trust_row)
+
+
+def edition_row() -> str:
+    """刊頭底下的版別：美國版｜台灣版。哪一版亮著由 <html data-ed> 決定（BOOT 在
+    第一次繪製前設好），所以這裡不標預設——標了，記住台灣版的人會先看到美國版閃一下。"""
+    from ..layout import edition_tabs
+    return row(edition_tabs(), '<span class="edsw-k" aria-hidden="true">版別</span>', cls="edrow")
 
 
 # -------------------------------------------------- 頁邊：自上一期以來 ----
@@ -130,19 +143,29 @@ def since_items(diff: dict, reading_changes: list[dict], scenario: dict,
     return items
 
 
-def since_block(items: list[dict], prior: dict | None, first_run: bool, *, shown: int = 4) -> str:
-    """頭條旁邊那一欄頁邊。有變動才有黃底；沒變動時這一欄是空白的紙。"""
+def since_block(items: list[dict], prior: dict | None, first_run: bool, *, shown: int = 4,
+                prefix: str = "", none_text: str = "") -> str:
+    """頭條旁邊那一欄頁邊。有變動才有黃底；沒變動時這一欄是空白的紙。
+
+    none_text：沒有項目時要說的話。預設是「跟上一期相同」；台灣版在上一期沒有記錄
+    台灣讀數時要換一句——那是比不了，不是沒變。
+    """
     from ..layout import TAGLINE
     base = (prior or {}).get("date")
     head = (f'自 <time datetime="{esc(base)}">{esc(base)}</time> 以來' if base else "自上一期以來")
     if first_run:
         body = '<p class="since-none">這是第一期，還沒有可以比對的上一期。</p>'
     elif not items:
-        body = (f'<p class="since-none">判斷與關鍵讀數與 {esc(base or "上一期")} 相同。</p>')
+        same = none_text or f'判斷與關鍵讀數與 {base or "上一期"} 相同。'
+        body = ('<p class="since-none">'
+                + "".join(f"<span>{esc(part)}</span>" for part in _by_comma(same)) + "</p>")
     else:
         rows = []
         for item in items[:shown]:
-            big_cls = "d d-t" if item.get("text") else "d"
+            big_cls = "d"
+            if item.get("text"):
+                # 「黃紅→紅」比「高→中」長，同一個字級會在頁邊折成兩行
+                big_cls = "d d-t d-long" if len(item["big"]) > 3 else "d d-t"
             ft_cls = "ft ft-t" if item.get("long") else "ft"
             rows.append(f'<li><span class="{big_cls}">{esc(item["big"])}</span>'
                         f'<span class="w"><b>{esc(item["name"])}</b>'
@@ -153,8 +176,8 @@ def since_block(items: list[dict], prior: dict | None, first_run: bool, *, shown
     return (
         '<div class="hero-m">'
         f'<p class="tagline">{esc(TAGLINE)}</p>'
-        '<section class="since" aria-labelledby="h-since">'
-        f'<h2 id="h-since">{head}</h2>{body}</section>'
+        f'<section class="since" aria-labelledby="{prefix}h-since">'
+        f'<h2 id="{prefix}h-since">{head}</h2>{body}</section>'
         '<button class="scan" type="button" aria-pressed="false" '
         'title="把正文調淡，只沿著頁邊讀今天的變化（快捷鍵 M）">只看頁邊<kbd>M</kbd></button>'
         '</div>')
@@ -187,10 +210,10 @@ def gist_blocks(scenario: dict, summary: dict, stance: dict, futures: dict | Non
     return f'<div class="lead-note">{"".join(blocks)}</div>'
 
 
-def hero(ctx: dict, scenario: dict, summary: dict, diff: dict,
-         reading_changes: list[dict], prior: dict | None) -> tuple[str, bool]:
-    """頭條＋頁邊的變動欄。回傳 (HTML, 有沒有變動)。"""
-    lede = frontpage.lede(ctx.get("events"), scenario, ctx.get("_bundle"))
+def hero_shell(lede: dict, since_html: str, gist_html: str, *, prefix: str = "",
+               nav: str = "頭條") -> str:
+    """頭條的外殼：兩個版共用。印哪一枚印看頭條的來源——本站的判定印「判」、
+    本站沒拿到印「缺」，其餘（決議、數據、國發會的燈號）都是機構事實。"""
     kind = lede["kind"]
     mark = {"verdict": "判", "gap": "缺"}.get(kind, "實")
     quiet = f'<span>{esc(lede["quiet"])}</span>' if lede.get("quiet") else ""
@@ -198,21 +221,30 @@ def hero(ctx: dict, scenario: dict, summary: dict, diff: dict,
     figure = f'<p class="lede-fig">{esc(lede["figure"])}</p>' if lede.get("figure") else ""
     deck = (f'<p class="sub">{_phrases(_by_comma(lede["deck"]), "cl")}</p>'
             if lede.get("deck") else "")
+    # 兩個版各有一個 h1，但同一時間只有一個版在畫面與無障礙樹裡（另一版 display:none）。
     head = (
         f'<div class="lead-head lede-{esc(kind)}">'
         f'<p class="eyebrow"><b>{seal(mark)}{esc(lede["eyebrow"])}</b>{quiet}</p>'
-        f'<h1 id="lede-h"><a href="{esc(lede["href"])}">{_phrases(phrases, "l")}</a></h1>'
+        f'<h1 id="{prefix}lede-h"><a href="{esc(lede["href"])}">{_phrases(phrases, "l")}</a></h1>'
         f'{figure}{deck}</div>')
+    return (f'<section id="{prefix}lede" class="hero" data-title="{esc(nav)}" '
+            f'aria-labelledby="{prefix}lede-h">' + head + since_html + gist_html + '</section>')
 
+
+def hero(ctx: dict, scenario: dict, summary: dict, diff: dict,
+         reading_changes: list[dict], prior: dict | None, *,
+         events: dict | None = None) -> tuple[str, bool]:
+    """頭條＋頁邊的變動欄。回傳 (HTML, 有沒有變動)。
+
+    events：這一版要看的事件（美國版傳 events.for_region(…, "美國")）。沒給就用全部。
+    """
+    lede = frontpage.lede(ctx.get("events") if events is None else events,
+                          scenario, ctx.get("_bundle"))
     items = since_items(diff, reading_changes, scenario, prior)
     stance = (ctx.get("rates") or {}).get("stance") or {}
-    standing = frontpage.verdict_lede(scenario) if kind != "verdict" else None
-    body = (
-        '<section id="lede" class="hero" data-title="頭條" aria-labelledby="lede-h">'
-        + head
-        + since_block(items, prior, bool(diff.get("first_run")))
-        + gist_blocks(scenario, summary, stance, ctx.get("fedfunds"), standing)
-        + '</section>')
+    standing = frontpage.verdict_lede(scenario) if lede["kind"] != "verdict" else None
+    body = hero_shell(lede, since_block(items, prior, bool(diff.get("first_run"))),
+                      gist_blocks(scenario, summary, stance, ctx.get("fedfunds"), standing))
     return body, bool(items)
 
 
@@ -248,11 +280,18 @@ def gate_chart(ctx: dict, scenario: dict) -> str:
     trend = ""
     if ann3 is not None:
         trend = f"近三月年化 {ann3:.1f}%，" + ("放緩中" if ann3 < core else "仍在加速")
+    values = [round(v, 3) for v in yoy.values]
     spec = {
-        "dates": [d.isoformat() for d in yoy.dates],
-        "values": [round(v, 3) for v in yoy.values],
-        "low": low, "high": high, "gate": gate, "goal": INFLATION_TARGET,
-        "gap": f"{abs(gap):.2f}", "last": f"{core:.1f}%",
+        "dates": [d.isoformat() for d in yoy.dates], "values": values,
+        # 值域：涵蓋資料、兩道門檻與目標，上下各留一點
+        "lo": math.floor((min(values + [INFLATION_TARGET, low]) - 0.3) * 10) / 10,
+        "hi": math.ceil((max(values + [high]) + 0.25) * 10) / 10,
+        "grid": 0.5, "digits": 1,
+        "thr": [{"v": low, "name": "門檻"}, {"v": high, "name": "門檻"}],
+        "gate": gate, "goal": {"v": INFLATION_TARGET, "name": "目標"},
+        # 斜線＝本站規則判定為「高」的區域
+        "zones": [{"dir": "above", "v": high, "style": "hatch"}],
+        "gap": f"{abs(gap):.2f}", "gapWord": "還差", "last": f"{core:.1f}%",
         "ann3": (round(ann3, 2) if ann3 is not None else None), "trend": trend,
     }
     last_period = zh_date(yoy.dates[-1], freq="m")
@@ -290,7 +329,7 @@ def ruler(*, lo: float, hi: float, now: float | None, prev: float | None = None,
           refs: list[tuple[float, str]] | None = None,
           zones: list[tuple[float, float, str]] | None = None,
           kind: str = "threshold", flag: str = "", step: float | None = None,
-          label: str = "") -> str:
+          label: str = "", dense: bool = False) -> str:
     """一把尺。kind：threshold（寫死的門檻）或 range（只是區間，沒有規則）。
 
     ticks  規則裡寫死的門檻，畫成長刻度，數字標在尺下
@@ -333,7 +372,8 @@ def ruler(*, lo: float, hi: float, now: float | None, prev: float | None = None,
         first = ((-lo) % step) / (hi - lo) * 100
         style = (f' style="--first:{first:.3f}%;'
                  f'--step:{step / (hi - lo) * 100 / (100 - first) * 100:.4f}%"')
-    return (f'<div class="ruler ruler-{esc(kind)}" role="img" aria-label="{esc(label)}">'
+    extra = " ruler-dense" if dense else ""
+    return (f'<div class="ruler ruler-{esc(kind)}{extra}" role="img" aria-label="{esc(label)}">'
             f'<div class="ruler-track"{style}>{"".join(marks)}</div></div>')
 
 
@@ -380,7 +420,8 @@ def figure_rows(ctx: dict, scenario: dict, reading_changes: list[dict]) -> list[
                              (high_band, top + 1, "高")],
                       label=f"核心 PCE {pct(core, 2)}；門檻 {low_band}% 與 "
                             f"{high_band}%，目標 {INFLATION_TARGET:.0f}%"),
-        "gap": (fmt(gap, 2), "離下一格") if gap is not None else None,
+        "gap": ({"value": fmt(gap, 2), "what": "離下一格", "unit": "個百分點"}
+                if gap is not None else None),
     })
 
     # 2. 失業率：看的是離一年低點多遠，不是絕對水準
@@ -405,7 +446,7 @@ def figure_rows(ctx: dict, scenario: dict, reading_changes: list[dict]) -> list[
                        label=f"失業率 {pct(rate, 1)}；一年低點 {low12:.1f}%，"
                              f"高出 {EMPLOYMENT_BANDS['weak_unrate_gap']} 個百分點視為轉弱")
                   if low12 is not None else dict(lo=0, hi=1, now=None)),
-        "gap": ((fmt(weak_at - rate, 1), "離轉弱")
+        "gap": ({"value": fmt(weak_at - rate, 1), "what": "離轉弱", "unit": "個百分點"}
                 if (weak_at is not None and rate is not None and weak_at > rate) else None),
     })
 
@@ -431,8 +472,8 @@ def figure_rows(ctx: dict, scenario: dict, reading_changes: list[dict]) -> list[
                       zones=[(real_lo - 1, RESTRICTIVE_REAL_RATE, "中性或偏寬鬆"),
                              (RESTRICTIVE_REAL_RATE, real_hi + 1, "限制性")],
                       label=f"實質政策利率 {pct(real, 2)}；高於 {RESTRICTIVE_REAL_RATE:.0f}% 視為具限制性"),
-        "gap": ((fmt(abs(RESTRICTIVE_REAL_RATE - real), 2), "離限制性門檻")
-                if real is not None else None),
+        "gap": ({"value": fmt(abs(RESTRICTIVE_REAL_RATE - real), 2), "what": "離限制性門檻",
+                 "unit": "個百分點"} if real is not None else None),
     })
 
     # 4. 10 年期公債：沒有寫死的門檻，只能畫區間
@@ -456,35 +497,61 @@ def figure_rows(ctx: dict, scenario: dict, reading_changes: list[dict]) -> list[
     return rows
 
 
-def _fact_note(item: dict, base: str | None) -> str:
+def _fact_note(item: dict, base: str | None, comparable: bool = True) -> str:
+    """一列數字的頁邊。順序：跟上一期不同（上色）> 離門檻多遠 > 沒變。
+
+    comparable＝上一期有沒有記這個讀數。沒有記就不能寫「未變」——那是沒比，不是沒變。
+    """
     since = f"自 {base[5:].replace('-', '/')}" if base else "自上一期"
     change = item.get("change")
     if change:
-        return note(f'<i>{_signed(change["change"])}</i>',
-                    f'{fmt(change["was"], 2)} → {fmt(change["now"], 2)}　{esc(since)}', kind="chg")
-    if item.get("gap"):
-        value, what = item["gap"]
-        return note(f'還差 <i>{value}</i>', f'{esc(what)}<span class="wide">，個百分點</span>')
+        digits = change.get("digits", 2)
+        return note(f'<i>{_signed(change["change"], digits)}</i>',
+                    f'{fmt(change["was"], digits)} → {fmt(change["now"], digits)}　{esc(since)}',
+                    kind="chg")
+    gap = item.get("gap")
+    if gap:
+        return note(f'{esc(gap.get("word", "還差"))} <i>{gap["value"]}</i>',
+                    f'{esc(gap["what"])}<span class="wide">，{esc(gap["unit"])}</span>')
+    if item.get("missing"):
+        return note("<i>—</i>", "沒有資料", kind="na")
+    if not comparable:
+        return note("<i>—</i>", "上期未記", kind="na")
     return note("未變", esc(since), kind="na")
 
 
-def facts(ctx: dict, scenario: dict, reading_changes: list[dict], prior: dict | None) -> str:
-    base = (prior or {}).get("date")
-    out = [sec_open("facts", "四個數字", kind="實",
-                    sub="機構發布的數字。尺上的門檻是本站寫死的，頁邊是離門檻還差多少。")]
-    for item in figure_rows(ctx, scenario, reading_changes):
+def fact_section(rows: list[dict], base: str | None, *, anchor: str, title: str, sub: str,
+                 nav: str = "", comparable: bool = True) -> str:
+    """「四個數字」的排版，兩個版共用。"""
+    out = [sec_open(anchor, title, kind="實", sub=sub, nav=nav)]
+    for item in rows:
         value = item["value"]
-        if value.endswith("%"):
-            value = f'{value[:-1]}<span class="u">%</span>'
-        direction = f' dir {item["dir"]}' if item["dir"] else ""
+        unit = "" if item.get("missing") else (item.get("unit") or ("%" if value.endswith("%") else ""))
+        if unit and value.endswith(unit):
+            value = value[:-len(unit)]
+        if unit:
+            value = f'{value}<span class="u">{esc(unit)}</span>'
+        direction = f' dir {item["dir"]}' if item.get("dir") else ""
+        read = f'<b class="rd{direction}">{esc(item["read"])}</b>' if item.get("read") else ""
+        if item.get("missing"):
+            # 沒有資料：不畫一把空的尺，直接講是哪個來源沒拿到
+            reading = f'<div class="read"><p class="gapnote">{seal("缺")}{esc(item["sub"])}</p></div>'
+        else:
+            reading = (f'<div class="read">{ruler(**item["ruler"])}'
+                       f'<p>{read}{esc(item["sub"])}</p></div>')
         body = (
             f'<h3><a href="{item["href"]}">{esc(item["name"])}</a></h3>'
-            f'<p class="val">{value}</p>'
-            f'<div class="read">{ruler(**item["ruler"])}'
-            f'<p><b class="rd{direction}">{esc(item["read"])}</b>{esc(item["sub"])}</p></div>')
-        out.append(row(body, _fact_note(item, base), cls="fact ln rv", tag="article"))
+            f'<p class="val">{value}</p>{reading}')
+        out.append(row(body, _fact_note(item, base, comparable), cls="fact ln rv", tag="article"))
     out.append("</section>")
     return "".join(out)
+
+
+def facts(ctx: dict, scenario: dict, reading_changes: list[dict], prior: dict | None) -> str:
+    return fact_section(
+        figure_rows(ctx, scenario, reading_changes), (prior or {}).get("date"),
+        anchor="facts", title="四個數字",
+        sub="機構發布的數字。尺上的門檻是本站寫死的，頁邊是離門檻還差多少。")
 
 
 # ------------------------------------------------------------ 本站的判定 ----
@@ -534,15 +601,16 @@ def calls(scenario: dict, summary: dict) -> str:
         '</div>', cls="rv")
 
 
-def _signal_row(signal: dict, new_keys: set) -> str:
+def _signal_row(signal: dict, new_keys: set, *, direction: bool = True) -> str:
+    """一條規則訊號。direction=False 時不印升降息方向（台灣的規則沒有方向）。"""
     severity = signal.get("severity") or "low"
-    direction = signal.get("direction") or "neutral"
-    dir_cls = DIR_CLASS.get(direction, "")
+    leaning = signal.get("direction") or "neutral"
+    dir_tag = (f'<span class="dir {DIR_CLASS.get(leaning, "")}">{DIR_TEXT.get(leaning, "中性")}</span>'
+               if direction else "")
     body = (
         f'<p class="tags"><span class="sv {SEV_CLASS.get(severity, "sv-3")}">'
         f'{esc(SEV_TEXT.get(severity, ""))}</span>'
-        f'<span class="meta"><span>{esc(signal.get("module", ""))}</span>'
-        f'<span class="dir {dir_cls}">{DIR_TEXT.get(direction, "中性")}</span></span></p>'
+        f'<span class="meta"><span>{esc(signal.get("module", ""))}</span>{dir_tag}</span></p>'
         f'<div><h3><button type="button" class="sig-btn" data-rule="{attr_json(signal)}" '
         f'aria-haspopup="dialog">{esc(signal.get("headline", ""))}</button></h3>'
         f'<p class="det">{esc(signal.get("why", ""))}</p>'
@@ -629,20 +697,26 @@ def _update_rows(ctx: dict) -> list[str]:
     return rows
 
 
-def today(ctx: dict) -> str:
+def today(ctx: dict, *, events: dict | None = None, anchor: str = "today", nav: str = "",
+          updates: bool = True, gaps: list[str] | None = None, hint: str = "") -> str:
     """今天：重大數據與政策決議，全是機構正式發布的事實。
 
     會後一週內的央行決議列在「本週稍早」，決議遺漏永遠置頂（events.py 已排好序）。
+
+    events   這一版要看的事件（events.for_region 的結果）；沒給就用全部
+    updates  要不要列「今天更新的序列」（那份清單來自 FRED，只有美國版有）
+    gaps     這一輪沒抓到的資料來源，逐條印「缺」
+    hint     今天沒事時補一句「下一個是什麼」
     """
-    ev = ctx.get("events") or {}
+    ev = (ctx.get("events") or {}) if events is None else events
     day = ev.get("date") or clock.today()
     weekday = ev.get("weekday") or WEEKDAYS[day.weekday()]
     verdict_line = ev.get("verdict") or "今天的重大事件這一輪沒有計算成功，請看下方更新清單。"
-    out = [sec_open("today", "今天", kind="實",
+    out = [sec_open(anchor, "今天", kind="實", nav=nav,
                     sub=f'{day.month}/{day.day}（{weekday}）台北時間。{esc(verdict_line)}')]
-    events = ev.get("events") or []
-    now_rows = [e for e in events if e["today"]]
-    earlier = [e for e in events if not e["today"]]
+    listed = ev.get("events") or []
+    now_rows = [e for e in listed if e["today"]]
+    earlier = [e for e in listed if not e["today"]]
     out.extend(_event_row(e) for e in now_rows)
     if earlier:
         out.append(row('<h3 class="sub-h">本週稍早</h3>', cls="rv"))
@@ -653,12 +727,18 @@ def today(ctx: dict) -> str:
     if ev and not ev.get("us_calendar_ok", True):
         warnings.append("美國發布行事曆這一輪沒有取得（"
                         + "、".join(ev.get("us_calendar_failed") or []) + "），今天的美國數據可能漏列。")
+    warnings.extend(f"{gap}。" for gap in gaps or [])
     if warnings:
         out.append(row("".join(f'<p class="gapnote">{seal("缺")}{esc(w)}</p>' for w in warnings)))
-    updates = _update_rows(ctx)
+    if not updates:
+        if not listed and hint:
+            out.append(row(f'<p class="quiet">{esc(hint)}</p>'))
+        out.append("</section>")
+        return "".join(out)
+    rows = _update_rows(ctx)
     out.append(row('<h3 class="sub-h">今天更新的序列</h3>', cls="rv"))
-    if updates:
-        out.extend(updates)
+    if rows:
+        out.extend(rows)
     else:
         nxt = next((r for r in ((ctx.get("freshness") or {}).get("rows") or [])
                     if r.get("days_away") is not None), None)
@@ -775,7 +855,7 @@ def price_rows(ctx: dict) -> list[dict]:
     market = ctx.get("market") or {}
     rates = ctx.get("rates") or {}
     comm = ctx.get("commodities") or {}
-    tw, us = eq.get("tw") or {}, eq.get("us") or {}
+    us = eq.get("us") or {}
     vol = market.get("volatility") or {}
     curve = {r["name"]: r for r in (rates.get("curve") or {}).get("rows") or []}
     shape = rates.get("shape") or {}
@@ -786,10 +866,6 @@ def price_rows(ctx: dict) -> list[dict]:
         rows.append({"name": item["name"], "href": "/equities/", "level": fmt(item["price"], 2),
                      "cap": f'昨收 {fmt(item["previous_close"], 2)}',
                      "chg": (item.get("change_percent"), 2, "%", "")})
-    twii = next((r for r in (tw.get("index") or []) if str(r.get("symbol")) == "^TWII"), None)
-    if twii:
-        rows.append({"name": "台股加權", "href": "/tw/", "level": fmt(twii["price"], 2),
-                     "cap": "證交所即時", "chg": (twii.get("change_percent"), 2, "%", "")})
     ten = curve.get("10Y")
     if ten:
         rows.append({"name": "10 年期公債", "href": "/fed/", "level": fmt(ten["value"], 2),
@@ -816,12 +892,11 @@ def price_rows(ctx: dict) -> list[dict]:
     return rows
 
 
-def prices(ctx: dict) -> str:
-    from .overview_blocks import _rotation
-    out = [sec_open("prices", "今日價格", kind="市",
-                    sub="頁邊是漲跌。台股為盤中即時，美股與利率為前一交易日收盤；"
-                        "沒有變動資料的畫「—」。")]
-    for item in price_rows(ctx):
+def price_section(rows: list[dict], lines: list[tuple[str, str]], *, anchor: str, sub: str,
+                  nav: str = "") -> str:
+    """「今日價格」的排版，兩個版共用。lines 是底下那排補充（板塊、法人、融資）。"""
+    out = [sec_open(anchor, "今日價格", kind="市", sub=sub, nav=nav)]
+    for item in rows:
         unit = f'<span class="u">{esc(item["unit"])}</span>' if item.get("unit") else ""
         body = (f'<h3><a href="{item["href"]}">{esc(item["name"])}</a></h3>'
                 f'<p class="lv">{item["level"]}{unit}</p>'
@@ -830,16 +905,24 @@ def prices(ctx: dict) -> str:
             margin = note(esc(item["text"]))
         elif item.get("chg") and item["chg"][0] is not None:
             value, digits, suffix, what = item["chg"]
-            # 綠漲紅跌只給價格。殖利率上升是債券價格下跌，上色會讓人讀反
+            # 綠漲紅跌只給價格。殖利率上升是債券價格下跌、匯率數字變大是台幣貶值，
+            # 上色會讓人讀反
             kind = "" if item.get("plain") else ("up" if value > 0 else ("dn" if value < 0 else "na"))
             margin = note(f'<i>{_signed(value, digits)}{esc(suffix)}</i>', esc(what), kind=kind)
         else:
             margin = note("<i>—</i>", kind="na") + '<span class="sr-only">沒有變動資料</span>'
         out.append(row(body, margin, cls="px ln rv", tag="article"))
+    if lines:
+        out.append(row('<dl class="also">' + "".join(f"<div><dt>{esc(k)}</dt><dd>{v}</dd></div>"
+                                                     for k, v in lines) + "</dl>", cls="rv"))
+    out.append("</section>")
+    return "".join(out)
 
+
+def prices(ctx: dict) -> str:
+    from .overview_blocks import _rotation
     market = ctx.get("market") or {}
     us = (ctx.get("equities") or {}).get("us") or {}
-    tw = (ctx.get("equities") or {}).get("tw") or {}
     risk, liquidity = market.get("risk") or {}, market.get("liquidity") or {}
     lines = []
     rotation = _rotation(us.get("sectors") or [])
@@ -851,22 +934,16 @@ def prices(ctx: dict) -> str:
         lines.append(("聯準會淨流動性",
                       f'{fmt(liquidity["latest"] / 1000, 2, suffix=" 兆美元")}，'
                       f'近三月 {fmt(liquidity.get("chg_3m"), 0, suffix=" 十億", signed=True)}'))
-    institutional = tw.get("institutional") or {}
-    if institutional.get("foreign") is not None:
-        lines.append(("台股外資", f'{fmt(institutional["foreign"], 1, suffix=" 億", signed=True)}'
-                                  f'（{esc(institutional.get("date", ""))}）'))
-    if lines:
-        out.append(row('<dl class="also">' + "".join(f"<div><dt>{esc(k)}</dt><dd>{v}</dd></div>"
-                                                     for k, v in lines) + "</dl>", cls="rv"))
-    out.append("</section>")
-    return "".join(out)
+    return price_section(
+        price_rows(ctx), lines, anchor="prices",
+        sub="頁邊是漲跌。美股與利率為前一交易日收盤；沒有變動資料的畫「—」。")
 
 
 # ---------------------------------------------------------- 別人怎麼說 ----
 
-def said(brief_html: str) -> str:
+def said(brief_html: str, *, anchor: str = "voices", nav: str = "") -> str:
     """別人的報導。責任在報導者，所以這一段直線畫成虛線、頁邊不寫字。"""
-    return (sec_open("voices", "別人怎麼說", kind="聞", cls="said",
+    return (sec_open(anchor, "別人怎麼說", kind="聞", cls="said", nav=nav,
                      sub="別人的報導，說錯了責任在報導者。本站不會因為它們改變上面的判定"
                          "——所以這一段直線是虛線，頁邊不寫字。")
             + row(brief_html, cls="said-b rv") + "</section>")

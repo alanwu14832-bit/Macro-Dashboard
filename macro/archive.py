@@ -53,6 +53,9 @@ def build_snapshot(ctx: dict, signals: list[dict], summary: dict,
             "recession_gauge": growth.get("gauge", {}).get("value"),
             "composite_labor": labor.get("composite", {}).get("value"),
         },
+        # 台灣版頭版的「跟上一期比」。2026-10-10 以前的存檔沒有這一段，
+        # 所以那之前的存檔不能拿來比台灣——比不了就明講，不當成「沒變」。
+        "readings_tw": taiwan_readings(ctx),
         "as_of": {
             "labor": _iso(labor.get("as_of")),
             "inflation": _iso(inflation.get("as_of")),
@@ -63,6 +66,29 @@ def build_snapshot(ctx: dict, signals: list[dict], summary: dict,
 
 def _iso(value):
     return value.isoformat() if hasattr(value, "isoformat") else value
+
+
+def _rounded(value, digits: int = 2):
+    return None if value is None else round(value, digits)
+
+
+def taiwan_readings(ctx: dict) -> dict:
+    """台灣版頭版盯的讀數。四捨五入後才存：年增率是算出來的，不取位數的話
+    同一份資料兩次建置會差在第十幾位小數，被當成「變了」。"""
+    tw = ctx.get("taiwan") or {}
+    cycle, external = tw.get("cycle") or {}, tw.get("external") or {}
+    labour, money, output = tw.get("labour") or {}, tw.get("money") or {}, tw.get("output") or {}
+    return {
+        "score": _rounded(cycle.get("score"), 0),
+        "light": cycle.get("light"),
+        "exports_yoy": _rounded(external.get("customs_yoy"), 1),
+        "orders_yoy": _rounded(external.get("orders_amount_yoy"), 1),
+        "cpi": _rounded(labour.get("cpi_yoy"), 2),
+        "unemployment": _rounded(labour.get("unemployment"), 2),
+        "policy": _rounded(money.get("policy"), 3),
+        "gdp": _rounded(output.get("gdp_growth"), 2),
+        "m1b_m2": _rounded(money.get("m1b_m2_spread"), 2),
+    }
 
 
 def save(snapshot: dict) -> str:
@@ -90,6 +116,36 @@ def previous(before: date | None = None) -> dict | None:
     before = before or clock.today()
     snapshots = [s for s in load_all() if s.get("date") < before.isoformat()]
     return snapshots[-1] if snapshots else None
+
+
+TAIWAN_LABELS = {
+    "score": ("景氣對策信號", "分", 0),
+    "exports_yoy": ("出口年增", "%", 1),
+    "orders_yoy": ("外銷訂單年增", "%", 1),
+    "cpi": ("CPI 年增", "%", 2),
+    "unemployment": ("台灣失業率", "%", 2),
+    "policy": ("重貼現率", "%", 3),
+    "gdp": ("經濟成長率", "%", 2),
+    "m1b_m2": ("M1B 減 M2", "pp", 2),
+}
+
+
+def taiwan_changes(readings: dict, prior: dict | None) -> list[dict] | None:
+    """台灣讀數跟上一期的差。上一期沒有記台灣讀數時回傳 None——那是「比不了」，
+    不是「沒變」，頭版要分開講。"""
+    was_all = (prior or {}).get("readings_tw")
+    if not was_all:
+        return None
+    out = []
+    if readings.get("light") and was_all.get("light") and readings["light"] != was_all["light"]:
+        out.append({"name": "景氣燈號", "text": f'{was_all["light"]}→{readings["light"]}'})
+    for key, (name, unit, digits) in TAIWAN_LABELS.items():
+        now, was = readings.get(key), was_all.get(key)
+        if now is None or was is None or now == was:
+            continue
+        out.append({"name": name, "unit": unit, "digits": digits,
+                    "now": now, "was": was, "change": now - was})
+    return out
 
 
 def reading_changes(current: dict, prior: dict | None) -> list[dict]:

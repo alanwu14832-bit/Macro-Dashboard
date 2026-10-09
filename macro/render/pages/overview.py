@@ -3,14 +3,23 @@ from __future__ import annotations
 
 import re
 
+from ... import archive
+from ...compute import events as events_mod
+from ...compute import signals as signals_mod
 from ...compute.news import _headline, _is_market, _same_story, _tokens
 from ...fomc import next_meeting
 from . import front_blocks as front
+from . import front_tw
 from ..html import esc
 
+TAIWAN = "台灣"       # 訊號的 module、事件的 region、要聞的分類，三個地方都叫這個名字
 
-def _curated_brief(brief: dict) -> str:
+
+def _curated_brief(brief: dict, region: str = "") -> str:
     """整理過的要聞：四類，預設只出標題。
+
+    region：「美國」只出台灣以外的三類，「台灣」只出台灣那一類；空字串＝全部。
+    「與本期判斷的交集」講的是九宮格的判定，只跟著美國版。
 
     內文收在標題底下，點標題才展開。理由是掃視與閱讀是兩件事：早上那一眼要
     的是「今天有哪幾件事」，不是十二段各 90 字的說明；真的想看某一則再點開。
@@ -22,6 +31,8 @@ def _curated_brief(brief: dict) -> str:
     groups = []
     for sec in brief["sections"]:
         if not sec["items"]:
+            continue
+        if region and (sec["title"] == TAIWAN) != (region == TAIWAN):
             continue
         items = []
         for it in sec["items"]:
@@ -49,16 +60,19 @@ def _curated_brief(brief: dict) -> str:
         groups.append(f'<div class="bf-group"><div class="bf-k">{esc(sec["title"])}</div>'
                       f'<ul class="bf-list">{"".join(items)}</ul></div>')
     synthesis = ""
-    if brief.get("synthesis"):
+    if brief.get("synthesis") and region != TAIWAN:
         text = re.sub(r"^與本期判斷的交集[：:]\s*", "", brief["synthesis"])
         synthesis = f'<p class="bf-syn"><strong>與本期判斷的交集</strong>　{esc(text)}</p>'
     stamp = brief["date"].isoformat()
+    if not groups:
+        return (f'<p class="quiet">{esc(stamp)} 整理的要聞裡沒有{esc(region)}的項目。'
+                '<a href="/news/">看國際新聞頁 →</a></p>')
     return ("".join(groups) + synthesis
             + f'<p class="mc-foot-note">整理於 {esc(stamp)}，由排程任務讀完 64 個來源後寫成；'
               f'<a href="/news/">看原始的今日焦點與分類 →</a></p>')
 
 
-def market_brief(ctx: dict, *, limit: int = 6) -> str:
+def market_brief(ctx: dict, *, limit: int = 6, region: str = "") -> str:
     """今日資本市場要聞。
 
     有整理過的 data/brief.json 就用它（中文 headline、四類）；沒有或過期時
@@ -67,7 +81,11 @@ def market_brief(ctx: dict, *, limit: int = 6) -> str:
     from ... import brief as brief_module
     curated = brief_module.load()
     if curated:
-        return _curated_brief(curated)
+        return _curated_brief(curated, region)
+    if region == TAIWAN:
+        # 退路的關鍵字清單挑的是國際財經報導，硬分一份給台灣版只會是同一批標題
+        return ('<p class="quiet">今天沒有整理過的台灣要聞（整理版由排程任務每天寫入）。'
+                '<a href="/news/">看國際新聞頁 →</a></p>')
 
     news = ctx.get("news") or {}
     if not news.get("available"):
@@ -112,25 +130,74 @@ def market_brief(ctx: dict, *, limit: int = 6) -> str:
             '<p class="mc-foot-note"><a href="/news/">看今日焦點全表與分類 →</a></p>')
 
 
+def _only(diff: dict, keep) -> dict:
+    """訊號的增減只留某一邊的。"""
+    added = [s for s in diff.get("added") or [] if keep(s)]
+    removed = [s for s in diff.get("removed") or [] if keep(s)]
+    return {**diff, "added": added, "removed": removed, "same": not added and not removed}
+
+
+def edition(key: str, html: str) -> str:
+    """一個版的一段。兩個版都在同一份 HTML 裡，<html data-ed> 決定顯示哪一個；
+    前後的註解是給 measure() 量各版的版面預算用的。"""
+    return f'<!--ed:{key}--><div class="edn" data-ed="{key}">{html}</div><!--/ed:{key}-->'
+
+
 def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
            diff: dict, reading_changes: list[dict], updated: str,
            prior: dict | None = None) -> str:
     # 頭版是一份日報的頭版：左邊一條頁邊，正文講現況、頁邊講變化。
-    # 排版全部在 front_blocks.py；這裡只決定順序。八個區塊，上限仍然寫死在 BUDGET。
+    # 排版在 front_blocks.py（美國版與共用零件）與 front_tw.py（台灣版）；這裡只決定順序。
+    #
+    # 兩個版：美國｜台灣，同一個網址，刊頭底下切換。兩版的段落一一對應，
+    # 各自受同一份版面預算（BUDGET）約束——每一版都是八個區塊。
     from ..layout import _trust_row
-    top, changed = front.hero(ctx, scenario, summary, diff, reading_changes, prior)
-    body = [
-        f'<div class="fp{" has-changes" if changed else ""}">',
-        # 刊頭（品牌，不算區塊）＋ 1 頭條：有事報事，沒事報判定
-        f'<div class="top">{front.masthead(_trust_row(updated))}{top}</div>',
+    is_tw = lambda s: s.get("module") == TAIWAN
+    ev = ctx.get("events") or {}
+
+    # ---- 美國版：九宮格只吃美國的就業與通膨，所以訊號條數也只算美國的 ----
+    us_signals = [s for s in signals if not is_tw(s)]
+    us_summary = signals_mod.summarise(us_signals) if us_signals else {**summary, "total": 0, "neutral": 0}
+    us_diff = _only(diff, lambda s: not is_tw(s))
+    us_events = events_mod.for_region(ev, "美國")
+    us_top, us_changed = front.hero(ctx, scenario, us_summary, us_diff, reading_changes, prior,
+                                    events=us_events)
+    us_rest = "".join([
         front.gate_chart(ctx, scenario),                          # 頭條的圖，不另算區塊
         front.facts(ctx, scenario, reading_changes, prior),       # 2 四個數字（機構事實）
-        front.verdict(scenario, signals, summary, diff),          # 3 本站的判定
-        front.today(ctx),                                         # 4 今天
+        front.verdict(scenario, us_signals, us_summary, us_diff), # 3 本站的判定
+        front.today(ctx, events=us_events),                       # 4 今天
         front.next_up(ctx, scenario, next_meeting()),             # 5 接下來
         front.prices(ctx),                                        # 6 今日價格
-        front.said(market_brief(ctx)),                            # 7 別人怎麼說
-        front.contents(ctx),                                      # 8 目錄
+        front.said(market_brief(ctx, region="美國")),             # 7 別人怎麼說
+    ])
+
+    # ---- 台灣版：同樣的七段，沒有九宮格 ----
+    tw_signals = [s for s in signals if is_tw(s)]
+    tw_diff = _only(diff, is_tw)
+    tw_events = events_mod.for_region(ev, TAIWAN)
+    tw_changes = archive.taiwan_changes(archive.taiwan_readings(ctx), prior)
+    tw_top, tw_changed = front_tw.hero(ctx, tw_signals, tw_diff, tw_changes, prior, tw_events)
+    tw_rest = "".join([
+        front_tw.signal_chart(ctx),
+        front_tw.facts(ctx, tw_changes, prior),
+        front_tw.verdict(tw_signals, tw_diff),
+        front_tw.today(ctx, tw_events),
+        front_tw.next_up(ctx, tw_events),
+        front_tw.prices(ctx),
+        front.said(market_brief(ctx, region=TAIWAN), anchor="tw-voices", nav="台灣｜別人怎麼說"),
+    ])
+
+    # 頁邊的色帶跟著「這一版有沒有變動」：兩版各有各的旗標
+    flags = (" us-chg" if us_changed else "") + (" tw-chg" if tw_changed else "")
+    body = [
+        f'<div class="fp{flags}">',
+        # 刊頭與版別（品牌與導覽，不算區塊）＋ 1 頭條：有事報事，沒事報判定
+        f'<div class="top">{front.masthead(_trust_row(updated))}{front.edition_row()}'
+        f'{edition("us", us_top)}{edition("tw", tw_top)}</div>',
+        edition("us", us_rest),
+        edition("tw", tw_rest),
+        front.contents(ctx),                                      # 8 目錄（兩版共用）
         front.colophon(updated),
         "</div>",
     ]
@@ -158,9 +225,24 @@ NEWS_DISCLOSURES = 12     # 要聞四類各 3 則，每則一個行內展開；�
 VISIBLE_CHARS_SOFT = 2600  # 重構當下實測 2,537，留 2.5% 餘裕
 
 
+EDITION_RE = re.compile(r"<!--ed:(\w+)-->(.*?)<!--/ed:\1-->", re.S)
+EDITION_NAMES = {"us": "美國版", "tw": "台灣版"}
+
+
+def editions(body: str) -> dict[str, str]:
+    """把頭版拆回一版一份：該版自己的段落＋兩版共用的部分（刊頭、目錄、頁尾）。
+    沒有版別標記的 HTML（測試、舊版面）原樣當成一份。"""
+    chunks: dict[str, list[str]] = {}
+    for key, html in EDITION_RE.findall(body):
+        chunks.setdefault(key, []).append(html)
+    if not chunks:
+        return {"": body}
+    shared = EDITION_RE.sub("", body)
+    return {key: "".join(parts) + shared for key, parts in chunks.items()}
+
+
 def measure(body: str) -> dict:
-    """量總覽的版面用量。輸入是渲染完的 body HTML。"""
-    import re
+    """量一份頭版的版面用量。輸入是渲染完的 body HTML（單一版；整頁請先過 editions）。"""
     visible = re.sub(r'<div class="acc-body">.*?</div></details>', "</details>",
                      body, flags=re.S)
     visible = re.sub(r'<div class="bf-body">.*?</div></details>', "</details>",
@@ -181,10 +263,16 @@ def measure(body: str) -> dict:
 
 
 def budget_report(body: str) -> tuple[list[str], list[str]]:
-    """回傳 (硬性超標, 軟性警告)。硬性超標要讓建置失敗。"""
-    used = measure(body)
-    hard = [f'{k} {used[k]} 超過上限 {v}——要加東西必須指名擠掉哪一個'
-            for k, v in BUDGET.items() if used[k] > v]
-    soft = ([f'可見字元 {used["visible_chars"]} 超過 {VISIBLE_CHARS_SOFT}']
-            if used["visible_chars"] > VISIBLE_CHARS_SOFT else [])
+    """回傳 (硬性超標, 軟性警告)。硬性超標要讓建置失敗。
+
+    兩個版各量各的：讀者一次只看一版，預算管的是「一版有多長」，不是 HTML 有多大。
+    """
+    hard, soft = [], []
+    for key, html in editions(body).items():
+        used = measure(html)
+        name = EDITION_NAMES.get(key, key)
+        hard += [f'{name}{k} {used[k]} 超過上限 {v}——要加東西必須指名擠掉哪一個'
+                 for k, v in BUDGET.items() if used[k] > v]
+        if used["visible_chars"] > VISIBLE_CHARS_SOFT:
+            soft.append(f'{name}可見字元 {used["visible_chars"]} 超過 {VISIBLE_CHARS_SOFT}')
     return hard, soft

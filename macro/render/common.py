@@ -153,7 +153,8 @@ def curve_chart(title: str, rows: list[dict], *, sub: str = "") -> str:
 
 
 def signals_block(signals: list[dict], *, limit: int | None = None,
-                  module: str | None = None, grid: bool = False) -> str:
+                  module: str | None = None, grid: bool = False,
+                  direction: bool = True) -> str:
     """訊號清單。grid=True 排成方格（總覽用），否則維持逐列（各模組頁用）。"""
     rows = [s for s in signals if module is None or s.get("module") == module]
     if limit:
@@ -162,7 +163,7 @@ def signals_block(signals: list[dict], *, limit: int | None = None,
         return '<p class="muted">本期沒有觸發訊號。</p>'
     if grid:
         return ('<div class="sig-grid">'
-                + "".join(signal_card(s) for s in rows) + "</div>")
+                + "".join(signal_card(s, direction=direction) for s in rows) + "</div>")
     return '<div class="signal-list">' + "".join(signal_row(s) for s in rows) + "</div>"
 
 

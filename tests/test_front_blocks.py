@@ -31,8 +31,9 @@ class Highlighter(unittest.TestCase):
         self.assertIn("rm-prev", html)
 
     def test_margin_note_is_coloured_only_for_a_change(self):
-        changed = {"change": {"change": 0.07, "was": 5.21, "now": 5.28}, "gap": ("0.21", "離下一格")}
-        distance = {"change": None, "gap": ("0.21", "離下一格")}
+        gap = {"value": "0.21", "what": "離下一格", "unit": "個百分點"}
+        changed = {"change": {"change": 0.07, "was": 5.21, "now": 5.28}, "gap": gap}
+        distance = {"change": None, "gap": gap}
         nothing = {"change": None, "gap": None}
         self.assertIn('class="mn chg"', front._fact_note(changed, "2026-10-09"))
         self.assertIn("+0.07", front._fact_note(changed, "2026-10-09"))

@@ -101,6 +101,11 @@ setTimeout(function(){if(!window.__fp)d.classList.add('still')},3000);
 try{if(sessionStorage.getItem('seen'))d.classList.add('again');else sessionStorage.setItem('seen','1')}catch(e){}
 var t=localStorage.getItem('theme'),q=location.search.match(/[?&]theme=(dark|light)(?:&|$)/);if(q)t=q[1];
 if(t==='dark'||t==='light')d.setAttribute('data-theme',t);
+// 頭版的版別（美國｜台灣）：網址指定的 > 錨點所在的那一版 > 上次看的
+var h=location.hash,e=(location.search.match(/[?&]ed=(us|tw)(?:&|$)/)||[])[1]
+||(/^#tw-/.test(h)?'tw':/^#(lede|facts|verdict|today|next|prices|voices)$/.test(h)?'us':'')
+||localStorage.getItem('ed');
+d.setAttribute('data-ed',e==='tw'?'tw':'us');
 if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
 }catch(e){}})();
 """
@@ -233,6 +238,23 @@ def _trust_row(updated: str) -> str:
 
 
 WEEKDAYS = "一二三四五六日"
+
+# 頭版的兩個版。錨點是沒有 JS 時的退路——那時兩個版上下並排，連結直接跳過去。
+EDITIONS = [("us", "美國", "lede"), ("tw", "台灣", "tw-lede")]
+
+
+def edition_tabs(*, compact: bool = False) -> str:
+    """版別切換。compact 是刊頭捲走之後、頂列裡那一份（只有兩個字，沒有「版」）。
+
+    哪一版亮著由 <html data-ed> 決定（BOOT 在第一次繪製前設好），aria-current 由
+    front.js 補上；這裡不標預設，否則記住台灣版的人每次都會先看到美國版閃一下。
+    """
+    tabs = "".join(
+        f'<a class="edt" href="/#{anchor}" data-ed-set="{key}">{esc(name)}'
+        + ("" if compact else "<span>版</span>") + "</a>"
+        for key, name, anchor in EDITIONS)
+    classes = "edsw edsw-bar" if compact else "edsw"
+    return f'<nav class="{classes}" aria-label="版別">{tabs}</nav>'
 
 
 def masthead(trust_row: str) -> str:
@@ -406,6 +428,7 @@ def page(*, title: str, path: str, body: str, lede: str = "",
              stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
       <a class="nameplate" href="/" lang="en" aria-label="{esc(SITE_NAME)}，回到頭版">{esc(SITE_NAME)}</a>
+      {edition_tabs(compact=True) if front else ""}
       <div class="topbar-title">{esc(title)}</div>
       <a class="topbar-guide" href="/guide/">使用講義</a>
       <div class="topbar-meta">{esc(updated)}</div>

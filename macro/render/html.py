@@ -158,15 +158,18 @@ def signal_row(signal: dict) -> str:
     )
 
 
-def signal_card(signal: dict) -> str:
+def signal_card(signal: dict, *, direction: bool = True) -> str:
     """One rule-engine finding as a tile.
+
+    direction=False：不印升降息方向。台灣的規則沒有方向，頭版台灣版連「中性」
+    都不印——印了會被讀成「對聯準會中性」。
 
     格子的三層是固定的：頂列標模組與方向（顏色 + 文字，不只靠色相）、
     中間是結論、底部是那條規則實際引用的數字。嚴重度靠左側色條而不是
     另一個字級，這樣一排格子掃過去高度一致、輕重仍分得出來。
     """
     sev = signal.get("severity", "low")
-    direction = signal.get("direction", "neutral")
+    leaning = tag(signal.get("direction", "neutral")) if direction else ""
     # 整張卡可點：開規則卡（手機是 sheet、寬螢幕是右側 inspector）。
     # 資料掛在 data- 上而不是另外抓一份 JSON——這張卡已經有全部欄位了，
     # 再去 fetch 一次只會多一個會失敗的環節。
@@ -178,7 +181,7 @@ def signal_card(signal: dict) -> str:
         f'data-rule="{payload}" aria-haspopup="dialog">'
         f'<div class="sig-top">'
         f'<span class="sig-mod">{esc(signal.get("module", ""))}</span>'
-        f'{tag(direction)}</div>'
+        f'{leaning}</div>'
         f'<div class="sig-head">{esc(signal["headline"])}</div>'
         f'<div class="sig-why">{esc(signal.get("why", ""))}</div>'
         + (f'<div class="sig-evi">{esc(signal["evidence"])}</div>'

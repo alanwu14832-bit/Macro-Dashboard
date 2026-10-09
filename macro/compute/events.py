@@ -209,14 +209,16 @@ def taiwan_data_events(releases: list[dict], now: datetime) -> list[dict]:
         out.append({
             "kind": "data", "region": "台灣", "today": item["date"] == today, "sev": "medium",
             "tag": "台灣數據　" + ("已公布" if done else f"{at:%H:%M} 公布"),
-            "title": label,
+            "title": label, "period": item.get("period") or "",
             "detail": f"{item['dept']}，資料期 {item['period']}。" if item.get("period") else item["dept"],
             "href": "/taiwan/", "at": at,
         })
     return out
 
 
-def verdict(events: list[dict], *, us_ok: bool = True, tw_ok: bool = True) -> str:
+def verdict(events: list[dict], *, us_ok: bool = True, tw_ok: bool = True,
+            where: str = "") -> str:
+    """where：頭版分成美國版與台灣版之後，各版只講自己那一邊（「今天台灣沒有…」）。"""
     today_events = [e for e in events if e["today"]]
     count = lambda policy: sum(1 for e in today_events if e.get("policy") == policy)
     data = sum(1 for e in today_events if e["kind"] == "data")
@@ -234,9 +236,40 @@ def verdict(events: list[dict], *, us_ok: bool = True, tw_ok: bool = True) -> st
     caveat = f"（{'與'.join(failed)}這一輪沒有取得，可能漏列）" if failed else ""
     if not bits:
         if failed:
-            return f"今天沒有偵測到重大數據或政策決議{caveat}。"
-        return "今天沒有重大數據或政策決議。"
-    return "今天有" + "、".join(bits) + caveat + "。"
+            return f"今天{where}沒有偵測到重大數據或政策決議{caveat}。"
+        return f"今天{where}沒有重大數據或政策決議。"
+    return f"今天{where}有" + "、".join(bits) + caveat + "。"
+
+
+def for_region(ev: dict | None, region: str) -> dict:
+    """只留某一邊的事件，第一句與行事曆缺口也只講那一邊。
+
+    region 是事件上的 region 欄位（「美國」「台灣」）。另一邊的行事曆抓不到
+    不關這一版的事，所以在這裡標成沒問題——它會在自己那一版被講出來。
+    """
+    ev = ev or {}
+    if not ev:
+        return {}
+    kept = [e for e in ev.get("events") or [] if e.get("region") == region]
+    us_ok = ev.get("us_calendar_ok", True) if region == "美國" else True
+    tw_ok = ev.get("calendar_ok", True) if region == "台灣" else True
+    return {**ev, "events": kept, "region": region,
+            "verdict": verdict(kept, us_ok=us_ok, tw_ok=tw_ok, where=region),
+            "us_calendar_ok": us_ok, "calendar_ok": tw_ok}
+
+
+def taiwan_upcoming(releases: list[dict], now: datetime) -> list[dict]:
+    """看板上還沒到的台灣主要統計。看板只排到一兩週後，所以這份清單通常很短。"""
+    today = now.date()
+    out, seen = [], set()
+    for item in sorted(releases, key=lambda i: (i["date"], i.get("time") or time(0))):
+        label = item.get("label")
+        if not label or item["date"] <= today or (label, item["date"]) in seen:
+            continue
+        seen.add((label, item["date"]))
+        out.append({"label": label, "date": item["date"], "days": (item["date"] - today).days,
+                    "dept": item.get("dept") or "", "period": item.get("period") or ""})
+    return out
 
 
 def build(fomc, cbc, freshness: dict, tw_releases: list[dict], now: datetime,
@@ -255,6 +288,7 @@ def build(fomc, cbc, freshness: dict, tw_releases: list[dict], now: datetime,
         "events": events,
         "calendar_ok": tw_ok, "us_calendar_ok": us_ok,
         "us_calendar_failed": list(freshness.get("calendar_failed") or []),
+        "tw_upcoming": taiwan_upcoming(tw_releases, now),
     }
 
 

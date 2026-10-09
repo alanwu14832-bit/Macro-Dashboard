@@ -229,6 +229,11 @@ def main() -> int:
     prior = archive.previous()
     diff = signals.diff(found, (prior or {}).get("signals"))
     reading_changes = archive.reading_changes(snapshot, prior)
+    # 台灣讀數的變動：頭版台灣版自己算自己的（overview.render），這一份是給存檔頁的
+    # 完整清單用的——頭版「看全部 N 項」連過去，那裡要找得到。換燈那一項是文字，
+    # 存檔頁的表只收數字（分數的變動已經在裡面）。
+    tw_reading_changes = [c for c in archive.taiwan_changes(snapshot["readings_tw"], prior) or []
+                          if not c.get("text")]
     if not args.no_archive:
         archive.save(snapshot)
     snapshots = archive.load_all()
@@ -315,7 +320,7 @@ def main() -> int:
         ("/archive/", "存檔", "存檔",
          "每天的判斷與關鍵讀數，可回看任一天的結論。",
          lambda: archive_page.render(snapshots, diff=diff,
-                                    reading_changes=reading_changes)),
+                                    reading_changes=reading_changes + tw_reading_changes)),
     ]
 
     # 兩段式：先渲染出全部頁面的內文、抽出各頁的區塊清單，

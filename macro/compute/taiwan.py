@@ -199,6 +199,10 @@ def external(ind: dict[str, Series], bundle: Bundle,
                         label="積體電路佔總出口", unit="%")
     us_share = _combine(_gov(gov, "exports_us"), _gov(gov, "exports_world"),
                         _share, "TW_US_SHARE", label="對美出口佔總出口", unit="%")
+    # 財政部按美元計的總出口，通常比國發會同時指標構成項目裡的那一檔新一個月。
+    # 頭版用這一檔；「連續負成長」那條規則仍然用國發會的（見 exports_negative_months）。
+    customs = _gov(gov, "exports_total")
+    customs_yoy = customs.yoy()
     us_prior = None
     if us_share.last_date:
         us_prior = _by_month(us_share).get((us_share.last_date.year - 1,
@@ -208,6 +212,8 @@ def external(ind: dict[str, Series], bundle: Bundle,
         "exports": exports.last, "exports_date": exports.last_date,
         "exports_yoy": exports_yoy.last, "exports_yoy_series": exports_yoy,
         "exports_negative_months": _negative_run(exports_yoy),
+        "customs_yoy": customs_yoy.last, "customs_date": customs_yoy.last_date,
+        "customs_yoy_series": customs_yoy,
         "orders": orders.last, "orders_date": orders.last_date,
         "orders_series": orders,
         "orders_expanding": (orders.last is not None
