@@ -1,6 +1,6 @@
 """頭版的排版。
 
-「邊際」這個刊名在這一頁有具體的形狀：版面左側有一條真的頁邊，中間一條直線
+刊名 At the Margin 在這一頁有具體的形狀：版面左側有一條真的頁邊，中間一條直線
 從頭畫到尾。正文（直線右邊）講現況，頁邊（直線左邊）只寫變化——跟上一期比動了
 多少、離門檻還差多少、離公布還有幾天。沿著直線掃一遍，就是今天。
 
@@ -92,16 +92,15 @@ def _by_comma(text: str) -> list[str]:
 # ------------------------------------------------------------------ 刊頭 ----
 
 def masthead(trust_row: str) -> str:
-    """刊名跨在直線上：「邊」在頁邊，「際」在正文。"""
-    from ..layout import SITE_NAME, SITE_NAME_EN
+    """刊名跨在直線上：「At the」在頁邊，「Margin」在正文——那條線就是 the margin。"""
+    from ..layout import SITE_NAME, WORDMARK
     today = clock.today()
-    left, right = SITE_NAME[0], SITE_NAME[1:]
+    left, right = WORDMARK
     return (
         '<header class="mast row">'
         '<div class="b">'
-        f'<span class="sr-only">{esc(SITE_NAME)} {esc(SITE_NAME_EN)}</span>'
-        f'<span class="wm-c" aria-hidden="true">{esc(right)}</span>'
-        f'<span class="wm-en" lang="en" aria-hidden="true">{esc(SITE_NAME_EN)}</span>'
+        f'<span class="sr-only">{esc(SITE_NAME)}</span>'
+        f'<span class="wm-c" lang="en" aria-hidden="true">{esc(right)}</span>'
         f'<p class="dateline"><time datetime="{today.isoformat()}">'
         f'{today.year}.{today.month:02d}.{today.day:02d} 週{WEEKDAYS[today.weekday()]}</time>'
         f'{trust_row}</p>'
@@ -109,7 +108,7 @@ def masthead(trust_row: str) -> str:
         '<div class="m" aria-hidden="true">'
         '<span class="ed"><span class="ed-d">日報<em lang="en">Day edition</em></span>'
         '<span class="ed-n">夜報<em lang="en">Night edition</em></span></span>'
-        f'<span class="wm-c">{esc(left)}</span>'
+        f'<span class="wm-c" lang="en">{esc(left)}</span>'
         '</div>'
         '</header>')
 
@@ -923,8 +922,8 @@ def contents(ctx: dict) -> str:
 
 def colophon(updated: str) -> str:
     """怎麼讀這一頁，加上版權頁。圖例寫在這裡，不是藏在講義裡。"""
-    from ..layout import SITE_NAME, SITE_NAME_EN
-    left, right = SITE_NAME[0], SITE_NAME[1:]
+    from ..layout import WORDMARK
+    left, right = WORDMARK
     legend = (
         '<dl class="howto">'
         '<div><dt>頁邊與正文</dt><dd><span><span class="hlx">+0.01</span>有螢光筆的＝跟上一期不一樣。</span>'
@@ -945,10 +944,9 @@ def colophon(updated: str) -> str:
         + row('<h2>怎麼讀這一頁</h2>', cls="sh rv")
         + row(legend, cls="rv")
         + '<div class="row colo"><div class="b">'
-          f'<span class="wm-c" aria-hidden="true">{esc(right)}</span>'
-          f'<span class="wm-en" lang="en" aria-hidden="true">{esc(SITE_NAME_EN)}</span>'
+          f'<span class="wm-c" lang="en" aria-hidden="true">{esc(right)}</span>'
           '<p class="fine"><strong>所有判定由固定規則產生，同一份資料每次執行結果一致。</strong>'
           f'個人資料整理，不構成投資建議。{esc(updated)}　'
           '<a href="/sources/">資料來源與判斷方法</a>　<a href="/guide/">使用講義</a></p>'
-          f'</div><div class="m" aria-hidden="true"><span class="wm-c">{esc(left)}</span></div></div>'
+          f'</div><div class="m" aria-hidden="true"><span class="wm-c" lang="en">{esc(left)}</span></div></div>'
         + '</footer>')

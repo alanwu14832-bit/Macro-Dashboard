@@ -25,23 +25,23 @@
   --latin: "Newsreader", "Charter", "Iowan Old Style", "Times New Roman";
   --ming: var(--latin), "Songti TC", "Noto Serif TC", "Source Han Serif TC", "PMingLiU", serif;
   --hei: var(--latin), "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
-  --m: clamp(190px, 25vw, 400px);          /* 頁邊寬 */
-  --edge: clamp(16px, 2vw, 30px);          /* 頁邊左緣 */
-  --mpad: clamp(16px, 1.9vw, 28px);        /* 批註到直線的距離 */
-  --pad: clamp(24px, 2.9vw, 44px);         /* 直線到正文的距離 */
-  --padr: clamp(20px, 4.2vw, 64px);
-  --tick: 18px;
-  --c1: 13.5rem; --c2: 14rem; --gap: 2rem;
-  --sec: clamp(60px, 6.6vw, 100px);
-  --nn: 29px; --nz: 17px;                  /* 批註：數字／中文 */
-  --h1: clamp(40px, calc((100vw - var(--m) - var(--pad) - var(--padr)) / 11.3), 92px);
+  --m: clamp(164px, 17vw, 256px);          /* 頁邊寬：夠放一個變動數字，不佔掉四分之一的畫面 */
+  --edge: clamp(14px, 1.5vw, 22px);        /* 頁邊左緣 */
+  --mpad: clamp(13px, 1.4vw, 20px);        /* 批註到直線的距離 */
+  --pad: clamp(20px, 2.3vw, 34px);         /* 直線到正文的距離 */
+  --padr: clamp(20px, 3.2vw, 48px);
+  --tick: 14px;
+  --c1: 11.5rem; --c2: 10.5rem; --gap: 1.75rem;
+  --sec: clamp(36px, 3.6vw, 54px);
+  --nn: 24px; --nz: 15px;                  /* 批註：數字／中文 */
+  --h1: clamp(36px, calc((100vw - var(--m) - var(--pad) - var(--padr)) / 16.4), 68px);
   --fx: cubic-bezier(.2, .7, .1, 1);
-  --wgap: clamp(7px, .9vw, 13px);
-  --wm: clamp(30px, 4vw, 58px);
-  --wh: clamp(17px, 1.6vw, 21px);
+  --wgap: clamp(5px, .55vw, 9px);
+  --wm: clamp(26px, 2.9vw, 42px);
+  --wh: clamp(16px, 1.35vw, 19px);
   --bar-dy: -3px;
   --tools: 216px;                          /* 右上角工具列佔的寬度 */
-  --mast-h: calc(clamp(16px, 2.1vw, 30px) + var(--wm) + clamp(10px, 1.2vw, 18px));
+  --mast-h: calc(clamp(12px, 1.4vw, 20px) + var(--wm) + clamp(8px, .9vw, 13px));
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -65,13 +65,14 @@
   --show-day: none;     --show-night: inline;
   --smooth: antialiased; --fp-text: #d9d5c9;  --wnum: 400;
 }
-@media (max-width: 1199px) { :root { --c1: 10.5rem; --c2: 11rem; --gap: 1.5rem; } }
+@media (max-width: 1199px) { :root { --c1: 9.5rem; --c2: 9.5rem; --gap: 1.4rem; } }
 @media (max-width: 699px) {
   :root {
-    --m: 84px; --edge: 8px; --mpad: 10px; --pad: 15px; --padr: 16px; --tick: 10px;
-    --nn: 19px; --nz: 13px; --wh: 17px; --bar-dy: 0px; --tools: 132px;
-    --h1: clamp(30px, calc((100vw - 84px - 15px - 16px) / 6.2), 60px);
-    --mast-h: 56px;
+    --m: 70px; --edge: 6px; --mpad: 8px; --pad: 13px; --padr: 14px; --tick: 8px;
+    --nn: 17px; --nz: 12.5px; --wh: 16px; --bar-dy: 0px; --tools: 132px;
+    --h1: clamp(28px, calc((100vw - 70px - 13px - 14px) / 7.3), 52px);
+    --wm: 23px; --wgap: 4px; --sec: 34px;
+    --mast-h: 50px;
   }
 }
 
@@ -100,7 +101,7 @@
 .is-front .topbar-title, .is-front .topbar-meta, .is-front .topbar-guide { display: none; }
 .is-front .nameplate {
   display: block; margin-right: auto; border-right: 0; padding-right: 0;
-  font-size: 20px; letter-spacing: .14em;
+  font-size: 19px; letter-spacing: 0;
   opacity: 0; transform: translateY(6px); pointer-events: none;
   transition: opacity .25s ease, transform .3s var(--fx);
 }
@@ -135,7 +136,7 @@
 
 /* ---- 基本排版 ------------------------------------------------------------- */
 .fp {
-  font: 400 16px/1.75 var(--hei); color: var(--fp-text);
+  font: 400 15px/1.7 var(--hei); color: var(--fp-text);
   font-variant-numeric: lining-nums tabular-nums; font-kerning: normal;
   -webkit-font-smoothing: var(--smooth); line-break: strict; overflow-wrap: break-word;
 }
@@ -710,7 +711,6 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 @media (max-width: 699px) {
   /* 手機：第一行只有刊名與工具列，英文刊名與日期各自往下排 */
   .fp .mast > .b { padding-right: var(--padr); row-gap: 3px; }
-  .fp .wm-en { flex-basis: 100%; padding-left: calc(var(--pad) - var(--wgap)); margin-top: 2px; }
   .fp .dateline { padding-right: 0; flex-direction: column; gap: 0; }
   .fp .dateline .trust { white-space: nowrap; }
   .fp .mn small .wide { display: none; }
@@ -739,3 +739,147 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .plot .hz { stroke: var(--ink); stroke-width: 1; opacity: .26; }
 .fp .plot .xl { font-family: var(--latin), serif; font-size: 13.5px; }
 .fp .read .rd.dir.nt::before { background: var(--ink-muted); }
+
+
+/* ============================================================================
+   密度（2026-10-10）：第一版留白太多，頁邊佔掉四分之一的畫面，沒有變動的日子
+   整欄是空的，版面往右偏。頁邊收窄、段距與列距收緊、字級降一階。
+   ========================================================================== */
+/* 刊名：英文、襯線斜體，兩個字跨在直線兩側 */
+.fp .wm-c { font: italic 500 var(--wm)/1 var(--latin), serif; letter-spacing: -.012em; white-space: nowrap; }
+.fp .mast { padding-top: clamp(12px, 1.4vw, 20px); padding-bottom: clamp(8px, .9vw, 13px); }
+.fp .mast > .b { align-items: baseline; }
+.fp .ed { bottom: .45em; font-size: 12px; }
+.fp .ed em { display: none; }       /* 刊名變成英文之後，旁邊再放一行英文會打架 */
+.fp .dateline { font-size: 13px; }
+
+/* 頭條 */
+.fp .lead-head { padding-top: clamp(18px, 2.2vw, 34px); }
+.fp .hero-m { padding-top: clamp(18px, 2.2vw, 34px); padding-bottom: clamp(16px, 1.8vw, 26px); }
+.fp .eyebrow { margin-bottom: clamp(8px, 1vw, 14px); font-size: 13px; }
+.fp .eyebrow b { font-size: 14px; }
+.fp .hero h1 { line-height: 1.18; }
+.fp .sub { margin-top: clamp(8px, 1vw, 14px); font-size: clamp(16px, 1.5vw, 21px); line-height: 1.55; }
+.fp .lead-note { padding-top: clamp(16px, 1.8vw, 26px); padding-bottom: clamp(20px, 2.4vw, 36px); gap: var(--gap); }
+.fp .gist h2 { margin-bottom: .45em; font-size: 12.5px; }
+.fp .gist p { font-size: 15px; line-height: 1.7; }
+.fp .tagline { font-size: clamp(15px, 1.25vw, 18px); }
+.fp .since h2 { font-size: 12.5px; }
+.fp .since ol { margin-top: clamp(12px, 1.4vw, 20px); gap: clamp(8px, 1vw, 14px); }
+.fp .since .d { font-size: clamp(34px, 3.5vw, 52px); }
+.fp .since .w { margin-top: 5px; font-size: 13px; line-height: 1.45; }
+.fp .since .w b { font-size: 14px; margin-right: .6em; }
+.fp .since-none { margin-top: clamp(10px, 1.2vw, 16px); font-size: 14px; line-height: 1.65; text-wrap: balance; }
+.fp .hero-m .scan { margin-top: clamp(14px, 1.6vw, 22px); padding: 6px 9px 5px; font-size: 12px; }
+
+/* 段落標題 */
+.fp .sh { margin-bottom: clamp(6px, .8vw, 12px); }
+.fp .sh > .b { padding-top: clamp(11px, 1.2vw, 17px); }
+.fp .sh > .b::before { height: 3px; }
+.fp .sh h2 { font-size: clamp(20px, 1.8vw, 26px); }
+.fp .sh p { margin-top: .3em; font-size: 13.5px; line-height: 1.55; max-width: 48em; }
+.fp .sub-h { padding-top: clamp(12px, 1.5vw, 20px); padding-bottom: .35em; font-size: 12.5px; }
+.fp .mn small { margin-top: 5px; font-size: 12px; }
+
+/* 圖 */
+.fp .gchart { margin-top: 4px; }
+.fp .fig-src { margin-top: 6px; }
+.fp .yl { font-size: 12px; }
+.fp .yl i { font-size: 15px; }
+.fp .yl.key { font-size: 12px; }
+.fp .yl.key i { font-size: 17px; }
+.fp .plot .endv { font-size: 23px; }
+
+/* 四個數字 */
+.fp .fact > .b { padding-top: clamp(6px, .7vw, 10px); padding-bottom: clamp(6px, .7vw, 10px); }
+.fp .fact h3 { font-size: clamp(16px, 1.3vw, 19px); }
+.fp .val { font-size: clamp(36px, 3.3vw, 50px); }
+.fp .ruler { padding: 27px 0 33px; }
+.fp .read p { font-size: 13.5px; line-height: 1.55; }
+.fp .read .rd { font-size: 14.5px; }
+
+/* 本站的判定 */
+.fp .call { padding: clamp(13px, 1.4vw, 20px) clamp(14px, 1.6vw, 24px); }
+.fp .call h3 { margin-bottom: .55em; font-size: 13px; }
+.fp .big { font-size: clamp(24px, 2.3vw, 34px); }
+.fp .split { font-size: clamp(16px, 1.5vw, 21px); }
+.fp .tally { height: 20px; margin-top: 8px; }
+.fp .tkey { margin-top: 5px; }
+.fp .call-s { margin-top: .5em; font-size: 13px; }
+.fp .sig > .b { padding-top: clamp(11px, 1.2vw, 16px); padding-bottom: clamp(11px, 1.2vw, 16px); }
+.fp .sig h3 { font-size: clamp(18px, 1.55vw, 22px); line-height: 1.35; }
+.fp .sig .det { margin-top: .3em; font-size: 14px; line-height: 1.6; }
+.fp .sig .evi { margin-top: .45em; font-size: 13.5px; line-height: 1.55; }
+.fp .tags { font-size: 13px; gap: 3px; }
+.fp .tags .sv { font-size: 15px; }
+.fp .acc { margin-top: clamp(10px, 1.2vw, 16px); }
+.fp .acc > summary { padding: 10px 0; font-size: 14px; }
+.fp .more { margin-top: .6em; font-size: 14px; }
+
+/* 今天／接下來／價格：一列一行，不撐高 */
+.fp .nx > .b { padding-top: clamp(8px, .85vw, 12px); padding-bottom: clamp(8px, .85vw, 12px); }
+.fp .nx h3 { font-size: clamp(16px, 1.35vw, 19px); }
+.fp .nx .det { font-size: 13.5px; line-height: 1.55; }
+.fp .kind { font-size: 13px; }
+.fp .kind b { font-size: 14px; }
+.fp .axis { margin-top: clamp(8px, 1vw, 12px); }
+.fp .when > .b { padding-top: clamp(5px, .55vw, 8px); padding-bottom: clamp(5px, .55vw, 8px); }
+.fp .px > .b { padding-top: 6px; padding-bottom: 6px; }
+.fp .px h3 { font-size: 15.5px; }
+.fp .px .lv { font-size: clamp(19px, 1.6vw, 23px); }
+.fp .px .cap { font-size: 13px; }
+.fp .also { margin-top: clamp(14px, 1.6vw, 22px); gap: .7em var(--gap); font-size: 13.5px; line-height: 1.6; }
+.fp .quiet { font-size: 13.5px; padding: 4px 0; }
+
+/* 別人怎麼說／目錄／頁尾 */
+.fp .said-b .bf-group { margin-bottom: clamp(10px, 1.2vw, 16px); }
+.fp .said-b .bf-h { font-size: 16px; line-height: 1.5; }
+.fp .said-b .bf-d > summary.bf-h { padding: 8px 26px 8px 0; }
+.fp .said-b .bf-d > summary.bf-h::after { top: 9px; }
+.fp .said-b .bf-syn { font-size: 14.5px; line-height: 1.75; }
+.fp .toc { gap: clamp(16px, 2vw, 28px) var(--gap); }
+.fp .toc h3 { padding-bottom: .5em; margin-bottom: .3em; }
+.fp .toc a { padding: .26em 0; font-size: clamp(15px, 1.25vw, 17px); }
+.fp .howto { gap: clamp(12px, 1.5vw, 20px) var(--gap); font-size: 13px; line-height: 1.65; }
+.fp .howto dt { margin-bottom: .25em; font-size: 13.5px; }
+.fp .colo { margin-top: clamp(28px, 3vw, 44px); }
+.fp .colo > .m { padding-top: clamp(14px, 1.6vw, 22px); padding-bottom: clamp(16px, 1.8vw, 26px); }
+.fp .colo > .b { padding-top: clamp(14px, 1.6vw, 22px); padding-bottom: clamp(16px, 1.8vw, 26px); }
+.fp .colo .fine { font-size: 13px; line-height: 1.65; }
+
+@media (max-width: 699px) {
+  .fp .mast { padding-top: 11px; padding-bottom: 8px; }
+  .fp .mast > .b { row-gap: 2px; }
+  .fp .ed { display: none; }                 /* 手機的頁邊放不下；右上角的按鈕已經寫著日報／夜報 */
+  .fp .dateline { font-size: 11.5px; }
+  .fp .lead-head { padding-top: 16px; padding-bottom: 18px; }
+  .fp .eyebrow { margin-bottom: 9px; font-size: 12px; }
+  .fp .eyebrow b { font-size: 13px; }
+  .fp .sub { font-size: 16px; line-height: 1.5; margin-top: 10px; }
+  .fp .tagline { margin-top: 18px; font-size: 13.5px; }
+  .fp .since { padding-bottom: 14px; }
+  .fp .since li { padding: 6px 0; }
+  .fp .since .d { font-size: 22px; }
+  .fp .since .w b { font-size: 15px; }
+  .fp .since .ft { font-size: 13.5px; }
+  .fp .lead-note { padding-top: 16px; padding-bottom: 4px; gap: 1em; }
+  .fp .gist p { font-size: 14.5px; line-height: 1.7; }
+  .fp .sh h2 { font-size: 20px; }
+  .fp .sh p { font-size: 12.5px; }
+  .fp .fact > .b { padding-top: 10px; padding-bottom: 10px; }
+  .fp .fact h3 { font-size: 15.5px; }
+  .fp .fact .val { font-size: 38px; }
+  .fp .ruler { padding: 26px 0 32px; }
+  .fp .call { padding: 13px 13px 14px; }
+  .fp .sig h3 { font-size: 17.5px; }
+  .fp .sig .det { font-size: 13px; }
+  .fp .nx h3 { font-size: 15.5px; }
+  .fp .px > .b { padding-top: 7px; padding-bottom: 7px; }
+  .fp .px h3 { font-size: 15px; }
+  .fp .px .lv { font-size: 19px; }
+  .fp .when > .b { padding-top: 8px; padding-bottom: 7px; }
+  .fp .txt { padding-top: 5px; }
+  .fp .said-b .bf-h { font-size: 15.5px; }
+  .fp .mn small { font-size: 10.5px; margin-top: 3px; }
+  .fp .plot .endv { font-size: 19px; }
+}

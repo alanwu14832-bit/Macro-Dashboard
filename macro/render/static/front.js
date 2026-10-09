@@ -8,6 +8,7 @@
 (function () {
   "use strict";
   var root = document.documentElement;
+  window.__fp = true;      // 告訴 <head> 裡的保險計時器：這支腳本有跑起來
 
   /* ------------------------------------------------------------ 只看頁邊 -- */
   var scanBtn = document.querySelector(".fp .scan");
@@ -43,8 +44,8 @@
     if (!W || W === lastW) return;
     lastW = W;
     var mob = W < 440;
-    var H = mob ? 272 : Math.round(Math.max(330, Math.min(440, W * 0.41)));
-    var pT = mob ? 22 : 30, pB = 38, pR = mob ? 86 : 146, pw = W - pR;
+    var H = mob ? 228 : Math.round(Math.max(250, Math.min(330, W * 0.29)));
+    var pT = mob ? 20 : 26, pB = 34, pR = mob ? 80 : 132, pw = W - pR;
     var D = spec.values, months = spec.dates.map(monthIndex);
     var m0 = months[0], span = Math.max(1, months[months.length - 1] - m0), n = D.length;
 

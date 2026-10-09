@@ -1,5 +1,5 @@
 /* ============================================================================
-   邊際 At the Margin — design tokens & components
+   At the Margin — design tokens & components
    Palette: the dataviz reference instance, validated in both modes
    (adjacent CVD ΔE 9.1 light / 8.4 dark; normal-vision 19.6 / 19.3).
    Light-mode aqua/yellow/magenta sit below 3:1 on the surface, so every chart
@@ -2060,7 +2060,7 @@ thead.is-stuck th {
 
 
 /* ============================================================================
-   邊際 At the Margin — 刊物層（2026-10 改版）
+   At the Margin — 刊物層（2026-10 改版）
 
    刊名有三個具體的形狀：
      頁邊    頭版右側有一條真的頁邊，正文講現況、頁邊講變化
@@ -2117,11 +2117,7 @@ td.num, th.num { font-size: var(--t-15); }
   width: 22px; height: 22px; border-radius: 0; box-shadow: none; border: 1px solid var(--ink);
   background: linear-gradient(90deg, var(--mark) 0 9px, var(--ink) 9px 10.5px, var(--page) 10.5px);
 }
-.rail-name { font-family: var(--serif-zh); font-weight: 900; font-size: var(--t-18); letter-spacing: 0.1em; }
-.rail-name i {
-  font-family: var(--serif); font-style: italic; font-weight: 400; font-size: var(--t-13);
-  letter-spacing: 0; color: var(--ink-muted); margin-left: 8px;
-}
+.rail-name { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: var(--t-18); letter-spacing: 0; }
 .nav-group { letter-spacing: 0.16em; }
 .nav-item[aria-current="page"] { background: none; }
 .nav-item[aria-current="page"]::before { background: var(--ink); width: 2px; height: 20px; }
@@ -2131,8 +2127,8 @@ td.num, th.num { font-size: var(--t-15); }
 .topbar { background: color-mix(in srgb, var(--page) 88%, transparent); gap: var(--s3); }
 .topbar-title { font-weight: 600; }
 .nameplate {
-  display: none; font-family: var(--serif-zh); font-weight: 900; font-size: var(--t-18);
-  line-height: 1; letter-spacing: 0.12em; color: var(--ink); text-decoration: none;
+  display: none; font-family: var(--serif); font-style: italic; font-weight: 500; font-size: var(--t-18);
+  line-height: 1; letter-spacing: 0; color: var(--ink); text-decoration: none; white-space: nowrap;
   padding-right: var(--s3); border-right: 1px solid var(--border-strong);
 }
 :root.rail-collapsed .nameplate { display: block; }
