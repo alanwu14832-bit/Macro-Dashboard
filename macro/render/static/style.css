@@ -2167,7 +2167,7 @@ th, td { border-bottom-color: var(--border); }
 .card { background: var(--surface); }
 .callout.key { font-family: var(--serif-zh); font-size: var(--t-18); line-height: 1.7; color: var(--ink); }
 
-/* ---- 門檻尺（頭版的「四個數字」用；色票與版面在 front.css）---------------- */
+/* ---- 門檻尺（頭版的「四個數字」用；色票與版面在 margin.css）---------------- */
 /* 門檻尺。由上到下三排：小旗與參考點｜尺本身｜門檻數字與格位名稱 */
 .ruler { position: relative; min-width: 0; padding: 36px 0 30px; }
 .ruler-empty { padding: 0; }
@@ -2343,4 +2343,117 @@ footer.site .foot-main { font-family: var(--serif-zh); font-size: var(--t-15); l
   .sig-card:hover .sig-head { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
   .sig-card:hover .sig-open { color: var(--ink); }
   .bf-d > summary.bf-h:hover { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+}
+
+
+/* ============================================================================
+   內頁的元件（2026-10）：全部回到同一套語言——不裝盒子、墨色、明體小標、
+   襯線數字；方向用小斜線，嚴重度用形狀與濃淡。版面骨架在 margin.css。
+   ========================================================================== */
+html.still .enter { opacity: 1; transform: none; transition: none; }   /* ?still：截圖時不等進場 */
+
+/* 方向：小斜線＝利率的走向，紅藍只在這裡出現（跟頭版同一個記號） */
+.pg .tag { border: 0; padding: 0; background: none; letter-spacing: .04em; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
+.pg .tag::before {
+  content: ""; display: inline-block; width: 13px; height: 2.5px; margin-right: .45em; vertical-align: .3em;
+  background: var(--ink-muted);
+}
+.pg .tag.hawkish, .pg .tag.dovish { color: var(--ink-2); }
+.pg .tag.hawkish::before { background: var(--hawkish); transform: rotate(-34deg); }
+.pg .tag.dovish::before { background: var(--dovish); transform: rotate(34deg); }
+
+/* 訊號列 */
+.pg .signal { padding: 12px 0; border-bottom: 1px solid var(--hair); }
+.pg .signal:first-child { border-top: 1px solid var(--hair); }
+.pg .signal .headline { font-family: var(--ming); font-size: 18px; line-height: 1.4; font-weight: 700; }
+.pg .signal .why { font-size: 14px; line-height: 1.6; margin-top: 3px; }
+.pg .signal .evidence {
+  margin-top: 5px; padding-left: .8em; border-left: 1px solid var(--ink-muted);
+  font-size: 13.5px; line-height: 1.55; color: var(--ink);
+}
+.pg .signal .sev.high { color: var(--ink); }
+.pg .signal .sev.medium { color: var(--ink-2); }
+.pg .signal .sev.low { color: var(--ink-muted); }
+.pg .signal .side { font-size: 13px; color: var(--ink-2); }
+
+.pg .signal .side .evidence { margin-top: 2px; padding-left: 0; border-left: 0; font-size: 12.5px; color: var(--ink-muted); }
+
+/* 尋找、自選比較：清單是線，不是白底方框 */
+.pg .find-search, .pg .wl-input, .pg #ex-search { background: none; border: 0; border-bottom: 1.5px solid var(--ink); border-radius: 0; }
+.pg .find-group h3 { font: 700 13px/1.4 var(--ming); letter-spacing: .3em; color: var(--ink-2); }
+.pg .find-list { gap: 0; background: none; border: 0; border-top: 1px solid var(--ink); border-radius: 0; }
+.pg .find-row { background: none; padding: 9px 2px; border-bottom: 1px solid var(--hair); font-family: var(--ming); font-weight: 700; }
+.pg .find-t { font-weight: 700; }
+.pg .find-c { font-family: var(--hei); font-weight: 400; }
+.pg .ex-item { background: none; border-radius: 0; border-color: var(--hair); }
+.pg .ex-item.is-on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.pg .ex-chip { border-radius: 0; background: none; }
+.pg .wl-add { border-radius: 0; }
+.pg .heat-tile { border-radius: 2px; }
+
+/* 卡片與檢核：線，不是盒子 */
+.pg .card { background: none; border: 0; border-top: 1px solid var(--hair); border-radius: 0; padding: 12px 0 4px; }
+.pg .card + .card { margin-top: 6px; }
+.pg .card h3, .pg .card > strong:first-child { font-family: var(--ming); font-size: 17px; font-weight: 700; }
+.pg .kv { gap: 0 var(--gap); font-size: 14px; line-height: 1.5; }
+.pg .kv dt, .pg .kv dd { padding: 5px 0; border-bottom: 1px solid var(--border); }
+.pg .kv dt { color: var(--ink-2); }
+.pg .kv dd { font-family: var(--serif); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+.pg .checks { gap: 0 var(--gap); }
+.pg .check { background: none; border: 0; border-bottom: 1px solid var(--hair); border-radius: 0; padding: 9px 0; }
+.pg .check.alert .glyph { color: var(--ink); }
+.pg .check.watch .glyph { color: var(--ink-2); }
+.pg .check.normal .glyph { color: var(--ink-muted); }
+.pg .check .reading { font-family: var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.pg .callout { font-size: 14px; line-height: 1.7; }
+.pg .callout.key { font-family: var(--ming); font-size: 17px; line-height: 1.65; border-left: 2px solid var(--ink); }
+.pg .table-wrap th:first-child, .pg .table-wrap td:first-child { background: var(--page); }
+.pg thead th { background: var(--page); }
+.pg .acc { border-top: 1px solid var(--hair); }
+.pg .term-count { border: 0; background: none; padding: 0; color: var(--ink-muted); }
+
+/* 讀數格 */
+.pg .stat { border-top: 1px solid var(--ink); }
+.pg .stat .label { font-size: 12.5px; letter-spacing: .08em; color: var(--ink-2); }
+.pg .stat .value { font-size: clamp(22px, 2vw, 28px); line-height: 1.15; }
+
+/* 情境頁：定位、九宮格 */
+.pg .verdict { padding: clamp(14px, 1.6vw, 22px) 0 0; }
+.pg .verdict .eyebrow { font: 700 13px/1.4 var(--ming); letter-spacing: .3em; color: var(--ink-2); }
+.pg .verdict .eyebrow::before { display: none; }
+.pg .hero-figure { font-family: var(--ming); font-size: clamp(28px, 3vw, 44px); line-height: 1.2; font-weight: 700; letter-spacing: .02em; margin: 6px 0 8px; }
+.pg .chips { gap: 4px 18px; margin-top: 6px; }
+.pg .chip { border: 0; background: none; padding: 0; border-radius: 0; font-size: 14px; color: var(--ink-2); }
+.pg .chip .dot { width: 13px; height: 2.5px; border-radius: 0; background: var(--ink-muted); }
+.pg .chip.hawkish .dot { background: var(--hawkish); transform: rotate(-34deg); }
+.pg .chip.dovish .dot { background: var(--dovish); transform: rotate(34deg); }
+.pg .ninegrid { gap: 0; border-top: 1px solid var(--ink); border-left: 1px solid var(--hair); }
+.pg .ninegrid .corner, .pg .ninegrid .colhead, .pg .ninegrid .rowhead { font-size: 12.5px; letter-spacing: .12em; color: var(--ink-2); }
+.pg .ninegrid .corner, .pg .ninegrid .colhead { border-bottom: 1px solid var(--hair); padding: 6px 8px; }
+.pg .ninegrid .rowhead { border-bottom: 1px solid var(--hair); padding: 10px 12px; }
+.pg .ninegrid .cell { background: none; border: 0; border-right: 1px solid var(--hair); border-bottom: 1px solid var(--hair); border-radius: 0; padding: 12px 14px; }
+.pg .ninegrid .cell .name { font-family: var(--ming); font-size: 16px; font-weight: 700; }
+.pg .ninegrid .cell.active {
+  background: repeating-linear-gradient(-45deg, transparent 0 7px, var(--hatch) 7px 8px);
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+/* 報價狀態、新資料、文章頁 */
+.pg .live-bar { border: 0; background: none; padding: 0; border-radius: 0; margin: 8px 0; }
+.pg .new-badge {
+  background: var(--mark); color: #11151a; border-radius: 0; padding: 0 .3em; margin-left: .5em;
+  font: 700 12px/1.5 var(--ming);
+}
+.pg .dd-cat { border-radius: 0; background: none; padding: 0; font-family: var(--ming); letter-spacing: .1em; }
+.pg .dd-article-head blockquote {
+  margin: 12px 0 0; padding: 10px 0 10px 14px; border-left: 2px solid var(--ink); background: none; border-radius: 0;
+  font-size: 14px; line-height: 1.7; color: var(--ink-2); max-width: 52em;
+}
+.pg .dd-prose { max-width: 44em; font-size: 16px; line-height: 1.9; }
+.pg .dd-prose h3 { font-family: var(--ming); font-size: 19px; }
+@media (max-width: 699px) {
+  .pg .signal .headline { font-size: 16.5px; }
+  .pg .dd-prose { font-size: 15.5px; line-height: 1.85; }
+  .pg .ninegrid .cell { padding: 9px 8px; }
+  .pg .ninegrid .cell .name { font-size: 14px; }
 }

@@ -232,6 +232,71 @@ def _trust_row(updated: str) -> str:
             f'<span class="trust-go" aria-hidden="true">›</span></a>')
 
 
+WEEKDAYS = "一二三四五六日"
+
+
+def masthead(trust_row: str) -> str:
+    """刊頭。刊名拆成兩半跨在直線上：「At the」在頁邊，「Margin」在正文。"""
+    from .. import clock
+    today = clock.today()
+    left, right = WORDMARK
+    return (
+        '<header class="mast row">'
+        '<div class="b">'
+        f'<span class="sr-only">{esc(SITE_NAME)}</span>'
+        f'<a class="wm-c" href="/" lang="en" aria-hidden="true" tabindex="-1">{esc(right)}</a>'
+        f'<p class="dateline"><time datetime="{today.isoformat()}">'
+        f'{today.year}.{today.month:02d}.{today.day:02d} 週{WEEKDAYS[today.weekday()]}</time>'
+        f'{trust_row}</p>'
+        '</div>'
+        '<div class="m" aria-hidden="true">'
+        '<span class="ed"><span class="ed-d">日報<em lang="en">Day edition</em></span>'
+        '<span class="ed-n">夜報<em lang="en">Night edition</em></span></span>'
+        f'<a class="wm-c" href="/" lang="en" tabindex="-1">{esc(left)}</a>'
+        '</div>'
+        '</header>')
+
+
+def colophon(updated: str) -> str:
+    """版權頁：刊名再跨一次線，加上那句不變的聲明。"""
+    left, right = WORDMARK
+    return (
+        '<div class="row colo"><div class="b">'
+        f'<span class="wm-c" lang="en" aria-hidden="true">{esc(right)}</span>'
+        '<p class="fine"><strong>所有判定由固定規則產生，同一份資料每次執行結果一致。</strong>'
+        f'個人資料整理，不構成投資建議。{esc(updated)}　'
+        '<a href="/sources/">資料來源與判斷方法</a>　<a href="/guide/">使用講義</a></p>'
+        f'</div><div class="m" aria-hidden="true"><span class="wm-c" lang="en">{esc(left)}</span></div></div>')
+
+
+def _page_number(path: str) -> tuple[str, str, str]:
+    """(頁碼, 組別, 頁名)。頁碼跟頭版目錄同一套：NAV 裡有組別的項目依序編號。"""
+    number = 0
+    for href, label, _icon, group in NAV:
+        if not group:
+            continue
+        number += 1
+        if href == path:
+            return f"{number:02d}", group, label
+    return "", "", ""
+
+
+def _margin_toc(path: str, nav_path: str, sections: dict | None) -> str:
+    """內頁的頁邊：這一頁在哪一組、第幾頁，以及本頁的區塊目錄（跟著捲動亮起來）。"""
+    number, group, label = _page_number(nav_path or path)
+    kicker = ""
+    if number:
+        # 文章頁與落點頁掛在別人底下：頁邊寫的是它的上一層，點了回去
+        parent = (f'<a href="{esc(nav_path)}">← {esc(label)}</a>' if nav_path and nav_path != path
+                  else f'<span>{esc(group)}</span>')
+        kicker = f'<p class="pg-kicker"><i>{number}</i>{parent}</p>'
+    links = "".join(
+        f'<a href="#{esc(anchor)}"' + (' class="sub2"' if level == 2 else "") + f'>{esc(title)}</a>'
+        for anchor, title, level in (sections or {}).get(path) or [])
+    return (f'<aside class="pg-m"><nav class="pg-toc" aria-label="本頁目錄">'
+            f'{kicker}{links}</nav></aside>')
+
+
 def _supabase_config() -> str:
     """帳號功能的前端設定。沒填就輸出空字串，account.js 會自動休眠。"""
     if not (SUPABASE_URL and SUPABASE_ANON_KEY):
@@ -249,7 +314,7 @@ def asset_version() -> str:
     keeps yesterday's chart.js against today's markup.
     """
     stamp = 0.0
-    for name in ("style.css", "front.css", "front.js", "chart.js", "sidebar.js",
+    for name in ("style.css", "margin.css", "front.js", "chart.js", "sidebar.js",
                  "quotes.js", "explore.js", "account.js", "expense.js"):
         candidate = os.path.join(paths.STATIC_DIR, name)
         if os.path.exists(candidate):
@@ -296,6 +361,18 @@ def page(*, title: str, path: str, body: str, lede: str = "",
             + (f'<p class="lede">{esc(lede)}</p>' if lede else "")
             + "</header>")
 
+    # 頭版自己排（front_blocks）；內頁共用同一條直線與刊頭，頁邊放本頁目錄。
+    if front:
+        inner = body
+    else:
+        inner = ('<div class="pg">'
+                 + masthead(_trust_row(updated))
+                 + '<div class="pg-grid">'
+                 + _margin_toc(path, nav_path, sections)
+                 + f'<div class="pg-b">{head_block}{body}</div></div>'
+                 + colophon(updated)
+                 + '</div>')
+
     return f"""<!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -313,11 +390,11 @@ def page(*, title: str, path: str, body: str, lede: str = "",
 <meta name="apple-mobile-web-app-title" content="{esc(SITE_NAME)}">
 <link rel="preload" href="/newsreader-roman.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/style.css?v={version}">
-{f'<link rel="stylesheet" href="/front.css?v={version}">' if front else ""}
+<link rel="stylesheet" href="/margin.css?v={version}">
 <link rel="icon" href="data:image/svg+xml,{MARK_SVG}">
 <script>{BOOT}</script>
 </head>
-<body{' class="is-front"' if front else ""}>
+<body class="mg {'is-front' if front else 'is-page'}">
 <a class="skip" href="#content">跳到主要內容</a>
 <div class="app">
 {_sidebar(nav_path or path, sections)}
@@ -344,14 +421,8 @@ def page(*, title: str, path: str, body: str, lede: str = "",
     </header>
     <main class="content" id="content">
       <div class="wrap">
-{"" if front else _trust_row(updated)}
-{head_block}
-{body}
+{inner}
       </div>
-      <footer class="site">
-        <p class="foot-main">所有判定由固定規則產生，同一份資料每次執行結果一致。<a href="/sources/">資料來源與判斷方法</a></p>
-        <p class="foot-fine">個人資料整理，不構成投資建議。{esc(updated)}</p>
-      </footer>
     </main>
   </div>
 {_tabbar(path)}

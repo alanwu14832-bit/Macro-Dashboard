@@ -594,10 +594,12 @@
   // 那正是捲動掉帧的來源（scroll spy 那邊已經踩過一次）。
   // 頭版：刊頭還在畫面上時，右上角只有工具、沒有底色；刊頭捲走之後才變成一條
   // 帶刊名的列。刊頭多高只在載入與改變寬度時量一次——捲動處理器裡不讀版面。
-  const masthead = document.querySelector(".fp .mast");
+  const masthead = document.querySelector(".fp .mast, .pg .mast");
   let mastheadEnd = 0;
   const measureMasthead = () => {
-    mastheadEnd = masthead ? Math.max(0, masthead.offsetHeight - 20) : 0;
+    // 窄螢幕的內頁沒有刊頭（display:none，高度 0）：頂列從一開始就是完整的一列
+    const height = masthead ? masthead.offsetHeight : 0;
+    mastheadEnd = height ? Math.max(0, height - 20) : -1;
   };
   measureMasthead();
   window.addEventListener("resize", measureMasthead, { passive: true });
@@ -656,13 +658,20 @@
   /* ------------------------------------ 側欄捲動同步（看到哪亮到哪） ----- */
   // 只針對目前頁展開的小標清單。用 scroll + rAF 而不是 IntersectionObserver：
   // 要的是「最後一個越過頂端的區塊」這種單調狀態，不是可視比例。
-  const subLinks = [...document.querySelectorAll(".nav-details[open] .nav-sub a")]
+  // 兩份目錄一起亮：抽屜裡目前頁的小標，以及內頁頁邊那一份。同一個錨點的連結
+  // 收成一組，區塊只量一次。
+  const subLinks = [...document.querySelectorAll(".nav-details[open] .nav-sub a, .pg-toc > a")]
     .filter((a) => a.hash);
   if (subLinks.length) {
-    const targets = subLinks
-      .map((a) => {
-        try { return [document.getElementById(a.hash.slice(1)), a]; }
-        catch { return [null, a]; }
+    const byHash = new Map();
+    for (const a of subLinks) {
+      if (!byHash.has(a.hash)) byHash.set(a.hash, []);
+      byHash.get(a.hash).push(a);
+    }
+    const targets = [...byHash.entries()]
+      .map(([hash, links]) => {
+        try { return [document.getElementById(decodeURIComponent(hash.slice(1))), links]; }
+        catch { return [null, links]; }
       })
       .filter(([t]) => t);
     let current = null;
@@ -671,7 +680,11 @@
     // 那正是捲動掉帧的典型來源。摺疊展開或換尺寸才需要重量。
     let marks = [];
     const measure = () => {
-      marks = targets.map(([node, link]) => [node.offsetTop, link]);
+      // 用視窗座標換算，不用 offsetTop：內頁的區塊包在有定位的容器裡，
+      // offsetTop 量到的是離那個容器多遠，不是離頁首多遠。
+      marks = targets
+        .map(([node, links]) => [node.getBoundingClientRect().top + window.scrollY, links])
+        .sort((a, b) => a[0] - b[0]);
     };
     const spy = () => {
       spyTick = false;
@@ -682,8 +695,8 @@
         else break;
       }
       if (hit !== current) {
-        current?.classList.remove("now");
-        hit?.classList.add("now");
+        current?.forEach((a) => a.classList.remove("now"));
+        hit?.forEach((a) => a.classList.add("now"));
         current = hit;
       }
     };

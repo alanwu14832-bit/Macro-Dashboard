@@ -13,7 +13,7 @@
   尺        有寫死門檻的畫門檻尺（實線、有刻度）；沒有門檻的只能畫區間尺
             （虛線），不能讓一個區間的端點看起來像一條規則。
 
-每一列都是 .row：.b 是正文、.m 是頁邊。這裡只產生 HTML；樣式在 static/front.css，
+每一列都是 .row：.b 是正文、.m 是頁邊。這裡只產生 HTML；樣式在 static/margin.css，
 圖與互動在 static/front.js。
 """
 from __future__ import annotations
@@ -92,25 +92,9 @@ def _by_comma(text: str) -> list[str]:
 # ------------------------------------------------------------------ 刊頭 ----
 
 def masthead(trust_row: str) -> str:
-    """刊名跨在直線上：「At the」在頁邊，「Margin」在正文——那條線就是 the margin。"""
-    from ..layout import SITE_NAME, WORDMARK
-    today = clock.today()
-    left, right = WORDMARK
-    return (
-        '<header class="mast row">'
-        '<div class="b">'
-        f'<span class="sr-only">{esc(SITE_NAME)}</span>'
-        f'<span class="wm-c" lang="en" aria-hidden="true">{esc(right)}</span>'
-        f'<p class="dateline"><time datetime="{today.isoformat()}">'
-        f'{today.year}.{today.month:02d}.{today.day:02d} 週{WEEKDAYS[today.weekday()]}</time>'
-        f'{trust_row}</p>'
-        '</div>'
-        '<div class="m" aria-hidden="true">'
-        '<span class="ed"><span class="ed-d">日報<em lang="en">Day edition</em></span>'
-        '<span class="ed-n">夜報<em lang="en">Night edition</em></span></span>'
-        f'<span class="wm-c" lang="en">{esc(left)}</span>'
-        '</div>'
-        '</header>')
+    """刊頭全站共用，定義在 layout。"""
+    from ..layout import masthead as shared
+    return shared(trust_row)
 
 
 # -------------------------------------------------- 頁邊：自上一期以來 ----
@@ -922,8 +906,7 @@ def contents(ctx: dict) -> str:
 
 def colophon(updated: str) -> str:
     """怎麼讀這一頁，加上版權頁。圖例寫在這裡，不是藏在講義裡。"""
-    from ..layout import WORDMARK
-    left, right = WORDMARK
+    from ..layout import colophon as shared
     legend = (
         '<dl class="howto">'
         '<div><dt>頁邊與正文</dt><dd><span><span class="hlx">+0.01</span>有螢光筆的＝跟上一期不一樣。</span>'
@@ -943,10 +926,5 @@ def colophon(updated: str) -> str:
         '<footer class="foot">'
         + row('<h2>怎麼讀這一頁</h2>', cls="sh rv")
         + row(legend, cls="rv")
-        + '<div class="row colo"><div class="b">'
-          f'<span class="wm-c" lang="en" aria-hidden="true">{esc(right)}</span>'
-          '<p class="fine"><strong>所有判定由固定規則產生，同一份資料每次執行結果一致。</strong>'
-          f'個人資料整理，不構成投資建議。{esc(updated)}　'
-          '<a href="/sources/">資料來源與判斷方法</a>　<a href="/guide/">使用講義</a></p>'
-          f'</div><div class="m" aria-hidden="true"><span class="wm-c" lang="en">{esc(left)}</span></div></div>'
+        + shared(updated)
         + '</footer>')

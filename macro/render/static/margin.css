@@ -1,8 +1,9 @@
 /* ============================================================================
-   邊際 At the Margin — 頭版
+   At the Margin — 頁邊版面（全站載入）
 
-   只有 / 這一頁載入。版面只有一個主意：左邊一條頁邊，一條直線從頭畫到尾。
-   正文（線的右邊）講現況；頁邊（線的左邊）只寫變化。
+   版面只有一個主意：左邊一條頁邊，一條直線從頭畫到尾。
+   頭版（.fp）：正文講現況，頁邊只寫變化。
+   內頁（.pg）：同一條線、同一個刊頭，頁邊放本頁的目錄。
 
    顏色的規矩（改任何一條之前先讀 front_blocks.py 的檔頭）：
      --mark   螢光筆。只標「跟上一期不一樣」，其他任何地方都不准用——
@@ -77,61 +78,60 @@
 }
 
 /* ---- 外殼：頭版沒有常駐側欄，選單收成抽屜；工具列疊在刊頭右上角 ---------- */
-.is-front .app, :root.rail-collapsed .is-front .app { display: block; }
-.is-front .shell { display: block; }
-.is-front .content { padding-top: 0; }
-.is-front .content .wrap { max-width: none; padding: 0; }
-.is-front footer.site { display: none; }
+.mg .app, :root.rail-collapsed .mg .app { display: block; }
+.mg .shell { display: block; }
+.mg .content { padding-top: 0; }
+.mg .content .wrap { max-width: none; padding: 0; }
 
-.is-front .topbar {
+.mg .topbar {
   position: fixed; inset: 0 0 auto 0; z-index: 50; height: var(--mast-h);
   padding: 0 var(--padr) 0 var(--edge); gap: 6px; justify-content: flex-end;
   pointer-events: none;
   transition: height .3s var(--fx), background-color .25s ease, border-color .25s ease;
 }
-.is-front .topbar > * { pointer-events: auto; }
-:root:not(.masthead-gone) .is-front .topbar {
+.mg .topbar > * { pointer-events: auto; }
+:root:not(.masthead-gone) .mg .topbar {
   background: transparent; border-bottom-color: transparent; backdrop-filter: none;
 }
-:root.masthead-gone .is-front .topbar {
+:root.masthead-gone .mg .topbar {
   height: var(--topbar-h);
   background: color-mix(in srgb, var(--page) 90%, transparent);
   backdrop-filter: saturate(1.4) blur(10px); border-bottom-color: var(--border-strong);
 }
-.is-front .topbar-title, .is-front .topbar-meta, .is-front .topbar-guide { display: none; }
-.is-front .nameplate {
+.mg .topbar-title, .mg .topbar-meta, .mg .topbar-guide { display: none; }
+.mg .nameplate {
   display: block; margin-right: auto; border-right: 0; padding-right: 0;
   font-size: 19px; letter-spacing: 0;
   opacity: 0; transform: translateY(6px); pointer-events: none;
   transition: opacity .25s ease, transform .3s var(--fx);
 }
-:root.masthead-gone .is-front .nameplate { opacity: 1; transform: none; pointer-events: auto; }
-.is-front .topbar .icon-btn {
+:root.masthead-gone .mg .nameplate { opacity: 1; transform: none; pointer-events: auto; }
+.mg .topbar .icon-btn {
   border-color: transparent; background: none; color: var(--ink);
   min-width: 40px; min-height: 40px; display: grid; place-items: center; padding: 0 8px;
 }
-.is-front .topbar #theme-toggle {
+.mg .topbar #theme-toggle {
   border: 1.5px solid var(--ink); border-radius: 0; min-height: 30px; padding: 0 8px 0 11px;
   font: 700 13px/1 var(--ming); letter-spacing: .28em;
 }
-.is-front .drawer-btn { display: grid; order: 9; }
-.is-front .drawer-btn svg { width: 22px; height: 22px; }
+.mg .drawer-btn { display: grid; order: 9; }
+.mg .drawer-btn svg { width: 22px; height: 22px; }
 
 @media (min-width: 768px) {
-  .is-front .rail {
+  .mg .rail {
     position: fixed; inset: 0 auto 0 0; width: min(300px, 82vw); z-index: 70;
     transform: translateX(-100%); transition: transform .3s var(--fx);
     box-shadow: none; border-right: 1px solid var(--border-strong);
   }
-  :root.drawer-open .is-front .rail { transform: translateX(0); box-shadow: var(--shadow-float); }
-  :root.drawer-open .is-front .rail-scrim { opacity: 1; }
-  .is-front .rail-toggle { display: none; }
+  :root.drawer-open .mg .rail { transform: translateX(0); box-shadow: var(--shadow-float); }
+  :root.drawer-open .mg .rail-scrim { opacity: 1; }
+  .mg .rail-toggle { display: none; }
   /* 抽屜永遠是展開樣式，其他頁記住的「收合」不該滲進來 */
-  :root.rail-collapsed .is-front .nav-label,
-  :root.rail-collapsed .is-front .nav-group span { opacity: 1; }
-  :root.rail-collapsed .is-front .nav-group { height: auto; padding: 16px 10px 6px; }
-  :root.rail-collapsed .is-front .nav-item { justify-content: flex-start; padding-left: 10px; padding-right: 10px; }
-  .is-front .nav-tip { display: none !important; }
+  :root.rail-collapsed .mg .nav-label,
+  :root.rail-collapsed .mg .nav-group span { opacity: 1; }
+  :root.rail-collapsed .mg .nav-group { height: auto; padding: 16px 10px 6px; }
+  :root.rail-collapsed .mg .nav-item { justify-content: flex-start; padding-left: 10px; padding-right: 10px; }
+  .mg .nav-tip { display: none !important; }
 }
 
 /* ---- 基本排版 ------------------------------------------------------------- */
@@ -150,8 +150,8 @@
 .fp ::selection { background: var(--mark); color: #11151a; }
 /* 收起來的抽屜不該把陰影漏進畫面左緣 */
 @media (max-width: 767px) {
-  .is-front .rail { box-shadow: none; }
-  :root.drawer-open .is-front .rail { box-shadow: 0 0 40px rgba(0, 0, 0, 0.28); }
+  .mg .rail { box-shadow: none; }
+  :root.drawer-open .mg .rail { box-shadow: 0 0 40px rgba(0, 0, 0, 0.28); }
 }
 /* 全站的 section 有上框線與內距；頭版的段落自己管 */
 .fp section { margin: 0; padding: 0; border: 0; }
@@ -162,9 +162,9 @@
 /* ───────── 頁面與那條直線 ───────── */
 .fp{position:relative;max-width:1640px;margin:0 auto}
 .fp::after{content:"";position:absolute;top:0;bottom:0;left:var(--m);width:1px;background:var(--mrule);pointer-events:none;z-index:3}
-.fp .row{display:grid;grid-template-columns:var(--m) minmax(0,1fr);align-items:baseline}
-.fp .row>.b{grid-column:2;grid-row:1;min-width:0;padding-left:var(--pad);padding-right:var(--padr);max-width:calc(1080px + var(--pad) + var(--padr))}
-.fp .row>.m{grid-column:1;grid-row:1;min-width:0;padding-right:var(--mpad);text-align:right;position:relative}
+:is(.fp,.pg) .row{display:grid;grid-template-columns:var(--m) minmax(0,1fr);align-items:baseline}
+:is(.fp,.pg) .row>.b{grid-column:2;grid-row:1;min-width:0;padding-left:var(--pad);padding-right:var(--padr);max-width:calc(1080px + var(--pad) + var(--padr))}
+:is(.fp,.pg) .row>.m{grid-column:1;grid-row:1;min-width:0;padding-right:var(--mpad);text-align:right;position:relative}
 /* 批註：頁邊唯一的語氣。數字用斜體，中文用明體。 */
 .fp .mn{display:block;font-size:var(--nz);line-height:1}
 .fp .mn .k{--kx:0em;display:inline-block;position:relative;font:700 var(--nz)/1 var(--ming);color:var(--ink);
@@ -178,23 +178,23 @@
 .fp .mn.dn .k{color:var(--down)}
 .fp .mn.na .k{color:var(--ink-2)}
 .fp .mn.na .k i{font-style:normal;font-weight:400}
-@media (hover:hover) and (pointer:fine){.fp .row:hover>.m .mn .k::after{width:calc(var(--tick) + var(--mpad) - var(--kx) - 4px)}}
+@media (hover:hover) and (pointer:fine){:is(.fp,.pg) .row:hover>.m .mn .k::after{width:calc(var(--tick) + var(--mpad) - var(--kx) - 4px)}}
 /* ───────── 刊頭 ───────── */
 .fp .top{position:relative}
 .fp .top::before{content:"";position:absolute;top:0;bottom:0;left:-50vw;width:calc(50vw + var(--m));background:var(--band);transform-origin:top}
 .fp .top>*{position:relative;z-index:1}
-.fp .mast{padding-top:clamp(16px,2.1vw,30px);padding-bottom:clamp(10px,1.2vw,18px)}
-.fp .mast>.m{padding-right:var(--wgap)}
-.fp .mast>.b{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px clamp(12px,1.5vw,22px);padding-left:var(--wgap);max-width:none}
-.fp .wm-c{font:700 var(--wm)/1 "Songti TC","Noto Serif TC","Source Han Serif TC","PMingLiU",serif;display:inline-block}
-.fp .mast>.m .wm-c{color:var(--band-ink)}
+:is(.fp,.pg) .mast{padding-top:clamp(16px,2.1vw,30px);padding-bottom:clamp(10px,1.2vw,18px)}
+:is(.fp,.pg) .mast>.m{padding-right:var(--wgap)}
+:is(.fp,.pg) .mast>.b{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px clamp(12px,1.5vw,22px);padding-left:var(--wgap);max-width:none}
+:is(.fp,.pg) .wm-c{font:700 var(--wm)/1 "Songti TC","Noto Serif TC","Source Han Serif TC","PMingLiU",serif;display:inline-block}
+:is(.fp,.pg) .mast>.m .wm-c{color:var(--band-ink)}
 .fp .wm-en{font:italic 400 clamp(15px,1.75vw,25px)/1 var(--latin),serif;white-space:nowrap;letter-spacing:.005em}
-.fp .ed{position:absolute;left:var(--edge);bottom:.5em;font:700 13px/1 var(--ming);letter-spacing:.34em;color:var(--band-ink);white-space:nowrap}
-.fp .ed em{font:italic 400 13px/1 var(--latin),serif;letter-spacing:.02em;margin-left:.2em;color:var(--band-ink-2)}
-.fp .ed-d{display:var(--show-day)}
-.fp .ed-n{display:var(--show-night)}
-.fp .dateline{margin-left:auto;display:flex;flex-wrap:wrap;gap:0 1.3em;font-size:13.5px;line-height:1.4;color:var(--ink-2)}
-.fp .dateline time{color:var(--ink);font-weight:600}
+:is(.fp,.pg) .ed{position:absolute;left:var(--edge);bottom:.5em;font:700 13px/1 var(--ming);letter-spacing:.34em;color:var(--band-ink);white-space:nowrap}
+:is(.fp,.pg) .ed em{font:italic 400 13px/1 var(--latin),serif;letter-spacing:.02em;margin-left:.2em;color:var(--band-ink-2)}
+:is(.fp,.pg) .ed-d{display:var(--show-day)}
+:is(.fp,.pg) .ed-n{display:var(--show-night)}
+:is(.fp,.pg) .dateline{margin-left:auto;display:flex;flex-wrap:wrap;gap:0 1.3em;font-size:13.5px;line-height:1.4;color:var(--ink-2)}
+:is(.fp,.pg) .dateline time{color:var(--ink);font-weight:600}
 /* ───────── 頭條 ───────── */
 .fp .hero{display:grid;grid-template-columns:var(--m) minmax(0,1fr);grid-template-rows:auto 1fr}
 .fp .lead-head{grid-column:2;grid-row:1;padding:clamp(26px,4.2vw,64px) var(--padr) 0 var(--pad);min-width:0}
@@ -233,9 +233,9 @@
 .fp .hero-m .scan{margin-top:clamp(22px,3vw,44px)}
 .fp .hero-m .since{margin-bottom:auto}
 /* 只看頁邊 */
-.fp .b,.fp .lead-head,.fp .lead-note>*,.fp .mast .dateline{transition:opacity .35s ease}
-html.scanning .fp .row>.b,html.scanning .fp .lead-head,html.scanning .fp .lead-note>*,html.scanning .fp .dateline{opacity:.13}
-html.scanning .fp .mast>.b{opacity:1}
+.fp .b,.fp .lead-head,.fp .lead-note>*,:is(.fp,.pg) .mast .dateline{transition:opacity .35s ease}
+html.scanning :is(.fp,.pg) .row>.b,html.scanning .fp .lead-head,html.scanning .fp .lead-note>*,html.scanning :is(.fp,.pg) .dateline{opacity:.13}
+html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
 /* ───────── 段落標題：直線上的主刻度 ───────── */
 .fp .sec{padding-top:var(--sec)}
 .fp .sh{margin-bottom:clamp(12px,2vw,26px)}
@@ -372,14 +372,14 @@ html.scanning .fp .mast>.b{opacity:1}
 .fp .howto .hlx{font:italic 500 16px/1 var(--latin),serif;background:var(--hl-bg);color:var(--hl-ink);padding:.12em .3em .04em;margin-right:.5em}
 .fp .howto .cu{color:var(--up);font-weight:600}
 .fp .howto .cd{color:var(--down);font-weight:600}
-.fp .colo{margin-top:clamp(44px,5vw,72px);position:relative}
-.fp .colo::before{content:"";position:absolute;top:0;bottom:0;left:-50vw;width:calc(50vw + var(--m));background:var(--surface-sunken)}
-.fp .colo>*{position:relative;z-index:1}
-.fp .colo>.m{padding:clamp(22px,2.8vw,40px) var(--wgap) clamp(26px,3vw,44px) 0}
-.fp .colo>.b{padding-top:clamp(22px,2.8vw,40px);padding-bottom:clamp(26px,3vw,44px);padding-left:var(--wgap);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px clamp(14px,2vw,30px);max-width:none}
-.fp .colo .m .wm-c{color:var(--ink)}
-.fp .colo .fine{font-size:13.5px;line-height:1.75;color:var(--ink-2);max-width:34em;margin-left:auto}
-.fp .colo .fine strong{color:var(--ink);font-weight:600}
+:is(.fp,.pg) .colo{margin-top:clamp(44px,5vw,72px);position:relative}
+:is(.fp,.pg) .colo::before{content:"";position:absolute;top:0;bottom:0;left:-50vw;width:calc(50vw + var(--m));background:var(--surface-sunken)}
+:is(.fp,.pg) .colo>*{position:relative;z-index:1}
+:is(.fp,.pg) .colo>.m{padding:clamp(22px,2.8vw,40px) var(--wgap) clamp(26px,3vw,44px) 0}
+:is(.fp,.pg) .colo>.b{padding-top:clamp(22px,2.8vw,40px);padding-bottom:clamp(26px,3vw,44px);padding-left:var(--wgap);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px clamp(14px,2vw,30px);max-width:none}
+:is(.fp,.pg) .colo .m .wm-c{color:var(--ink)}
+:is(.fp,.pg) .colo .fine{font-size:13.5px;line-height:1.75;color:var(--ink-2);max-width:34em;margin-left:auto}
+:is(.fp,.pg) .colo .fine strong{color:var(--ink);font-weight:600}
 /* ───────── 中等寬度 ───────── */
 @media (max-width:1023px){
   .fp .lead-note{grid-template-columns:1fr;gap:1.4em}
@@ -397,16 +397,16 @@ html.scanning .fp .mast>.b{opacity:1}
   .fp .kind{margin-bottom:.15em}
   .fp .toc{grid-template-columns:repeat(2,minmax(0,1fr))}
   .fp .howto{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .fp .dateline{order:3;width:100%;margin-left:0;padding-left:0}
+  :is(.fp,.pg) .dateline{order:3;width:100%;margin-left:0;padding-left:0}
 }
 /* ───────── 手機：頁邊縮成貼在左緣的一條細欄，但不消失 ───────── */
 @media (max-width:699px){
-  .fp .mast{padding-top:14px;padding-bottom:12px}
-  .fp .mast>.b{gap:6px 9px;padding-right:var(--padr)}
+  :is(.fp,.pg) .mast{padding-top:14px;padding-bottom:12px}
+  :is(.fp,.pg) .mast>.b{gap:6px 9px;padding-right:var(--padr)}
   .fp .wm-en{font-size:15.5px}
-  .fp .ed{left:var(--edge);bottom:auto;top:.15em;font-size:11px;letter-spacing:.12em;writing-mode:vertical-rl}
-  .fp .ed em{display:none}
-  .fp .dateline{font-size:12px;gap:0 .9em;padding-left:calc(var(--pad) - var(--wgap))}
+  :is(.fp,.pg) .ed{left:var(--edge);bottom:auto;top:.15em;font-size:11px;letter-spacing:.12em;writing-mode:vertical-rl}
+  :is(.fp,.pg) .ed em{display:none}
+  :is(.fp,.pg) .dateline{font-size:12px;gap:0 .9em;padding-left:calc(var(--pad) - var(--wgap))}
   .fp .hero{grid-template-rows:auto auto auto}
   .fp .hero-m{display:contents}
   .fp .lead-head{padding-top:22px;padding-bottom:26px}
@@ -439,7 +439,7 @@ html.scanning .fp .mast>.b{opacity:1}
   .fp .sh p{font-size:13px}
   .fp .mn small{font-size:11px;margin-top:5px;line-height:1.35}
   .fp .mn.chg .k{--kx:.4em}
-  @media (hover:hover) and (pointer:fine){.fp .row:hover>.m .mn .k::after{width:var(--tick)}}
+  @media (hover:hover) and (pointer:fine){:is(.fp,.pg) .row:hover>.m .mn .k::after{width:var(--tick)}}
   .fp .fact>.b{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n v" "r r";column-gap:.9em;padding-top:15px;padding-bottom:17px;align-items:end}
   .fp .fact h3{font-size:16.5px}
   .fp .fact .val{font-size:44px;margin:0}
@@ -469,7 +469,7 @@ html.scanning .fp .mast>.b{opacity:1}
   .fp .toc a{font-size:16px;gap:.5em}
   .fp .toc a::after{display:none}
   .fp .howto{grid-template-columns:1fr;font-size:13px}
-  .fp .colo .fine{margin:10px 0 0;font-size:12.5px;padding-left:calc(var(--pad) - var(--wgap));width:100%}
+  :is(.fp,.pg) .colo .fine{margin:10px 0 0;font-size:12.5px;padding-left:calc(var(--pad) - var(--wgap));width:100%}
   .fp .yl{font-size:11.5px}
   .fp .yl i{font-size:14px}
   .fp .yl.key{font-size:11.5px}
@@ -492,10 +492,10 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
   @keyframes fp-tickIn{from{transform:scaleX(0)}}
   html.js:not(.still) .fp::after{transform-origin:top;animation:fp-drawY 1.25s cubic-bezier(.65,0,.2,1) both}
   html.js:not(.still) .fp .top::before{animation:fp-drawY .95s cubic-bezier(.65,0,.2,1) .08s both}
-  html.js:not(.still) .fp .mast .m .wm-c{animation:fp-fromL .8s var(--fx) .3s both}
-  html.js:not(.still) .fp .mast .b .wm-c{animation:fp-fromR .8s var(--fx) .3s both}
-  html.js:not(.still) .fp .wm-en,html.js:not(.still) .fp .ed{animation:fp-fade .8s ease .65s both}
-  html.js:not(.still) .fp .dateline{animation:fp-fade .8s ease .8s both}
+  html.js:not(.still) :is(.fp,.pg) .mast .m .wm-c{animation:fp-fromL .8s var(--fx) .3s both}
+  html.js:not(.still) :is(.fp,.pg) .mast .b .wm-c{animation:fp-fromR .8s var(--fx) .3s both}
+  html.js:not(.still) .fp .wm-en,html.js:not(.still) :is(.fp,.pg) .ed{animation:fp-fade .8s ease .65s both}
+  html.js:not(.still) :is(.fp,.pg) .dateline{animation:fp-fade .8s ease .8s both}
   html.js:not(.still) .fp .eyebrow{animation:fp-fade .8s ease .5s both}
   html.js:not(.still) .fp .hero h1 .l{animation:fp-rise 1s var(--fx) both}
   html.js:not(.still) .fp .hero h1 .l1{animation-delay:.55s}
@@ -518,8 +518,8 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
   @media (max-width:699px){
     html.js:not(.still) .fp::after{animation-duration:.9s}
     html.js:not(.still) .fp .top::before{animation-duration:.7s;animation-delay:0s}
-    html.js:not(.still) .fp .mast .m .wm-c,html.js:not(.still) .fp .mast .b .wm-c{animation-delay:.1s;animation-duration:.6s}
-    html.js:not(.still) .fp .wm-en,html.js:not(.still) .fp .ed,html.js:not(.still) .fp .dateline,html.js:not(.still) .fp .eyebrow{animation-delay:.3s;animation-duration:.6s}
+    html.js:not(.still) :is(.fp,.pg) .mast .m .wm-c,html.js:not(.still) :is(.fp,.pg) .mast .b .wm-c{animation-delay:.1s;animation-duration:.6s}
+    html.js:not(.still) .fp .wm-en,html.js:not(.still) :is(.fp,.pg) .ed,html.js:not(.still) :is(.fp,.pg) .dateline,html.js:not(.still) .fp .eyebrow{animation-delay:.3s;animation-duration:.6s}
     html.js:not(.still) .fp .hero h1 .l{animation-duration:.8s}
     html.js:not(.still) .fp .hero h1 .l1{animation-delay:.2s}
     html.js:not(.still) .fp .hero h1 .l2{animation-delay:.29s}
@@ -568,16 +568,16 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
    ========================================================================== */
 
 /* ---- 刊頭：右上角讓給工具列；信任列併進日期行 ---------------------------- */
-.fp .mast { min-height: var(--mast-h); }
-.fp .mast > .b { padding-right: calc(var(--padr) + var(--tools)); }
-.fp .dateline .trust {
+:is(.fp,.pg) .mast { min-height: var(--mast-h); }
+:is(.fp,.pg) .mast > .b { padding-right: calc(var(--padr) + var(--tools)); }
+:is(.fp,.pg) .dateline .trust {
   display: inline-flex; align-items: baseline; gap: .45em; margin: 0; padding: 0;
   border: 0; background: none; font: inherit; color: inherit; letter-spacing: 0;
 }
-.fp .dateline .trust time { font-weight: 400; color: inherit; font-family: inherit; }
-.fp .dateline .trust-dot { align-self: center; }
-.fp .dateline .trust-go { display: none; }
-.fp .dateline .trust.stale { color: var(--critical); }
+:is(.fp,.pg) .dateline .trust time { font-weight: 400; color: inherit; font-family: inherit; }
+:is(.fp,.pg) .dateline .trust-dot { align-self: center; }
+:is(.fp,.pg) .dateline .trust-go { display: none; }
+:is(.fp,.pg) .dateline .trust.stale { color: var(--critical); }
 
 /* ---- 頭條 ----------------------------------------------------------------- */
 .fp .hero h1 a { display: block; }
@@ -710,9 +710,9 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 }
 @media (max-width: 699px) {
   /* 手機：第一行只有刊名與工具列，英文刊名與日期各自往下排 */
-  .fp .mast > .b { padding-right: var(--padr); row-gap: 3px; }
-  .fp .dateline { padding-right: 0; flex-direction: column; gap: 0; }
-  .fp .dateline .trust { white-space: nowrap; }
+  :is(.fp,.pg) .mast > .b { padding-right: var(--padr); row-gap: 3px; }
+  :is(.fp,.pg) .dateline { padding-right: 0; flex-direction: column; gap: 0; }
+  :is(.fp,.pg) .dateline .trust { white-space: nowrap; }
   .fp .mn small .wide { display: none; }
   .fp .since-none { margin: 0; padding: 0 var(--padr) 4px calc(var(--m) + var(--pad)); font-size: 14.5px; color: var(--ink-2); text-align: left; }
   .fp .since-more { margin: 4px 0 0 calc(var(--m) + var(--pad)); color: var(--ink); }
@@ -746,12 +746,12 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
    整欄是空的，版面往右偏。頁邊收窄、段距與列距收緊、字級降一階。
    ========================================================================== */
 /* 刊名：英文、襯線斜體，兩個字跨在直線兩側 */
-.fp .wm-c { font: italic 500 var(--wm)/1 var(--latin), serif; letter-spacing: -.012em; white-space: nowrap; }
-.fp .mast { padding-top: clamp(12px, 1.4vw, 20px); padding-bottom: clamp(8px, .9vw, 13px); }
-.fp .mast > .b { align-items: baseline; }
-.fp .ed { bottom: .45em; font-size: 12px; }
-.fp .ed em { display: none; }       /* 刊名變成英文之後，旁邊再放一行英文會打架 */
-.fp .dateline { font-size: 13px; }
+:is(.fp,.pg) .wm-c { font: italic 500 var(--wm)/1 var(--latin), serif; letter-spacing: -.012em; white-space: nowrap; }
+:is(.fp,.pg) .mast { padding-top: clamp(12px, 1.4vw, 20px); padding-bottom: clamp(8px, .9vw, 13px); }
+:is(.fp,.pg) .mast > .b { align-items: baseline; }
+:is(.fp,.pg) .ed { bottom: .45em; font-size: 12px; }
+:is(.fp,.pg) .ed em { display: none; }       /* 刊名變成英文之後，旁邊再放一行英文會打架 */
+:is(.fp,.pg) .dateline { font-size: 13px; }
 
 /* 頭條 */
 .fp .lead-head { padding-top: clamp(18px, 2.2vw, 34px); }
@@ -842,16 +842,16 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .toc a { padding: .26em 0; font-size: clamp(15px, 1.25vw, 17px); }
 .fp .howto { gap: clamp(12px, 1.5vw, 20px) var(--gap); font-size: 13px; line-height: 1.65; }
 .fp .howto dt { margin-bottom: .25em; font-size: 13.5px; }
-.fp .colo { margin-top: clamp(28px, 3vw, 44px); }
-.fp .colo > .m { padding-top: clamp(14px, 1.6vw, 22px); padding-bottom: clamp(16px, 1.8vw, 26px); }
-.fp .colo > .b { padding-top: clamp(14px, 1.6vw, 22px); padding-bottom: clamp(16px, 1.8vw, 26px); }
-.fp .colo .fine { font-size: 13px; line-height: 1.65; }
+:is(.fp,.pg) .colo { margin-top: clamp(28px, 3vw, 44px); }
+:is(.fp,.pg) .colo > .m { padding-top: clamp(14px, 1.6vw, 22px); padding-bottom: clamp(16px, 1.8vw, 26px); }
+:is(.fp,.pg) .colo > .b { padding-top: clamp(14px, 1.6vw, 22px); padding-bottom: clamp(16px, 1.8vw, 26px); }
+:is(.fp,.pg) .colo .fine { font-size: 13px; line-height: 1.65; }
 
 @media (max-width: 699px) {
-  .fp .mast { padding-top: 11px; padding-bottom: 8px; }
-  .fp .mast > .b { row-gap: 2px; }
-  .fp .ed { display: none; }                 /* 手機的頁邊放不下；右上角的按鈕已經寫著日報／夜報 */
-  .fp .dateline { font-size: 11.5px; }
+  :is(.fp,.pg) .mast { padding-top: 11px; padding-bottom: 8px; }
+  :is(.fp,.pg) .mast > .b { row-gap: 2px; }
+  :is(.fp,.pg) .ed { display: none; }                 /* 手機的頁邊放不下；右上角的按鈕已經寫著日報／夜報 */
+  :is(.fp,.pg) .dateline { font-size: 11.5px; }
   .fp .lead-head { padding-top: 16px; padding-bottom: 18px; }
   .fp .eyebrow { margin-bottom: 9px; font-size: 12px; }
   .fp .eyebrow b { font-size: 13px; }
@@ -882,4 +882,107 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
   .fp .said-b .bf-h { font-size: 15.5px; }
   .fp .mn small { font-size: 10.5px; margin-top: 3px; }
   .fp .plot .endv { font-size: 19px; }
+}
+
+
+/* ============================================================================
+   內頁（.pg）：同一條直線、同一個刊頭。頁邊放「本頁目錄」，跟著捲動亮起來——
+   內頁很長，頁邊若是空的，整頁會往右偏；放目錄它就一直有事做。
+   寬度不到 960px 時沒有頁邊：直線與刊頭都收掉，頂列照常黏在上面。
+   ========================================================================== */
+.pg { position: relative; max-width: 1640px; margin: 0 auto; }
+.pg::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: var(--m); width: 1px;
+  background: var(--mrule); pointer-events: none; z-index: 3;
+}
+.pg .mast a { color: inherit; text-decoration: none; }
+.pg .mast *, .pg .mast *::after { animation: none !important; }   /* 進場只在頭版演 */
+.pg-grid { display: grid; grid-template-columns: var(--m) minmax(0, 1fr); }
+.pg-m { min-width: 0; }
+.pg-toc {
+  position: sticky; top: calc(var(--topbar-h) + 14px);
+  max-height: calc(100vh - var(--topbar-h) - 28px); overflow-y: auto; scrollbar-width: none;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+  padding: clamp(18px, 2.2vw, 34px) var(--mpad) 20px var(--edge); text-align: right;
+}
+.pg-toc::-webkit-scrollbar { display: none; }
+.pg-kicker {
+  margin: 0 0 clamp(10px, 1.2vw, 16px); display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  font: 700 13px/1.4 var(--ming); letter-spacing: .24em; color: var(--ink-2);
+}
+.pg-kicker i { font: italic 500 clamp(34px, 3.5vw, 52px)/.9 var(--latin), serif; letter-spacing: -.02em; color: var(--ink); }
+.pg-kicker a { color: inherit; text-decoration: none; letter-spacing: .08em; }
+.pg-toc > a {
+  position: relative; padding: 3px 0; max-width: 100%;
+  font: 400 13px/1.45 var(--hei); color: var(--ink-2); text-decoration: none;
+  transition: color .2s ease;
+}
+.pg-toc > a.sub2 { font-size: 12px; color: var(--ink-muted); padding: 2px 0; }
+.pg-toc > a::after {
+  content: ""; position: absolute; right: calc(-1 * var(--mpad) - var(--tick) / 2); top: 50%;
+  width: var(--tick); height: 1px; background: var(--mrule);
+  transform: scaleX(0); transform-origin: right center; transition: transform .3s var(--fx);
+}
+.pg-toc > a.now { color: var(--ink); font-weight: 700; font-family: var(--ming); }
+.pg-toc > a.now::after { transform: none; }
+.pg-b { min-width: 0; padding: 0 var(--padr) 0 var(--pad); font-family: var(--hei); }
+
+.pg-b .page-head { margin: 0; padding-top: clamp(18px, 2.2vw, 34px); }
+.pg-b .page-head h1 {
+  margin: 0; font: 700 clamp(32px, 3.5vw, 52px)/1.18 var(--ming); letter-spacing: .012em;
+  text-wrap: balance;
+}
+.pg-b .page-head .lede {
+  margin: clamp(8px, 1vw, 14px) 0 0; max-width: 42em;
+  font: 400 clamp(15px, 1.25vw, 18px)/1.6 var(--ming); color: var(--fp-text);
+}
+/* 段落：直線上的主刻度，跟頭版同一個記號 */
+.pg-b section { position: relative; border-top: 0; padding: var(--sec) 0 0; }
+.pg-b section > .section-head {
+  position: relative; margin-bottom: clamp(8px, 1vw, 14px); padding-top: clamp(11px, 1.2vw, 17px);
+}
+.pg-b section:not(.sub-section) > .section-head::before {
+  content: ""; position: absolute; top: 0; left: calc(-1 * var(--pad) - var(--tick) / 2);
+  width: calc(var(--tick) / 2 + var(--pad) + 2.1em); height: 3px; background: var(--mrule);
+}
+.pg-b .section-head h2 { flex: 0 1 auto; min-width: 0; font: 700 clamp(20px, 1.8vw, 26px)/1.3 var(--ming); letter-spacing: .01em; }
+.pg-b section:not(.sub-section) > .section-head h2::before {
+  font: italic 400 .62em/1 var(--latin), serif; color: var(--ink-2); letter-spacing: 0;
+}
+.pg-b .section-head .note { font-size: 13px; line-height: 1.55; color: var(--ink-2); }
+.pg-b section.sub-section { padding-top: clamp(16px, 1.8vw, 26px); }
+.pg-b section.sub-section > .section-head { padding-top: 0; margin-bottom: 8px; }
+.pg-b section.sub-section > .section-head h2 { font-size: clamp(16px, 1.3vw, 19px); }
+.pg > .colo { margin-top: var(--sec); }
+
+/* 頂列：刊頭還在時只有工具；捲走後是「刊名｜頁名」 */
+.is-page .topbar-title {
+  display: block; margin-right: auto; padding-left: 12px; font: 700 15px/1 var(--ming); letter-spacing: .06em;
+  opacity: 0; transition: opacity .25s ease;
+}
+.is-page .nameplate { margin-right: 0; padding-right: 12px; border-right: 1px solid var(--border-strong); }
+:root.masthead-gone .is-page .topbar-title { opacity: 1; }
+
+@media (max-width: 959px) {
+  .pg::after, .pg > .mast, .pg-m { display: none; }
+  .pg-grid { display: block; }
+  .pg-b { padding: 0 var(--padr); }
+  .pg-b section:not(.sub-section) > .section-head::before { left: 0; width: 3.2em; }
+  .pg > .colo { grid-template-columns: minmax(0, 1fr); }
+  .pg > .colo > .m { display: none; }
+  .pg > .colo > .b { grid-column: 1; padding-left: var(--padr); }
+  .pg > .colo > .b .wm-c::before { content: "At the "; }
+  .pg > .colo::before { width: 150vw; }
+  /* 沒有刊頭可以疊：頂列一開始就是完整的一列，正文讓出它的高度 */
+  .is-page .content { padding-top: var(--topbar-h); }
+  .is-page .topbar { height: var(--topbar-h); }
+  .is-page .topbar-title { font-size: 14px; }
+}
+@media (max-width: 699px) {
+  .pg-b { padding: 0 16px; }
+  .pg-b .page-head { padding-top: 16px; }
+  .pg-b .page-head h1 { font-size: 30px; }
+  .pg-b .page-head .lede { font-size: 15px; }
+  .is-page .topbar-title { display: none; }
+  .is-page .nameplate { border-right: 0; margin-right: auto; }
 }

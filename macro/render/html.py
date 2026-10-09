@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 from datetime import date
 
 # ------------------------------------------------------------------ escaping -
@@ -349,16 +350,37 @@ def section(anchor: str, title: str, body: str, *, note: str = "",
             f'{body}{terms_block(terms) if terms else ""}</section>')
 
 
+_TAGS = re.compile(r"<[^>]+>")
+_NUMERIC = re.compile(r"^[+\-−–—~≈<>≤≥(（]*[\d.,]")
+
+
+def _looks_numeric(cell: str) -> bool:
+    """這一格是數字嗎？數字開頭（可以帶正負號、單位、日期）或是缺值的破折號都算。"""
+    text = html.unescape(_TAGS.sub("", str(cell))).strip()
+    return (not text) or text in {"—", "–", "-"} or bool(_NUMERIC.match(text))
+
+
 def table(headers: list[str], rows: list[list[str]], *, foot: str = "",
           align_first_left: bool = True, text_cols: tuple[int, ...] = ()) -> str:
-    """text_cols：除了第一欄以外，還有哪幾欄是文字（靠左）。預設其餘欄都當數字靠右——
-    事件名稱被當成數字靠右排，整張表就會讀起來像對不齊。"""
+    """一欄裡多數是文字就靠左，多數是數字才靠右——由內容決定，不用每一頁自己標。
+
+    原本除了第一欄一律靠右，「說明」「事件」這類文字欄被當成數字排，整張表讀起來
+    像對不齊。text_cols 可以強制指定文字欄（內容全是數字開頭的代號之類）。
+    """
+    width = len(headers)
+    text = set(text_cols)
+    for i in range(1, width) if align_first_left else range(width):
+        cells = [row[i] for row in rows if i < len(row)]
+        filled = [c for c in cells if html.unescape(_TAGS.sub("", str(c))).strip() not in {"", "—", "–", "-"}]
+        if filled and sum(1 for c in filled if _looks_numeric(c)) * 2 < len(filled):
+            text.add(i)
+
     def cls(i: int) -> str:
-        if i in text_cols:
+        if i in text:
             return "txt"
         return "" if i == 0 and align_first_left else "num"
 
-    head = "".join(f'<th class="{cls(i)}">{esc(h)}</th>' if cls(i) == "txt"
+    head = "".join(f'<th class="txt">{esc(h)}</th>' if cls(i) == "txt"
                    else f"<th>{esc(h)}</th>" for i, h in enumerate(headers))
     body = "".join(
         "<tr>" + "".join(f'<td class="{cls(i)}">{cell}</td>'
