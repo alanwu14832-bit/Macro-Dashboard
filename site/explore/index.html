@@ -14,8 +14,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="At the Margin">
 <link rel="preload" href="/newsreader-roman.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/style.css?v=1791613190">
-<link rel="stylesheet" href="/margin.css?v=1791613190">
+<link rel="stylesheet" href="/style.css?v=1791617221">
+<link rel="stylesheet" href="/margin.css?v=1791617221">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23f3f4f1'/><rect width='13' height='32' fill='%23ffd23b'/><rect x='13' width='2' height='32' fill='%2311151a'/><rect x='8' y='15' width='12' height='2' fill='%2311151a'/></svg>">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');try{
@@ -66,7 +66,7 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
       
       <div class="topbar-title">自選比較</div>
       <a class="topbar-guide" href="/guide/">使用講義</a>
-      <div class="topbar-meta">最後更新 2026-10-10 14:26</div>
+      <div class="topbar-meta">最後更新 2026-10-10 15:33</div>
       <button type="button" class="icon-btn" id="reload-btn" aria-label="重新載入">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
@@ -79,7 +79,7 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
     </header>
     <main class="content" id="content">
       <div class="wrap">
-<div class="pg"><header class="mast row"><div class="b"><span class="sr-only">At the Margin</span><a class="wm-c" href="/" lang="en" aria-hidden="true" tabindex="-1">Margin</a><p class="dateline"><time datetime="2026-10-10">2026.10.10 週六</time><a class="trust" href="/freshness/" data-build="2026-10-10T14:26+08:00" aria-label="最後更新 10 月 10 日 14 時 26 分 台北時間，開啟資料狀態"><span class="trust-dot" aria-hidden="true"></span><span>最後更新 <time datetime="2026-10-10T14:26+08:00">2026-10-10 14:26</time> 台北</span><span class="trust-next" data-trust-next></span><span class="trust-go" aria-hidden="true">›</span></a></p></div><div class="m" aria-hidden="true"><span class="ed"><span class="ed-d">日報<em lang="en">Day edition</em></span><span class="ed-n">夜報<em lang="en">Night edition</em></span></span><a class="wm-c" href="/" lang="en" tabindex="-1">At the</a></div></header><div class="pg-grid"><aside class="pg-m"><nav class="pg-toc" aria-label="本頁目錄"><p class="pg-kicker"><i>14</i><span>判讀與紀錄</span></p><a href="#explore">自選指標比較</a><a href="#about">這一頁怎麼運作</a></nav></aside><div class="pg-b"><header class="page-head"><h1>自選比較</h1><p class="lede">從目錄裡的全部序列自選最多 4 個比較，轉換方式與區間隨你調，資料即時取自 FRED。</p></header><section id="explore"><div class="section-head"><h2>自選指標比較</h2><p class="note">最多同時比較 4 個指標；狀態會寫進網址，可以直接分享</p></div><div id="explore">
+<div class="pg"><header class="mast row"><div class="b"><span class="sr-only">At the Margin</span><a class="wm-c" href="/" lang="en" aria-hidden="true" tabindex="-1">Margin</a><p class="dateline"><time datetime="2026-10-10">2026.10.10 週六</time><a class="trust" href="/freshness/" data-build="2026-10-10T15:33+08:00" aria-label="最後更新 10 月 10 日 15 時 33 分 台北時間，開啟資料狀態"><span class="trust-dot" aria-hidden="true"></span><span>最後更新 <time datetime="2026-10-10T15:33+08:00">2026-10-10 15:33</time> 台北</span><span class="trust-next" data-trust-next></span><span class="trust-go" aria-hidden="true">›</span></a></p></div><div class="m" aria-hidden="true"><span class="ed"><span class="ed-d">日報<em lang="en">Day edition</em></span><span class="ed-n">夜報<em lang="en">Night edition</em></span></span><a class="wm-c" href="/" lang="en" tabindex="-1">At the</a></div></header><div class="pg-grid"><aside class="pg-m"><nav class="pg-toc" aria-label="本頁目錄"><p class="pg-kicker"><i>14</i><span>判讀與紀錄</span></p><a href="#explore">自選指標比較</a><a href="#about">這一頁怎麼運作</a></nav></aside><div class="pg-b"><header class="page-head"><h1>自選比較</h1><p class="lede">從目錄裡的全部序列自選最多 4 個比較，轉換方式與區間隨你調，資料即時取自 FRED。</p></header><section id="explore"><div class="section-head"><h2>自選指標比較</h2><p class="note">最多同時比較 4 個指標；狀態會寫進網址，可以直接分享</p></div><div id="explore">
   <div class="ex-bar">
     <label class="ex-field">
       <span>轉換</span>
@@ -103,7 +103,7 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
            autocomplete="off" aria-label="搜尋指標">
     <div id="ex-list" class="ex-list"></div>
   </div>
-</div></section><section id="about"><div class="section-head"><h2>這一頁怎麼運作</h2></div><div class="callout">序列資料不是烤在頁面裡的，而是選到時才向 <code>/api/series</code> 取——那是一個代理 FRED 的 serverless function，所以你看到的永遠是 FRED 上的最新版本，不必等下一次建置。<br><br>本機以 <code>http.server</code> 預覽時沒有這個代理，頁面會顯示取不到資料，這是預期行為。</div><details class="acc"><summary>為什麼單位不同就強制指數化</summary><div class="acc-body"><dl class="kv" style="grid-template-columns:auto 1fr"><dt>雙軸圖的問題</dt><dd style='text-align:left'>把兩個單位不同的序列畫在同一張圖上、各給一條 Y 軸，兩條線的交叉點完全由你怎麼縮放決定——換個刻度就換個故事。它是最容易誤導人的圖表形式。</dd><dt>指數化</dt><dd style='text-align:left'>把每條序列的起點都設成 100，之後只看相對變化。這樣比較的是「誰漲得多」，而那是單位不同的序列之間唯一有意義的比較。</dd><dt>z 分數</dt><dd style='text-align:left'>把每條序列換算成「距離自己的平均幾個標準差」。適合比較「誰現在比較極端」，而不是誰的絕對水準高。</dd></dl></div></details></section></div></div><div class="row colo"><div class="b"><span class="wm-c" lang="en" aria-hidden="true">Margin</span><p class="fine"><strong>所有判定由固定規則產生，同一份資料每次執行結果一致。</strong>個人資料整理，不構成投資建議。最後更新 2026-10-10 14:26　<a href="/sources/">資料來源與判斷方法</a>　<a href="/guide/">使用講義</a></p></div><div class="m" aria-hidden="true"><span class="wm-c" lang="en">At the</span></div></div></div>
+</div></section><section id="about"><div class="section-head"><h2>這一頁怎麼運作</h2></div><div class="callout">序列資料不是烤在頁面裡的，而是選到時才向 <code>/api/series</code> 取——那是一個代理 FRED 的 serverless function，所以你看到的永遠是 FRED 上的最新版本，不必等下一次建置。<br><br>本機以 <code>http.server</code> 預覽時沒有這個代理，頁面會顯示取不到資料，這是預期行為。</div><details class="acc"><summary>為什麼單位不同就強制指數化</summary><div class="acc-body"><dl class="kv" style="grid-template-columns:auto 1fr"><dt>雙軸圖的問題</dt><dd style='text-align:left'>把兩個單位不同的序列畫在同一張圖上、各給一條 Y 軸，兩條線的交叉點完全由你怎麼縮放決定——換個刻度就換個故事。它是最容易誤導人的圖表形式。</dd><dt>指數化</dt><dd style='text-align:left'>把每條序列的起點都設成 100，之後只看相對變化。這樣比較的是「誰漲得多」，而那是單位不同的序列之間唯一有意義的比較。</dd><dt>z 分數</dt><dd style='text-align:left'>把每條序列換算成「距離自己的平均幾個標準差」。適合比較「誰現在比較極端」，而不是誰的絕對水準高。</dd></dl></div></details></section></div></div><div class="row colo"><div class="b"><span class="wm-c" lang="en" aria-hidden="true">Margin</span><p class="fine"><strong>所有判定由固定規則產生，同一份資料每次執行結果一致。</strong>個人資料整理，不構成投資建議。最後更新 2026-10-10 15:33　<a href="/sources/">資料來源與判斷方法</a>　<a href="/guide/">使用講義</a></p></div><div class="m" aria-hidden="true"><span class="wm-c" lang="en">At the</span></div></div></div>
       </div>
     </main>
   </div>
@@ -127,12 +127,12 @@ if(localStorage.getItem('rail')==='collapsed')d.classList.add('rail-collapsed');
   </svg>
 </button>
 <script>window.__SB={"url": "https://nwbfjoroqnhpymdtdbwu.supabase.co", "key": "sb_publishable_qEglLVVzOkMr1-ZzwX-H0w_5OWnmcUx"}</script>
-<script src="/sidebar.js?v=1791613190" defer></script>
-<script src="/chart.js?v=1791613190" defer></script>
-<script src="/account.js?v=1791613190" defer></script>
-<script src="/quotes.js?v=1791613190" defer></script>
-<script src="/explore.js?v=1791613190" defer></script>
-<script src="/notify.js?v=1791613190" defer></script>
+<script src="/sidebar.js?v=1791617221" defer></script>
+<script src="/chart.js?v=1791617221" defer></script>
+<script src="/account.js?v=1791617221" defer></script>
+<script src="/quotes.js?v=1791617221" defer></script>
+<script src="/explore.js?v=1791617221" defer></script>
+<script src="/notify.js?v=1791617221" defer></script>
 
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));</script>
 </body>
