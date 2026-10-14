@@ -2453,7 +2453,7 @@ html.still .enter { opacity: 1; transform: none; transition: none; }   /* ?still
 .pg .dd-prose { max-width: 44em; font-size: 16px; line-height: 1.9; }
 
 /* 晨報：抬頭一行（摘、日期、寫成時間、字數），標題、導言，要聞底下列出處 */
-.pg .mb-head { padding-bottom: var(--s4); max-width: 44em; }
+.pg .mb-head { margin-top: var(--s6); padding-bottom: var(--s4); max-width: 44em; }
 .pg .mb-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); margin: 0 0 var(--s3); font-size: var(--t-13); line-height: var(--lh-13); color: var(--ink-2); }
 .pg .mb-meta .seal { font-size: var(--t-12); margin-right: 0; vertical-align: 0; }
 .pg .mb-date { color: var(--ink); font-variant-numeric: tabular-nums; }
