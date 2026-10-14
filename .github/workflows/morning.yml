@@ -1,0 +1,110 @@
+name: 每日晨報
+
+# 台北 07:00 前後出刊（UTC 22:30 / 23:05 / 23:40 = 台北 06:30 / 07:05 / 07:40）。
+# 排三次是因為 GitHub 對公開 repo 的排程只是 best-effort，常被延後或整次丟掉。
+# 同一期只寫一次：第一個跑成的那一輪出刊之後，後面兩輪在「今天出刊了沒」就停下。
+# 寫過一次卻沒寫成（花了錢、檢查沒過）的那天，排程也不再重試——要重寫請手動觸發。
+on:
+  schedule:
+    - cron: "30 22 * * *"
+    - cron: "5 23 * * *"
+    - cron: "40 23 * * *"
+  workflow_dispatch:          # 手動重寫（不受出刊時段限制）
+
+# 跟 build.yml 同一個並行群組：兩邊都會提交 site/，同一時間只准一個在跑，另一個排隊，
+# 不會兩邊搶推。（GitHub 的規則：同一群組裡排隊中的舊執行會被更新的取代，所以晨報偶爾
+# 會被緊接著的兩次建置擠掉——上面那三個排程就是為這個留的。）
+concurrency:
+  group: build
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  morning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 今天出刊了沒
+        id: due
+        run: python3 tools/morning_brief.py --check
+
+      # 以下照 build.py 的路子先建置一輪：晨報的數字只能來自這一輪抓到的資料。
+      - name: 還原資料快取
+        if: steps.due.outputs.due == 'true'
+        uses: actions/cache@v4
+        with:
+          path: data/cache
+          key: macro-cache-${{ github.run_id }}
+          restore-keys: |
+            macro-cache-
+
+      - name: 測試
+        if: steps.due.outputs.due == 'true'
+        run: python3 -m unittest discover -s tests
+
+      - name: 建置（抓最新資料）
+        if: steps.due.outputs.due == 'true'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: python3 build.py --ttl 3000 --quiet
+
+      # 寫稿只在這一步用到第三方套件（官方 SDK，版本釘死）；網站本體照舊零依賴。
+      # 失敗不會讓這一步變紅：失敗紀錄（data/morning/failed-日期.json）還要提交，
+      # 最後一步再依 published 決定要不要標紅。
+      - name: 寫晨報
+        id: write
+        if: steps.due.outputs.due == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          pip install --quiet "anthropic==1.14.0"
+          python3 tools/morning_brief.py
+
+      - name: 重建頁面（加上這一期）
+        if: steps.write.outputs.published == 'true'
+        run: python3 build.py --offline --no-archive --quiet
+
+      # fresh_state.json 不提交：它是 build.yml 判斷「這一輪才公布、要推播」的基準。
+      # 這裡提交了，下一輪建置就會以為那些公布早已推過。
+      - name: 提交
+        if: steps.due.outputs.due == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -- data/fresh_state.json 2>/dev/null || true
+          git add site data/morning data/archive data/quotes_snapshot.json \
+                  data/series_dates.json data/fedfunds_snapshot.json
+          if git diff --cached --quiet; then
+            echo "沒有變更，跳過 commit"
+          else
+            git commit -m "晨報 ${{ steps.due.outputs.date }}"
+            git pull --rebase --autostash origin main
+            git push
+          fi
+
+      # 只有這一輪真的出刊才推（同一期只推一次）。推播失敗不影響出刊。
+      - name: 晨報推播
+        if: steps.write.outputs.published == 'true'
+        continue-on-error: true
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          pip install --quiet pywebpush
+          python3 tools/send_push.py --morning
+
+      - name: 沒有出刊就標紅
+        if: steps.due.outputs.due == 'true' && steps.write.outputs.published != 'true'
+        run: |
+          echo "晨報沒有出刊，原因在「寫晨報」那一步的紀錄裡"
+          exit 1

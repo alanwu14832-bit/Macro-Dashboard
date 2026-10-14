@@ -206,6 +206,32 @@ def compose_data_update() -> dict | None:
     }
 
 
+# --------------------------------------------------- 晨報推播（--morning） --
+
+def compose_morning(day=None) -> dict | None:
+    """新一期晨報出刊的通知，點開到 /morning/。
+
+    同一期只發一次靠的是 workflow：只有這一輪真的寫出新一期（published=true）才會
+    跑到這一步，而寫稿腳本看到當天那一期已經存在就不會再寫。這裡再擋一次：檔案裡
+    沒有今天那一期、或它沒過檢查，就不發。
+    """
+    from macro import clock, morning
+    day = day or clock.today()
+    issues, _bad = morning.load_all()
+    issue = next((i for i in issues if i["day"] == day), None)
+    if issue is None:
+        print(f"沒有 {day} 這一期（或它沒過檢查），不發晨報通知")
+        return None
+    lines = [issue["title"]]
+    lines += ["・" + _clean_title(s["headline"]) for s in issue["stories"][:3]]
+    return {
+        "title": f"晨報｜{day.month}/{day.day} {morning.weekday(day)}",
+        "body": "\n".join(lines),
+        "url": "/morning/",
+        "tag": f"morning-{day.isoformat()}",   # 每期不同 tag：不會被數據更新或每日新聞蓋掉
+    }
+
+
 def main() -> int:
     private_key = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
     service_key = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
@@ -215,6 +241,10 @@ def main() -> int:
 
     if "--data-update" in sys.argv:
         payload = compose_data_update()
+        if payload is None:
+            return 0
+    elif "--morning" in sys.argv:
+        payload = compose_morning()
         if payload is None:
             return 0
     else:

@@ -40,7 +40,7 @@ python3 build.py              # 一般建置（6 小時內的快取直接用）
 python3 build.py --fresh      # 忽略快取全部重抓
 python3 build.py --offline    # 只用快取、不連網
 python3 build.py --ttl 3000   # 自訂快取有效期（排程用）
-python3 -m unittest discover tests   # 440 個測試，CI 會先跑這個
+python3 -m unittest discover tests   # 488 個測試，CI 會先跑這個
 ```
 
 **乾淨 clone 跑不動 `--offline`**：`data/cache/` 在 .gitignore 裡。第一次要用
@@ -65,7 +65,7 @@ python3 -m unittest discover tests   # 440 個測試，CI 會先跑這個
 ## 絕對不要手動合併生成檔
 
 `site/`、`data/quotes_snapshot.json`、`data/fedfunds_snapshot.json`、
-`data/series_dates.json`、`data/archive/*.json` 都是建置產物。跟雲端建置撞到時：
+`data/series_dates.json`、`data/archive/*.json`、`data/morning/*.json` 都是建置產物。跟雲端建置撞到時：
 
 ```bash
 git checkout HEAD -- site data        # 取已提交版本
@@ -345,6 +345,47 @@ bug：頁面上的「最後更新」標著台北卻差 8 小時；每日存檔�
 
 `tests/test_story.py` 釘住以上的機械檢查。
 
+## 每日晨報（/morning/，雲端用 Claude API 寫）
+
+2026-10-14 使用者要的：每天自動出刊一篇、篇幅參考天下雜誌晨間新聞，送到**網站一頁＋推播**，
+欄目是「今日要聞、昨夜美國市場、台股美股、今天要看什麼、本站判定」。今日導讀保留不動，
+晨報是另一篇。用使用者自己的 API 額度，這個功能控制在**每月 15–20 美元**。
+
+- 排程 `.github/workflows/morning.yml`：台北 06:30／07:05／07:40 各排一次（GitHub 排程會被
+  延後或丟掉），**同一期只寫一次**——`tools/morning_brief.py --check` 看到當天那一期已存在就停。
+  花過錢卻沒寫成的那天，排程不再重試（手動觸發可以）。跟 `build.yml` 同一個並行群組，
+  不會兩邊搶推；`fresh_state.json` 不提交（那是 build.yml 判斷數據推播的基準）。
+- 流程：先 `build.py --ttl 3000` 抓新資料 → 寫稿 → `build.py --offline --no-archive` 重建 →
+  提交 `data/morning/` 與 `site/` → 只有這一輪真的出刊才推播（`send_push.py --morning`，
+  點開到 `/morning/`）。
+- 寫稿只在雲端跑，用官方 `anthropic` SDK（workflow 裡 pip install，**版本釘死**），跟
+  `pywebpush` 同一個例外：依賴止步於發送端，不進網站。模型、effort、搜尋次數上限、
+  `max_tokens` 都是 `tools/morning_brief.py` 開頭的常數；每次執行印 token 用量與估計花費，
+  估計值也存進那一期的 `usage`。`macro/morning.py` 的 `MONTHLY_BUDGET_USD` 是本站自己的
+  月度守門（出刊與沒出刊的花費都算）；真正的硬上限是使用者在 Console 設的花費上限。
+- 金鑰在 GitHub secret `ANTHROPIC_API_KEY`。**不要在對話裡跟使用者要金鑰，也不要寫進任何檔案。**
+- **數字的唯一來源是 `tools/daily_digest.py` 的輸出**（新聞那一段只留「今日焦點」，其餘是
+  上百則標題，太貴又用不到）。四個固定欄目裡的每個阿拉伯數字都要在素材裡找得到
+  （`morning.unmatched_numbers`）：可以四捨五入，不能換算、不能自己算；小於 100 的整數要一模一樣；
+  段落編號（「4. 市場快照」）不算素材裡的數字。比的是絕對值——正負號寫在字上，比不了。
+- **新聞一定有出處**：用 API 的網頁搜尋，來源網址必須是這次搜尋**實際回傳**的
+  （`morning.verify_sources`，只認工具回傳的區塊，模型自己寫的網址不算）。沒有來源的要聞
+  讓整期不出刊。
+- 週末與美國假日：`morning.session()` 決定「昨夜」有沒有美股，美股那一欄的標題由程式寫，
+  不是模型寫；沒有昨夜時標題與美股兩欄寫「昨夜／昨晚／隔夜」就不出刊。休市日
+  （`NYSE_HOLIDAYS`）只排到 2027 年底，剩不到 60 天建置會提醒。
+- 用語：全文不准「優於／不如／符合／高於／低於預期」「市場共識」「建議」類；固定欄目
+  不准「市場預期」「共識」（新聞段可以轉述報導裡的「市場預期」）。連「這不是市場共識」
+  這種免責句也會被擋——要說明就寫在頁面上（`render/pages/morning.py` 的欄目說明），不寫進稿裡。
+- 檢查沒過就把問題清單當成 `submit_brief` 的錯誤結果交回去改一次（同一段對話、append-only）；
+  還是沒過就不出刊，寫 `data/morning/failed-日期.json`（原因與花費），workflow 標紅。
+- 沒有今天這一期時 `/morning/` 照登最近一期，開頭講明「這是哪一天的、今天的還沒有」
+  （原因只講白話：沒過自動檢查／額度用完／寫稿沒有成功）。不放佔位文字。
+- 頭版入口是刊頭版別底下**一行**（`morning_page.front_row`），不是區塊、不吃 `BUDGET`；
+  最近一期超過一天就不出現。它也蓋「摘」的印，不上螢光筆。
+
+`tests/test_morning.py` 釘住以上每一條（不連網、不呼叫 API，寫稿用假的客戶端）。
+
 ## 公布前的預期（模型與期貨，不是共識）
 
 2026-10-10 使用者問「市場共識能不能從期貨價格推」。答案是：利率決議可以（聯邦基金
@@ -478,7 +519,7 @@ bug：頁面上的「最後更新」標著台北卻差 8 小時；每日存檔�
 
 ## 測試
 
-440 個測試，CI 在建置前跑。新增測試時針對「壞了不會報錯、只會靜默給錯答案」
+488 個測試，CI 在建置前跑。新增測試時針對「壞了不會報錯、只會靜默給錯答案」
 那一類：時區、變動排序、分頁歸屬、追蹤清單與落點頁的同步、版面預算計數。
 
 寫批次修改腳本時**每個字串替換都要 `assert`**——`str.replace` 找不到目標時
@@ -493,7 +534,8 @@ bug：頁面上的「最後更新」標著台北卻差 8 小時；每日存檔�
 
 ## 秘密
 
-`data/secrets/` 在 .gitignore 裡（VAPID 私鑰）。GitHub Actions 用四個 secret：
-`FRED_API_KEY`、`FINNHUB_API_KEY`、`VAPID_PRIVATE_KEY`、`SUPABASE_SERVICE_KEY`。
+`data/secrets/` 在 .gitignore 裡（VAPID 私鑰）。GitHub Actions 用五個 secret：
+`FRED_API_KEY`、`FINNHUB_API_KEY`、`VAPID_PRIVATE_KEY`、`SUPABASE_SERVICE_KEY`，
+以及晨報用的 `ANTHROPIC_API_KEY`（使用者自己加）。
 Supabase 的 anon key 是設計上公開的前端金鑰（靠 RLS 隔離），寫在
 `macro/render/layout.py` 裡不是外洩。
