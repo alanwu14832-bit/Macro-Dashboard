@@ -2451,10 +2451,29 @@ html.still .enter { opacity: 1; transform: none; transition: none; }   /* ?still
   font-size: 14px; line-height: 1.7; color: var(--ink-2); max-width: 52em;
 }
 .pg .dd-prose { max-width: 44em; font-size: 16px; line-height: 1.9; }
+
+/* 晨報：抬頭一行（摘、日期、寫成時間、字數），標題、導言，要聞底下列出處 */
+.pg .mb-head { margin-top: var(--s6); padding-bottom: var(--s4); max-width: 44em; }
+.pg .mb-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); margin: 0 0 var(--s3); font-size: var(--t-13); line-height: var(--lh-13); color: var(--ink-2); }
+.pg .mb-meta .seal { font-size: var(--t-12); margin-right: 0; vertical-align: 0; }
+.pg .mb-date { color: var(--ink); font-variant-numeric: tabular-nums; }
+.pg .mb-stale { margin: 0 0 var(--s4); padding: var(--s3) 0 var(--s3) var(--s3); border-left: 2px solid var(--critical); font-size: var(--t-15); line-height: var(--lh-15); color: var(--ink-2); }
+.pg .mb-stale strong { display: block; color: var(--critical); font-weight: 700; }
+.pg .mb-title { margin: 0 0 var(--s3); font-family: var(--ming); font-size: var(--t-30); line-height: var(--lh-30); font-weight: 700; text-wrap: balance; }
+.pg .mb-lede { margin: 0; font-size: var(--t-18); line-height: 1.8; color: var(--ink); }
+.pg .mb-story + .mb-story { margin-top: var(--s8); padding-top: var(--s6); border-top: 1px solid var(--hair); }
+.pg .mb-prose h3 { margin: 0 0 var(--s3); }
+.pg .mb-src { list-style: none; margin: var(--s2) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); font-size: var(--t-13); line-height: var(--lh-13); }
+.pg .mb-src li { margin: 0; line-height: var(--lh-13); }
+.pg .mb-src a { color: var(--ink-2); }
+.pg .mb-src a span { color: var(--ink-muted); }
+.pg .dd-item[aria-current="page"] .dd-title::after { content: "　本期"; font-weight: 400; color: var(--ink-muted); font-size: var(--t-13); }
 .pg .dd-prose h3 { font-family: var(--ming); font-size: 19px; }
 @media (max-width: 699px) {
   .pg .signal .headline { font-size: 16.5px; }
   .pg .dd-prose { font-size: 15.5px; line-height: 1.85; }
+  .pg .mb-title { font-size: var(--t-22); line-height: var(--lh-22); }
+  .pg .mb-lede { font-size: var(--t-15); line-height: 1.85; }
   .pg .ninegrid .cell { padding: 9px 8px; }
   .pg .ninegrid .cell .name { font-size: 14px; }
 }

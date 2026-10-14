@@ -10,6 +10,7 @@ from ...compute.news import _headline, _is_market, _same_story, _tokens
 from ...fomc import next_meeting
 from . import front_blocks as front
 from . import front_tw
+from . import morning as morning_page
 from ..html import esc
 
 TAIWAN = "台灣"       # 訊號的 module、事件的 region、要聞的分類，三個地方都叫這個名字
@@ -153,7 +154,7 @@ def edition(key: str, html: str) -> str:
 
 def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
            diff: dict, reading_changes: list[dict], updated: str,
-           prior: dict | None = None) -> str:
+           prior: dict | None = None, morning_issues: list[dict] | None = None) -> str:
     # 頭版是一份日報的頭版：左邊一條頁邊，正文講現況、頁邊講變化。
     # 排版在 front_blocks.py（美國版與共用零件）與 front_tw.py（台灣版）；這裡只決定順序。
     #
@@ -208,7 +209,9 @@ def render(ctx: dict, signals: list[dict], summary: dict, scenario: dict,
     body = [
         f'<div class="fp{flags}">',
         # 刊頭與版別（品牌與導覽，不算區塊）＋ 1 頭條：有事報事，沒事報判定
+        # 晨報的入口是刊頭底下的一行（兩版共用，不是區塊）：晨報本身兩版都寫
         f'<div class="top">{front.masthead(_trust_row(updated))}{front.edition_row()}'
+        f'{morning_page.front_row(morning_issues or [])}'
         f'{edition("us", us_top)}{edition("tw", tw_top)}</div>',
         edition("us", us_rest),
         edition("tw", tw_rest),

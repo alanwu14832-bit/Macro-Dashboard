@@ -18,7 +18,7 @@ import time
 import traceback
 from datetime import date, datetime
 
-from macro import archive, cbc_board, clock, data, deepdive, fomc, paths
+from macro import archive, cbc_board, clock, data, deepdive, fomc, morning, paths
 from macro import http as http_layer
 from macro.sources import cbc as cbc_source, fomc_text
 from macro.sources import taiwan as dgbas_source
@@ -31,6 +31,7 @@ from macro.render.pages import (archive as archive_page,
                                 deepdive as deepdive_page,
                                 expense as expense_page,
                                 guide as guide_page,
+                                morning as morning_page,
                                 commodities as commodities_page,
                                 debt as debt_page,
                                 equities as equities_page,
@@ -268,11 +269,24 @@ def main() -> int:
     reports = deepdive.load_all()
     if verbose and synced:
         print(f"   深度專題同步 {len(synced)} 個檔案", flush=True)
+    # 每日晨報（tools/morning_brief.py 在雲端寫、提交進 data/morning/）。不合格的期數
+    # 在這裡就擋掉並印出原因——那是寫稿以外唯一知道它沒上站的地方。
+    issues, bad_issues = morning.load_all()
+    for name, why in bad_issues.items():
+        print(f"   ⚠ 晨報 {name} 沒有上站：{'；'.join(why[:4])}", flush=True)
+    if (not issues or issues[0]["day"] != clock.today()) and clock.now().hour >= 8:
+        reason = (morning.failure(clock.today()) or {}).get("reason") or "排程還沒跑或還沒提交"
+        print(f"   ⚠ 晨報：今天（{clock.today()}）沒有出刊——{reason}；/morning/ 照登上一期並標明日期",
+              flush=True)
+    if (morning.NYSE_CALENDAR_END - clock.today()).days < 60:
+        print(f"   ⚠ 美股休市日只排到 {morning.NYSE_CALENDAR_END}，請把下一年補進 macro/morning.py"
+              "——排完之後假日那天的晨報會把前一個交易日說成昨夜", flush=True)
     pages = [
         ("/", "頭版", "",
          "把勞動、通膨、利率、債務、成長、全球與市場七個面向，收斂成一個可追蹤的判斷。",
          lambda: overview.render(ctx, found, summary, scenario_data, diff,
-                                 reading_changes, updated, prior=prior)),
+                                 reading_changes, updated, prior=prior,
+                                 morning_issues=issues)),
         ("/labor/", "勞動市場", "勞動市場",
          "損益兩平、初值修正追蹤、行業別拆解與綜合強弱指數。",
          lambda: labor_page.render(ctx, found)),
@@ -313,6 +327,11 @@ def main() -> int:
         ("/scenario/", "情境與部位", "情境與部位",
          "九宮格定位、三種政策重心、轉換門檻與部位對照。",
          lambda: scenario_page.render(ctx, scenario_data, summary)),
+        ("/morning/", "晨報", "晨報",
+         "每天台北 7 點前後一篇：今日要聞、昨夜美國市場、台股美股、今天要看什麼、"
+         "本站判定。語言模型寫的，新聞附出處，市場數字逐一比對本站資料。",
+         lambda: morning_page.render_index(issues,
+                                           reason=morning_page.failure_reason())),
         ("/deep-dive/", "深度專題", "資本市場深度專題",
          "每天一篇的產業與個股研究：結論先行、論點展開、量化佐證，"
          "以及反方觀點與證偽條件。",
@@ -417,6 +436,25 @@ def main() -> int:
             failures.append(report["path"])
     if verbose and reports:
         print(f"   ✓ /deep-dive/ 文章 {len(reports)} 篇", flush=True)
+
+    # 晨報的每一期。側欄停在 /morning/，跟深度專題的文章頁同一個做法。
+    for position, issue in enumerate(issues):
+        try:
+            html = layout.page(
+                title=f"晨報 {issue['date']}", path=issue["path"], nav_path="/morning/",
+                body=morning_page.render_issue(
+                    issue,
+                    newer=issues[position - 1] if position else None,
+                    older=issues[position + 1] if position + 1 < len(issues) else None),
+                heading=f"晨報　{issue['date']} {morning.weekday(issue['day'])}",
+                lede="", updated=updated, description=issue["lede"], sections=section_map)
+            written.append(layout.write_page(issue["path"], html))
+        except Exception:
+            print(f'   ✗ {issue["path"]}', flush=True)
+            traceback.print_exc()
+            failures.append(issue["path"])
+    if verbose and issues:
+        print(f"   ✓ /morning/ 共 {len(issues)} 期", flush=True)
 
     # 每個追蹤指標一頁發布落點。推播直接打開它，所以它必須是真路由、
     # 伺服器端渲染、離線可讀——不是一張 sheet，也不是總覽上的一個錨點。
