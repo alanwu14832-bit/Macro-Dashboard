@@ -1,6 +1,6 @@
 {
  "date": "2026-10-14",
- "generated_at": "2026-10-14T16:09:51+08:00",
+ "generated_at": "2026-10-14T22:10:09+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -8,6 +8,14 @@
    "direction": "hawkish",
    "severity": "high",
    "evidence": "核心 PCE 3.0%，距 2% 目標 +1.0 個百分點",
+   "module": "物價"
+  },
+  {
+   "key": "momentum_reaccelerating",
+   "headline": "核心 CPI 近三月年化高於年增率，通膨在再加速",
+   "direction": "hawkish",
+   "severity": "high",
+   "evidence": "近三月年化 3.4%，年增 2.6%",
    "module": "物價"
   },
   {
@@ -25,14 +33,6 @@
    "severity": "medium",
    "evidence": "r−g 為 +0.7 個百分點，債務佔 GDP 123%",
    "module": "債務"
-  },
-  {
-   "key": "momentum_cooling",
-   "headline": "核心 CPI 近三月年化明顯低於年增率",
-   "direction": "dovish",
-   "severity": "medium",
-   "evidence": "近三月年化 2.0%，年增 2.4%，低 0.5 個百分點",
-   "module": "物價"
   },
   {
    "key": "payrolls_below_breakeven",
@@ -59,14 +59,6 @@
    "module": "利率"
   },
   {
-   "key": "shelter_still_dragging",
-   "headline": "住房落後項仍在推升表面讀數，實際通膨比表面低",
-   "direction": "dovish",
-   "severity": "medium",
-   "evidence": "住房年增 3.0%、近三月年化 2.1%，收斂後對整體 CPI 約 -0.33 個百分點",
-   "module": "物價"
-  },
-  {
    "key": "stock_bond_correlation_positive",
    "headline": "股債同向，債券對股票的對沖效果變差",
    "direction": "neutral",
@@ -79,7 +71,7 @@
    "headline": "核心服務除住房卡在目標之上",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "年增 3.1%，已連 64 個月高於 2.5%",
+   "evidence": "年增 3.2%，已連 65 個月高於 2.5%",
    "module": "物價"
   },
   {
@@ -116,12 +108,12 @@
   }
  ],
  "summary": {
-  "total": 14,
-  "hawkish": 3,
-  "dovish": 7,
+  "total": 13,
+  "hawkish": 4,
+  "dovish": 5,
   "neutral": 4,
-  "score": -7,
-  "tilt": "偏降息"
+  "score": 0,
+  "tilt": "方向分歧"
  },
  "scenario": {
   "name": "通膨未解",
@@ -135,9 +127,9 @@
   "payrolls_3m": 50.666666666666664,
   "breakeven": 76.62036099999999,
   "unemployment": 4.2,
-  "core_cpi": 2.4459799375700753,
+  "core_cpi": 2.5643583511686607,
   "core_pce": 3.0075959761856064,
-  "supercore": 3.1040978972467492,
+  "supercore": 3.2293721989494317,
   "ten_year": 5.24,
   "real_ten_year": 2.91,
   "policy_upper": 4.0,
@@ -158,7 +150,7 @@
  },
  "as_of": {
   "labor": "2026-09-01",
-  "inflation": "2026-08-01",
+  "inflation": "2026-09-01",
   "rates": "2026-10-09"
  }
 }
