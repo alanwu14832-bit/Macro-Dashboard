@@ -21,6 +21,12 @@ concurrency:
 permissions:
   contents: write
 
+# 整個 job 都要有資料源的金鑰：快取的鍵是含金鑰的網址，寫稿時的摘要與之後的離線重建
+# 沒有金鑰就讀不到快取（2026-10-15 第一次實跑就是這樣：205 檔全缺，重建中止）。
+env:
+  FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+  FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+
 jobs:
   morning:
     runs-on: ubuntu-latest
@@ -53,9 +59,6 @@ jobs:
 
       - name: 建置（抓最新資料）
         if: steps.due.outputs.due == 'true'
-        env:
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: python3 build.py --ttl 3000 --quiet
 
       # 寫稿只在這一步用到第三方套件（官方 SDK，版本釘死）；網站本體照舊零依賴。
@@ -71,13 +74,17 @@ jobs:
           python3 tools/morning_brief.py
 
       - name: 重建頁面（加上這一期）
+        id: rebuild
         if: steps.write.outputs.published == 'true'
         run: python3 build.py --offline --no-archive --quiet
 
       # fresh_state.json 不提交：它是 build.yml 判斷「這一輪才公布、要推播」的基準。
       # 這裡提交了，下一輪建置就會以為那些公布早已推過。
+      # always()：前面哪一步失敗都要把寫好的那一期或失敗紀錄提交——不提交的話，下一個
+      # 排程看不到今天已經寫過，會再花一次錢重寫（2026-10-15 就這樣寫了三次）。
+      # 重建失敗時 site/ 是第一輪建置的產物（或沒變），那一期等下一次建置上站。
       - name: 提交
-        if: steps.due.outputs.due == 'true'
+        if: always() && steps.due.outputs.due == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -92,9 +99,9 @@ jobs:
             git push
           fi
 
-      # 只有這一輪真的出刊才推（同一期只推一次）。推播失敗不影響出刊。
+      # 只有這一輪真的出刊、頁面也重建好了才推（同一期只推一次）。推播失敗不影響出刊。
       - name: 晨報推播
-        if: steps.write.outputs.published == 'true'
+        if: steps.write.outputs.published == 'true' && steps.rebuild.outcome == 'success'
         continue-on-error: true
         env:
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
