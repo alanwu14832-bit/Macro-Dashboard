@@ -343,6 +343,9 @@ class Digest(unittest.TestCase):
         self.assertIn("git reset --hard origin/main", text)
         self.assertIn("cp /tmp/morning-keep/*.json data/morning/", text)
         self.assertIn("steps.commit.outcome == 'success'", text)
+        with open(path.replace("morning.yml", "build.yml"), encoding="utf-8") as fh:
+            build = fh.read()
+        self.assertIn("ref: main", build[build.index("actions/checkout@v4"):build.index("actions/setup-python")])
 
     def test_material_starts_with_the_session_note(self):
         self.assertTrue(morning_brief.material_for(DAY, "x").startswith("出刊日：2026-10-15"))
