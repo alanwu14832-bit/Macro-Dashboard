@@ -320,6 +320,23 @@ class Digest(unittest.TestCase):
         self.assertNotIn("兩則", out)
         self.assertIn("PPI", out)
 
+    def test_material_with_missing_series_is_refused(self):
+        """2026-10-15：寫稿那一步沒有 FRED 金鑰，205 檔全缺卻照樣寫了三次稿。"""
+        body = "x" * 4000
+        self.assertIn("缺漏 205 檔", morning_brief.digest_problem(f"序列 205 檔，缺漏 205 檔\n{body}"))
+        self.assertEqual(morning_brief.digest_problem(f"序列 205 檔，缺漏 3 檔\n{body}"), "")
+        self.assertIn("找不到", morning_brief.digest_problem(body))
+        self.assertIn("不完整", morning_brief.digest_problem("序列 205 檔，缺漏 0 檔"))
+
+    def test_the_workflow_gives_every_step_the_data_keys_and_always_commits(self):
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                            ".github", "workflows", "morning.yml")
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        head = text[:text.index("jobs:")]
+        self.assertIn("FRED_API_KEY: ${{ secrets.FRED_API_KEY }}", head)    # job 層級，不只建置那一步
+        self.assertIn("if: always() && steps.due.outputs.due == 'true'", text)
+
     def test_material_starts_with_the_session_note(self):
         self.assertTrue(morning_brief.material_for(DAY, "x").startswith("出刊日：2026-10-15"))
 

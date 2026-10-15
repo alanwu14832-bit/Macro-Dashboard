@@ -42,6 +42,7 @@ MAX_TOKENS = 16000
 MAX_SEARCHES = 4              # 一次寫稿最多搜尋幾次（每次 $0.01，搜尋結果另計 token）
 MAX_CONTINUATIONS = 3         # 伺服器端搜尋迴圈被暫停（pause_turn）時最多接續幾次
 REPAIR_ROUNDS = 1             # 檢查沒過時，把問題交回給模型改幾次
+MISSING_LIMIT = 10           # 跟 build.py 同一道門檻：缺超過這麼多檔就是資料源整個沒接上
 WINDOW = (6, 14)              # 排程只在台北 06:00–14:00 之間寫；手動觸發不受限
 EXPECTED_COST = 0.8           # 一期大約花多少（月度守門用，第一次實跑後要依紀錄調整）
 TIMEOUT = 900                 # 秒。伺服器端搜尋迴圈可能要好幾分鐘
@@ -157,6 +158,24 @@ def trim_digest(text: str) -> str:
         if not skipping:
             out.append(line)
     return "\n".join(out)
+
+
+def digest_problem(digest: str) -> str:
+    """素材能不能用。空字串表示可以。
+
+    2026-10-15 第一次實跑：寫稿那一步沒有 FRED 金鑰，摘要裡 205 檔序列全部缺漏，
+    但「序列 205 檔」照印（缺漏的也算一檔），舊的檢查只認「序列 0 檔」，於是用一份
+    沒有任何美國總經數字的素材寫了三次稿。缺漏的檔數才是該看的數字。
+    """
+    if len(digest) < 3000:
+        return f"素材不完整（{len(digest)} 字），先確認 build.py 有跑成功"
+    hit = re.search(r"缺漏 (\d+) 檔", digest)
+    if hit is None:
+        return "素材裡找不到序列的缺漏統計，daily_digest 的輸出格式可能變了"
+    if int(hit.group(1)) > MISSING_LIMIT:
+        return (f"素材裡缺漏 {hit.group(1)} 檔序列（上限 {MISSING_LIMIT}）——"
+                "多半是這一步沒有 FRED_API_KEY；不拿缺了數據的素材寫稿")
+    return ""
 
 
 def material_for(day: date, digest: str) -> str:
@@ -419,8 +438,9 @@ def main() -> int:
         digest = digest_text()
     except Exception as exc:  # 素材壞了就不寫：沒有素材的數字檢查等於沒有檢查
         return fail(day, f"素材（daily_digest）跑不起來：{type(exc).__name__}: {exc}")
-    if "序列 0 檔" in digest or len(digest) < 3000:
-        return fail(day, f"素材不完整（{len(digest)} 字），先確認 build.py 有跑成功")
+    problem = digest_problem(digest)
+    if problem:
+        return fail(day, problem)
     material = material_for(day, digest)
     print(f"   素材 {len(material):,} 字（原始摘要 {len(digest):,} 字）", flush=True)
 
