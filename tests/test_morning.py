@@ -336,6 +336,13 @@ class Digest(unittest.TestCase):
         head = text[:text.index("jobs:")]
         self.assertIn("FRED_API_KEY: ${{ secrets.FRED_API_KEY }}", head)    # job 層級，不只建置那一步
         self.assertIn("if: always() && steps.due.outputs.due == 'true'", text)
+        # 排在 build.yml 後面時，觸發當下的提交已經舊了：要建在最新的 main 上
+        checkout = text[text.index("actions/checkout@v4"):text.index("actions/setup-python")]
+        self.assertIn("ref: main", checkout)
+        # 撞到遠端的建置產物時不逐行解衝突：取遠端版本、放回這一期、重建
+        self.assertIn("git reset --hard origin/main", text)
+        self.assertIn("cp /tmp/morning-keep/*.json data/morning/", text)
+        self.assertIn("steps.commit.outcome == 'success'", text)
 
     def test_material_starts_with_the_session_note(self):
         self.assertTrue(morning_brief.material_for(DAY, "x").startswith("出刊日：2026-10-15"))
