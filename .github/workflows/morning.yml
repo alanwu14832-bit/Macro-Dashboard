@@ -33,7 +33,12 @@ jobs:
     timeout-minutes: 30
 
     steps:
+      # ref: main，不是觸發當下的那個提交：這個 job 常在 build.yml 後面排隊，排到的時候
+      # main 已經多了一個建置提交。拿舊的提交來建，site/ 每一頁都會跟它衝突
+      # （2026-10-15 手動觸發那一次就是這樣，寫好的一期在提交時丟了）。
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-python@v5
         with:
@@ -83,25 +88,45 @@ jobs:
       # always()：前面哪一步失敗都要把寫好的那一期或失敗紀錄提交——不提交的話，下一個
       # 排程看不到今天已經寫過，會再花一次錢重寫（2026-10-15 就這樣寫了三次）。
       # 重建失敗時 site/ 是第一輪建置的產物（或沒變），那一期等下一次建置上站。
+      # 期間 main 若又多了別人的提交（本機的要聞整理、手動推送）而 site/ 撞在一起：
+      # 照 CLAUDE.md 的規矩不逐行解衝突——取遠端版本，把這一期放回去，重建，再提交一次。
       - name: 提交
+        id: commit
         if: always() && steps.due.outputs.due == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -- data/fresh_state.json 2>/dev/null || true
+          mkdir -p /tmp/morning-keep
+          cp data/morning/*.json /tmp/morning-keep/ 2>/dev/null || true
           git add site data/morning data/archive data/quotes_snapshot.json \
                   data/series_dates.json data/fedfunds_snapshot.json
           if git diff --cached --quiet; then
             echo "沒有變更，跳過 commit"
-          else
-            git commit -m "晨報 ${{ steps.due.outputs.date }}"
-            git pull --rebase --autostash origin main
-            git push
+            exit 0
           fi
+          git commit -q -m "晨報 ${{ steps.due.outputs.date }}"
+          if git pull --rebase --autostash origin main && git push; then
+            exit 0
+          fi
+          echo "跟遠端的建置產物衝突：取遠端版本、放回這一期、重建後再提交"
+          git rebase --abort 2>/dev/null || true
+          git fetch origin main
+          git reset --hard origin/main
+          mkdir -p data/morning            # 第一期之前遠端還沒有這個目錄
+          cp /tmp/morning-keep/*.json data/morning/
+          python3 build.py --offline --no-archive --quiet \
+            || echo "::warning::重建失敗：只提交這一期，頁面等下一次建置"
+          git checkout -- data/fresh_state.json 2>/dev/null || true
+          git add site data/morning
+          git diff --cached --quiet || git commit -q -m "晨報 ${{ steps.due.outputs.date }}"
+          git push
 
       # 只有這一輪真的出刊、頁面也重建好了才推（同一期只推一次）。推播失敗不影響出刊。
       - name: 晨報推播
-        if: steps.write.outputs.published == 'true' && steps.rebuild.outcome == 'success'
+        if: >-
+          steps.write.outputs.published == 'true' && steps.rebuild.outcome == 'success' &&
+          steps.commit.outcome == 'success'
         continue-on-error: true
         env:
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}

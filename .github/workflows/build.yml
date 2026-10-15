@@ -32,7 +32,11 @@ jobs:
     timeout-minutes: 25
 
     steps:
+      # ref: main，不是觸發當下的那個提交：排程與推送常在晨報（morning.yml，同一個並行群組）
+      # 後面排隊，排到時 main 已經多了一個提交；拿舊的提交來建，提交時 site/ 每一頁都會衝突。
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-python@v5
         with:
