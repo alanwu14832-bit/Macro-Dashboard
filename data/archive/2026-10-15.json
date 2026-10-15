@@ -1,6 +1,6 @@
 {
  "date": "2026-10-15",
- "generated_at": "2026-10-15T09:00:13+08:00",
+ "generated_at": "2026-10-15T14:35:02+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -83,14 +83,6 @@
    "module": "物價"
   },
   {
-   "key": "systematic_downward_revisions",
-   "headline": "初值近一年呈系統性下修，實質動能弱於初值",
-   "direction": "dovish",
-   "severity": "medium",
-   "evidence": "近 10 個月有 60% 遭下修，平均修正 -2.8 萬人",
-   "module": "就業"
-  },
-  {
    "key": "tw_export_orders_contracting",
    "headline": "台灣外銷訂單動向指數低於 50，看減家數多於看增",
    "direction": "neutral",
@@ -116,12 +108,12 @@
   }
  ],
  "summary": {
-  "total": 14,
+  "total": 13,
   "hawkish": 5,
-  "dovish": 5,
+  "dovish": 4,
   "neutral": 4,
-  "score": 2,
-  "tilt": "方向分歧"
+  "score": 4,
+  "tilt": "偏升息"
  },
  "scenario": {
   "name": "通膨未解",
