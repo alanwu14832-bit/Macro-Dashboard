@@ -1,0 +1,139 @@
+{
+ "date": "2026-10-16",
+ "written_at": "2026-10-16T08:43:25+08:00",
+ "model": "claude-opus-5-5",
+ "title": "台積電Q3淨利年增近七成 美債殖利率回落",
+ "lede": "台積電第三季淨利年增 68.7%；美國 9 月零售銷售月增 0.8%，但大塊花在油錢。荷莫茲海峽再傳船隻沉沒。本站判定與上一份相同，維持「通膨未解」，10 年期殖利率小幅下降。",
+ "stories": [
+  {
+   "headline": "台積電第三季淨利年增 68.7%，先進製程佔晶圓營收近八成",
+   "paragraphs": [
+    "台積電 10 月 15 日公布第三季財報，營收新台幣 1 兆 4,942 億元、年增 50.9%，淨利 7,631 億元、年增 68.7%，每股盈餘 29.43 元。",
+    "新聞稿顯示毛利率 66.4%，7 奈米以下先進製程佔晶圓營收 79%。Benzinga 在財報前引述路透報導，投資人關注獲利能否連續第六季創高，以及 2027 年 AI 產能資本支出的線索。"
+   ],
+   "sources": [
+    {
+     "title": "TSMC Reports Third Quarter EPS of NT$29.43",
+     "outlet": "台積電新聞稿",
+     "url": "https://pr.tsmc.com/english/news/3346"
+    },
+    {
+     "title": "TSMC Eyes Sixth Straight Record With 65% Q3 Profit Jump",
+     "outlet": "Benzinga",
+     "url": "https://www.benzinga.com/markets/earnings/26/10/62372396/tsmc-q3-sixth-straight-record-ai-chip-boom"
+    }
+   ]
+  },
+  {
+   "headline": "美國 9 月零售銷售月增 0.8%，油錢撐起大半",
+   "paragraphs": [
+    "美國普查局 10 月 15 日公布，9 月零售銷售月增 0.8%，8 月上修為 1.3%。",
+    "美聯社報導，加油站營收單月增 6.4%，不少支出是在付油錢。Investing.com 指出扣除汽油後只增 0.2%；TheStreet 指出計入 GDP 的控制組只增 0.14%。"
+   ],
+   "sources": [
+    {
+     "title": "Retail sales saw 0.8% bump in September, but big chunk of spending went to paying for gas",
+     "outlet": "PBS／美聯社",
+     "url": "https://www.pbs.org/newshour/economy/retail-sales-saw-0-8-bump-in-september-but-big-chunk-of-spending-went-to-paying-for-gas"
+    },
+    {
+     "title": "US Retail Sales Rise 0.8%, but Growth Ex-Gas Slows to 0.2%",
+     "outlet": "Investing.com",
+     "url": "https://www.investing.com/analysis/us-retail-sales-rise-08-but-growth-exgas-slows-to-02-200689669"
+    },
+    {
+     "title": "U.S. retail sales rise 0.8% in September on gasoline spending",
+     "outlet": "Quartz",
+     "url": "https://qz.com/us-retail-sales-september-gasoline-stations-census-101526"
+    }
+   ]
+  },
+  {
+   "headline": "伊朗稱貨輪在荷莫茲海峽觸雷沉沒，新加坡籍船隻也遭擊中",
+   "paragraphs": [
+    "伊朗革命衛隊海軍美東 14 日稱，一艘貨輪在荷莫茲海峽觸雷沉沒，美聯社指出這是開戰以來伊朗首度通報。新加坡海事及港務管理局則說，兩艘新加坡籍船隻過峽時遭不明飛行物擊中，一艘沉沒。",
+    "美聯社同篇報導也提到，沙烏地阿美總部遭胡塞武裝夜間攻擊。"
+   ],
+   "sources": [
+    {
+     "title": "Iran says a ship sank after striking a mine in Strait of Hormuz, and other Middle East developments",
+     "outlet": "OPB／美聯社",
+     "url": "https://www.opb.org/article/2026/10/14/iran-says-a-ship-sank-after-striking-a-mine-in-strait-of-hormuz-and-other-middle-east-developments/"
+    },
+    {
+     "title": "Iran Says Cargo Ship Hit Naval Mine and Sank in Strait of Hormuz, Tehran Broadcasts Images of Tilted Container Vessel",
+     "outlet": "Benzinga",
+     "url": "https://www.benzinga.com/news/politics/26/10/62372305/iran-says-cargo-ship-hit-naval-mine-and-sank-in-strait-of-hormuz-tehran-broadcasts-images-of-tilted-container-vessel"
+    }
+   ]
+  },
+  {
+   "headline": "SK 海力士以對中設備出口作為赴美建廠條件",
+   "paragraphs": [
+    "路透 14 日引述知情人士獨家報導，SK 海力士尋求華府核准對中出口美國晶片設備，並以此作為在美建廠的條件。",
+    "報導指出，子公司 Solidigm 想在大連廠擴產 NAND，背景是記憶體短缺推高價格；華府一邊施壓外國晶片廠赴美設廠，一邊限制對中設備出口。"
+   ],
+   "sources": [
+    {
+     "title": "Exclusive-SK Hynix conditions new US factory on more US chip equipment exports to China, sources say",
+     "outlet": "路透（Yahoo轉載）",
+     "url": "https://www.yahoo.com/news/articles/exclusive-sk-hynix-conditions-us-020530651.html"
+    },
+    {
+     "title": "SK Hynix bargains for chip equipment exports to its China facility in return for building a factory in US",
+     "outlet": "TechCrunch",
+     "url": "https://techcrunch.com/2026/10/15/sk-hynix-bargains-for-chip-equipment-exports-to-its-china-facility-in-return-for-building-a-factory-in-us/"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "昨夜（美東 10 月 15 日）收盤，標普 500 報 7,744、那斯達克 26,693、道瓊 52,178；近一月標普漲 2.5%、那斯達克漲 2.7%。VIX 16.87。",
+    "10 年期殖利率 5.19%，較上一份 5.21% 下降；10 年實質 2.84%。廣體美元指數 121.60（10 月 9 日），近一月漲 3.0%。WTI 原油 101.91 美元、布蘭特 126.55 美元，黃金 4,144.55 美元，近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股加權指數昨收 46,970。盤前報價台積電 2,395 元，較昨收 2,440 元跌 1.8%；聯發科 4,575 元，漲 9.8%；鴻海漲 1.9%，台達電跌 0.9%。",
+    "美股權值股輝達跌 1.8%，收 217.23 美元；微軟漲 1.1%，收 539.44 美元；Alphabet 漲 0.5%，蘋果跌 0.3%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今晚台北 21:15 美國公布工業生產。聯準會 10/28 會議期貨定價不動 88%、降息 12%；到 2027/7 累計升息 36 bp。",
+    "下一次 CPI 模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增 3.77%、核心 2.48%；模型預估（亞特蘭大聯準銀行 GDPNow）Q3 年化季增 3.6%。台灣今天沒有重大數據。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔相同：九宮格「通膨未解」（就業中、通膨高），傾向偏升息（score 4），訊號 13 條，偏升息 5、偏降息 4、中性 4，沒有增減。",
+    "關鍵讀數中，10 年期由 5.21% 降到 5.19%，10 年實質由 2.88% 降到 2.84%，10 減 2 由 0.42 降到 0.37；衰退風險刻度由 42.87 升到 43.47。核心 PCE 3.01% 沒有變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-15",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 63,
+  "sources": 9,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 22,
+  "output_tokens": 14371,
+  "cache_creation_input_tokens": 46351,
+  "cache_read_input_tokens": 279427,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.6151
+ }
+}
