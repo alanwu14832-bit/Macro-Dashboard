@@ -1,0 +1,154 @@
+{
+ "date": "2026-10-17",
+ "written_at": "2026-10-17T08:49:40+08:00",
+ "model": "claude-opus-5-5",
+ "title": "IEA加速釋儲 中國擬限AI技術出口",
+ "lede": "國際能源總署加速釋出油儲，烏克蘭卻恢復攻擊俄羅斯煉油廠，油市消息方向相反；中國擬限制 AI 與晶片等技術出口。路透統計，美債殖利率回落後資金重回美股基金。本站判定維持「通膨未解」，訊號沒有增減。",
+ "stories": [
+  {
+   "headline": "國際能源總署加速釋出剩餘油儲，含逾2,000萬桶柴油",
+   "paragraphs": [
+    "國際能源總署（IEA）週四宣布，成員國將盡快完成 3 月承諾釋儲中剩下的約 1 億桶，其中逾 2,000 萬桶是柴油，總量將超過原訂的 4 億桶。The National 報導，已釋出 3.3 億桶。",
+    "CNBC 報導，這批柴油只相當於全球不到一天的用量；川普政府在期中選舉前一直施壓歐洲釋出柴油庫存。CNBC 引述分析師 Andy Lipow 認為，釋儲解決不了中東與俄羅斯煉油廠受損的根本問題。"
+   ],
+   "sources": [
+    {
+     "title": "IEA to release more than 20 million barrels of diesel as soon as possible",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/15/iea-diesel-price-ukraine-iran-oil.html"
+    },
+    {
+     "title": "IEA oil supply pledge to exceed target as it boosts release of remaining stocks",
+     "outlet": "The National",
+     "url": "https://www.thenationalnews.com/business/energy/2026/10/15/iea-oil-supply-pledge-to-exceed-target-as-it-boosts-release-of-remaining-stocks/"
+    },
+    {
+     "title": "IEA says it will release 20 million barrels of diesel ‘as soon as possible’",
+     "outlet": "Global News",
+     "url": "https://globalnews.ca/news/12105128/iea-diesel-barrels/"
+    }
+   ]
+  },
+  {
+   "headline": "烏克蘭恢復攻擊俄羅斯煉油廠，川普斥為「恥辱」",
+   "paragraphs": [
+    "澤倫斯基宣布不再遵守川普片面宣布的能源停火後，烏克蘭週四以無人機攻擊俄羅斯梁贊的煉油設施。川普在 Newsmax 專訪中稱此舉是讓全球能源價格居高不下的「恥辱」。",
+    "半島電視台指出，川普正設法在期中選舉前壓低國內能源價格。NBC 報導，澤倫斯基週五赴布魯塞爾爭取歐洲支持。"
+   ],
+   "sources": [
+    {
+     "title": "Ukraine’s resumption of strikes on Russian refineries is ‘disgrace’, Trump says",
+     "outlet": "CTV News",
+     "url": "https://www.ctvnews.ca/world/russia-ukraine-war/article/ukraines-resumption-of-strikes-on-russian-refineries-is-disgrace-trump-says/"
+    },
+    {
+     "title": "Trump says Ukraine resuming strikes on Russian oil sites is a ‘disgrace’",
+     "outlet": "NBC News",
+     "url": "https://www.nbcnews.com/world/ukraine/trump-ukraine-strikes-russian-oil-disgrace-zelenskyy-starlink-rcna603848"
+    },
+    {
+     "title": "Trump slams Zelenskyy as Ukraine resumes strikes on Russian oil refineries",
+     "outlet": "半島電視台",
+     "url": "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries"
+    }
+   ]
+  },
+  {
+   "headline": "中國擬限制或禁止40項技術出口，涵蓋AI、晶片與太陽能",
+   "paragraphs": [
+    "美聯社報導，中國週五表示計畫限制或禁止 40 項技術出口，涵蓋人工智慧、晶片與太陽能。US News 轉載的報導提到，參數量 2 兆以上或具世界領先能力的 AI 模型可能受限。商務部稱措施「必要」，理由之一是國家安全。",
+    "報導把此舉放在中美科技競賽升溫的脈絡下：美國多年來限制先進技術輸往中國，如今中國反向管制自家技術。"
+   ],
+   "sources": [
+    {
+     "title": "China says it will curb tech exports, including AI, citing national security risks",
+     "outlet": "PBS NewsHour（美聯社）",
+     "url": "https://www.pbs.org/newshour/world/china-says-it-will-curb-tech-exports-including-ai-citing-national-security-risks"
+    },
+    {
+     "title": "China Moves to Curb Tech Exports, Including AI, Citing National Security Risks",
+     "outlet": "US News",
+     "url": "https://www.usnews.com/news/business/articles/2026-10-16/china-moves-to-curb-tech-exports-including-ai-citing-national-security-risks"
+    },
+    {
+     "title": "China moves to curb tech exports, including AI, citing national security risks",
+     "outlet": "BNN Bloomberg",
+     "url": "https://www.bnnbloomberg.ca/business/artificial-intelligence/2026/10/16/china-moves-to-curb-tech-exports-including-ai-citing-national-security-risks/"
+    }
+   ]
+  },
+  {
+   "headline": "美債殖利率自高點回落，美股基金一週轉為淨流入",
+   "paragraphs": [
+    "路透週四引述 LSEG Lipper 資料，截至 10/14 一週，美股基金淨流入約 130.1 億美元，扭轉前一週的流出；全球股票基金連續第四週淨流入。",
+    "路透指出，背景是美債殖利率從接近 25 年高點回落，投資人也看好財報季；但科技基金因產業債務攀升的疑慮，同週遭撤資約 52.1 億美元。"
+   ],
+   "sources": [
+    {
+     "title": "US equity funds draw renewed inflows as Treasury yields ease",
+     "outlet": "路透（Investing.com 轉載）",
+     "url": "https://www.investing.com/news/economy-news/us-equity-funds-draw-renewed-inflows-as-treasury-yields-ease-4954040"
+    },
+    {
+     "title": "Global equity funds draw inflows for fourth week as Treasury yields ease",
+     "outlet": "路透（Investing.com 轉載）",
+     "url": "https://www.investing.com/news/economy-news/global-equity-funds-draw-inflows-for-fourth-week-as-treasury-yields-ease-4953578"
+    },
+    {
+     "title": "US equity funds draw renewed inflows as Treasury yields ease",
+     "outlet": "路透（WBOW 轉載）",
+     "url": "https://1027wbow.com/2026/10/16/us-equity-funds-draw-renewed-inflows-as-treasury-yields-ease/"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "昨夜（10/16）標普 500 收 7,659，距一年高點約 2.0%；那斯達克收 26,713，道瓊工業收 52,002。VIX 為 16.46，處於常態區間。",
+    "美債 10 年期殖利率 5.10%，較上一份存檔的 5.19% 下降；10 年實質殖利率 2.78%。廣體美元指數 121.60（10/09），近一月漲 3.0%。WTI 原油 101.91 美元，近一月跌 4.8%；布蘭特 126.55 美元；黃金 4,144.55 美元，近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股週五加權指數收 47,111 點，漲 141.39 點；櫃買指數漲 0.8%。台積電收 2,420 元，跌 0.8%；鴻海漲 1.9%、聯發科漲 2.0%、廣達漲 1.7%。",
+    "美股大型科技股昨夜多數走低：Meta 跌 3.7%、Alphabet 跌 2.5%、微軟與亞馬遜各跌 1.9%、輝達跌 1.4%；蘋果漲 0.4%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美台都沒有重大數據。10/28 FOMC，期貨定價不動 88%、降息 12%；到 2027/7 累計升息 36 bp。",
+    "下次 CPI，模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增 3.77%、核心 2.48%；9 月 CPI 月增實際 0.65%，高於該模型的 0.53%。第三季 GDP 模型預估（亞特蘭大聯準銀行 GDPNow）3.6%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定沒有變：九宮格仍是「通膨未解」（就業 中 × 通膨 高），政策傾向偏升息（score 4）。訊號 13 條，偏升息 5、偏降息 4、中性 4，與上一份相同。",
+    "核心 PCE 3.01%、失業率 4.20% 不變；10 年期殖利率由 5.19% 降到 5.10%，10 年實質由 2.84% 降到 2.78%，衰退風險刻度由 43.47 降到 43.41。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-16",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 60,
+  "sources": 12,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 16,
+  "output_tokens": 14529,
+  "cache_creation_input_tokens": 40260,
+  "cache_read_input_tokens": 170516,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.566
+ }
+}
