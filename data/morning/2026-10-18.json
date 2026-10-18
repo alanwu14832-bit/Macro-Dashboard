@@ -1,0 +1,136 @@
+{
+ "date": "2026-10-18",
+ "written_at": "2026-10-18T08:17:16+08:00",
+ "model": "claude-opus-5-5",
+ "title": "晶片股連八跌 油價衝五個月高",
+ "lede": "美股10月16日在科技股賣壓下收低，晶片股連續八天下跌，布蘭特油價觸及五月以來高點；聯準會主席華許在IMF年會沒有釋出利率訊號。本站判定仍是「通膨未解」，與上一份相同；今天台美都沒有重大數據。",
+ "stories": [
+  {
+   "headline": "晶片股連跌八天，那斯達克單週跌4.5%",
+   "paragraphs": [
+    "美東10月16日週五，美股受大型科技股拖累收低。ABC新聞轉載的美聯社統計顯示，標普500跌1.1%至7,659.44點，那斯達克綜合指數跌2.1%至26,140.03點，道瓊跌0.3%；那斯達克整週跌4.5%，美光、英特爾分別跌5.6%與5.8%。",
+    "彭博報導，晶片股連續第八個交易日下跌，是2008年以來最長的連跌，投資人懷疑AI基礎建設投資能否回收；雲端業者CoreWeave重挫12%。彭博也提到，油價走高壓低了美債價格。"
+   ],
+   "sources": [
+    {
+     "title": "How major US stock indexes fared Friday 10/16/2026",
+     "outlet": "ABC News（美聯社）",
+     "url": "https://abcnews.com/Business/wireStory/major-us-stock-indexes-fared-friday-10162026-137331951"
+    },
+    {
+     "title": "Chip Stocks Post Longest Losing Streak Since 2008: Markets Wrap",
+     "outlet": "彭博",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-15/stock-market-today-dow-s-p-live-updates"
+    }
+   ]
+  },
+  {
+   "headline": "中東緊張升溫，布蘭特油價觸及五個月高點",
+   "paragraphs": [
+    "NBC新聞報導，布蘭特原油10月16日盤中突破每桶110美元，收在109.86美元，是5月19日以來最高收盤；同一天科技股市值蒸發超過1兆美元。",
+    "NBC指出，債務膨脹、高利率與油價上漲的疑慮同時浮現，帶動科技股賣壓。Trading Economics的資料顯示，西德州原油當天漲3.95%至每桶101.84美元，該站把油價走高歸因於中東局勢升溫與供應中斷。"
+   ],
+   "sources": [
+    {
+     "title": "Tech stocks erase $1 trillion of wealth as oil surges to $110 for the first time since May",
+     "outlet": "NBC News",
+     "url": "https://www.nbcnews.com/business/energy/oil-prices-hormuz-iran-ukraine-rcna603919"
+    },
+    {
+     "title": "Crude Oil - Price - Chart - Historical Data - News",
+     "outlet": "Trading Economics",
+     "url": "https://tradingeconomics.com/commodity/crude-oil"
+    }
+   ]
+  },
+  {
+   "headline": "華許在IMF年會不給利率訊號",
+   "paragraphs": [
+    "CNBC報導，聯準會主席華許10月16日在曼谷舉行的IMF與世界銀行年會上發言，沒有對利率給出方向，並形容全球多數央行同步緊縮是對抗物價的共同之戰；他也說AI能讓經濟更有生產力，但過程可能「非常顛簸」。",
+    "CNBC另一篇分析指出，聯準會9月把利率升到3.75%至4%，是2023年以來首次升息；9月經濟預測的中位數顯示年內還有一次升息，留下10月暫停、12月再升的空間。不過分析認為，華許不採傳統前瞻指引，又強調2%的PCE目標是固定的，10月的決策仍有變數。"
+   ],
+   "sources": [
+    {
+     "title": "Fed's Warsh withholds rate signal, praises recent global tightening",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/16/feds-warsh-says-ai-development-path-will-be-very-bumpy-.html"
+    },
+    {
+     "title": "Analysis: Everyone expects the Fed to hold rates in October. Kevin Warsh could surprise us all",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/16/kevin-warsh-fed-october-rate-hike-interest-rates-markets.html"
+    }
+   ]
+  },
+  {
+   "headline": "台積電獲利連六季創新高，ADR仍隨晶片股走低",
+   "paragraphs": [
+    "雅虎財經報導，台積電10月15日公布第三季財報，獲利連續第六季創新高，年增將近69%，營收成長51%，本季營收上看543億美元；公司也證實正派團隊評估德州設廠。",
+    "雅虎財經指出，類股整體賣壓蓋過了財報，台積電ADR應聲走低；StockAnalysis資料顯示，ADR在10月16日收412.61美元，跌2.28%。"
+   ],
+   "sources": [
+    {
+     "title": "TSMC stock drops despite record profit amid 'extremely robust demand' for AI chips",
+     "outlet": "雅虎財經",
+     "url": "https://finance.yahoo.com/markets/stocks/article/tsmc-stock-drops-despite-record-profit-amid-extremely-robust-demand-for-ai-chips-152649370.html"
+    },
+    {
+     "title": "Taiwan Semiconductor Manufacturing Company (TSM) Stock Price & Overview",
+     "outlet": "StockAnalysis",
+     "url": "https://stockanalysis.com/stocks/tsm/"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "最近一個交易日的美國市場（10/16 週五）",
+   "paragraphs": [
+    "10月16日（週五）標普500收7,659點，比一年高點低2.0%；道瓊收52,002點，比一年高點低4.3%。VIX為16.46，波動率在常態區間；風險胃納指標34.5，屬謹慎。",
+    "10年期公債殖利率5.10%，近三月上升0.53個百分點；30年期5.43%，10年實質利率2.78%，10減2利差0.33個百分點。美元廣體指數121.60（10月9日資料）。",
+    "商品方面，西德州原油每桶101.91美元，近一月跌4.8%、近一年漲63.4%；黃金每盎司4,144.55美元，近一月跌9.3%；銅每噸13,542.82美元，位在十年百分位99。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股10月16日加權指數收47,111點，漲141.39點、0.3%；櫃買指數收400.26點，漲0.8%。權值股台積電收2,420元，跌20元、0.8%；聯發科漲2.0%至4,250元，鴻海漲1.9%至244元，廣達漲1.7%至322元，台達電與中華電各漲0.3%。",
+    "美股權值股10月16日多數收低：Meta跌3.7%至709.33美元，Alphabet跌2.5%，微軟與亞馬遜各跌1.9%，輝達跌1.4%至214.13美元；蘋果逆勢漲0.4%至343.46美元。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天（週日）美國與台灣都沒有重大數據或政策決議。",
+    "聯準會10月28日開會，期貨定價（聯邦基金利率期貨）為不變88%、降息12%、升息0%；期貨定價到2027年7月累計升息36 bp。",
+    "下一次CPI，模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增3.77%、月增0.27%，核心CPI年增2.48%、月增0.21%；PCE年增3.60%，核心PCE年增3.05%。第三季GDP，模型預估（亞特蘭大聯準銀行 GDPNow）年化季增3.6%。台灣央行下次理監事會在12月17日。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份（10月17日）相同：九宮格仍在「通膨未解」（就業中、通膨高），政策重心是通膨優先，政策傾向偏升息（score 4）。訊號共13條，偏升息5、偏降息4、中性4，沒有新增或消失。",
+    "關鍵讀數都沒有變：核心PCE 3.01%、核心CPI 2.56%、核心服務除住房3.23%、失業率4.20%、三月均非農50.67千人、10年期殖利率5.10%、衰退風險刻度43.41。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-16",
+  "overnight": false
+ },
+ "checks": {
+  "numbers": 84,
+  "sources": 8,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 18,
+  "output_tokens": 9265,
+  "cache_creation_input_tokens": 29170,
+  "cache_read_input_tokens": 142901,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.3998
+ }
+}
