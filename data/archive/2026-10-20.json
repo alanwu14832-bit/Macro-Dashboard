@@ -1,6 +1,6 @@
 {
  "date": "2026-10-20",
- "generated_at": "2026-10-20T06:49:24+08:00",
+ "generated_at": "2026-10-20T09:17:00+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -71,7 +71,7 @@
    "headline": "股債同向，債券對股票的對沖效果變差",
    "direction": "neutral",
    "severity": "medium",
-   "evidence": "標普報酬與10年殖利率變動相關 -0.35（近一年）",
+   "evidence": "標普報酬與10年殖利率變動相關 -0.36（近一年）",
    "module": "市場"
   },
   {

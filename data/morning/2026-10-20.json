@@ -1,0 +1,139 @@
+{
+ "date": "2026-10-20",
+ "written_at": "2026-10-20T09:19:38+08:00",
+ "model": "claude-opus-5-5",
+ "title": "科技股反彈，台股仍承受外資賣壓",
+ "lede": "美股10月19日由晶片與AI股帶頭反彈，費城半導體指數結束連八跌，亞馬遜獲摩根士丹利列為首選股大漲。台股前一天靠政府基金護盤收斂跌幅，今早仍走低。本站判定與上一份相同，仍是「通膨未解」。",
+ "stories": [
+  {
+   "headline": "晶片股止跌回升，那斯達克漲逾1%",
+   "paragraphs": [
+    "CNBC報導，美股10月19日週一科技股從上週賣壓中反彈，那斯達克漲1.11%、收26,430.89點，標普500漲0.41%，道瓊小跌0.07%。中時新聞網報導，費城半導體指數收漲1.61%，結束連八跌，台積電ADR漲1.84%。",
+    "CNBC指出，半導體ETF在連跌九天後回升近3%，輝達漲約2%；金融股沒跟上，花旗與摩根大通跌近2%。TheStreet把上週科技股賣壓歸因於殖利率偏高與通膨疑慮。"
+   ],
+   "sources": [
+    {
+     "title": "Stock market news for Oct. 19, 2026",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/18/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "Stock Market Today (Oct. 19, 2026): Nasdaq climbs as tech rebounds from sell-off",
+     "outlet": "TheStreet",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-oct-19-2026-nasdaq-futures-climb-as-tech-rebound-from-sell-off"
+    },
+    {
+     "title": "台股賣壓重！早盤續殺近300點 台積電下殺守2400元",
+     "outlet": "中時新聞網",
+     "url": "https://www.chinatimes.com/realtimenews/20261020001413-260410"
+    }
+   ]
+  },
+  {
+   "headline": "摩根士丹利列亞馬遜為首選，股價漲5%",
+   "paragraphs": [
+    "Yahoo Finance轉載24/7 Wall St.報導，摩根士丹利19日把亞馬遜列為首選股並上調AWS成長預估，亞馬遜當天大漲5%。",
+    "報導指出，摩根士丹利估計AWS營業利益率2027年達42%、2028年達44%。AskTraders報導，亞馬遜收262.49美元，是8月28日以來最高收盤價。"
+   ],
+   "sources": [
+    {
+     "title": "Amazon Jumps 5% as Morgan Stanley Names It Top Pick on Faster AWS Growth; Microsoft and Alphabet Edge Higher",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/amazon-jumps-5-morgan-stanley-161544196.html"
+    },
+    {
+     "title": "Why Amazon Stock Jumped on Monday",
+     "outlet": "AskTraders",
+     "url": "https://www.asktraders.com/analysis/why-amazon-stock-jumped-on-monday/"
+    }
+   ]
+  },
+  {
+   "headline": "外資匯出拖累股匯，國家隊進場護盤",
+   "paragraphs": [
+    "聯合報報導，台股19日受AI投資疑慮影響盤中一度大跌941點，政府基金與公股行庫進場買進台積電等權值股，終場跌289點；台積電尾盤一筆大單拉回平盤，新台幣盤中重貶逾兩角。",
+    "聯合報標題直指外資撤離壓力未減。中時新聞網報導，20日早盤日經跌逾850點、韓股跌逾2%，台股開出後下跌超過280點。"
+   ],
+   "sources": [
+    {
+     "title": "股匯雙殺！國家隊護盤急穩市 外資撤離壓力未減",
+     "outlet": "聯合報",
+     "url": "https://udn.com/news/story/7238/9824913"
+    },
+    {
+     "title": "台股賣壓重！早盤續殺近300點 台積電下殺守2400元",
+     "outlet": "中時新聞網",
+     "url": "https://www.chinatimes.com/realtimenews/20261020001413-260410"
+    }
+   ]
+  },
+  {
+   "headline": "俄羅斯能源鬆綁與胡塞攻擊拉扯油價",
+   "paragraphs": [
+    "BabyPips指出，川普上週五簽署行政命令，豁免部分對俄能源出口的制裁與關稅，壓低19日早盤油價；葉門胡塞組織宣稱攻擊沙烏地能源設施後，WTI回到100美元以上。",
+    "BabyPips記錄WTI在100美元附近收平，TheStreet則報導WTI期貨漲逾2%，兩者說法不一。"
+   ],
+   "sources": [
+    {
+     "title": "Financial & Forex Market Recap – Oct. 19, 2026",
+     "outlet": "BabyPips",
+     "url": "https://www.babypips.com/news/financial-forex-market-recap-2026-10-19"
+    },
+    {
+     "title": "Stock Market Today (Oct. 19, 2026): Nasdaq climbs as tech rebounds from sell-off",
+     "outlet": "TheStreet",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-oct-19-2026-nasdaq-futures-climb-as-tech-rebound-from-sell-off"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "昨夜（2026-10-19）標普500收7,690.73點，道瓊工業收51,966.03點。VIX為19.99，處於常態區間。",
+    "10年期美債殖利率5.09%，較上一份的5.10%下降；10年實質利率2.74%，由2.78%下降。廣體美元指數121.40（2026-10-16）。WTI原油101.91美元/桶；黃金4,144.55美元/盎司，近一月跌9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股今早盤中（09:17報價）加權指數46,489.41點，跌332.67點、跌0.7%。台積電2,395元，跌1.0%；台達電跌20元，鴻海跌1.5元，聯發科漲10元，廣達與中華電平盤。",
+    "美股權值股：亞馬遜漲5.0%，輝達漲1.4%，Alphabet漲1.1%，微軟漲0.8%；蘋果跌0.2%，Meta跌0.5%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "台灣：經濟部今天16:00公布外銷訂單（資料期11509），動向指數上一期為49.7。美國：台北時間今晚20:30公布新屋開工。",
+    "聯準會10/28會議，期貨定價不變88%、降息12%；到2027/7累計升息36 bp。下一次CPI，模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增3.77%、核心2.48%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔（2026-10-19）相同：九宮格「通膨未解」（就業中、通膨高），政策重心通膨優先，傾向偏升息（score 4）。訊號13條，偏升息5、偏降息4、中性4，沒有增減。",
+    "變動的讀數：10年期殖利率5.09%（原5.10%）、10年實質利率2.74%（原2.78%）、10減2利差0.35個百分點（原0.33）、衰退風險刻度43.07（原43.41）。核心PCE 3.01%、失業率4.20%不變；台灣讀數也與上一份相同。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-19",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 70,
+  "sources": 9,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 18,
+  "output_tokens": 14510,
+  "cache_creation_input_tokens": 39115,
+  "cache_read_input_tokens": 175350,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.5609
+ }
+}
