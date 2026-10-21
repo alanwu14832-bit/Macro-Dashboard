@@ -1,6 +1,6 @@
 {
  "date": "2026-10-21",
- "generated_at": "2026-10-21T04:59:50+08:00",
+ "generated_at": "2026-10-21T08:14:46+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -134,14 +134,14 @@
   "real_ten_year": 2.8,
   "policy_upper": 4.0,
   "curve_10_2": 0.3800000000000008,
-  "recession_gauge": 43.26914406642005,
+  "recession_gauge": 43.40118432166895,
   "composite_labor": -6.927513808785794
  },
  "readings_tw": {
   "score": 41.0,
   "light": "紅",
   "exports_yoy": 60.9,
-  "orders_yoy": 61.9,
+  "orders_yoy": 62.4,
   "cpi": 2.73,
   "unemployment": 3.41,
   "policy": 2.0,
