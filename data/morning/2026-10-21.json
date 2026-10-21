@@ -1,0 +1,117 @@
+{
+ "date": "2026-10-21",
+ "written_at": "2026-10-21T08:51:17+08:00",
+ "model": "claude-opus-5-5",
+ "title": "油價回落美債走揚，道瓊漲逾500點",
+ "lede": "美股10/20在財報帶動下走高，道瓊大漲、那斯達克持平；彭博報導油價自高檔回落，美債殖利率全線下滑。台灣9月外銷訂單創單月新高。本站情境判定維持「通膨未解」，訊號沒有增減。",
+ "stories": [
+  {
+   "headline": "財報與油價回落撐盤，道瓊漲逾500點",
+   "paragraphs": [
+    "CNBC報導，美股10月20日道瓊工業指數上漲529.85點（1.02%），收52,495.88點；標普500小漲0.28%，那斯達克微跌0.02%。3M財報亮眼並上調財測，股價漲逾5%。",
+    "CNBC指出，財報與油價回落蓋過了AI相關股的壓力。Frank Cappelleri的收盤整理則指出漲勢擴散，羅素2000漲1.65%領先，等權重標普勝過市值加權指數。"
+   ],
+   "sources": [
+    {
+     "title": "Dow jumps 500 points as earnings optimism steadies market: Live updates",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/19/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "Closing Look — Tuesday, October 20, 2026",
+     "outlet": "Substack（Frank Cappelleri）",
+     "url": "https://cappnotes.substack.com/p/closing-look-tuesday-october-20-2026"
+    }
+   ]
+  },
+  {
+   "headline": "油價自高檔回落，美債走揚、交易員下修升息押注",
+   "paragraphs": [
+    "彭博10月20日報導，基準油價從數週高點回落，美國公債上漲，各天期殖利率下降3至6個基點、長債領漲，交易員因此減少對聯準會未來一年升息的押注。",
+    "CNBC報導，西德州原油期貨收跌1.8%至每桶101.79美元；胡塞組織宣稱攻擊沙烏地設施，中東供應風險仍受關注。"
+   ],
+   "sources": [
+    {
+     "title": "Treasuries Rise as Oil Retreats From Highest Levels in Weeks",
+     "outlet": "彭博",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-20/treasuries-rise-as-oil-retreats-from-highest-levels-in-weeks"
+    },
+    {
+     "title": "Dow jumps 500 points as earnings optimism steadies market: Live updates",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/19/stock-market-today-live-updates.html"
+    }
+   ]
+  },
+  {
+   "headline": "台灣9月外銷訂單1142億美元創單月新高，連20紅",
+   "paragraphs": [
+    "中央社報導，經濟部10月20日公布9月外銷訂單1142.1億美元，年增62.4%，連續20個月正成長；前9月累計8192億美元，已超越去年全年紀錄。",
+    "統計處長黃偉傑估第4季接單將高於第3季。經濟日報報導，美國、陸港、歐洲、東協9月接單同步創高，美國訂單以伺服器、手機與筆電為主。"
+   ],
+   "sources": [
+    {
+     "title": "前9月外銷訂單累計8192億美元 提前改寫全年新高",
+     "outlet": "中央社",
+     "url": "https://www.cna.com.tw/news/afe/202610200279.aspx"
+    },
+    {
+     "title": "外銷訂單強強滾 四大市場齊旺 9月接單飆高",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/10869/9827240"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "10/20 美股收盤：道瓊工業 52,496 點，標普 500 為 7,691 點，那斯達克 26,431 點；標普距一年高點還低 1.6%。VIX 18.44，處於常態區間。",
+    "本站最新的 10 年期殖利率讀數為 5.15%，較上一份存檔的 5.09% 上升，30 年期 5.48%；彭博報導的 10/20 走勢則是殖利率下滑（見要聞）。廣體美元指數 121.40（資料日 2026-10-16），近一月漲 2.1%。",
+    "WTI 原油 101.91 美元，近一月跌 4.8%；黃金 4,144.55 美元，近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股加權指數昨收 46,292.93 點。盤前報價台積電 2,415 元，較昨收 2,405 元漲 0.4%；台達電漲 2.2%、鴻海漲 1.4%，聯發科跌 1.7%。",
+    "美股權值股多數收低：Meta 跌 1.6%、Alphabet 跌 1.1%、蘋果跌 1.0%，輝達與微軟各跌 0.3%，亞馬遜漲 0.1%。",
+    "國發會景氣對策信號 41 分紅燈，已連續 9 個月。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美國與台灣都沒有重大數據或政策決議。10/28 FOMC 期貨定價：不動 88%、降息 12%、升息 0%；到 2027/7 累計升息 36 bp。",
+    "下一份 CPI 的模型預估（克里夫蘭聯準銀行 Inflation Nowcasting，2026-10-20 的估計）為年增 3.77%、月增 0.27%，核心 CPI 年增 2.48%。上次 9 月核心 CPI 月增實際 0.33%，比模型預估高 0.13 個百分點。模型預估（亞特蘭大聯準銀行 GDPNow）2026 年 Q3 年化季增 3.5%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔（2026-10-20）相同：九宮格「通膨未解」（就業 中 × 通膨 高），政策重心通膨優先，傾向偏升息（score 4）。訊號 13 條，偏升息 5、偏降息 4、中性 4，沒有增減。",
+    "關鍵讀數：10 年期殖利率由 5.09% 升至 5.15%，10 年實質利率由 2.74% 升至 2.80%，衰退風險刻度由 43.07 升至 43.40；核心 PCE 3.01%、失業率 4.20% 沒有變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-20",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 71,
+  "sources": 6,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 20,
+  "output_tokens": 14240,
+  "cache_creation_input_tokens": 39878,
+  "cache_read_input_tokens": 210010,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.5663
+ }
+}
