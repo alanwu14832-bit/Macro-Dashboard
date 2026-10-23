@@ -1,0 +1,149 @@
+{
+ "date": "2026-10-23",
+ "written_at": "2026-10-23T08:58:16+08:00",
+ "model": "claude-opus-5-5",
+ "title": "AI疑慮再起，科技股重挫、資金湧入美債",
+ "lede": "Meta財報重燃對AI資本支出的疑慮，那斯達克寫下6月初以來最大單日跌幅，資金轉進美債；胡塞組織攻擊沙烏地，油價升至五個月高點。台股同日已先重挫846點。本站情境判定與上一份相同，仍是「通膨未解」。",
+ "stories": [
+  {
+   "headline": "Meta擴大資本支出重燃AI疑慮，那斯達克創6月以來最大跌幅",
+   "paragraphs": [
+    "路透報導，美股10月22日（週四）收黑，一連串AI相關財報再度引發對AI支出競賽的擔憂，那斯達克跌2.6%，是6月初以來最大單日跌幅；標普500跌1.21%，道瓊勉強收紅。",
+    "彭博指出，Meta宣布提高資本支出，勾起科技公司將大舉發債支應AI建設的憂慮，晶片股重挫近7%。雅虎財經報導，Meta季報公布後跌近7%。"
+   ],
+   "sources": [
+    {
+     "title": "S&P 500, Nasdaq end sharply lower as revived AI doubts ignite tech selloff",
+     "outlet": "路透（雅虎財經轉載）",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/nasdaq-futures-drop-over-1-093849296.html"
+    },
+    {
+     "title": "Stock Market Today: Dow, S&P Live Updates for October 22 - Bloomberg",
+     "outlet": "彭博",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-21/stock-market-today-dow-s-p-live-updates"
+    },
+    {
+     "title": "Stock market today: S&P 500, Nasdaq tanks as tech stocks sink amid AI trade worries, Meta shares plummet",
+     "outlet": "雅虎財經",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-thursday-october-22-dow-sp-500-nasdaq-tesla-meta-112217857.html"
+    }
+   ]
+  },
+  {
+   "headline": "胡塞組織攻擊沙烏地，國際油價升至五個月高點",
+   "paragraphs": [
+    "路透報導，葉門胡塞組織攻擊沙烏地阿拉伯，引發中東供應中斷的擔憂，油價10月22日漲約3%，創五個月新高；美東下午1點左右，布蘭特原油期貨報每桶112.33美元。",
+    "MarineLink轉述路透報導，沙烏地阿美已要求達蘭總部員工撤離。彭博指出，油價走高也壓抑了當天的股市情緒。"
+   ],
+   "sources": [
+    {
+     "title": "Oil hits five-month high as Houthi attacks stoke supply fears",
+     "outlet": "路透（雅虎財經轉載）",
+     "url": "https://finance.yahoo.com/energy/articles/oil-climbs-over-1-more-052014906.html"
+    },
+    {
+     "title": "Houthi Attacks Drive Oil Prices to Five-Month High",
+     "outlet": "MarineLink",
+     "url": "https://www.marinelink.com/news/houthi-attacks-drive-oil-prices-fivemonth-543850"
+    }
+   ]
+  },
+  {
+   "headline": "資金湧入美債，10年期殖利率跌回5%以下",
+   "paragraphs": [
+    "CNBC報導，美債殖利率10月22日走低，盤中10年期降逾10個基點至5.038%，2年期降逾9個基點至4.731%。雅虎財經指出，10年期當天跌回5%以下，可能是兩年多來最大單日降幅。",
+    "彭博報導，科技股重挫與中東風險讓資金轉向債券，交易員減少押注聯準會今年再升息。"
+   ],
+   "sources": [
+    {
+     "title": "Treasury yields fall as investors weigh Middle East tensions and await fresh jobs data",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/amp/2026/10/22/treasurys-bonds-ai-yields.html"
+    },
+    {
+     "title": "Stock market today: S&P 500, Nasdaq tanks as tech stocks sink amid AI trade worries, Meta shares plummet",
+     "outlet": "雅虎財經",
+     "url": "https://finance.yahoo.com/markets/article/stock-market-today-thursday-october-22-dow-sp-500-nasdaq-tesla-meta-112217857.html"
+    },
+    {
+     "title": "U.S. Treasury yields may be poised for a breakout with Fed meeting as catalyst, says BMO",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/22/us-treasury-yields-breakout-fed-bmo-.html"
+    }
+   ]
+  },
+  {
+   "headline": "台股重挫846點失守季線，外資賣超816億元",
+   "paragraphs": [
+    "聯合新聞網報導，台股10月22日開高走低，加權指數終場跌846.34點，收46,041.43點，跌破季線；三大法人合計賣超1,001.6億元，其中外資及陸資賣超816.56億元。NOWnews指出，早盤一度大漲逾400點，但中東局勢升溫、油價反彈，指數由紅翻黑。",
+    "Yahoo奇摩新聞報導，外資10月以來累計賣超逾8,200億元，新台幣22日收在32.508元；央行19日說明，新台幣走貶主要反映國際股市動盪及外資賣超併同股利匯出。"
+   ],
+   "sources": [
+    {
+     "title": "外資又揮大刀！三大法人賣超1,001億元 台股重挫846點失守季線",
+     "outlet": "聯合新聞網",
+     "url": "https://udn.com/news/story/7251/9831314"
+    },
+    {
+     "title": "台股開高走低！終場重挫846點失守季線 台積電跌35元",
+     "outlet": "NOWnews",
+     "url": "https://www.nownews.com/news/6885606"
+    },
+    {
+     "title": "外資提款816億 台股跌846點失守季線",
+     "outlet": "Yahoo奇摩新聞",
+     "url": "https://tw.news.yahoo.com/%E5%A4%96%E8%B3%87%E6%8F%90%E6%AC%BE816%E5%84%84-%E5%8F%B0%E8%82%A1%E8%B7%8C846%E9%BB%9E%E5%A4%B1%E5%AE%88%E5%AD%A3%E7%B7%9A-100000258.html"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "美東10月22日收盤（FRED）：標普500為7,757，距一年高點0.8%；那斯達克26,703，距一年高點3.3%；道瓊工業52,868。VIX為16.68，處常態區間。",
+    "本站序列最新一筆10年期殖利率5.13%，較上一份的5.12%上升，與要聞的盤中報價時點不同。WTI原油每桶107.89美元，近一月漲11.3%；黃金每盎司4,144.55美元，近一月跌9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股10月22日加權指數收46,041，跌846點、跌1.8%；櫃買指數跌3.5%。台積電收2,385元，跌35元；聯發科跌3.1%、台達電跌4.0%、鴻海跌2.0%，中華電逆勢漲2.6%。",
+    "美股權值股：Meta收648.85美元，跌7.0%；亞馬遜跌4.6%、輝達跌4.4%、Alphabet跌3.1%、微軟跌2.2%，蘋果漲1.2%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "台灣今天16:00公布9月失業率（主計總處）與工業生產（經濟部）；8月失業率為3.41%。美國今天沒有重大數據。",
+    "聯準會10月28日會議，期貨定價：不變88%、降息12%、升息0%；到2027年7月累計升息36個基點。下一次CPI的模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增3.75%，核心CPI年增2.48%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "情境與上一份存檔相同：九宮格「通膨未解」（就業中 × 通膨高），政策重心通膨優先，傾向偏升息（score 4）；訊號12條，偏升息5、偏降息4、中性3，沒有增減。",
+    "讀數變動：10年期殖利率由5.12%上升至5.13%，10年實質利率由2.77%下降至2.76%，衰退風險刻度由43.49升至44.43；核心PCE 3.01%、失業率4.20%不變。台灣讀數與上一份相同。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-22",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 62,
+  "sources": 11,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 22,
+  "output_tokens": 16813,
+  "cache_creation_input_tokens": 42488,
+  "cache_read_input_tokens": 233609,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.6355
+ }
+}
