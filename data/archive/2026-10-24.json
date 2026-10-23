@@ -1,6 +1,6 @@
 {
  "date": "2026-10-24",
- "generated_at": "2026-10-24T02:51:05+08:00",
+ "generated_at": "2026-10-24T05:50:28+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -25,14 +25,6 @@
    "severity": "high",
    "evidence": "綜合分數 41 分（紅燈 38–45、藍燈 9–16）",
    "module": "台灣"
-  },
-  {
-   "key": "debt_dynamics_adverse",
-   "headline": "實質利率高於實質成長，債務比會自動累積",
-   "direction": "hawkish",
-   "severity": "medium",
-   "evidence": "r−g 為 +0.6 個百分點，債務佔 GDP 123%",
-   "module": "債務"
   },
   {
    "key": "inflation_broad",
@@ -63,7 +55,7 @@
    "headline": "10年實質利率處於限制性水準",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "10年實質利率 2.76%",
+   "evidence": "10年實質利率 2.64%",
    "module": "利率"
   },
   {
@@ -108,12 +100,12 @@
   }
  ],
  "summary": {
-  "total": 13,
-  "hawkish": 5,
+  "total": 12,
+  "hawkish": 4,
   "dovish": 4,
   "neutral": 4,
-  "score": 4,
-  "tilt": "偏升息"
+  "score": 2,
+  "tilt": "方向分歧"
  },
  "scenario": {
   "name": "通膨未解",
@@ -130,11 +122,11 @@
   "core_cpi": 2.5643583511686607,
   "core_pce": 3.0075959761856064,
   "supercore": 3.2293721989494317,
-  "ten_year": 5.13,
-  "real_ten_year": 2.76,
+  "ten_year": 4.96,
+  "real_ten_year": 2.64,
   "policy_upper": 4.0,
-  "curve_10_2": 0.3200000000000003,
-  "recession_gauge": 44.43388152922659,
+  "curve_10_2": 0.3099999999999996,
+  "recession_gauge": 44.16492393649637,
   "composite_labor": -6.919092889105376
  },
  "readings_tw": {
@@ -151,6 +143,6 @@
  "as_of": {
   "labor": "2026-09-01",
   "inflation": "2026-09-01",
-  "rates": "2026-10-21"
+  "rates": "2026-10-22"
  }
 }
