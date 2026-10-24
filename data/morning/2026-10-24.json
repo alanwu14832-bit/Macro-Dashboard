@@ -1,0 +1,135 @@
+{
+ "date": "2026-10-24",
+ "written_at": "2026-10-24T09:05:40+08:00",
+ "model": "claude-opus-5-5",
+ "title": "油價半年高點壓美股，台股颱風休市",
+ "lede": "中東緊張推升油價到半年高點，美股週五三大指數全數收低，道瓊重挫逾600點，AI支出疑慮也還沒散去。台股因薔琵颱風休市，連同光復節補假連休四天。下週三聯準會利率決議登場，期貨定價維持不變的機率是88%。",
+ "stories": [
+  {
+   "headline": "美股週五全面收低，道瓊重挫逾600點",
+   "paragraphs": [
+    "CNBC報導，美東時間23日週五，道瓊工業指數跌652.82點、跌幅1.23%，收52,215.16點；標普500跌0.52%，那斯達克跌0.21%。道瓊成分股美國運通宣布裁減全球約5%人力、稱要為AI做準備，股價跌逾3%。",
+    "雅虎財經指出，油價走高在下週聯準會會議前壓抑市場情緒。"
+   ],
+   "sources": [
+    {
+     "title": "Stock market news for Oct. 23, 2026",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/22/stock-market-today-live-update.html"
+    },
+    {
+     "title": "Stock market today: Dow sinks 600 points, S&P 500, Nasdaq drop to cap a volatile week, oil prices rise",
+     "outlet": "雅虎財經",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-october-23-dow-sp-500-nasdaq-tesla-meta-093000521.html"
+    }
+   ]
+  },
+  {
+   "headline": "AI支出疑慮引爆科技股賣壓，那斯達克創6月以來最差單日",
+   "paragraphs": [
+    "Zacks刊於雅虎財經的報導指出，22日週四那斯達克重挫2.6%，是6月初以來最差單日，投資人憂心AI資料中心的龐大支出能否持續，油價走高也打擊信心。",
+    "NordFX整理，費城半導體指數當天大跌6.7%，美國10年期公債殖利率降到約4.97%，是兩年多來最大單日降幅，資金轉進債市。"
+   ],
+   "sources": [
+    {
+     "title": "Stock Market News for Oct 23, 2026",
+     "outlet": "雅虎財經（Zacks）",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-news-oct-23-081700850.html"
+    },
+    {
+     "title": "Market Pulse",
+     "outlet": "NordFX",
+     "url": "https://nordfx.com/market-news/market-pulse-october-23-2026"
+    }
+   ]
+  },
+  {
+   "headline": "布蘭特原油升至半年高點，中東情勢推升",
+   "paragraphs": [
+    "雅虎財經報導，布蘭特原油12月期貨23日以半年高點每桶116.72美元結算。TT News指出，布蘭特10月初還不到97美元，全美汽油均價升到每加侖4.29美元。",
+    "雅虎財經另一篇報導說，胡塞組織持續攻擊沙烏地石油設施，加上有報導指白宮準備在期中選舉後對伊朗恢復空襲，推升油價；同篇引述CME FedWatch，聯準會維持利率不變的機率仍有91.7%。"
+   ],
+   "sources": [
+    {
+     "title": "Oil prices hit levels not seen since March - TT",
+     "outlet": "TT News",
+     "url": "https://www.ttnews.com/articles/oil-prices-levels-may"
+    },
+    {
+     "title": "Gold price today, Friday, October 23, 2026: Gold opens at 3-month lows as oil prices keep rising",
+     "outlet": "雅虎財經",
+     "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-friday-october-23-2026-gold-opens-at-3-month-lows-as-oil-prices-keep-rising-111248003.html"
+    }
+   ]
+  },
+  {
+   "headline": "薔琵颱風來襲，台股23日休市、連休四天",
+   "paragraphs": [
+    "經濟日報報導，因薔琵颱風來襲，證交所與櫃買中心23日停止交易，連同光復節補假台股連休四天，27日才開盤。",
+    "經濟日報彙整，台股22日受中東情勢升溫與長假變數衝擊，終場大跌846點收46,041點、跌破季線，三大法人賣超1,001億元。"
+   ],
+   "sources": [
+    {
+     "title": "10月23日 五件財經大事搶先看",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9832642"
+    },
+    {
+     "title": "薔琵颱風來襲 台北股市23日休市1天",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5612/9832174"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "美東23日週五，道瓊工業指數收在52,215，標普500與那斯達克同步收低。VIX為19.03，仍在常態區間。",
+    "美國10年期公債殖利率4.96%，比上一份存檔的5.13%下降；10年實質利率2.64%，10年減2年利差0.31個百分點。",
+    "WTI原油每桶107.89美元，近一月漲11.3%；黃金每盎司4,144.55美元，近一月跌9.3%。廣體美元指數121.40（2026-10-16）。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股休市，最近交易日仍是10/22：加權指數收46,041，跌846點、跌1.8%；櫃買指數跌3.5%。台積電收2,385元、跌35元，聯發科跌3.1%、台達電跌4.0%，中華電逆勢漲2.6%。",
+    "美股權值股最近收盤：微軟漲0.7%至524.51美元，輝達跌0.6%，Meta跌1.0%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美國與台灣都沒有重大數據或政策決議。下週焦點是10/28聯準會FOMC決議，期貨定價（聯邦基金利率期貨）維持不變88%、降息12%、升息0%，到2027/7累計升息36 bp。",
+    "模型預估（克里夫蘭聯準銀行 Inflation Nowcasting，2026-10-23的估計）下一次CPI年增3.75%、核心CPI年增2.48%，核心PCE年增3.05%；上一次9月核心CPI月增實際0.33%，比模型高0.13個百分點。模型預估（亞特蘭大聯準銀行 GDPNow）2026年Q3年化季增3.5%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站規則判定與上一份存檔相比沒有變：九宮格仍是「通膨未解」（就業 中 × 通膨 高），政策重心仍是通膨優先。訊號由13條減為12條，偏升息由5條減為4條，偏降息維持4條；拿掉的是「實質利率高於實質成長，債務比會自動累積」。",
+    "10年期殖利率4.96%（原5.13%）、衰退風險刻度44.16（原44.43）；核心PCE 3.01%、失業率4.20%與上一份相同。台灣讀數也沒有變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-23",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 63,
+  "sources": 8,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 22,
+  "output_tokens": 15114,
+  "cache_creation_input_tokens": 42923,
+  "cache_read_input_tokens": 239090,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.6048
+ }
+}
