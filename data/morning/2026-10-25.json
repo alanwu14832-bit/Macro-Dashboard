@@ -1,0 +1,124 @@
+{
+ "date": "2026-10-25",
+ "written_at": "2026-10-25T08:36:00+08:00",
+ "model": "claude-opus-5-5",
+ "title": "油價創四年高，聯準會週三開會",
+ "lede": "10 月 23 日週五，布蘭特原油漲到四年多來最高，美股三大指數一起收黑。下週有兩件大事：聯準會 28 日公布利率決議，三大雲端業者也陸續發財報。本站的情境判定跟上一份存檔一樣，仍是「通膨未解」。",
+ "stories": [
+  {
+   "headline": "油價衝上四年多高點，美股週五收黑",
+   "paragraphs": [
+    "美聯社報導，美股 10 月 23 日收低：標普 500 跌 0.5%，連兩週收黑；道瓊跌 1.2%，收 52,215.16 點；那斯達克跌 0.2%。布蘭特原油漲 3.1%，收每桶 116.72 美元，是 2022 年 6 月以來最高。",
+    "美聯社說，油價是當天壓垮大盤的主因，AI 相關股則有幾檔逆勢上漲。Strategitz 指出，市場擔心美伊再起衝突，10 年期公債殖利率回到 5.00%，能源類股是當天漲最多的類股。"
+   ],
+   "sources": [
+    {
+     "title": "Wall Street loses ground under pressure from rising oil prices",
+     "outlet": "美聯社（華盛頓時報轉載）",
+     "url": "https://www.washingtontimes.com/news/2026/oct/23/wall-street-loses-ground-friday-pressure-rising-oil-prices/"
+    },
+    {
+     "title": "Global Markets Close — October 23, 2026",
+     "outlet": "Strategitz",
+     "url": "https://strategitz.substack.com/p/global-markets-close-october-23-2026"
+    }
+   ]
+  },
+  {
+   "headline": "聯準會 27–28 日開會，機構估計按兵不動但保留升息空間",
+   "paragraphs": [
+    "Continuum Economics 的會前分析認為，連續第二次升息的理由充分、會中一定會討論，但比較可能把利率維持在 3.75%–4.0%，12 月才升息；主席華許反對前瞻指引，大概不會明確暗示。",
+    "該機構提到 9 月 CPI 月增 0.6%，以及 AI 投資帶動的需求推高通膨。PIMCO 也估計這次暫停但維持緊縮傾向，並認為長天期殖利率走高已部分抵銷股市對成長的推升。"
+   ],
+   "sources": [
+    {
+     "title": "FOMC Preview for October 28: Tightening to be debated but delayed",
+     "outlet": "Continuum Economics",
+     "url": "https://continuumeconomics.com/a/f1d0e0b0/fomc-preview-for-october-28-tightening-to-be-debated-but-delayed"
+    },
+    {
+     "title": "October Fed Meeting Preview: A Pause Is Still a Recalibration",
+     "outlet": "PIMCO（Advisor Perspectives 轉載）",
+     "url": "https://www.advisorperspectives.com/commentaries/2026/10/23/pause-still-recalibration?topic=retirement-income"
+    }
+   ]
+  },
+  {
+   "headline": "三大雲端業者本週發財報，路透稱是 AI 行情的考驗",
+   "paragraphs": [
+    "Tech Insider 引述路透 10 月 23 日報導，本週 Alphabet、微軟、亞馬遜公布財報，約三分之一標普 500 成分股同期發布業績，聯準會也在週三開會。",
+    "路透說，投資人愈來愈擔心資料中心支出的風險，本週是第一次拿到實際證據，檢驗這些支出有沒有回報。"
+   ],
+   "sources": [
+    {
+     "title": "AI Market Rally: Earnings and Fed Test Hit Oct. 28 [2026]",
+     "outlet": "Tech Insider（引述路透）",
+     "url": "https://tech-insider.org/wall-st-week-ahead-earnings-fed-meeting-ai-rally-2026/"
+    }
+   ]
+  },
+  {
+   "headline": "台積電獲利連六季創新高，股價卻回落",
+   "paragraphs": [
+    "Motley Fool 10 月 23 日分析指出，台積電第三季獲利連六季創高，但股價近一個月跌 7%。第三季毛利率 66.4%，在公司財測區間內，但低於第二季的 67.7%。",
+    "文章認為毛利率下滑來自 2 奈米量產與海外擴廠，加上今年資本支出將創新高、股價財報前已漲 39%，讓部分投資人轉趨謹慎。"
+   ],
+   "sources": [
+    {
+     "title": "Taiwan Semiconductor (TSMC) Posted Record Profit and the Stock Still Fell. Here's What the Market Is Worried About.",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/investing/2026/10/23/taiwan-semiconductor-posted-record-profit-and-the/"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "最近一個交易日的美國市場（10/23 週五）",
+   "paragraphs": [
+    "10 月 23 日（美東）收盤，道瓊 52,215 點，近一月漲 1.7%；那斯達克 25,955 點，近一月跌 3.7%，離一年高點 -6.0%。VIX 19.03。",
+    "本站序列的 10 年期殖利率 4.96%，近三月上升 0.25 個百分點；10 減 2 年利差 0.31 個百分點。廣體美元指數 121.40（2026-10-16）。WTI 原油 107.89 美元，近一年漲 85.1%；黃金 4,144.55 美元，近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股最近資料停在 2026-10-22：加權指數收 46,041 點，跌 1.8%；台積電收 2,385 元，跌 1.4%；聯發科跌 3.1%、台達電跌 4.0%，中華電逆勢漲 2.6%。",
+    "美股權值股 10 月 23 日：微軟漲 0.7%，輝達跌 0.6%，Alphabet 跌 1.2%，亞馬遜、Meta 各跌 1.0%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美台都沒有重大數據。本週重點是 10/28 FOMC：期貨定價不動 88%、降息 12%、升息 0%；到 2027/7 累計升息 36 bp。",
+    "模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）：下一次核心 PCE 年增 3.05%、CPI 年增 3.75%。模型預估（亞特蘭大聯準銀行 GDPNow）：2026 年 Q3 年化季增 3.5%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "跟上一份存檔比沒有變：九宮格仍是「通膨未解」（就業 中 × 通膨 高），政策重心通膨優先；訊號 12 條，偏升息 4、偏降息 4、中性 4，沒有增減。",
+    "關鍵讀數都相同：核心 PCE 3.01%、核心 CPI 2.56%、失業率 4.20%，三月均非農 50.67 千人低於損益兩平 76.62 千人，衰退風險刻度 44.16。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-23",
+  "overnight": false
+ },
+ "checks": {
+  "numbers": 59,
+  "sources": 6,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 2,
+  "input_tokens": 16,
+  "output_tokens": 9763,
+  "cache_creation_input_tokens": 38077,
+  "cache_read_input_tokens": 115633,
+  "web_search_requests": 4,
+  "attempts": 2,
+  "cost_usd": 0.4488
+ }
+}
