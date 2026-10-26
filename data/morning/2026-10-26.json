@@ -1,0 +1,130 @@
+{
+ "date": "2026-10-26",
+ "written_at": "2026-10-26T08:42:34+08:00",
+ "model": "claude-opus-5-5",
+ "title": "聯準會本週開會 油價與AI財報同場考驗",
+ "lede": "美股 10 月 23 日收低後，週日晚間期貨反彈、油價回落。本週聯準會 27–28 日開會，大型科技股同週公布財報，油價仍在高檔。本站情境判定仍是通膨未解，與上一份存檔相同。",
+ "stories": [
+  {
+   "headline": "週五美股收低，標普與那斯達克連兩週下跌",
+   "paragraphs": [
+    "CNBC 報導，油價走高加上賣壓擴散，美股三大指數 10 月 23 日全數收低：道瓊跌逾 650 點，標普 500 跌 0.5%，那斯達克跌 0.2%，標普與那斯達克連兩週下跌。",
+    "彭博報導，美東週日晚間那斯達克 100 期貨漲 0.5%、標普期貨漲 0.3%，原油回落；上週 AI 類股壓力沉重，投資人正為大型科技財報與多家央行決議做準備。"
+   ],
+   "sources": [
+    {
+     "title": "Stock futures climb as traders try to recover from the S&P 500′s losing week: Live updates",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/25/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "US Stock Futures Climb as Crude Oil Price Dips: Markets Wrap",
+     "outlet": "彭博",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-25/us-equity-futures-climb-as-crude-oil-price-dips-markets-wrap"
+    }
+   ]
+  },
+  {
+   "headline": "布蘭特原油觸及 2022 年以來高點",
+   "paragraphs": [
+    "Trading Economics 整理，布蘭特原油 10 月 23 日升至每桶 116 美元，為 2022 年 6 月以來最高，週線連三週上漲，原因是外界愈來愈認為美國可能在未來幾週恢復攻擊伊朗。",
+    "彭博報導週日晚間原油回落；Ed Lane 週報則指出，高油價持續威脅消費者與企業利潤率。"
+   ],
+   "sources": [
+    {
+     "title": "Brent oil - Price - Chart - Historical Data - News",
+     "outlet": "Trading Economics",
+     "url": "https://tradingeconomics.com/commodity/brent-crude-oil"
+    },
+    {
+     "title": "Stock Market Report for October 25, 2026",
+     "outlet": "Ed Lane（Substack）",
+     "url": "https://edwardlane.substack.com/p/stock-market-report-for-october-25"
+    }
+   ]
+  },
+  {
+   "headline": "聯準會本週開會，PIMCO 認為暫停但保留升息",
+   "paragraphs": [
+    "TradingKey 報導，聯準會 9 月升息 1 碼至 3.75%–4.00%，本週聲明在美東 28 日公布；引述 CME FedWatch，10 月 22 日不變機率約 90.6%。",
+    "PIMCO 會前展望認為 10 月會暫停，但維持緊縮傾向；PIMCO 指出長天期殖利率走高部分抵銷了股市對成長的推升。"
+   ],
+   "sources": [
+    {
+     "title": "The Week Ahead: Fed Rate Decision Looming as Microsoft, Alphabet, and Amazon Report Earnings",
+     "outlet": "TradingKey",
+     "url": "https://www.tradingkey.com/analysis/stocks/us-stocks/262237761-weekly-fed-microsoft-alphabet-amazon-earnings-tradingkey"
+    },
+    {
+     "title": "October Fed Meeting Preview: A Pause Is Still a Recalibration - PIMCO",
+     "outlet": "Advisor Perspectives（PIMCO）",
+     "url": "https://www.advisorperspectives.com/commentaries/2026/10/23/pause-still-recalibration?topic=retirement-income"
+    }
+   ]
+  },
+  {
+   "headline": "台股重挫後，分析師點名超賣半導體股",
+   "paragraphs": [
+    "中時新聞網 10 月 24 日報導，台股近期重挫，分析師點出聯電、台積電、聯發科、台達電等 16 檔技術指標超賣的個股。",
+    "報導引述凱基投顧分析師張明祥說法，台積電法說會上修全年營收展望，半導體與 AI 供應鏈有機會迎來獲利上修，市場焦點可望從短期利空轉向企業獲利。"
+   ],
+   "sources": [
+    {
+     "title": "台股下周又崩盤？「16檔錯殺股」底氣爆表 內行曝KD超賣別亂砍",
+     "outlet": "中時新聞網",
+     "url": "https://www.chinatimes.com/realtimenews/20261024002730-260410"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "最近一個交易日的美國市場（10/23 週五）",
+   "paragraphs": [
+    "美股最近一次收盤是 2026-10-23（週五）。標普 500 收 7,757，比一年高點低 0.8%；那斯達克 25,955，低 6.0%；道瓊 52,215，低 3.9%。VIX 19.03。",
+    "10 年期公債殖利率 4.96%，近三個月上升 0.25 個百分點；10 年實質利率 2.64%，10 減 2 年利差 0.31 個百分點。廣體美元指數 121.40（2026-10-16），近一月漲 2.1%。",
+    "WTI 原油每桶 107.89 美元，近一月漲 11.3%；布蘭特 115.22 美元。黃金每盎司 4,144.55 美元，近一月跌 9.3%；銅在十年百分位 100。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股最後交易日 2026-10-22，加權指數收 46,041，跌 846 點、跌 1.8%；櫃買指數跌 3.5%。台積電收 2,385 元，跌 1.4%；聯發科跌 3.1%，台達電跌 4.0%，鴻海、廣達各跌 2.0%；中華電漲 2.6%。",
+    "美股權值股最近一個交易日多數收低：輝達跌 0.6%，Alphabet 跌 1.2%，亞馬遜、Meta 各跌 1.0%；微軟漲 0.7%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美國與台灣都沒有重大數據或政策決議。本週焦點是 10/28 的 FOMC，期貨定價不動 88%、降息 12%、升息 0%；到 2027/7 期貨定價累計升息 36 bp。",
+    "模型預估（克里夫蘭聯準銀行 Inflation Nowcasting，2026-10-23 的估計）：下一次 CPI 年增 3.75%、核心 CPI 年增 2.48%，核心 PCE 年增 3.05%。模型預估（亞特蘭大聯準銀行 GDPNow）2026 年 Q3 年化季增 3.5%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔（2026-10-25）相同，沒有變。九宮格仍是「通膨未解」（就業 中 × 通膨 高），政策重心通膨優先，政策傾向方向分歧（score 2）。訊號共 12 條，偏升息 4、偏降息 4、中性 4，沒有新增或消失。",
+    "關鍵讀數全數持平：核心 PCE 3.01%、核心 CPI 2.56%、失業率 4.20%、三月均非農 50.67 千人、損益兩平 76.62 千人、衰退風險刻度 44.16。台灣讀數也與上一份相同；國發會景氣對策信號 41 分紅燈。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-23",
+  "overnight": false
+ },
+ "checks": {
+  "numbers": 76,
+  "sources": 7,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 24,
+  "output_tokens": 14509,
+  "cache_creation_input_tokens": 40591,
+  "cache_read_input_tokens": 274317,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.5881
+ }
+}
