@@ -1,0 +1,150 @@
+{
+ "date": "2026-10-28",
+ "written_at": "2026-10-28T09:39:45+08:00",
+ "model": "claude-opus-5-5",
+ "title": "聯準會明晨決議，期貨定價88%不動",
+ "lede": "聯準會會議已在美東27日展開，決議台北時間明天凌晨揭曉。會前，Anthropic申請上市帶動晶片股走強，中東談判讓油價連兩天下跌。台股連假後震盪收紅，今早走高。本站判定與上一份存檔相比沒有變。",
+ "stories": [
+  {
+   "headline": "聯準會10月會議登場，台北時間明晨公布利率決議",
+   "paragraphs": [
+    "聯準會10月例會美東27日起連開兩天，聲明在台北29日凌晨2點發布。Capital Finance Bureau整理行事曆指出，本次不公布點陣圖，會議紀要排在11月18日。",
+    "FedRateCalc整理，聯準會9月以12比0升息1碼，目標區間來到3.75%至4%，是本次會議的起點。雅虎財經提到，聯準會先前表明今年有意再升息，但專家看法不一。"
+   ],
+   "sources": [
+    {
+     "title": "FOMC Meeting Schedule 2026 and 2027: Next Fed Meeting Dates",
+     "outlet": "Capital Finance Bureau",
+     "url": "https://capitalfinancebureau.com/news/fomc-meeting-schedule-2026-2027/"
+    },
+    {
+     "title": "Next Fed Meeting Countdown",
+     "outlet": "FedRateCalc",
+     "url": "https://fedratecalc.com/fomc-meeting-schedule/"
+    },
+    {
+     "title": "When is the Fed's next meeting? See the full schedule for 2026.",
+     "outlet": "雅虎財經",
+     "url": "https://finance.yahoo.com/personal-finance/banking/article/when-is-the-next-fed-meeting-full-schedule-150709698.html"
+    }
+   ]
+  },
+  {
+   "headline": "伊朗高層討論停戰條件，國際油價連兩天走低",
+   "paragraphs": [
+    "CNBC報導，伊朗最高領袖與最高安全官員討論結束戰事的條件，原油27日連兩個交易日下跌：布蘭特跌1.7%收每桶113.88美元，西德州原油跌1.8%收99.90美元。",
+    "CNBC也指出，胡塞組織的攻擊仍威脅沙烏地阿拉伯出口。Capp Notes整理，能源是當天標普500最弱類股。"
+   ],
+   "sources": [
+    {
+     "title": "Oil prices fall after Iran supreme leader and top security official discuss conditions to end war",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/27/oil-today-iran-us-crude-wti-brent-trump.html"
+    },
+    {
+     "title": "Closing Look — Tuesday, October 27, 2026",
+     "outlet": "Capp Notes",
+     "url": "https://cappnotes.substack.com/p/closing-look-tuesday-october-27-2026"
+    }
+   ]
+  },
+  {
+   "headline": "Anthropic申請上市點燃晶片股，標普500連兩天收高",
+   "paragraphs": [
+    "CNBC報導，美股27日三大指數齊漲，標普500漲0.6%，那斯達克漲1.18%，道瓊僅漲0.03%。TheStreet指出科技股是主要推手。",
+    "Capp Notes整理，Anthropic申請上市讓晶片股連三天上漲，費城半導體指數漲3.6%；但等權重標普500 ETF只漲0.11%。"
+   ],
+   "sources": [
+    {
+     "title": "S&P 500 posts back-to-back winning days as chips rally and oil prices slide: Live updates",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/26/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "Stock Market Today (Oct. 27, 2026): Nasdaq and Russell 2000 gain as Anthropic lifts tech sector",
+     "outlet": "TheStreet",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-27-2026"
+    },
+    {
+     "title": "Closing Look — Tuesday, October 27, 2026",
+     "outlet": "Capp Notes",
+     "url": "https://cappnotes.substack.com/p/closing-look-tuesday-october-27-2026"
+    }
+   ]
+  },
+  {
+   "headline": "台股連假後上下震盪908點，靠台積電驚險收紅",
+   "paragraphs": [
+    "中央社報導，台股27日在4天連假後開高震盪，收漲54.8點至46,096.23點，成交金額新台幣9,765.47億元。時報資訊指出，盤中高低差908.78點。",
+    "中時新聞網報導，指數上午一度翻黑，尾盤靠台積電拉抬才翻紅，台積電收2,400元；南亞科、華邦電漲逾5%，台達電續跌逾3%，聯電跌逾2%。"
+   ],
+   "sources": [
+    {
+     "title": "台股漲54.8點",
+     "outlet": "中央社",
+     "url": "https://www.cna.com.tw/news/afe/202610270136.aspx"
+    },
+    {
+     "title": "台股驚險收紅漲54點！台積電站穩2400元 CCL台燿爆鬼故事跌停",
+     "outlet": "中時新聞網",
+     "url": "https://www.chinatimes.com/realtimenews/20261027002561-260410"
+    },
+    {
+     "title": "《盤後解析》台股上下狂甩908點 後市先看三大法人籌碼",
+     "outlet": "時報資訊",
+     "url": "https://www.chinatimes.com/realtimenews/20261027002792-260410"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "10月27日美股收盤，標普500收7,723點，距一年高點1.2%；道瓊收52,378點。10年期公債殖利率5.00%，10年實質利率2.66%；10年減2年利差0.32個百分點，較前一份的0.31上升，曲線形態大致不變。",
+    "商品方面，WTI原油近一年漲85.1%，十年百分位98；黃金4,145美元/盎司，近一月跌9.3%。美元指數（廣體）最新為121.32（2026-10-23）。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "截至台北09:36，加權指數報46,879點，漲783點、漲1.7%；櫃買指數漲3.1%。台積電報2,420元，漲20元；聯發科漲5.4%至4,175元，台達電漲2.6%。",
+    "美股權值股最近收盤：亞馬遜漲1.6%，Alphabet漲1.2%，輝達、蘋果各漲0.9%；微軟跌0.2%，Meta跌1.6%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "FOMC決議台北10/29 02:00公布。期貨定價：本次不動88%、降息12%、升息0%；到2027/7累計升息36 bp。EFFR為3.88%。",
+    "模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）下一次CPI年增3.74%、核心CPI年增2.48%；模型預估（亞特蘭大聯準銀行 GDPNow）2026年Q3年化季增3.4%。",
+    "台灣：國發會16:00公布景氣對策信號（資料期11509），上一期為41分紅燈，已連續9個月。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔相比沒有變：九宮格仍是「通膨未解」（就業 中 × 通膨 高），政策重心通膨優先；訊號共12條，偏升息4、偏降息4、中性4，沒有增減。",
+    "關鍵讀數中，10年減2年利差從0.31上升到0.32個百分點，衰退風險刻度從44.16升到44.30；核心PCE 3.01%、失業率4.20%等其餘讀數不變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-27",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 68,
+  "sources": 11,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 28,
+  "output_tokens": 14081,
+  "cache_creation_input_tokens": 45630,
+  "cache_read_input_tokens": 347527,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.6194
+ }
+}
