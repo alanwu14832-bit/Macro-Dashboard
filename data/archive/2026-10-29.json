@@ -1,6 +1,6 @@
 {
  "date": "2026-10-29",
- "generated_at": "2026-10-29T03:14:23+08:00",
+ "generated_at": "2026-10-29T07:41:04+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -55,7 +55,7 @@
    "headline": "10年實質利率處於限制性水準",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "10年實質利率 2.66%",
+   "evidence": "10年實質利率 2.64%",
    "module": "利率"
   },
   {
@@ -122,11 +122,11 @@
   "core_cpi": 2.5643583511686607,
   "core_pce": 3.0075959761856064,
   "supercore": 3.2293721989494317,
-  "ten_year": 5.0,
-  "real_ten_year": 2.66,
+  "ten_year": 4.99,
+  "real_ten_year": 2.64,
   "policy_upper": 4.0,
-  "curve_10_2": 0.3200000000000003,
-  "recession_gauge": 44.67621282134299,
+  "curve_10_2": 0.29000000000000004,
+  "recession_gauge": 43.999136534813715,
   "composite_labor": -6.919092889105376
  },
  "readings_tw": {
@@ -143,6 +143,6 @@
  "as_of": {
   "labor": "2026-09-01",
   "inflation": "2026-09-01",
-  "rates": "2026-10-26"
+  "rates": "2026-10-27"
  }
 }
