@@ -1,0 +1,149 @@
+{
+ "date": "2026-10-29",
+ "written_at": "2026-10-29T10:04:39+08:00",
+ "model": "claude-opus-5-5",
+ "title": "聯準會按兵不動，兩票主張升息",
+ "lede": "聯準會昨夜維持利率 3.75%–4% 不變，但有兩名官員投票主張升息；美伊緊張推升油價，美股三大指數小幅收高，台股今天則在權值股賣壓下回落。今晚核心 PCE 與 GDP 同時公布，本站判定與上一份存檔相同。",
+ "stories": [
+  {
+   "headline": "聯準會維持利率 3.75%–4%，兩名官員主張升息",
+   "paragraphs": [
+    "聯準會 10 月 28 日結束會議，維持利率目標區間 3.75%–4% 不變。CNN 報導，兩名官員投下反對票、主張升息；《華盛頓郵報》指出，聯準會上個月才升息一碼，是三年來首次。",
+    "CNBC 報導，主席華許在記者會上說經濟強勁，並重申不偏好「前瞻指引」。中時新聞網報導，會後 12 月升息機率超過 80%。"
+   ],
+   "sources": [
+    {
+     "title": "Fed keeps interest rates unchanged, but two officials dissented in favor of a rate hike",
+     "outlet": "CNN",
+     "url": "https://www.cnn.com/2026/10/28/business/live-news/federal-reserve-interest-rate-october"
+    },
+    {
+     "title": "Fed rate decision October 2026",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/28/fed-meeting-today-live-updates.html"
+    },
+    {
+     "title": "Federal Reserve holds interest rates steady",
+     "outlet": "華盛頓郵報",
+     "url": "https://www.washingtonpost.com/business/2026/10/28/federal-reserve-held-interest-rates-steady/"
+    }
+   ]
+  },
+  {
+   "headline": "傳美國選後恢復攻擊伊朗，油價走高",
+   "paragraphs": [
+    "CNBC 報導，據傳美國已通知波灣國家，準備在期中選舉後恢復攻擊伊朗，布蘭特原油期貨 28 日漲 1.3%，收每桶 115.32 美元；西德州原油漲 2.9%，收 102.78 美元。",
+    "CNN 指出，伊朗戰事推高的能源成本正擴散到其他商品與服務，讓聯準會的取捨更難。"
+   ],
+   "sources": [
+    {
+     "title": "Oil prices rise as U.S. reportedly tells Gulf countries to prepare for Iran strikes after midterm elections",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/28/oil-price-today-wti-brent-hormuz.html"
+    },
+    {
+     "title": "Fed keeps interest rates unchanged, but two officials dissented in favor of a rate hike",
+     "outlet": "CNN",
+     "url": "https://www.cnn.com/2026/10/28/business/live-news/federal-reserve-interest-rate-october"
+    }
+   ]
+  },
+  {
+   "headline": "美股三大指數收高，費半漲 1.75%",
+   "paragraphs": [
+    "CNBC 報導，標普 500 指數 28 日漲 0.28%，收 7,743.98 點；那斯達克漲 0.27%；道瓊收 52,475.10 點，標普與道瓊連三天上漲。",
+    "Yahoo Finance 盤後整理顯示，甲骨文大漲 10.73%、Vertiv 漲 16.48%。Yahoo奇摩新聞報導，費城半導體指數漲 1.75%，台積電 ADR 漲 0.60%。"
+   ],
+   "sources": [
+    {
+     "title": "Stock market news for Oct. 28, 2026",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/27/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "Stock Market Today, Oct. 28: Markets Edge Higher as Fed Holds Rates Steady",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-28-220317072.html"
+    },
+    {
+     "title": "台股早盤跌逾200點 台積電跌10元",
+     "outlet": "Yahoo奇摩新聞",
+     "url": "https://tw.news.yahoo.com/%E5%8F%B0%E8%82%A1%E6%97%A9%E7%9B%A4%E8%B7%8C%E9%80%BE200%E9%BB%9E-%E5%8F%B0%E7%A9%8D%E9%9B%BB%E8%B7%8C10%E5%85%83-011542156.html"
+    }
+   ]
+  },
+  {
+   "headline": "台股前日大漲 939 點，今天開低回落",
+   "paragraphs": [
+    "經濟日報報導，台股 28 日在美股強彈與法人年底作帳帶動下大漲 939 點，收 47,035 點，站回季線；外資買超 159 億元。",
+    "經濟日報報導，29 日早盤台積電、台達電等權值股走弱，記憶體族群漲勢降溫，大盤一度跌逾 400 點；台指期夜盤跌 128 點。中時新聞網報導，三大權值股早盤同步走低。"
+   ],
+   "sources": [
+    {
+     "title": "10月29日 五件財經大事搶先看",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9843597"
+    },
+    {
+     "title": "台積電走弱、記憶體漲勢降溫！台股一度跌逾400點退守46,600",
+     "outlet": "經濟日報",
+     "url": "https://udn.com/news/story/7251/9843871"
+    },
+    {
+     "title": "Google引爆殺機！台股早盤下殺逾160點 3大權值股趴地",
+     "outlet": "中時新聞網",
+     "url": "https://www.chinatimes.com/realtimenews/20261029001409-260410"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "昨夜收盤，標普 500 為 7,744，近一月漲 1.0%；道瓊 52,475，近一月漲 2.2%；那斯達克 26,478，近一月跌 1.3%。VIX 17.52，處於常態區間。",
+    "10 年期殖利率 4.99%，較上一份的 5.00% 下降；10 年實質利率 2.64%。美元廣體指數 121.32（10/23）。WTI 原油 103.37 美元，近一月漲 4.0%；黃金 4,145 美元，近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股加權指數盤中 46,389，跌 1.4%；櫃買指數跌 2.0%。台積電 2,405 元跌 20 元，台達電跌 6.1%，聯發科跌 2.7%，中華電漲 1.0%。",
+    "美股權值股昨夜多數收低：輝達跌 1.2%，Meta 跌 1.2%，蘋果跌 0.9%；Alphabet 漲 1.3%，亞馬遜漲 0.6%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今晚台北 20:30 公布初領失業金、核心 PCE 與實質 GDP。模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）核心 PCE 年增 3.05%、月增 0.28%；模型預估（亞特蘭大聯準銀行 GDPNow）Q3 年化季增 3.3%。",
+    "期貨定價到 2027/7 累計升息 36 bp。台灣今天沒有重大數據，央行下次理監事會在 12/17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定沒有變。九宮格仍是「通膨未解」（就業 中 × 通膨 高），政策重心通膨優先。訊號共 12 條，偏升息 4、偏降息 4、中性 4，與上一份相同，沒有增減。",
+    "關鍵讀數只有利率類變動：10 年期 4.99%（原 5.00）、10 年實質 2.64%（原 2.66）、10 減 2 利差 0.29 個百分點（原 0.32），都下降；衰退風險刻度 44.00（原 44.68）。核心 PCE 3.01%、失業率 4.20% 不變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-28",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 58,
+  "sources": 11,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 2,
+  "input_tokens": 14,
+  "output_tokens": 13547,
+  "cache_creation_input_tokens": 43954,
+  "cache_read_input_tokens": 93566,
+  "web_search_requests": 4,
+  "attempts": 2,
+  "cost_usd": 0.5495
+ }
+}
