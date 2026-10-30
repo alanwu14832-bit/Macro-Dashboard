@@ -1,0 +1,139 @@
+{
+ "date": "2026-10-30",
+ "written_at": "2026-10-30T10:15:11+08:00",
+ "model": "claude-opus-5-5",
+ "title": "谷歌財報後重挫，台股失守半年線",
+ "lede": "Alphabet 財報後創上市以來最大單日跌幅，AI 支出疑慮再起；英特爾財測偏弱、台達電法說後重挫，台股今早跌破半年線。美國第三季 GDP 與 PCE 出爐，10 年期殖利率升破 5%。本站判定沒有變。",
+ "stories": [
+  {
+   "headline": "Alphabet 財報後重挫約 13%，市值單日蒸發逾 5,000 億美元",
+   "paragraphs": [
+    "Alphabet 於美東 10 月 29 日公布第三季財報。MarketBeat 報導，調整後每股盈餘 2.12 美元，低於分析師估計，股價收跌 12.6%。",
+    "雅虎財經引述彭博報導，Alphabet 市值單日蒸發逾 5,000 億美元，是 2004 年上市以來最大跌幅，AI 疑慮重回市場。"
+   ],
+   "sources": [
+    {
+     "title": "Alphabet (NASDAQ:GOOGL) Stock Falls 12.6% on Disappointing Earnings",
+     "outlet": "MarketBeat",
+     "url": "https://www.marketbeat.com/instant-alerts/price-alphabet-nasdaq-googl-stock-falls-126-on-disappointing-earnings-2026-10-29/"
+    },
+    {
+     "title": "Stock market today: Dow, S&P 500, Nasdaq slip as Alphabet stock sinks 12% and AI jitters return",
+     "outlet": "雅虎財經",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-thursday-october-29-dow-sp-500-nasdaq-alphabet-microsoft-earnings-130305714.html"
+    }
+   ]
+  },
+  {
+   "headline": "美國第三季 GDP 年化成長 3.4%，9 月 PCE 年增 3.6%",
+   "paragraphs": [
+    "美國經濟分析局 10 月 29 日公布，第三季實質 GDP 初估年化成長 3.4%，第二季為 2.2%。同日公布 9 月 PCE 物價年增 3.6%、月增 0.5%；核心 PCE 年增 3.1%、月增 0.3%。",
+    "The MortgagePoint 引述商務部資料指出，9 月物價漲勢加快，通膨仍明顯高於聯準會 2% 目標。"
+   ],
+   "sources": [
+    {
+     "title": "GDP (Advance Estimate), 3rd Quarter 2026",
+     "outlet": "美國經濟分析局",
+     "url": "https://www.bea.gov/sites/default/files/2026-10/gdp3q26-adv.pdf"
+    },
+    {
+     "title": "U.S. GDP Records Better-Than-Expected Increase",
+     "outlet": "The MortgagePoint",
+     "url": "https://themortgagepoint.com/2026/10/29/u-s-gdp-records-better-than-expected-increase/"
+    }
+   ]
+  },
+  {
+   "headline": "聯準會 10 比 2 維持利率，兩位官員主張升息",
+   "paragraphs": [
+    "聯準會美東 10 月 28 日以 10 比 2 決議維持利率在 3.75% 至 4%。CNBC 報導，理事庫克與克里夫蘭聯準銀行總裁哈瑪克反對，兩人主張升息 1 碼。",
+    "CNBC 指出，聲明說通膨「仍然偏高」。《財星》報導，聲明對經濟的描述改為「強勁」，交易員正押注 12 月升息。"
+   ],
+   "sources": [
+    {
+     "title": "Fed interest rate decision October 2026: Fed holds rates steady",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/10/28/fed-interest-rate-decision-october-2026.html"
+    },
+    {
+     "title": "Fed holds rates steady days before the midterms, even as inflation runs hot",
+     "outlet": "財星",
+     "url": "https://fortune.com/2026/10/28/fed-rates-steady-midterms-october-3-75-to-4-percent-cook-hammack-dissent/"
+    }
+   ]
+  },
+  {
+   "headline": "英特爾盤後重挫、台達電法說失色，台股開盤跌破半年線",
+   "paragraphs": [
+    "今周刊報導，台股 10 月 30 日早盤一度下殺逾 1,600 點、跌破半年線。東森新聞報導，英特爾 29 日盤後公布第四季財測疲弱，加上以色列晶圓廠爆炸估計損失逾 6 億美元，盤後股價重挫約 20%。",
+    "台達電法說會公布第三季毛利率降至 34.08%。新頭殼報導，董事長鄭平強調第四季營收會高於第三季，但市場對毛利率下滑與存貨跌價損失仍有疑慮，股價開盤後一度跌停。"
+   ],
+   "sources": [
+    {
+     "title": "台股大跌原因？殺逾1600點破半年線…台達電聯發科大立光全倒！英特爾盤後暴跌23%、美期指也跳水能撐住？",
+     "outlet": "今周刊",
+     "url": "https://www.businesstoday.com.tw/article/category/183008/post/202610300002/"
+    },
+    {
+     "title": "台達電、友達跌停！ 台股重挫1500點 一口氣破半年線",
+     "outlet": "東森新聞",
+     "url": "https://news.ebc.net.tw/news/business/578168"
+    },
+    {
+     "title": "法說結果市場不買單！台達電早盤觸跌停 毛利率、庫存疑慮難消",
+     "outlet": "新頭殼",
+     "url": "https://newtalk.tw/news/view/2026-10-30/1068262"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "10 年期公債殖利率上升至 5.05%（上一份 4.99%），10 年實質殖利率上升至 2.67%，10 減 2 利差 0.38 個百分點（上一份 0.29）。EFFR 為 3.88%。",
+    "WTI 原油每桶 103.37 美元、布蘭特 123.10 美元；黃金每盎司 4,145 美元。VIX 16.91。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "美股 2026-10-29 收盤：標普 500 為 7,744 點、那斯達克 26,550 點、道瓊 52,343 點。Alphabet 跌 12.6%、亞馬遜跌 4.2%；蘋果漲 1.5%、Meta 漲 2.0%。",
+    "台股盤中（10:12）加權指數 44,916 點，跌 1,452.60 點、跌 3.1%；櫃買跌 5.3%。台積電跌 1.9% 至 2,370 元，台達電跌 9.8%、聯發科跌 4.7%，鴻海跌 2.8%；中華電漲 0.6%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "美國今天沒有重大數據。台灣主計總處 16:00 公布 115Q3 GDP 與經濟成長率。",
+    "下次 CPI 模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增 3.74%、月增 0.24%，核心 CPI 年增 2.48%。模型預估（亞特蘭大聯準銀行 GDPNow）2026 年 Q4 年化季增 3.2%。期貨定價：12/9 FOMC 升息機率 100%；到 2027/7 累計升息 36 bp。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份相同：九宮格通膨未解（就業中 × 通膨高），政策重心通膨優先，傾向偏升息（score 4）；訊號 13 條，偏升息 5、偏降息 4、中性 4，沒有增減。",
+    "關鍵讀數：10 年期 4.99% → 5.05%，10 年實質 2.64% → 2.67%，10 減 2 從 0.29 → 0.38，衰退風險刻度 43.99 → 44.46；核心 PCE 3.12%、失業率 4.20% 不變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-29",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 67,
+  "sources": 9,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 22,
+  "output_tokens": 13568,
+  "cache_creation_input_tokens": 39757,
+  "cache_read_input_tokens": 236657,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.5576
+ }
+}
