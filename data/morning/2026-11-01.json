@@ -1,0 +1,115 @@
+{
+ "date": "2026-11-01",
+ "written_at": "2026-11-01T09:30:31+08:00",
+ "model": "claude-opus-5-5",
+ "title": "科技財報重挫美台股，判定維持偏升息",
+ "lede": "美股 10 月 30 日由英特爾、亞馬遜財報引爆科技股賣壓，那斯達克重挫近 3%；台股同日跌逾千點，外資單月賣超創紀錄。荷莫茲海峽油輪遇襲，油價再漲。本站判定沒有變，仍是「通膨未解」、偏升息。",
+ "stories": [
+  {
+   "headline": "英特爾、亞馬遜財報拖累，美股 10/30 科技股重挫",
+   "paragraphs": [
+    "美東 10 月 30 日，英特爾與亞馬遜財報引爆賣壓。TheStreet 報導，英特爾單日跌近 30%，標普 500 跌 1.83% 至 7,578.97 點，道瓊跌 1.06%，約七成個股下跌，VIX 盤中大漲逾 32%。",
+    "Yahoo Finance 的市場快報指出，英特爾疲弱的財測蓋過財報本身，半導體 ETF SOXX 跌逾 8%，那斯達克寫下 2025 年 3 月以來最大單月跌幅。"
+   ],
+   "sources": [
+    {
+     "title": "Stock Market Today (Oct. 30, 2026): Intel, Reddit are latest tech earnings casualties as Nasdaq sinks nearly 3%",
+     "outlet": "TheStreet",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-30-2026"
+    },
+    {
+     "title": "Markets News, Oct. 30, 2026: Tech Sell-Off Sends Nasdaq, S&P 500 Reeling; Intel Stock Drops 30%; Bitcoin Slides, Gold Hits One-Year Low",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nasdaq-p-123540419.html"
+    }
+   ]
+  },
+  {
+   "headline": "台股 10 月收官日跌 1,156 點，外資單月賣超近兆元",
+   "paragraphs": [
+    "中央社報導，台股 10 月 30 日收 45,211.83 點，跌 1,156.5 點，成交 8,777.3 億元，下跌 956 家。今周刊指出，指數跌破半年線，外資 10 月賣超 9,943.16 億元，創單月紀錄。",
+    "工商時報報導，台股 10 月波動超過 5,000 點，金管會已請證交所與櫃買中心密切注意國際市場。"
+   ],
+   "sources": [
+    {
+     "title": "【台北股市】跌1156.5點",
+     "outlet": "中央社",
+     "url": "https://tw.stock.yahoo.com/news/%E5%8F%B0%E5%8C%97%E8%82%A1%E5%B8%82-%E8%B7%8C1156-5%E9%BB%9E-055731085.html"
+    },
+    {
+     "title": "台股大跌原因？外資砍殺1100億、10月賣超9943億史上最狠！破半年線崩5200點會V轉？這群人賣壓待解",
+     "outlet": "今周刊",
+     "url": "https://www.businesstoday.com.tw/article/category/183008/post/202610300002/"
+    },
+    {
+     "title": "台股重挫逾千點！10月波動超過5,000點 金管會說話了",
+     "outlet": "工商時報",
+     "url": "https://www.ctee.com.tw/news/20261030701699-430301"
+    }
+   ]
+  },
+  {
+   "headline": "荷莫茲海峽油輪遇襲，油價連四個月上漲",
+   "paragraphs": [
+    "The National 報導，10 月 30 日一艘油輪在荷莫茲海峽遇襲，美國重申可能再對伊朗動武，布蘭特原油一度漲 2.37% 至 117.56 美元，WTI 漲 2.13%，朝第四個月上漲邁進。",
+    "報導引述分析指出，美方可能空襲伊朗的疑慮讓供給風險溢價居高不下，蓋過稍早的外交斡旋。"
+   ],
+   "sources": [
+    {
+     "title": "Oil prices set for sharp monthly rise on Hormuz strikes and US threat to hit Iran",
+     "outlet": "The National",
+     "url": "https://thenationalnews.com/business/markets/2026/10/30/oil-prices-set-for-sharp-monthly-rise-on-hormuz-strikes-and-us-threat-to-hit-iran"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "最近一個交易日的美國市場（10/30 週五）",
+   "paragraphs": [
+    "10 月 30 日美股收低，道瓊收 51,770 點，標普與那斯達克同步下跌；10 月 31 日休市。10 年期殖利率最新讀數 4.98%，近一月下降 0.28 個百分點；10 年實質利率 2.63%，10 減 2 年利差 0.37 個百分點。廣體美元指數 121.32（10/23）。",
+    "WTI 原油 103.37 美元，近一年漲 65.6%；黃金 4,144.55 美元，近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股加權指數收 45,212 點，跌 1,156.50 點（2.5%），櫃買指數跌 4.4%。台積電 2,370 元，跌 45 元；聯發科跌 3.2%；台達電跌 9.8% 至 1,335 元；中華電逆勢漲 1.3%。",
+    "美股權值股全面收黑：輝達跌 4.2% 至 204.64 美元，微軟跌 1.6%，Meta 跌 1.5%，Alphabet、亞馬遜各跌 1.4%，蘋果跌 1.2%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美台都沒有重大數據。聯準會 10/29（台北）維持利率 3.75%–4.00%，表決 10–2。下次會議 12/9，期貨定價升息機率 100%，到 2027/7 累計升息 36 bp。",
+    "下一次 CPI 模型預估（克里夫蘭聯準銀行 Inflation Nowcasting，2026-10-30 的估計）年增 3.74%，核心 CPI 年增 2.48%；核心 PCE 年增 3.20%。第四季模型預估（亞特蘭大聯準銀行 GDPNow）年化季增 3.2%。台灣央行理監事會在 2026-12-17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與 2026-10-31 存檔相同，沒有變：九宮格「通膨未解」（就業 中 × 通膨 高），政策重心通膨優先，偏升息（score 4）。訊號 13 條，偏升息 5、偏降息 4、中性 4，無增減。",
+    "關鍵讀數持平：核心 PCE 3.12%、失業率 4.20%，三月均非農 50.67 千人、損益兩平 76.62 千人，衰退風險刻度 44.59。台灣讀數亦無變化。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-10-30",
+  "overnight": false
+ },
+ "checks": {
+  "numbers": 70,
+  "sources": 6,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 18,
+  "output_tokens": 12678,
+  "cache_creation_input_tokens": 41704,
+  "cache_read_input_tokens": 179031,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.538
+ }
+}
