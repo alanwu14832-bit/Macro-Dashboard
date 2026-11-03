@@ -1,6 +1,6 @@
 {
  "date": "2026-11-04",
- "generated_at": "2026-11-04T02:08:54+08:00",
+ "generated_at": "2026-11-04T07:48:09+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -31,7 +31,7 @@
    "headline": "實質利率高於實質成長，債務比會自動累積",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "r−g 為 +0.5 個百分點，債務佔 GDP 121%",
+   "evidence": "r−g 為 +0.6 個百分點，債務佔 GDP 121%",
    "module": "債務"
   },
   {
@@ -55,7 +55,7 @@
    "headline": "10年實質利率處於限制性水準",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "10年實質利率 2.60%",
+   "evidence": "10年實質利率 2.62%",
    "module": "利率"
   },
   {
@@ -63,7 +63,7 @@
    "headline": "股債同向，債券對股票的對沖效果變差",
    "direction": "neutral",
    "severity": "medium",
-   "evidence": "標普報酬與10年殖利率變動相關 -0.31（近一年）",
+   "evidence": "標普報酬與10年殖利率變動相關 -0.30（近一年）",
    "module": "市場"
   },
   {
@@ -122,11 +122,11 @@
   "core_cpi": 2.5643583511686607,
   "core_pce": 3.1211596029620203,
   "supercore": 3.2293721989494317,
-  "ten_year": 4.94,
-  "real_ten_year": 2.6,
+  "ten_year": 4.91,
+  "real_ten_year": 2.62,
   "policy_upper": 4.0,
-  "curve_10_2": 0.3800000000000008,
-  "recession_gauge": 45.128280745577044,
+  "curve_10_2": 0.3200000000000003,
+  "recession_gauge": 44.85506822769927,
   "composite_labor": -2.830254936897572
  },
  "readings_tw": {
@@ -143,6 +143,6 @@
  "as_of": {
   "labor": "2026-09-01",
   "inflation": "2026-09-01",
-  "rates": "2026-10-30"
+  "rates": "2026-11-02"
  }
 }
