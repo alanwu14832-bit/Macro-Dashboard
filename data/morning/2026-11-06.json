@@ -1,0 +1,139 @@
+{
+ "date": "2026-11-06",
+ "written_at": "2026-11-06T10:51:44+08:00",
+ "model": "claude-opus-5-5",
+ "title": "AI股崩跌延燒 台股寫下盤中最大跌點",
+ "lede": "AI 股拋售從華爾街燒到台北：昨夜那斯達克重挫、輝達跌逾 9%，台股今早一度跌逾 3,700 點，改寫盤中最大跌點紀錄。今晚有美國非農就業；本站判定沒有變，仍是通膨未解、偏升息。",
+ "stories": [
+  {
+   "headline": "AI 股拋售擴大，美股昨夜重挫、七巨頭市值蒸發逾 1 兆美元",
+   "paragraphs": [
+    "CNBC 報導，美股週四（11 月 5 日）大跌，那斯達克綜合指數跌 5.5%、進入修正區間，標普 500 跌約 4.4%，道瓊跌約 1,833 點；七巨頭市值合計蒸發逾 1 兆美元。",
+    "CNBC 指出，投資人擔心期中選舉後資料中心建設放慢，AI 股帶頭下跌。Motley Fool 報導輝達跌 9.26%，認為反映的是需求與政策疑慮，而非公司消息。"
+   ],
+   "sources": [
+    {
+     "title": "Magnificent 7 loses $1 trillion. The most eye-popping stats from Thursday's tech stock plunge",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/05/stock-market-selloff-ai-fears.html"
+    },
+    {
+     "title": "Stock Market Today, Nov. 5: Nvidia Slides on AI Chip Selloff as Election Uncertainty Weighs",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/coverage/stock-market-today/2026/11/05/stock-market-today-nov-5-nvidia-slides-on-ai-chip-selloff-as-election-uncertainty-weighs/"
+    }
+   ]
+  },
+  {
+   "headline": "台股開盤一度重挫逾 3,700 點，改寫盤中最大跌點紀錄",
+   "paragraphs": [
+    "經濟日報報導，加權指數今（6）日以 38,915.76 點開出，盤中一度跌逾 3,700 點、下探 37,837.05 點，改寫盤中單日最大跌點紀錄，台積電一度跌停。",
+    "經濟日報指出，賣壓來自美股 AI 股拋售，費半崩跌 12%。聯合新聞網報導，台股此前已連 6 日收黑，金管會稱未見恐慌與超跌訊號；ETtoday 報導新台幣貶破 33 元。"
+   ],
+   "sources": [
+    {
+     "title": "台股史詩級崩跌！開低暴殺3,737點摜破年線 一度超過500檔跌停",
+     "outlet": "經濟日報",
+     "url": "https://udn.com/news/story/7251/9861077"
+    },
+    {
+     "title": "台股6天狂跌5460點！金管會稱未見恐慌、超跌 市場炸鍋：還有得跌",
+     "outlet": "聯合新聞網",
+     "url": "https://udn.com/news/story/12806/9860530"
+    },
+    {
+     "title": "專家：台股崩跌「11/16」是關鍵日 原因曝光",
+     "outlet": "ETtoday",
+     "url": "https://finance.ettoday.net/news/3267272"
+    }
+   ]
+  },
+  {
+   "headline": "美國初領失業金降至 18.9 萬人，短債殖利率領跌",
+   "paragraphs": [
+    "美國週四公布，截至 10 月 31 日當週初領失業金降至 18.9 萬人，第三季非農生產力年化成長 3.6%。",
+    "investingLive 報導，當天 2 年期殖利率降約 11 個基點、10 年期降約 5 個基點，曲線變陡；克里夫蘭聯準銀行總裁 Hammack 同日表示，漸進升息是讓通膨回到目標的最好方式。"
+   ],
+   "sources": [
+    {
+     "title": "investingLive Americas FX news wrap 5 Nov: Nasdaq 100 plunges 6.36% as AI selloff spreads",
+     "outlet": "investingLive",
+     "url": "https://investinglive.com/news/investinglive-americas-fx-news-wrap-5-nov-nasdaq-100-plunges-6-36-as-ai-selloff-spreads/"
+    },
+    {
+     "title": "Closing Look — Thursday, November 5, 2026",
+     "outlet": "Closing Look",
+     "url": "https://cappnotes.substack.com/p/closing-look-thursday-november-5"
+    }
+   ]
+  },
+  {
+   "headline": "英國央行升息至 4%，油價在股災中逆勢反彈",
+   "paragraphs": [
+    "Babypips 報導，英國央行週四將政策利率由 3.75% 調升至 4.00%。",
+    "Babypips 指出，股市拋售當天公債與黃金受避險買盤支撐，油價逆勢反彈；Closing Look 認為油價回升與伊朗戰爭供給風險有關。"
+   ],
+   "sources": [
+    {
+     "title": "Financial & Forex Market Recap: Nov. 5, 2026",
+     "outlet": "Babypips",
+     "url": "https://www.babypips.com/news/daily-financial-forex-market-recap-2026-11-05"
+    },
+    {
+     "title": "Closing Look — Thursday, November 5, 2026",
+     "outlet": "Closing Look",
+     "url": "https://cappnotes.substack.com/p/closing-look-thursday-november-5"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "本站取自 FRED 的美股指數收盤還沒更新到昨夜，今天不列點位，跌幅見要聞。",
+    "本站 10 年期殖利率讀數 4.90%，較上一份 4.95% 下降；10 年實質 2.64%，10 減 2 利差 0.32 個百分點。美元廣體指數 121.67（2026-10-30）。WTI 原油 99.64 美元/桶，黃金 4,145 美元/盎司、近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "截至台北上午 10:49，加權指數 39,869 點、跌 4.1%，櫃買指數跌 5.4%。台積電 2,155 元、跌 3.8%；台達電跌 8.0%，鴻海跌 4.5%，聯發科跌 3.6%。",
+    "美股權值股昨夜全數收黑：輝達收 181.60 美元、跌 9.3%；Meta 跌 4.0%、微軟跌 3.6%，蘋果跌 1.5%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今晚台北 21:30 美國公布非農就業與失業率；最新一期非農 29.00 千人，失業率 4.20%。",
+    "聯準會 12/9 會議，期貨定價升息機率 65%、不變 35%。下一次 CPI 模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增 3.74%，核心 CPI 年增 2.48%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份相同：九宮格仍是「通膨未解」（就業 中 × 通膨 高），政策重心通膨優先，傾向偏升息（score 6）。訊號 12 條，偏升息 5、偏降息 3、中性 4，沒有增減。",
+    "關鍵讀數中，10 年期由 4.95% 降到 4.90%，10 減 2 由 0.34 降到 0.32 個百分點，衰退風險刻度由 46.24 升到 46.38；核心 PCE、核心 CPI、失業率都沒變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-05",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 52,
+  "sources": 9,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 16,
+  "output_tokens": 16556,
+  "cache_creation_input_tokens": 43178,
+  "cache_read_input_tokens": 158614,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.6188
+ }
+}
