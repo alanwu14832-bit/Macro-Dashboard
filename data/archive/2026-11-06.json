@@ -1,6 +1,6 @@
 {
  "date": "2026-11-06",
- "generated_at": "2026-11-06T06:24:51+08:00",
+ "generated_at": "2026-11-06T09:17:51+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -134,7 +134,7 @@
   "light": "紅",
   "exports_yoy": 60.9,
   "orders_yoy": 62.4,
-  "cpi": 2.73,
+  "cpi": 2.33,
   "unemployment": 3.36,
   "policy": 2.0,
   "gdp": 12.93,
