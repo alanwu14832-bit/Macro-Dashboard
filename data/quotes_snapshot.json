@@ -1,82 +1,82 @@
 {
  "0050": {
-  "change": -4.6,
-  "change_percent": -4.7349,
-  "high": 94.45,
+  "change": -4.65,
+  "change_percent": -4.7864,
+  "high": 92.55,
   "limit_down": 87.45,
   "limit_up": 106.85,
-  "low": 87.55,
-  "market_status": "盤中",
+  "low": 92.4,
+  "market_status": "已收盤（本日收盤價）",
   "name": "元大台灣50",
-  "open": 89.95,
+  "open": 92.55,
   "previous_close": 97.15,
-  "price": 92.55,
-  "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "price": 92.5,
+  "quoted_at": "2026-11-06T13:30:00+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "0056": {
-  "change": -1.75,
-  "change_percent": -3.3948,
-  "high": 50.5,
+  "change": -1.64,
+  "change_percent": -3.1814,
+  "high": 49.92,
   "limit_down": 46.4,
   "limit_up": 56.7,
-  "low": 47.4,
-  "market_status": "盤中",
+  "low": 49.8,
+  "market_status": "已收盤（本日收盤價）",
   "name": "元大高股息",
-  "open": 47.95,
+  "open": 49.85,
   "previous_close": 51.55,
-  "price": 49.8,
-  "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "price": 49.91,
+  "quoted_at": "2026-11-06T13:30:00+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "006208": {
-  "change": -10.45,
-  "change_percent": -4.6956,
-  "high": 217.7,
+  "change": -12.45,
+  "change_percent": -5.5942,
+  "high": 212.35,
   "limit_down": 200.3,
   "limit_up": 244.8,
-  "low": 201.1,
-  "market_status": "盤中",
+  "low": 210.1,
+  "market_status": "已收盤（本日收盤價）",
   "name": "富邦台50",
-  "open": 203.0,
+  "open": 212.35,
   "previous_close": 222.55,
-  "price": 212.1,
-  "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "price": 210.1,
+  "quoted_at": "2026-11-06T13:30:00+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "00878": {
   "change": -1.04,
   "change_percent": -3.1487,
-  "high": 32.45,
+  "high": 32.03,
   "limit_down": 29.73,
   "limit_up": 36.33,
-  "low": 30.46,
-  "market_status": "盤中",
+  "low": 31.96,
+  "market_status": "已收盤（本日收盤價）",
   "name": "國泰永續高股息",
-  "open": 30.65,
+  "open": 32.01,
   "previous_close": 33.03,
   "price": 31.99,
-  "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "quoted_at": "2026-11-06T13:30:00+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "009816": {
-  "change": -0.63,
-  "change_percent": -4.3359,
-  "high": 14.2,
+  "change": -0.65,
+  "change_percent": -4.4735,
+  "high": 13.91,
   "limit_down": 13.08,
   "limit_up": 15.98,
-  "low": 13.2,
-  "market_status": "盤中",
+  "low": 13.88,
+  "market_status": "已收盤（本日收盤價）",
   "name": "凱基台灣TOP50",
-  "open": 13.43,
+  "open": 13.91,
   "previous_close": 14.53,
-  "price": 13.9,
-  "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "price": 13.88,
+  "quoted_at": "2026-11-06T13:30:00+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "1301": {
@@ -92,7 +92,7 @@
   "previous_close": 65.1,
   "price": 62.8,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "1303": {
@@ -108,7 +108,7 @@
   "previous_close": 249.0,
   "price": 237.5,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "1326": {
@@ -124,7 +124,7 @@
   "previous_close": 65.0,
   "price": 62.6,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "1503": {
@@ -140,7 +140,7 @@
   "previous_close": 168.5,
   "price": 159.0,
   "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "1513": {
@@ -156,7 +156,7 @@
   "previous_close": 143.5,
   "price": 137.5,
   "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "1519": {
@@ -172,7 +172,7 @@
   "previous_close": 493.5,
   "price": 450.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "1560": {
@@ -188,7 +188,7 @@
   "previous_close": 710.0,
   "price": 669.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2002": {
@@ -204,7 +204,7 @@
   "previous_close": 18.95,
   "price": 18.55,
   "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2027": {
@@ -220,7 +220,7 @@
   "previous_close": 47.75,
   "price": 45.7,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2059": {
@@ -236,7 +236,7 @@
   "previous_close": 7995.0,
   "price": 7485.0,
   "quoted_at": "2026-11-06T13:19:45+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2301": {
@@ -252,7 +252,7 @@
   "previous_close": 211.5,
   "price": 197.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2303": {
@@ -268,7 +268,7 @@
   "previous_close": 98.4,
   "price": 91.6,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2308": {
@@ -284,7 +284,7 @@
   "previous_close": 1130.0,
   "price": 1055.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2317": {
@@ -300,7 +300,7 @@
   "previous_close": 235.0,
   "price": 225.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2330": {
@@ -316,7 +316,7 @@
   "previous_close": 2240.0,
   "price": 2135.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2344": {
@@ -332,7 +332,7 @@
   "previous_close": 127.5,
   "price": 120.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2345": {
@@ -348,7 +348,7 @@
   "previous_close": 1380.0,
   "price": 1275.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2356": {
@@ -364,7 +364,7 @@
   "previous_close": 55.0,
   "price": 52.5,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2357": {
@@ -380,7 +380,7 @@
   "previous_close": 867.0,
   "price": 863.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2360": {
@@ -396,7 +396,7 @@
   "previous_close": 1335.0,
   "price": 0.0,
   "quoted_at": "2026-11-06T13:19:43+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2368": {
@@ -412,7 +412,7 @@
   "previous_close": 868.0,
   "price": 816.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2376": {
@@ -428,7 +428,7 @@
   "previous_close": 313.0,
   "price": 300.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2379": {
@@ -444,7 +444,7 @@
   "previous_close": 720.0,
   "price": 706.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2382": {
@@ -460,7 +460,7 @@
   "previous_close": 300.0,
   "price": 288.5,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2383": {
@@ -476,7 +476,7 @@
   "previous_close": 4100.0,
   "price": 3790.0,
   "quoted_at": "2026-11-06T13:19:47+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2408": {
@@ -492,7 +492,7 @@
   "previous_close": 360.0,
   "price": 342.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2409": {
@@ -508,7 +508,7 @@
   "previous_close": 27.25,
   "price": 26.45,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2412": {
@@ -524,7 +524,7 @@
   "previous_close": 161.5,
   "price": 163.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2421": {
@@ -540,7 +540,7 @@
   "previous_close": 131.0,
   "price": 124.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2449": {
@@ -556,7 +556,7 @@
   "previous_close": 228.5,
   "price": 206.0,
   "quoted_at": "2026-11-06T13:19:48+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2451": {
@@ -572,7 +572,7 @@
   "previous_close": 254.5,
   "price": 244.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2454": {
@@ -588,7 +588,7 @@
   "previous_close": 3460.0,
   "price": 3400.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2603": {
@@ -604,7 +604,7 @@
   "previous_close": 259.0,
   "price": 246.5,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2609": {
@@ -620,7 +620,7 @@
   "previous_close": 60.0,
   "price": 57.0,
   "quoted_at": "2026-11-06T13:19:48+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2610": {
@@ -636,7 +636,7 @@
   "previous_close": 21.65,
   "price": 21.15,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2615": {
@@ -652,7 +652,7 @@
   "previous_close": 113.0,
   "price": 107.5,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2618": {
@@ -668,7 +668,7 @@
   "previous_close": 45.1,
   "price": 43.6,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2881": {
@@ -684,7 +684,7 @@
   "previous_close": 155.5,
   "price": 148.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2882": {
@@ -700,7 +700,7 @@
   "previous_close": 112.0,
   "price": 106.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2884": {
@@ -716,7 +716,7 @@
   "previous_close": 47.95,
   "price": 46.9,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2885": {
@@ -732,7 +732,7 @@
   "previous_close": 69.1,
   "price": 67.5,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2886": {
@@ -748,7 +748,7 @@
   "previous_close": 54.0,
   "price": 53.7,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "2891": {
@@ -764,7 +764,7 @@
   "previous_close": 74.9,
   "price": 73.2,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3006": {
@@ -780,7 +780,7 @@
   "previous_close": 214.0,
   "price": 205.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3008": {
@@ -796,7 +796,7 @@
   "previous_close": 4525.0,
   "price": 4465.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3013": {
@@ -812,7 +812,7 @@
   "previous_close": 73.9,
   "price": 68.9,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3017": {
@@ -828,7 +828,7 @@
   "previous_close": 2565.0,
   "price": 0.0,
   "quoted_at": "2026-11-06T13:19:43+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3023": {
@@ -844,7 +844,7 @@
   "previous_close": 257.0,
   "price": 257.5,
   "quoted_at": "2026-11-06T13:19:47+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3034": {
@@ -860,7 +860,7 @@
   "previous_close": 510.0,
   "price": 496.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3036": {
@@ -876,7 +876,7 @@
   "previous_close": 195.0,
   "price": 184.5,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3037": {
@@ -892,7 +892,7 @@
   "previous_close": 800.0,
   "price": 726.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3044": {
@@ -908,7 +908,7 @@
   "previous_close": 438.5,
   "price": 410.5,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3045": {
@@ -924,7 +924,7 @@
   "previous_close": 132.5,
   "price": 132.5,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3131": {
@@ -940,7 +940,7 @@
   "previous_close": 1555.0,
   "price": 1440.0,
   "quoted_at": "2026-11-06T13:19:10+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3231": {
@@ -956,7 +956,7 @@
   "previous_close": 168.5,
   "price": 159.5,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3324": {
@@ -972,7 +972,7 @@
   "previous_close": 1170.0,
   "price": 0.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3374": {
@@ -988,7 +988,7 @@
   "previous_close": 402.5,
   "price": 363.5,
   "quoted_at": "2026-11-06T13:19:38+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3406": {
@@ -1004,7 +1004,7 @@
   "previous_close": 846.0,
   "price": 817.0,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3443": {
@@ -1020,7 +1020,7 @@
   "previous_close": 6405.0,
   "price": 6170.0,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3481": {
@@ -1036,7 +1036,7 @@
   "previous_close": 38.0,
   "price": 36.2,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3529": {
@@ -1052,7 +1052,7 @@
   "previous_close": 2025.0,
   "price": 1875.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3532": {
@@ -1068,7 +1068,7 @@
   "previous_close": 281.5,
   "price": 256.0,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3533": {
@@ -1084,7 +1084,7 @@
   "previous_close": 1660.0,
   "price": 1590.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3583": {
@@ -1100,7 +1100,7 @@
   "previous_close": 465.0,
   "price": 422.5,
   "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3596": {
@@ -1116,7 +1116,7 @@
   "previous_close": 140.0,
   "price": 136.0,
   "quoted_at": "2026-11-06T13:19:10+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3653": {
@@ -1132,7 +1132,7 @@
   "previous_close": 5805.0,
   "price": 0.0,
   "quoted_at": "2026-11-06T13:19:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3661": {
@@ -1148,7 +1148,7 @@
   "previous_close": 2960.0,
   "price": 2825.0,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3665": {
@@ -1164,7 +1164,7 @@
   "previous_close": 1470.0,
   "price": 0.0,
   "quoted_at": "2026-11-06T13:19:43+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3680": {
@@ -1180,7 +1180,7 @@
   "previous_close": 408.5,
   "price": 386.5,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3702": {
@@ -1196,7 +1196,7 @@
   "previous_close": 92.1,
   "price": 89.5,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3706": {
@@ -1212,7 +1212,7 @@
   "previous_close": 70.7,
   "price": 68.0,
   "quoted_at": "2026-11-06T13:19:44+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "3711": {
@@ -1228,7 +1228,7 @@
   "previous_close": 572.0,
   "price": 527.0,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "4904": {
@@ -1244,7 +1244,7 @@
   "previous_close": 112.5,
   "price": 112.0,
   "quoted_at": "2026-11-06T13:19:51+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "4958": {
@@ -1260,7 +1260,7 @@
   "previous_close": 394.0,
   "price": 374.0,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "4977": {
@@ -1276,7 +1276,7 @@
   "previous_close": 175.5,
   "price": 163.5,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "5269": {
@@ -1292,7 +1292,7 @@
   "previous_close": 1220.0,
   "price": 1155.0,
   "quoted_at": "2026-11-06T13:19:43+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "5347": {
@@ -1308,7 +1308,7 @@
   "previous_close": 126.0,
   "price": 119.5,
   "quoted_at": "2026-11-06T13:19:49+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "5434": {
@@ -1324,7 +1324,7 @@
   "previous_close": 484.0,
   "price": 458.0,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6147": {
@@ -1340,7 +1340,7 @@
   "previous_close": 157.5,
   "price": 142.5,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6196": {
@@ -1356,7 +1356,7 @@
   "previous_close": 437.0,
   "price": 402.0,
   "quoted_at": "2026-11-06T13:19:48+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6239": {
@@ -1372,7 +1372,7 @@
   "previous_close": 220.0,
   "price": 202.0,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6285": {
@@ -1388,7 +1388,7 @@
   "previous_close": 182.5,
   "price": 164.5,
   "quoted_at": "2026-11-06T13:19:48+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6409": {
@@ -1404,7 +1404,7 @@
   "previous_close": 829.0,
   "price": 785.0,
   "quoted_at": "2026-11-06T13:19:43+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6442": {
@@ -1420,7 +1420,7 @@
   "previous_close": 1070.0,
   "price": 997.0,
   "quoted_at": "2026-11-06T13:19:45+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6488": {
@@ -1436,7 +1436,7 @@
   "previous_close": 564.0,
   "price": 512.0,
   "quoted_at": "2026-11-06T13:19:52+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6505": {
@@ -1452,7 +1452,7 @@
   "previous_close": 87.9,
   "price": 85.0,
   "quoted_at": "2026-11-06T13:19:47+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6669": {
@@ -1468,7 +1468,7 @@
   "previous_close": 1650.0,
   "price": 1545.0,
   "quoted_at": "2026-11-06T13:19:46+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "6770": {
@@ -1484,7 +1484,7 @@
   "previous_close": 54.8,
   "price": 52.7,
   "quoted_at": "2026-11-06T13:19:48+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "8046": {
@@ -1500,7 +1500,7 @@
   "previous_close": 972.0,
   "price": 0.0,
   "quoted_at": "2026-11-06T13:19:43+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "8210": {
@@ -1516,7 +1516,7 @@
   "previous_close": 596.0,
   "price": 546.0,
   "quoted_at": "2026-11-06T13:19:46+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "8299": {
@@ -1532,7 +1532,7 @@
   "previous_close": 1560.0,
   "price": 1490.0,
   "quoted_at": "2026-11-06T13:19:48+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "8996": {
@@ -1548,7 +1548,7 @@
   "previous_close": 1290.0,
   "price": 1170.0,
   "quoted_at": "2026-11-06T13:19:48+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "9958": {
@@ -1564,487 +1564,487 @@
   "previous_close": 79.5,
   "price": 76.3,
   "quoted_at": "2026-11-06T13:19:43+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "AAPL": {
-  "change": -5.34,
-  "change_percent": -1.5279,
-  "high": 355.38,
+  "change": -3.19,
+  "change_percent": -0.9269,
+  "high": 341.69,
   "limit_down": null,
   "limit_up": null,
-  "low": 342.06,
+  "low": 338.3,
   "market_status": "",
   "name": "蘋果",
-  "open": 353.89,
-  "previous_close": 349.51,
-  "price": 344.17,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 340.76,
+  "previous_close": 344.17,
+  "price": 340.98,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "AMZN": {
-  "change": -5.82,
-  "change_percent": -2.1877,
-  "high": 273.23,
+  "change": 0.88,
+  "change_percent": 0.3382,
+  "high": 262.88,
   "limit_down": null,
   "limit_up": null,
-  "low": 252.27,
+  "low": 258.53,
   "market_status": "",
   "name": "亞馬遜",
-  "open": 271.43,
-  "previous_close": 266.03,
-  "price": 260.21,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 258.865,
+  "previous_close": 260.21,
+  "price": 261.09,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "ASHR": {
-  "change": -0.43,
-  "change_percent": -1.3875,
-  "high": 31.05,
+  "change": -0.09,
+  "change_percent": -0.2945,
+  "high": 30.48,
   "limit_down": null,
   "limit_up": null,
-  "low": 30.485,
+  "low": 30.42,
   "market_status": "",
   "name": "中國 A 股 ETF",
-  "open": 31.04,
-  "previous_close": 30.99,
-  "price": 30.56,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 30.48,
+  "previous_close": 30.56,
+  "price": 30.47,
+  "quoted_at": "2026-11-06T22:37:09+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "AVGO": {
-  "change": -33.95,
-  "change_percent": -10.4307,
-  "high": 314,
+  "change": 11.8,
+  "change_percent": 4.0476,
+  "high": 311.52,
   "limit_down": null,
   "limit_up": null,
-  "low": 290.12,
+  "low": 302.75,
   "market_status": "",
   "name": "博通",
-  "open": 311.89,
-  "previous_close": 325.48,
-  "price": 291.53,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 307.005,
+  "previous_close": 291.53,
+  "price": 303.33,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "DIA": {
-  "change": -18.84,
-  "change_percent": -3.534,
-  "high": 536.6,
+  "change": -4.34,
+  "change_percent": -0.8439,
+  "high": 510.39,
   "limit_down": null,
   "limit_up": null,
-  "low": 514.13,
+  "low": 508.66,
   "market_status": "",
   "name": "SPDR 道瓊",
-  "open": 535.95,
-  "previous_close": 533.11,
-  "price": 514.27,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 509.575,
+  "previous_close": 514.27,
+  "price": 509.93,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "EEM": {
-  "change": -3.57,
-  "change_percent": -5.7936,
-  "high": 60.605,
+  "change": 1.28,
+  "change_percent": 2.205,
+  "high": 59.475,
   "limit_down": null,
   "limit_up": null,
-  "low": 58,
+  "low": 59.175,
   "market_status": "",
   "name": "新興市場 ETF",
-  "open": 60.57,
-  "previous_close": 61.62,
-  "price": 58.05,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 59.475,
+  "previous_close": 58.05,
+  "price": 59.33,
+  "quoted_at": "2026-11-06T22:37:10+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "EWT": {
-  "change": -11.2,
-  "change_percent": -11.5369,
-  "high": 92.44,
+  "change": 3.93,
+  "change_percent": 4.5762,
+  "high": 90.32,
   "limit_down": null,
   "limit_up": null,
-  "low": 85.735,
+  "low": 89.46,
   "market_status": "",
   "name": "台灣 ETF",
-  "open": 92.44,
-  "previous_close": 97.08,
-  "price": 85.88,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 89.815,
+  "previous_close": 85.88,
+  "price": 89.81,
+  "quoted_at": "2026-11-06T22:37:08+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "EWY": {
-  "change": -20.47,
-  "change_percent": -13.4565,
-  "high": 145.73,
+  "change": 5.6,
+  "change_percent": 4.2537,
+  "high": 138.65,
   "limit_down": null,
   "limit_up": null,
-  "low": 131.65,
+  "low": 136.43,
   "market_status": "",
   "name": "南韓 ETF",
-  "open": 144.935,
-  "previous_close": 152.12,
-  "price": 131.65,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 138.45999999999998,
+  "previous_close": 131.65,
+  "price": 137.25,
+  "quoted_at": "2026-11-06T22:37:10+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "EWZ": {
-  "change": -0.49,
-  "change_percent": -1.5194,
-  "high": 32.55,
+  "change": 0.17,
+  "change_percent": 0.5353,
+  "high": 31.935,
   "limit_down": null,
   "limit_up": null,
-  "low": 31.64,
+  "low": 31.77,
   "market_status": "",
   "name": "巴西 ETF",
-  "open": 32.47,
-  "previous_close": 32.25,
-  "price": 31.76,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 31.816,
+  "previous_close": 31.76,
+  "price": 31.93,
+  "quoted_at": "2026-11-06T22:37:09+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "FXI": {
-  "change": 0.35,
-  "change_percent": 1.0119,
-  "high": 35.25,
+  "change": -0.2,
+  "change_percent": -0.5724,
+  "high": 34.76,
   "limit_down": null,
   "limit_up": null,
-  "low": 34.7,
+  "low": 34.59,
   "market_status": "",
   "name": "中國大型股 ETF",
-  "open": 35.235,
-  "previous_close": 34.59,
-  "price": 34.94,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 34.735,
+  "previous_close": 34.94,
+  "price": 34.74,
+  "quoted_at": "2026-11-06T22:37:07+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "GOOGL": {
-  "change": -6.36,
-  "change_percent": -2.2012,
-  "high": 295.6,
+  "change": 4.84,
+  "change_percent": 1.7128,
+  "high": 288.41,
   "limit_down": null,
   "limit_up": null,
-  "low": 277.07,
+  "low": 284.61,
   "market_status": "",
   "name": "Alphabet",
-  "open": 293.97,
-  "previous_close": 288.93,
-  "price": 282.57,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 285.175,
+  "previous_close": 282.57,
+  "price": 287.41,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "INDA": {
-  "change": -0.01,
-  "change_percent": -0.02,
-  "high": 50.35,
+  "change": 0.88,
+  "change_percent": 1.7593,
+  "high": 50.92,
   "limit_down": null,
   "limit_up": null,
-  "low": 49.81,
+  "low": 50.77,
   "market_status": "",
   "name": "印度 ETF",
-  "open": 50.24,
-  "previous_close": 50.03,
-  "price": 50.02,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 50.83,
+  "previous_close": 50.02,
+  "price": 50.9,
+  "quoted_at": "2026-11-06T22:37:05+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "IWM": {
-  "change": -13.04,
-  "change_percent": -4.5912,
-  "high": 284.7,
+  "change": -0.56,
+  "change_percent": -0.2067,
+  "high": 272.04,
   "limit_down": null,
   "limit_up": null,
-  "low": 270.52,
+  "low": 270.23,
   "market_status": "",
   "name": "iShares 羅素 2000",
-  "open": 283.75,
-  "previous_close": 284.02,
-  "price": 270.98,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 271.44,
+  "previous_close": 270.98,
+  "price": 270.42,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "JPM": {
-  "change": -14.77,
-  "change_percent": -4.1947,
-  "high": 359.8,
+  "change": -1.38,
+  "change_percent": -0.4091,
+  "high": 336.2,
   "limit_down": null,
   "limit_up": null,
-  "low": 335.93,
+  "low": 333,
   "market_status": "",
   "name": "摩根大通",
-  "open": 358.635,
-  "previous_close": 352.11,
-  "price": 337.34,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 334.545,
+  "previous_close": 337.34,
+  "price": 335.96,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "META": {
-  "change": -24.92,
-  "change_percent": -3.9556,
-  "high": 634.99,
+  "change": 10.69,
+  "change_percent": 1.7667,
+  "high": 617.81,
   "limit_down": null,
   "limit_up": null,
-  "low": 583.8,
+  "low": 606.66,
   "market_status": "",
   "name": "Meta",
-  "open": 632.3,
-  "previous_close": 630,
-  "price": 605.08,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 608.19,
+  "previous_close": 605.08,
+  "price": 615.77,
+  "quoted_at": "2026-11-06T22:36:46+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "MSFT": {
-  "change": -19.87,
-  "change_percent": -3.575,
-  "high": 557.62,
+  "change": -5.57,
+  "change_percent": -1.0393,
+  "high": 532.439,
   "limit_down": null,
   "limit_up": null,
-  "low": 532.675,
+  "low": 524.47,
   "market_status": "",
   "name": "微軟",
-  "open": 554.935,
-  "previous_close": 555.8,
-  "price": 535.93,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 528.745,
+  "previous_close": 535.93,
+  "price": 530.36,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "NVDA": {
-  "change": -18.53,
-  "change_percent": -9.259,
-  "high": 196.25,
+  "change": 10.24,
+  "change_percent": 5.6388,
+  "high": 193.47,
   "limit_down": null,
   "limit_up": null,
-  "low": 181.462,
+  "low": 187,
   "market_status": "",
   "name": "輝達",
-  "open": 196.07,
-  "previous_close": 200.13,
-  "price": 181.6,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 189.12,
+  "previous_close": 181.6,
+  "price": 191.84,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "QQQ": {
-  "change": -44.9,
-  "change_percent": -6.4889,
-  "high": 683.65,
+  "change": 8.81,
+  "change_percent": 1.3616,
+  "high": 658.96,
   "limit_down": null,
   "limit_up": null,
-  "low": 647.05,
+  "low": 655.17,
   "market_status": "",
   "name": "Invesco 那斯達克 100",
-  "open": 683.12,
-  "previous_close": 691.95,
-  "price": 647.05,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 658.36,
+  "previous_close": 647.05,
+  "price": 655.86,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "SPY": {
-  "change": -33.81,
-  "change_percent": -4.4092,
-  "high": 765.97,
+  "change": 2.36,
+  "change_percent": 0.322,
+  "high": 736.41,
   "limit_down": null,
   "limit_up": null,
-  "low": 732.71,
+  "low": 734.58,
   "market_status": "",
   "name": "SPDR 標普 500",
-  "open": 765.47,
-  "previous_close": 766.81,
-  "price": 733,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 735.04,
+  "previous_close": 733,
+  "price": 735.36,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "TSLA": {
-  "change": -41.5,
-  "change_percent": -10.7739,
-  "high": 374.3,
+  "change": 5.45,
+  "change_percent": 1.5857,
+  "high": 351.81,
   "limit_down": null,
   "limit_up": null,
-  "low": 338.15,
+  "low": 347.6,
   "market_status": "",
   "name": "特斯拉",
-  "open": 374.12,
-  "previous_close": 385.19,
-  "price": 343.69,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 348.77,
+  "previous_close": 343.69,
+  "price": 349.14,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "VXX": {
-  "change": 5.14,
-  "change_percent": 30.129,
-  "high": 22.3,
+  "change": -0.43,
+  "change_percent": -1.9369,
+  "high": 21.9,
   "limit_down": null,
   "limit_up": null,
-  "low": 17.29,
+  "low": 21.56,
   "market_status": "",
   "name": "波動率期貨 ETN",
-  "open": 17.3,
-  "previous_close": 17.06,
-  "price": 22.2,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 21.740000000000002,
+  "previous_close": 22.2,
+  "price": 21.77,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "XLE": {
-  "change": -1.89,
-  "change_percent": -2.9754,
-  "high": 64.535,
+  "change": -0.11,
+  "change_percent": -0.1785,
+  "high": 61.63,
   "limit_down": null,
   "limit_up": null,
-  "low": 61.63,
+  "low": 61.205,
   "market_status": "",
   "name": "能源",
-  "open": 64.13,
-  "previous_close": 63.52,
-  "price": 61.63,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 61.44,
+  "previous_close": 61.63,
+  "price": 61.52,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "XLF": {
-  "change": -1.7,
-  "change_percent": -2.8716,
-  "high": 60.04,
+  "change": -0.41,
+  "change_percent": -0.713,
+  "high": 57.115,
   "limit_down": null,
   "limit_up": null,
-  "low": 57.42,
+  "low": 56.7,
   "market_status": "",
   "name": "金融",
-  "open": 59.94,
-  "previous_close": 59.2,
-  "price": 57.5,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 56.985,
+  "previous_close": 57.5,
+  "price": 57.09,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "XLI": {
-  "change": -6.99,
-  "change_percent": -4.1249,
-  "high": 168.835,
+  "change": -0.58,
+  "change_percent": -0.357,
+  "high": 163.005,
   "limit_down": null,
   "limit_up": null,
-  "low": 162.04,
+  "low": 161.84,
   "market_status": "",
   "name": "工業",
-  "open": 167.99,
-  "previous_close": 169.46,
-  "price": 162.47,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 162.81,
+  "previous_close": 162.47,
+  "price": 161.89,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "XLK": {
-  "change": -14.12,
-  "change_percent": -8,
-  "high": 172.72,
+  "change": 3.12,
+  "change_percent": 1.9214,
+  "high": 167.1,
   "limit_down": null,
   "limit_up": null,
-  "low": 162.14,
+  "low": 165.47,
   "market_status": "",
   "name": "科技",
-  "open": 172.33,
-  "previous_close": 176.5,
-  "price": 162.38,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 166.935,
+  "previous_close": 162.38,
+  "price": 165.5,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "XLP": {
-  "change": -0.69,
-  "change_percent": -0.7505,
-  "high": 93.4,
+  "change": -1.92,
+  "change_percent": -2.1041,
+  "high": 89.61,
   "limit_down": null,
   "limit_up": null,
-  "low": 91.22,
+  "low": 88.87,
   "market_status": "",
   "name": "必需消費",
-  "open": 92.94,
-  "previous_close": 91.94,
-  "price": 91.25,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 89.61,
+  "previous_close": 91.25,
+  "price": 89.33,
+  "quoted_at": "2026-11-06T22:36:46+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "XLU": {
-  "change": -0.31,
-  "change_percent": -0.7108,
-  "high": 44.09,
+  "change": -0.49,
+  "change_percent": -1.1316,
+  "high": 43.02,
   "limit_down": null,
   "limit_up": null,
-  "low": 43.0413,
+  "low": 42.6309,
   "market_status": "",
   "name": "公用事業",
-  "open": 44.005,
-  "previous_close": 43.61,
-  "price": 43.3,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 42.88,
+  "previous_close": 43.3,
+  "price": 42.81,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "XLV": {
-  "change": -4.75,
-  "change_percent": -2.5045,
-  "high": 192.32,
+  "change": -1.67,
+  "change_percent": -0.9031,
+  "high": 183.47,
   "limit_down": null,
   "limit_up": null,
-  "low": 184.82,
+  "low": 181.14,
   "market_status": "",
   "name": "醫療",
-  "open": 191.455,
-  "previous_close": 189.66,
-  "price": 184.91,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 182.015,
+  "previous_close": 184.91,
+  "price": 183.24,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "XLY": {
-  "change": -4.69,
-  "change_percent": -3.8339,
-  "high": 122.91,
+  "change": -0.65,
+  "change_percent": -0.5525,
+  "high": 117.18,
   "limit_down": null,
   "limit_up": null,
-  "low": 116.6295,
+  "low": 116.63,
   "market_status": "",
   "name": "非必需消費",
-  "open": 122.65,
-  "previous_close": 122.33,
-  "price": 117.64,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 116.84,
+  "previous_close": 117.64,
+  "price": 116.99,
+  "quoted_at": "2026-11-06T22:36:47+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "XOM": {
-  "change": -3.97,
-  "change_percent": -2.3454,
-  "high": 173.67,
+  "change": -0.64,
+  "change_percent": -0.3872,
+  "high": 164.79,
   "limit_down": null,
   "limit_up": null,
-  "low": 165.14,
+  "low": 163.51,
   "market_status": "",
   "name": "埃克森美孚",
-  "open": 171.06,
-  "previous_close": 169.27,
-  "price": 165.3,
-  "quoted_at": "2026-11-06T05:00:00+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "open": 164.47,
+  "previous_close": 165.3,
+  "price": 164.66,
+  "quoted_at": "2026-11-06T22:36:45+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "finnhub.io"
  },
  "^BSESN": {
@@ -2252,7 +2252,7 @@
   "previous_close": 41574.72,
   "price": 39690.74,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "^TWOII": {
@@ -2268,7 +2268,7 @@
   "previous_close": 321.47,
   "price": 303.78,
   "quoted_at": "2026-11-06T13:19:50+08:00",
-  "saved_at": "2026-11-06T19:37:15+08:00",
+  "saved_at": "2026-11-06T22:37:23+08:00",
   "source": "mis.twse.com.tw"
  },
  "^VIX": {
