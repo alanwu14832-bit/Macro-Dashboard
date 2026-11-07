@@ -1,0 +1,139 @@
+{
+ "date": "2026-11-07",
+ "written_at": "2026-11-07T10:18:43+08:00",
+ "model": "claude-opus-5-5",
+ "title": "非農轉強，本站九宮格轉為「過熱」",
+ "lede": "美國10月非農增16.5萬人、失業率降到4.1%，本站九宮格由「通膨未解」改判「過熱」。同一天台股盤中狂瀉逾3,700點、創史上最大盤中跌點，國安基金授權護盤；美股則靠AI股小幅反彈收週。",
+ "stories": [
+  {
+   "headline": "美國10月非農增16.5萬人，失業率降至4.1%",
+   "paragraphs": [
+    "美國勞工統計局11月6日公布，10月非農就業增加16.5萬人，9月上修為6萬人，失業率由4.2%降到4.1%，勞參率同步上升。",
+    "路透報導，數據顯示勞動市場仍有韌性，讓聯準會更能專注處理中東衝突帶來的通膨。嘉信理財指出，公布後10年期公債殖利率跳升約4個基點，CME FedWatch的12月升息機率升到約73%。"
+   ],
+   "sources": [
+    {
+     "title": "Hot October Jobs Report Raises Odds of December Rate Hike",
+     "outlet": "晨星",
+     "url": "https://www.morningstar.com/economy/hot-october-jobs-report-raises-odds-december-rate-hike"
+    },
+    {
+     "title": "Strong October jobs report sends yields higher",
+     "outlet": "路透（Yahoo Finance轉載）",
+     "url": "https://finance.yahoo.com/economy/policy/articles/strong-october-jobs-report-sends-134858909.html"
+    },
+    {
+     "title": "Stocks Mixed, Yields Up on Surging U.S. Job Growth",
+     "outlet": "嘉信理財",
+     "url": "https://www.schwab.com/learn/story/stock-market-update-open"
+    }
+   ]
+  },
+  {
+   "headline": "美股週五反彈，全週仍收黑",
+   "paragraphs": [
+    "CNBC報導，市場擔心民主黨在期中選舉勝選後AI基礎建設監管趨嚴，週四那斯達克重挫5.5%、進入修正，標普500跌4.4%。",
+    "週五那斯達克漲1.09%、標普500漲0.31%，道瓊跌0.46%；輝達在前一天重挫9%後回升近3%。全週那斯達克仍跌3.4%。"
+   ],
+   "sources": [
+    {
+     "title": "Nasdaq rebounds 1% following worst session in 18 months as traders snap up tech shares: Live updates",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/05/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "Stock market today: Nasdaq and S&P 500 rebound, Dow slips to cap bruising week for AI stocks",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-november-6-dow-sp-500-nasdaq-jobs-report-earnings-135953863.html"
+    }
+   ]
+  },
+  {
+   "headline": "台股盤中崩跌3,737點，創史上最大盤中跌點",
+   "paragraphs": [
+    "經濟日報報導，受費半前一晚崩跌12%、台積電ADR重挫逾10%拖累，台股6日盤中一度下殺3,737.67點、最低到37,837.05點，跌破年線，刷新史上最大盤中跌點，一度超過500檔跌停。",
+    "TVBS引述瑞銀示警，IC載板、PCB與MLCC類股成長性恐向下反轉。"
+   ],
+   "sources": [
+    {
+     "title": "台股史詩級崩跌！開低暴殺3,737點摜破年線 一度超過500檔跌停",
+     "outlet": "經濟日報",
+     "url": "https://udn.com/news/story/7251/9861077"
+    },
+    {
+     "title": "台股史上最大跌點！一度崩跌3737點 瑞銀示警「3類股」恐向下反轉",
+     "outlet": "TVBS",
+     "url": "https://news.tvbs.com.tw/life/4046891"
+    }
+   ]
+  },
+  {
+   "headline": "國安基金授權護盤",
+   "paragraphs": [
+    "經濟日報報導，國安基金6日下午召開臨時會，授權執行秘書視市場情況動用資金護盤。台股11月2日至6日累計跌5,510點，收盤較今年高點跌逾兩成。",
+    "國安基金指出，外資10月賣超台股9,943.16億元、創單月新高。新頭殼報導，行政院長卓榮泰已指示金管會機動因應。"
+   ],
+   "sources": [
+    {
+     "title": "台股今開盤暴跌近3,800點 國安基金拍板授權護盤",
+     "outlet": "經濟日報",
+     "url": "https://udn.com/news/story/7251/9862468"
+    },
+    {
+     "title": "台股重挫1,873點失守4萬！AI訂單恐遞延 法人點名這4類供應鏈最敏感",
+     "outlet": "新頭殼",
+     "url": "https://newtalk.tw/news/view/2026-11-06/1069707"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "昨夜（11/6）美股，本站取自FRED的讀數：道瓊工業51,285.73、標普500為7,353.73、那斯達克24,315.00，距一年高點分別差5.6%、5.9%、11.9%。VIX在28.18，風險胃納指標15.7，落在恐慌區。",
+    "10年期殖利率4.84%，比上一份存檔的4.90%下降；10減2利差0.38個百分點，原為0.32。美元廣體指數121.67（10/30）。WTI原油99.64美元；黃金4,144.55美元，近一月跌9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股11/6加權指數收39,690.74，跌1,883.98點、跌4.5%；櫃買指數跌5.5%。台積電收2,135元、跌4.7%，鴻海跌4.5%，台達電跌6.6%，聯發科跌2.0%；中華電漲1.2%。",
+    "美股權值股昨夜漲跌互見：輝達收186.64美元、漲2.8%，Meta漲0.8%；微軟跌1.0%，蘋果跌0.5%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天（11/7）美台都沒有重大數據或政策決議。聯準會12/9會議，期貨定價升息機率65%、不變35%、降息0%；到2027/7累計升息36 bp。",
+    "模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）下一次CPI年增3.74%、核心CPI年增2.48%，核心PCE年增3.20%。模型預估（亞特蘭大聯準銀行 GDPNow）Q4年化季增3.4%。台灣央行理監事會在12/17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定有變：就業格由「中」轉「強」，通膨格維持「高」，九宮格由「通膨未解」改為「過熱」；政策重心仍是通膨優先，傾向偏升息（score 10）。",
+    "訊號由12條減為10條，偏升息維持5條，偏降息由3條減為1條，拿掉的是兩條就業偏弱訊號。失業率由4.20%降到4.10%，三月均非農由50.67千人升到137.00千人，勞動綜合強弱由-2.81回到-1.66；核心PCE 3.12%、衰退風險刻度46.38沒變。台灣讀數與上一份相同。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-06",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 69,
+  "sources": 9,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 22,
+  "output_tokens": 14795,
+  "cache_creation_input_tokens": 46178,
+  "cache_read_input_tokens": 277108,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.6223
+ }
+}
