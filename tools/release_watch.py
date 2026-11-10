@@ -20,6 +20,10 @@
 
 它不碰 site/、不提交任何東西——搶推的問題不存在；建置照舊在 build.yml 的並行群組裡排隊。
 時間上限：一個 job 最多 6 小時，所以跑滿 5 小時而事情還沒完時，它觸發自己接力再結束。
+
+BLS 探針（只記錄，不改網站、不影響觸發）：CPI、PPI、非農、JOLTS 是勞工統計局發的，FRED
+要晚 10–133 分鐘才登出。守候在這幾項公布之後順便問幾次 BLS 自己的 API，把「BLS 幾點有、
+FRED 幾點有」寫在這一次執行的註記裡——用來決定值不值得改成直接讀 BLS。見 BlsProbe。
 """
 from __future__ import annotations
 
@@ -56,6 +60,16 @@ IDLE_NAP = 300                         # 公布時間還沒到時一次睡多久
 MAX_DISPATCH_FAILURES = 3
 HANDOFF_MARK = "接力"                  # release-watch.yml 的 run-name 裡標記接力的那個詞
 WORKFLOW = "release-watch.yml"
+
+# BLS 探針。免金鑰的 API v1：每個 IP 一天 25 次查詢、一次最多 25 檔——所以不能像 FRED 那樣
+# 每分鐘問，一次公布最多問 12 次，同一個時刻的幾檔併成一次查詢。
+BLS_API = "https://api.bls.gov/publicAPI/v1/timeseries/data/"
+# 追蹤的序列裡 BLS 發的那幾檔：FRED 代號 → BLS 代號（2026-11-10 逐檔比對過，數值相同）。
+BLS_IDS = {"CPIAUCSL": "CUSR0000SA0", "PAYEMS": "CES0000000001", "UNRATE": "LNS14000000",
+           "PPIFIS": "WPSFD4", "JTSJOL": "JTS000000000000000JOL"}
+# 公布後第幾分鐘問：前十分鐘密、之後疏——要量的是「公布那一刻就有」還是「晚很久」。
+BLS_ASK_AT = (0, 2, 4, 6, 8, 10, 15, 20, 30, 45, 60, 90)
+BLS_MAX_FAILURES = 3                   # 連續幾次問不到就不再問（被擋、額度用完）
 
 
 # ------------------------------------------------------------------ 判斷（不連網）--
@@ -141,6 +155,120 @@ def _taipei(at: datetime) -> str:
     return f"台北 {at.astimezone(clock.TAIPEI):%m/%d %H:%M}"
 
 
+# ------------------------------------------------------------------ BLS 探針 ----
+
+def bls_latest(payload: dict) -> dict[str, str]:
+    """BLS API 的回應 → {BLS 代號: 最新一期 "YYYY-MM-01"}。
+
+    沒被受理（額度用完時 status 是 REQUEST_NOT_PROCESSED）就丟例外——那不是「沒有新的一期」。
+    M13 是年平均，不是月份。
+    """
+    if payload.get("status") != "REQUEST_SUCCEEDED":
+        reason = "；".join(str(m) for m in payload.get("message") or [])
+        raise RuntimeError(f"{payload.get('status')}：{reason[:160]}")
+    out: dict[str, str] = {}
+    for series in (payload.get("Results") or {}).get("series") or []:
+        months = [f"{row['year']}-{row['period'][1:]}-01" for row in series.get("data") or []
+                  if str(row.get("period", ""))[:1] == "M" and row["period"] != "M13"]
+        if months:
+            out[series["seriesID"]] = max(months)
+    return out
+
+
+def bls_next_ask(elapsed_minutes: float) -> int | None:
+    """問過之後，下一次是公布後第幾分鐘。排完了＝None。"""
+    return next((minute for minute in BLS_ASK_AT if minute > elapsed_minutes), None)
+
+
+class BlsProbe:
+    """公布之後問 BLS API 幾次，記下它幾點有新的一期。只記錄：不觸發建置、不改任何資料，
+    自己出什麼錯都不影響守候。結果寫成 ::notice::，在那一次執行的頁面上看得到。"""
+
+    def __init__(self) -> None:
+        self.slots: dict[datetime, dict] = {}
+
+    def ask(self, io, item: dict, now: datetime, state: dict) -> None:
+        try:
+            self._ask(io, item, now, state)
+        except Exception as exc:
+            io.log(f"BLS 探針出錯（{type(exc).__name__}：{exc}），不影響守候")
+
+    def _ask(self, io, item: dict, now: datetime, state: dict) -> None:
+        at = item["at"]
+        slot = self.slots.get(at)
+        if slot is None:
+            # 比的是第一次看到這一筆時站上的資料日期——之後站上跟上了，基準也不跟著動
+            base = {sid: state[sid]["date"] for sid in open_ids(item, state, set())
+                    if sid in BLS_IDS and (state.get(sid) or {}).get("date")}
+            slot = self.slots[at] = {"base": base, "have": {}, "asks": 0, "failures": 0,
+                                     "next": 0, "miss": None, "found": None,
+                                     "closed": not base, "compared": False}
+        if slot["closed"] or now < at + timedelta(minutes=slot["next"]):
+            return
+        elapsed = _minutes(now - at)
+        left = sorted(set(slot["base"]) - set(slot["have"]))
+        slot["asks"] += 1
+        upcoming = bls_next_ask((now - at).total_seconds() / 60)
+        try:
+            dates = io.bls_dates(left)
+        except Exception as exc:
+            slot["failures"] += 1
+            io.log(f"BLS 探針：公布後 {elapsed} 分鐘第 {slot['asks']} 次問，沒有問到"
+                   f"（{type(exc).__name__}：{exc}）")
+            if slot["failures"] >= BLS_MAX_FAILURES:
+                slot["closed"] = True
+                io.log(f"::notice title=BLS 探針::{_names(item, left)}：連續 {slot['failures']} 次"
+                       f"問不到 BLS API（最後一次：{type(exc).__name__}：{exc}）——從這裡用不了，不再問")
+                return
+        else:
+            slot["failures"] = 0
+            fresh = {sid: dates[sid] for sid in left
+                     if dates.get(sid) and dates[sid] > slot["base"][sid]}
+            slot["have"].update(fresh)
+            if fresh and len(slot["have"]) == len(slot["base"]):
+                slot["closed"], slot["found"], slot["exact"] = True, elapsed, slot["miss"] is not None
+                before = (f"上一次問是公布後 {slot['miss']} 分鐘、還沒有" if slot["miss"] is not None
+                          else "這是第一次問到，只知道不晚於這個時間")
+                io.log(f"::notice title=BLS 探針::BLS API 有新的一期了："
+                       f"{_names(item, list(slot['base']))}（{max(slot['have'].values())[:7]}），"
+                       f"公布後 {elapsed} 分鐘問到；{before}")
+                return
+            slot["miss"] = elapsed
+            got = f"；{_names(item, list(fresh))}先到" if fresh else ""
+            io.log(f"BLS 探針：公布後 {elapsed} 分鐘第 {slot['asks']} 次問，"
+                   f"{_names(item, sorted(set(left) - set(fresh)))} 還沒有新的一期{got}")
+        if upcoming is None:
+            slot["closed"] = True
+            io.log(f"::notice title=BLS 探針::{_names(item, left)}：問了 {slot['asks']} 次、"
+                   f"到公布後 {elapsed} 分鐘，BLS API 仍沒有新的一期——不再問")
+        else:
+            slot["next"] = upcoming
+
+    def fred_seen(self, io, item: dict, now: datetime) -> None:
+        """FRED 登出的那一刻，把兩邊的時間並排寫下來（一次公布只寫一次）。"""
+        slot = self.slots.get(item["at"])
+        if not slot or not slot["base"] or slot["compared"]:
+            return
+        slot["compared"] = True
+        fred = _minutes(now - item["at"])
+        names = _names(item, list(slot["base"]))
+        if slot["found"] is not None:
+            # 第一次問就有的，BLS 實際可能更早——差距只能說「至少」
+            gap = max(0, fred - slot["found"])
+            gain = (f"直讀 BLS 可以早約 {gap} 分鐘" if slot["exact"]
+                    else f"直讀 BLS 至少早 {gap} 分鐘" if gap
+                    else "守候啟動時兩邊都已經有了，這一次量不出差距")
+            io.log(f"::notice title=BLS 探針::{names}：BLS API 公布後 {slot['found']} 分鐘問到，"
+                   f"FRED 公布後 {fred} 分鐘——{gain}")
+        elif slot["miss"] is not None:
+            slot["closed"] = True
+            io.log(f"::notice title=BLS 探針::{names}：FRED 公布後 {fred} 分鐘先有了；BLS API 到"
+                   f"公布後 {slot['miss']} 分鐘（問了 {slot['asks']} 次）還沒有——直讀沒有比較快")
+        else:
+            io.log(f"::notice title=BLS 探針::{names}：FRED 公布後 {fred} 分鐘有了，"
+                   f"BLS API 這一次沒有量到（問了 {slot['asks']} 次，都沒有問到）")
+
+
 # ------------------------------------------------------------------ 流程 --------
 
 def trigger(io, item: dict, ahead: list[str]) -> bool:
@@ -200,6 +328,7 @@ def run(io, *, budget: timedelta = BUDGET) -> str:
     fired: set[str] = set()
     asking: set[datetime] = set()
     failures = 0
+    probe = BlsProbe()
     while True:
         now = io.now()
         state = None
@@ -208,9 +337,11 @@ def run(io, *, budget: timedelta = BUDGET) -> str:
                 continue
             if state is None:
                 state = io.state()
+            probe.ask(io, item, now, state)
             fred_dates = {sid: io.fred_date(sid) for sid in open_ids(item, state, fired)}
             what, ids = verdict(item, now, fred_dates, state, fired)
             if what == "trigger":
+                probe.fred_seen(io, item, now)
                 if trigger(io, item, ids):
                     fired.update(ids)
                 else:
@@ -296,6 +427,20 @@ class Live:
             self.log(f"FRED 這一次沒有回應（{series_id}：{type(exc).__name__}），下一輪再問")
             return None
         return rows[-1][0] if rows else None
+
+    def bls_dates(self, series_ids: list[str]) -> dict[str, str]:
+        """BLS API v1（免金鑰）上這幾檔的最新一期：{FRED 代號: "YYYY-MM-01"}。一次查詢問完。
+        問不到就丟例外，由探針記下來。"""
+        year = self.now().year          # 一月公布的是去年 12 月，所以連去年一起問
+        body = {"seriesid": [BLS_IDS[sid] for sid in series_ids],
+                "startyear": str(year - 1), "endyear": str(year)}
+        request = urllib.request.Request(
+            BLS_API, method="POST", data=json.dumps(body).encode(),
+            headers={"Content-Type": "application/json",
+                     "User-Agent": "macro-dashboard-release-watch"})
+        with urllib.request.urlopen(request, timeout=20) as response:
+            latest = bls_latest(json.loads(response.read()))
+        return {sid: latest[BLS_IDS[sid]] for sid in series_ids if BLS_IDS[sid] in latest}
 
     def _api(self, method: str, path: str, body: dict | None = None):
         if not (self.token and self.repo):

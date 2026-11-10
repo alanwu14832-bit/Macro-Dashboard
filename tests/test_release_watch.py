@@ -199,7 +199,7 @@ class FakeIO:
     """
 
     def __init__(self, start, calendar, *, fred_at=None, state=None, build_minutes=6,
-                 dispatch_fails=0, others_land_at=None):
+                 dispatch_fails=0, others_land_at=None, bls_at=None, bls_fails=0):
         self.clock = start
         self._calendar = calendar
         self.fred_at = fred_at or {}
@@ -211,6 +211,9 @@ class FakeIO:
         self.dispatched: list[datetime] = []
         self.pending_builds: list[datetime] = []
         self.lines: list[str] = []
+        self.bls_at = bls_at or {}                     # {序列: BLS API 幾點有新的一期}
+        self.bls_fails = bls_fails                     # 前幾次查詢失敗
+        self.bls_asked: list[tuple[datetime, list[str]]] = []
 
     def now(self):
         return self.clock
@@ -227,6 +230,14 @@ class FakeIO:
     def fred_date(self, series_id):
         posted = self.fred_at.get(series_id)
         return "2026-10-01" if posted and self.clock >= posted else "2026-09-01"
+
+    def bls_dates(self, series_ids):
+        self.bls_asked.append((self.clock, list(series_ids)))
+        if self.bls_fails:
+            self.bls_fails -= 1
+            raise RuntimeError("REQUEST_NOT_PROCESSED：daily threshold reached")
+        return {sid: "2026-10-01" if sid in self.bls_at and self.clock >= self.bls_at[sid]
+                else "2026-09-01" for sid in series_ids}
 
     def _land(self, series_id, when):
         self._state[series_id] = {"date": "2026-10-01",
@@ -413,6 +424,125 @@ class TestRun(unittest.TestCase):
         # 下一支接著等，照樣只觸發一次
         self.assertEqual(watch.run(io), "done")
         self.assertEqual(len(io.dispatched), 1)
+
+
+class TestBlsProbe(unittest.TestCase):
+    """只記錄的探針：公布後問 BLS API 幾次，記下它幾點有、FRED 幾點有。
+
+    會靜默出錯的地方：把額度用完的回應當成「還沒有新的一期」；問太多次把一天 25 次的
+    額度用光；探針自己出錯拖垮守候；或者探針影響了觸發（它不該改變網站的任何行為）。
+    """
+
+    POSTED = datetime(2026, 11, 10, 14, 12, 46, tzinfo=UTC)      # FRED 登出 CPI 的時間
+
+    def notices(self, io):
+        return [line for line in io.lines if line.startswith("::notice title=BLS 探針::")]
+
+    def test_parses_the_real_response_shape(self):
+        payload = {"status": "REQUEST_SUCCEEDED", "message": [], "Results": {"series": [
+            {"seriesID": "CUSR0000SA0", "data": [
+                {"year": "2026", "period": "M10", "value": "337.476"},
+                {"year": "2026", "period": "M09", "value": "336.298"},
+                {"year": "2025", "period": "M13", "value": "330.0"},        # 年平均，不是月份
+                {"year": "2025", "period": "M12", "value": "331.0"}]},
+            {"seriesID": "WPSFD4", "data": []}]}}
+        self.assertEqual(watch.bls_latest(payload), {"CUSR0000SA0": "2026-10-01"})
+
+    def test_refused_request_is_not_an_empty_answer(self):
+        with self.assertRaises(RuntimeError) as caught:
+            watch.bls_latest({"status": "REQUEST_NOT_PROCESSED",
+                              "message": ["daily threshold reached"], "Results": {}})
+        self.assertIn("daily threshold", str(caught.exception))
+
+    def test_schedule_fits_the_daily_quota(self):
+        self.assertLessEqual(len(watch.BLS_ASK_AT), 12)             # 一天 25 次，兩場公布也夠
+        self.assertEqual(watch.bls_next_ask(0), 2)
+        self.assertEqual(watch.bls_next_ask(41.5), 45)              # 啟動得晚：跳過已經過去的
+        self.assertIsNone(watch.bls_next_ask(90))
+
+    def test_every_probed_series_is_tracked_and_from_bls(self):
+        tracked = {series_id: release_id for series_id, _label, release_id in due.tracked()}
+        for series_id in watch.BLS_IDS:
+            self.assertIn(tracked.get(series_id), (10, 46, 50, 192), series_id)
+
+    def test_records_when_bls_and_fred_each_had_it(self):
+        # BLS 公布後 1 分鐘有、FRED 42 分鐘：0 分鐘問不到、2 分鐘問到，之後不再問
+        io = FakeIO(utc(10, 10), CAL, fred_at={"CPIAUCSL": self.POSTED},
+                    bls_at={"CPIAUCSL": CPI_AT + timedelta(minutes=1)})
+        self.assertEqual(watch.run(io), "done")
+        self.assertEqual([when for when, _ids in io.bls_asked],
+                         [CPI_AT, CPI_AT + timedelta(minutes=2)])
+        self.assertEqual(io.bls_asked[0][1], ["CPIAUCSL"])
+        found, compared = self.notices(io)
+        self.assertIn("公布後 2 分鐘問到", found)
+        self.assertIn("上一次問是公布後 0 分鐘", found)
+        self.assertIn("FRED 公布後 43 分鐘", compared)
+        self.assertIn("可以早約 41 分鐘", compared)
+        # 探針不改變觸發：仍然只在 FRED 登出之後觸發一次
+        self.assertEqual(len(io.dispatched), 1)
+        self.assertGreaterEqual(io.dispatched[0], self.POSTED)
+
+    def test_stops_asking_when_bls_never_updates(self):
+        io = FakeIO(utc(10, 12), CAL)                  # BLS 與 FRED 都沒有新的一期
+        self.assertEqual(watch.run(io), "done")
+        self.assertEqual(len(io.bls_asked), len(watch.BLS_ASK_AT))
+        self.assertEqual(io.bls_asked[-1][0], CPI_AT + timedelta(minutes=90))
+        self.assertIn("仍沒有新的一期", self.notices(io)[-1])
+        self.assertEqual(io.dispatched, [])
+
+    def test_fred_first_is_reported_as_no_gain(self):
+        io = FakeIO(utc(10, 10), CAL, fred_at={"CPIAUCSL": self.POSTED})
+        watch.run(io)
+        self.assertIn("直讀沒有比較快", self.notices(io)[-1])
+        self.assertLess(max(when for when, _ids in io.bls_asked), self.POSTED + timedelta(minutes=1))
+        self.assertEqual(len(io.dispatched), 1)
+
+    def test_blocked_api_stops_after_three_and_never_breaks_the_watch(self):
+        io = FakeIO(utc(10, 10), CAL, fred_at={"CPIAUCSL": self.POSTED}, bls_fails=99)
+        self.assertEqual(watch.run(io), "done")
+        self.assertEqual(len(io.bls_asked), watch.BLS_MAX_FAILURES)
+        self.assertIn("從這裡用不了", self.notices(io)[0])
+        self.assertIn("daily threshold", self.notices(io)[0])
+        self.assertEqual(len(io.dispatched), 1)
+        self.assertTrue(io.said("上站了"))
+
+    def test_a_probe_that_blows_up_is_contained(self):
+        io = FakeIO(utc(10, 10), CAL, fred_at={"CPIAUCSL": self.POSTED})
+        with mock.patch.object(watch, "bls_next_ask", side_effect=ValueError("boom")):
+            self.assertEqual(watch.run(io), "done")
+        self.assertTrue(io.said("BLS 探針出錯"))
+        self.assertEqual(len(io.dispatched), 1)
+        self.assertTrue(io.said("上站了"))
+
+    def test_late_start_only_claims_an_upper_bound(self):
+        # 守候被延後到公布後 50 分鐘才啟動：BLS 與 FRED 都已經有了
+        io = FakeIO(utc(10, 14, 20), CAL, fred_at={"CPIAUCSL": self.POSTED},
+                    bls_at={"CPIAUCSL": CPI_AT})
+        watch.run(io)
+        found, compared = self.notices(io)
+        self.assertIn("只知道不晚於這個時間", found)
+        self.assertIn("量不出差距", compared)
+        self.assertEqual(len(io.bls_asked), 1)
+
+    def test_releases_not_from_bls_are_never_asked(self):
+        claims = {180: [date(2026, 11, 12)]}
+        state = {sid: {"date": "2026-10-31", "seen": "2026-11-05"}
+                 for sid in catalogue.RELEASE_FAMILY[180]}
+        io = FakeIO(utc(12, 10), claims, state=state)
+        watch.run(io)
+        self.assertEqual(io.bls_asked, [])
+        self.assertEqual(self.notices(io), [])
+
+    def test_same_instant_series_share_one_query(self):
+        jobs = {50: [date(2026, 11, 6)]}
+        state = {sid: dict(OLD) for sid in catalogue.RELEASE_FAMILY[50]}
+        at = utc(6, 13, 30)
+        io = FakeIO(utc(6, 12), jobs, state=state,
+                    bls_at={"PAYEMS": at, "UNRATE": at + timedelta(minutes=3)})
+        watch.run(io)
+        self.assertEqual(io.bls_asked[0], (at, ["PAYEMS", "UNRATE"]))
+        self.assertEqual(io.bls_asked[1][1], ["UNRATE"])           # 到了的那一檔不再問
+        self.assertIn("公布後 4 分鐘問到", self.notices(io)[0])
 
 
 class TestYield(unittest.TestCase):
