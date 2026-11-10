@@ -1,6 +1,6 @@
 {
  "date": "2026-11-11",
- "generated_at": "2026-11-11T03:10:22+08:00",
+ "generated_at": "2026-11-11T04:42:40+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -39,7 +39,7 @@
    "headline": "剔除極端值後通膨不比核心低，漲勢是全面性的",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "核心 2.6%，剔除極端值均值 3.0%",
+   "evidence": "核心 2.6%，剔除極端值均值 3.7%",
    "module": "物價"
   },
   {
