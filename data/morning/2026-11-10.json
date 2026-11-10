@@ -1,0 +1,144 @@
+{
+ "date": "2026-11-10",
+ "written_at": "2026-11-10T12:24:34+08:00",
+ "model": "claude-opus-5-5",
+ "title": "美股大反彈後，今晚看10月CPI",
+ "lede": "美股昨夜在油價回落下大漲，輝達因董事會調查逆勢下挫；台股今早跟著反攻。今晚美國公布10月CPI，12月升息的討論正在升溫。本站判定與上一份存檔相同，仍在「過熱」格位。",
+ "stories": [
+  {
+   "headline": "油價回落，美股大反彈",
+   "paragraphs": [
+    "美股週一全面回升。TheStreet 與 Yahoo Finance 報導，道瓊收漲 1,104 點、約 2.15%，標普 500 漲 2.35%，那斯達克漲 2.74%。StockTitan 引述 CNBC 指出，這是標普自 4 月 8 日以來最好的一天。",
+    "TheStreet 把漲勢歸因於油價回落與科技股回補，並報導川普淡化再度空襲伊朗後原油重挫。Yahoo Finance 提到，上週 AI 與晶片股遭拋售，那斯達克一度跌入修正區間。"
+   ],
+   "sources": [
+    {
+     "title": "Stock Market Today (Nov. 9, 2026): Nasdaq, S&P 500 rise over 2% amid oil backslide, tech comeback",
+     "outlet": "TheStreet",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-nov-09-202"
+    },
+    {
+     "title": "Stock market today: Nasdaq surges despite Nvidia stock slide, Dow and S&P 500 rally as AI tech trade rises",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-monday-november-9-dow-sp-500-nasdaq-nvidia-090535419.html"
+    },
+    {
+     "title": "The Stock Market Today, November 9, 2026, Closed Higher as Nvidia Fell on Its Board's Investigation",
+     "outlet": "StockTitan",
+     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-9-2026"
+    }
+   ]
+  },
+  {
+   "headline": "輝達董事會調查，股價逆勢下挫",
+   "paragraphs": [
+    "輝達週一逆勢收跌約 4%。Eurasia Business News 報導，董事會已就執行長黃仁勳疑遭外國情報行動鎖定的報導展開獨立調查。StockTitan 估算，自上週五以來輝達市值蒸發約 1,920 億美元。",
+    "其他晶片股則走高。Motley Fool 報導，AMD 獲 Oppenheimer 調升評等、目標價 600 美元，又獲 Google Cloud 選用晶片，收漲 13.26%。"
+   ],
+   "sources": [
+    {
+     "title": "Stock Market Today, Nov. 9 : Nvidia Slides Amid Alleged Chinese Spying as Dow Surges Over 1,000 Points",
+     "outlet": "Eurasia Business News",
+     "url": "https://eurasiabusinessnews.com/2026/11/09/stock-market-today-nov-9-2026-nvidia-slides-amid-alleged-chinese-spying-as-dow-surges-over-1000-points/"
+    },
+    {
+     "title": "Stock Market Today, Nov. 9: AMD Jumps on Oppenheimer Upgrade and Google Cloud Chip Selection",
+     "outlet": "Motley Fool（Yahoo Finance）",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-9-223002825.html"
+    }
+   ]
+  },
+  {
+   "headline": "今晚公布10月CPI，沒有年增率",
+   "paragraphs": [
+    "美國今晚公布 10 月 CPI。CNBC 報導，道瓊社彙整的估計為整體月增 0.3%、核心月增 0.2%；因去年政府停擺留下資料缺口，這次不會有年增率。",
+    "CNBC 指出，汽油回落讓消費者喘口氣，但聯準會官員擔心其他物價壓力難壓。TheStreet Pro 的預覽認為，數據可能降溫，但恐怕擋不住 12 月升息；FXStreet 引述德國商業銀行，強勁的 10 月非農強化了該行對 12 月升息 1 碼的看法。"
+   ],
+   "sources": [
+    {
+     "title": "A key report for where inflation stood in October comes out Tuesday. Here's what to expect",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/09/october-cpi-report-2026-inflation.html"
+    },
+    {
+     "title": "Stock Market Today: November 9, 2026",
+     "outlet": "TheStreet Pro",
+     "url": "https://pro.thestreet.com/stock-market-today/2026-11-09#update-wp:28991"
+    },
+    {
+     "title": "Federal Reserve: December rate hike view reinforced – Commerzbank",
+     "outlet": "FXStreet",
+     "url": "https://www.fxstreet.com/news/federal-reserve-december-rate-hike-view-reinforced-commerzbank-202611090801"
+    }
+   ]
+  },
+  {
+   "headline": "費半大漲，台股跳空反攻",
+   "paragraphs": [
+    "理財周刊報導，費半週一大漲 6.85%，台指期夜盤漲 1,064 點。中時新聞網報導，加權指數今早開高後一度漲逾 1,100 點，台積電一度觸及 2,280 元，台達電再度觸及漲停。",
+    "理財周刊把 4.2 萬點視為多空關鍵。"
+   ],
+   "sources": [
+    {
+     "title": "費半狂飆6.85％、台指夜盤大漲1064點！台股今早報復性反攻 4.2萬點成多空關鍵",
+     "outlet": "理財周刊",
+     "url": "https://www.moneyweekly.com.tw/ArticleData/Info/Article/261062"
+    },
+    {
+     "title": "台股又噴漲逾1100點！台達電連拉兩根漲停 台積電漲45元",
+     "outlet": "中時新聞網",
+     "url": "https://www.chinatimes.com/realtimenews/20261110001342-260410"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "道瓊昨夜收在 52,390 點，距一年高點仍差 3.6%；標普與那斯達克漲幅見要聞。",
+    "美債殖利率上升：10 年期 4.86%（上一份 4.84%），10 年實質 2.63%（原 2.60%）；10 減 2 利差由 0.38 縮至 0.35 個百分點，曲線熊平坦化。美元廣體指數 121.88（2026-11-06）。黃金每盎司 4,145 美元，銅價在十年百分位 100。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股 12:21 盤中加權指數 42,404 點，漲 742 點、約 1.8%；櫃買漲 2.6%。台積電 2,250 元、漲 15 元，聯發科 3,815 元、漲 90 元，鴻海漲 1 元，中華電跌 0.5 元。",
+    "美股權值股昨夜分歧：輝達收 178.67 美元、跌 4.3%；Meta 漲 5.1%，亞馬遜漲 2.9%、微軟漲 2.7%、蘋果漲 2.4%、Alphabet 漲 1.2%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今晚台北 21:30 公布 10 月 CPI。模型預估（克里夫蘭聯準銀行 Inflation Nowcasting，2026-11-09 的估計）：CPI 月增 0.24%、年增 3.74%；核心 CPI 月增 0.21%、年增 2.48%。這個模型上次預估 9 月核心月增 0.20%，實際 0.33%。",
+    "期貨定價：12/9 FOMC 升息機率 65%、不變 35%；到 2027/7 累計升息 36 bp。台灣今天沒有重大數據，央行理監事會在 2026-12-17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定跟上一份存檔比沒有變：九宮格仍是「過熱」（就業強 × 通膨高），政策重心通膨優先，傾向偏升息（score 10）；訊號 10 條，偏升息 5、偏降息 1、中性 4，沒有增減。",
+    "核心 PCE 3.12%、核心 CPI 2.56%、失業率 4.10% 不變；10 年期殖利率由 4.84% 上升至 4.86%，10 減 2 由 0.38 降至 0.35，衰退風險刻度由 46.38 升至 46.58。台灣讀數不變，紅燈是國發會的燈號。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-09",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 75,
+  "sources": 10,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 24,
+  "output_tokens": 18162,
+  "cache_creation_input_tokens": 41971,
+  "cache_read_input_tokens": 248294,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.6628
+ }
+}
