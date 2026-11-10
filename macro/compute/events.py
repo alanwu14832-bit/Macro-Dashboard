@@ -172,6 +172,8 @@ def us_data_events(freshness: dict, now: datetime) -> list[dict]:
                     "sev": "medium", "tag": "美國數據　已公布", "title": row["name"],
                     "detail": f"台北 {released.month}/{released.day} {released:%H:%M} 公布。",
                     "href": "/freshness/", "at": released,
+                    # FRED 幾點登出的：常比公布晚幾十分鐘到兩小時，本站最快也要到這時才有數字
+                    "posted": local_ny.astimezone(TAIPEI),
                 })
                 continue
 

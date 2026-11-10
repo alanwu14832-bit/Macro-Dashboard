@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from .. import catalogue, clock, paths
 from ..data import Bundle
@@ -49,13 +49,23 @@ EXTERNAL = [
 ]
 
 
-def _release_dates(release_id: int, *, limit: int = 3) -> list[str] | None:
-    """今天之後的發布日。抓不到回 None——跟「沒有排定日期」（空清單）要分開，
-    否則限流的那一天，總覽會說「今天沒有重大數據」。"""
+# 發布日往回多看幾天：公布時間過了、資料還沒跟上的那幾檔要靠它認出來（compute/due.py）。
+# PPI 的一檔曾經晚一天才登上 FRED；只看「今天以後」的話，隔天它就不在行事曆上了。
+CALENDAR_LOOKBACK_DAYS = 3
+
+# 這一輪不准讀快取的追蹤序列（build.py 依 compute/due.py 設定）。FRED 的 last_updated
+# 也要跟著重抓：頭版「今天」靠它寫「已公布」，推播靠它判斷「這一輪才公布」。
+REFRESH: set[str] = set()
+
+
+def _release_dates(release_id: int, *, limit: int = 8) -> list[str] | None:
+    """前幾天到之後的發布日（舊到新）。抓不到回 None——跟「沒有排定日期」（空清單）
+    要分開，否則限流的那一天，總覽會說「今天沒有重大數據」。"""
+    since = clock.us_today() - timedelta(days=CALENDAR_LOOKBACK_DAYS)
     params = {
         "release_id": release_id, "api_key": fred.api_key(), "file_type": "json",
         "sort_order": "asc", "include_release_dates_with_no_data": "true",
-        "realtime_start": clock.us_today().isoformat(), "limit": limit,
+        "realtime_start": since.isoformat(), "limit": limit,
     }
     try:
         payload = get_json(build_url("https://api.stlouisfed.org/fred/release/dates", params),
@@ -141,7 +151,7 @@ def compute(bundle: Bundle) -> dict:
         meta = series.meta or {}
         if not meta.get("updated"):
             try:
-                meta = fred.metadata(series_id, ttl=3000)
+                meta = fred.metadata(series_id, ttl=0 if series_id in REFRESH else 3000)
                 meta = {"updated": meta.get("last_updated", "")}
             except Exception:
                 meta = {}

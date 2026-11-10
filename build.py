@@ -22,7 +22,7 @@ from macro import archive, cbc_board, clock, data, deepdive, fomc, morning, path
 from macro import http as http_layer
 from macro.sources import cbc as cbc_source, fomc_text
 from macro.sources import taiwan as dgbas_source
-from macro.compute import (commodities, debt, equities, expectations, fedfunds, freshness,
+from macro.compute import (commodities, debt, due, equities, expectations, fedfunds, freshness,
                            reaction, events,
                            growth, inflation, labor, market, news, rates,
                            scenario, signals, taiwan, world)
@@ -83,7 +83,35 @@ def main() -> int:
         news.TTL_OVERRIDE = ttl
 
     print("== 1/6 載入資料 ==", flush=True)
-    bundle = data.load(verbose=verbose, ttl=ttl)
+    # 公布時間已過、資料還沒跟上的那幾份發布：這一輪繞過快取重新抓（compute/due.py）。
+    # --fresh 本來就全部重抓；--offline 不連網，兩種都不用問。問不出來（行事曆抓不到、
+    # 沒有金鑰）就照一般的快取走，不擋建置。
+    overdue: dict = {}
+    refresh: set[str] = set()
+    prior_dates = freshness.load_state()
+    if not (args.fresh or args.offline):
+        try:
+            calendar = due.calendar()
+            overdue = due.waiting(clock.us_now(), calendar, prior_dates)
+            refresh = due.refresh_ids(clock.us_now(), calendar, prior_dates)
+        except Exception:
+            traceback.print_exc()
+            overdue, refresh = {}, set()
+    freshness.REFRESH = set(overdue)
+    if refresh:
+        print(f"   公布時間已過、資料還沒跟上：{'、'.join(sorted(overdue)) or '同一份發布裡晚到的'}"
+              f"——{len(refresh)} 檔這一輪繞過快取重新抓", flush=True)
+    bundle = data.load(verbose=verbose, ttl=ttl, refresh=refresh)
+    # 重抓的結果照實印：2026-11-10 那次建置早了五分鐘沒抓到 CPI，事後從紀錄裡看不出
+    # 它是「來源還沒登出」還是「讀了快取」。
+    for series_id, at in sorted(overdue.items()):
+        have = bundle[series_id].last_date
+        before = (prior_dates.get(series_id) or {}).get("date")
+        if have is not None and before and have.isoformat() > before:
+            print(f"   ✓ {series_id}：重抓到 {have}（上一輪是 {before}）", flush=True)
+        else:
+            print(f"   · {series_id}：{at:%m/%d %H:%M} 美東應已公布，重抓之後仍是 "
+                  f"{have or '沒有值'}——來源還沒登出，下一輪再抓", flush=True)
     print(f"   {len(bundle.series)} 檔序列，缺漏 {len(bundle.missing)} 檔", flush=True)
     # 內部缺格要一直看得見：2025-10 政府關門停發讓 34 檔 BLS 序列缺一格，
     # 位置型轉換因此默默用錯基期。轉換層已改日曆對齊，這行是第二道防線。

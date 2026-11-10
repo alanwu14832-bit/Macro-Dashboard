@@ -1,0 +1,65 @@
+name: 發布守候
+# 接力的那一支在名字上標出來：別的守候啟動時靠這兩個字認出它並讓開（tools/release_watch.py）。
+run-name: ${{ inputs.successor && '發布守候（接力）' || '發布守候' }}
+
+# 美國數據公布時間一到就盯著 FRED，新數字一登出就觸發 build.yml。細節在
+# tools/release_watch.py 的開頭；判斷用的行事曆與「跟上了沒」跟建置是同一份
+# （macro/compute/due.py）。
+#
+# 排程掛很多個、而且很早：GitHub 對公開 repo 的排程只是 best-effort，實測晨報的排程
+# 每天被延後 3–6 小時、每小時的建置實際 2–10 小時才跑一次。美國數據多在 UTC 12:30–19:00
+# 公布（美東 8:30–14:00，夏令冬令差一小時——腳本用美東時區算，這裡只是「夠早」）。
+# 每一次啟動先看接下來 8 小時有沒有追蹤的發布：沒有就幾十秒內結束；有而且已經有一支
+# 在等，也立刻結束。push 也會啟動它——筆電的要聞整理每天推幾次，推送不會被延後。
+on:
+  schedule:
+    - cron: "7 2 * * 1-5"
+    - cron: "37 3 * * 1-5"
+    - cron: "7 5 * * 1-5"
+    - cron: "37 6 * * 1-5"
+    - cron: "7 8 * * 1-5"
+    - cron: "37 9 * * 1-5"
+    - cron: "7 11 * * 1-5"
+    - cron: "37 12 * * 1-5"
+    - cron: "7 14 * * 1-5"
+    - cron: "37 15 * * 1-5"
+    - cron: "7 17 * * 1-5"
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      successor:
+        description: 接力（跑滿 5 小時的守候自己觸發下一支時用，手動不用勾）
+        type: boolean
+        default: false
+
+# 沒有 concurrency 群組：同一群組裡排隊的執行會被更新的取代而顯示成「已取消」，
+# 發布日一天會取消好幾次。改由腳本自己看有沒有別的守候在跑。
+#
+# actions: write 是為了用 GITHUB_TOKEN 觸發 build.yml 與自己的 workflow_dispatch
+# （GITHUB_TOKEN 觸發的事件裡，只有 workflow_dispatch 與 repository_dispatch 會真的
+# 啟動 workflow），以及列出自己的執行。它不提交任何東西，contents 只要讀。
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350        # job 上限 6 小時；腳本跑滿 5 小時會自己接力
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 守候
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          SUCCESSOR: ${{ inputs.successor }}
+        run: python3 tools/release_watch.py

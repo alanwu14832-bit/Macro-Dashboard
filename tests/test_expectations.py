@@ -403,6 +403,23 @@ class ReleasePage(unittest.TestCase):
         self.assertIn("不是市場共識，也不是市場定價", html)
         self.assertIn(nowcast.PAGE, html)
 
+    def test_on_release_night_the_estimate_is_not_called_the_next_release(self):
+        """2026-11-10：站上已經是 10 月的 CPI，來源隔天才登錄實際值，落點頁還寫
+        「下一次公布 模型預估…」——那個「下一次」幾個小時前就公布了。"""
+        def ctx(last):
+            bundle = Bundle()
+            bundle.add("CPIAUCSL", monthly("CPIAUCSL", last=last))
+            return {**context(cpi=cpi_item()), "_bundle": bundle}
+        night = release._expectation_block(ctx((2026, 9)), "CPIAUCSL")     # 預估的就是手上這一期
+        self.assertNotIn("下一次公布", night)
+        self.assertIn("9 月公布前", night)
+        self.assertIn("模型預估 CPI 年增 3.60%、月增 0.53%（10/9 的估計）", night)
+        self.assertIn("來源隔天才登錄實際值", night)
+        self.assertIn("8 月 CPI 月增：預估 0.30%、實際 0.38%", night)       # 上一次的成績照列，標明是 8 月
+        before = release._expectation_block(ctx((2026, 8)), "CPIAUCSL")    # 還沒公布
+        self.assertIn("下一次公布", before)
+        self.assertNotIn("公布前</strong>", before)
+
     def test_a_failed_fetch_is_said_out_loud(self):
         ctx = {"expectations": {"items": {}, "error": "克里夫蘭聯準銀行 Inflation Nowcasting（mom）拿不到"}}
         html = release._expectation_block(ctx, "CPIAUCSL")

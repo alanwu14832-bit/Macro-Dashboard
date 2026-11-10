@@ -33,7 +33,9 @@ class Bundle:
 
 
 def load(groups: list[str] | None = None, *, verbose: bool = True,
-         ttl: float = 6 * 3600) -> Bundle:
+         ttl: float = 6 * 3600, refresh: frozenset[str] | set[str] = frozenset()) -> Bundle:
+    """`refresh`：這一輪不准讀快取的序列（公布時間已過、資料還沒跟上的那幾檔，
+    見 compute/due.py）。其餘照 `ttl`。重抓失敗時 http 層照舊退回舊快取。"""
     bundle = Bundle()
     specs: dict[str, catalogue.Spec] = {}
     for name, group in catalogue.ALL_GROUPS.items():
@@ -45,7 +47,7 @@ def load(groups: list[str] | None = None, *, verbose: bool = True,
     total = len(specs)
     for i, (series_id, (label, unit, freq, start)) in enumerate(specs.items(), 1):
         s = fred.series(series_id, label=label, unit=unit, frequency=freq,
-                        start=start, ttl=ttl)
+                        start=start, ttl=0 if series_id in refresh else ttl)
         bundle.add(series_id, s)
         if verbose and (i % 25 == 0 or i == total):
             print(f"  資料載入 {i}/{total}", flush=True)

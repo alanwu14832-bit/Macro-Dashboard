@@ -351,5 +351,36 @@ ALL_GROUPS = {
 }
 
 
+# 同一份發布裡的序列（FRED 的發布編號 → 本站目錄裡屬於它的序列）。
+# 公布時間一過，這一份發布的每一檔都要繞過快取重新抓（compute/due.py）：只重抓 CPI 一檔、
+# 核心 CPI 與分項還讀 50 分鐘內的快取，通膨頁會拿 10 月的總指數去配 9 月的分項。
+# 只列 freshness.TRACKED 追蹤的那幾份發布；日頻的 H.15 不列（它沒有「公布那一刻」）。
+# 對照來源是 FRED 的 series/release 端點（2026-11-10 逐檔查過）。**加新序列進目錄時，
+# 屬於這幾份發布的要補進來**——漏了不會報錯，只是公布當晚那一檔會晚一輪才更新。
+RELEASE_FAMILY: dict[int, tuple[str, ...]] = {
+    50: (   # Employment Situation
+        "PAYEMS", "USPRIV", "UNRATE", "U6RATE", "CIVPART", "EMRATIO", "LNS11300060",
+        "LNS12300060", "CES0500000003", "AWHAETP", "AWHMAN", "UEMPMED", "UEMPMEAN",
+        "LNS13023621", "LNS13023557", "LNS12032194", "CNP16OV", "CLF16OV", "CE16OV",
+        "UNEMPLOY", "LNS13008397", "LNS13026511", "USCONS", "MANEMP", "USMINE",
+        "USWTRADE", "USTRADE", "CES4300000001", "USINFO", "USFIRE", "USPBS",
+        "CES6562000101", "USEHS", "USLAH", "USSERV", "USGOVT", "CES9091000001"),
+    180: ("ICSA", "IC4WSA", "CCSA"),                       # Weekly Claims
+    192: ("JTSJOL", "JTSHIL", "JTSHIR", "JTSQUR", "JTSLDR", "JTSTSR"),   # JOLTS
+    10: (   # Consumer Price Index
+        "CPIAUCSL", "CPILFESL", "CPIAUCNS", "CPILFENS", "CPIUFDSL", "CPIENGSL",
+        "CUSR0000SAH1", "CUSR0000SEHA", "CUSR0000SEHC", "CUSR0000SAS", "CUSR0000SAD",
+        "CUSR0000SAN", "CUSR0000SETA01", "CUSR0000SETA02", "CUSR0000SAF11",
+        "CUSR0000SAS4", "CUSR0000SAM2"),
+    46: ("PPIACO", "PPIFIS", "PPIFES"),                    # Producer Price Index
+    54: ("PCEPI", "PCEPILFE", "PCEC96", "DSPIC96", "PSAVERT"),   # Personal Income and Outlays
+    53: ("A091RC1Q027SBEA", "GDPC1", "A191RL1Q225SBEA", "GPDIC1"),   # Gross Domestic Product
+    9: ("RSAFS",),                                         # Advance Retail Sales
+    13: ("INDPRO", "TCU"),                                 # G.17
+    27: ("HOUST", "PERMIT"),                               # New Residential Construction
+    191: ("DRTSCILM",),                                    # SLOOS
+}
+
+
 def sector_specs() -> dict[str, Spec]:
     return {sid: (name, "千人", "m", LONG_START) for sid, name in LABOR_SECTORS.items()}

@@ -78,6 +78,9 @@ def _expectation_block(ctx: dict, sid: str) -> str:
         reason = (ctx.get("expectations") or {}).get("error") or "模型預估這一輪沒有取得"
         return section("expectation", "公布前的預期",
                        f'<p class="muted">{esc(reason)}。這一格留白，不拿前值代替。</p>')
+    bundle = ctx.get("_bundle")
+    held = bundle[sid].last_date if bundle is not None and bundle[sid] else None
+    on_hand = (held.year, held.month) if held else None      # 本站手上這一期是哪個月
     parts = []
     for item in items:
         gdp = item["key"] == "gdp"
@@ -85,7 +88,15 @@ def _expectation_block(ctx: dict, sid: str) -> str:
         nxt, last, track = item.get("next"), item.get("last"), item.get("track") or {}
         if nxt:
             stamp = (f'（{nxt["as_of"].month}/{nxt["as_of"].day} 的估計）' if nxt.get("as_of") else "")
-            lines.append(f'<p><strong>下一次公布</strong>　模型預估 {esc(ex.before(item))}{stamp}</p>')
+            if nxt.get("target") == on_hand:
+                # 公布當晚：本站已經拿到這一期，來源的檔案隔天才登錄實際值，所以它還把這一期
+                # 當成「下一期」。照舊列出公布前的預估，但不能再叫它「下一次公布」。
+                period = ex.quarter_label(nxt["target"]) if gdp else ex.month_label(nxt["target"])
+                lines.append(f'<p><strong>{esc(period)}公布前</strong>　模型預估 {esc(ex.before(item))}{stamp}'
+                             f'<span class="muted">　這一期已經公布；來源隔天才登錄實際值，'
+                             f'差多少到時才列。</span></p>')
+            else:
+                lines.append(f'<p><strong>下一次公布</strong>　模型預估 {esc(ex.before(item))}{stamp}</p>')
         if last:
             lines.append(f'<p><strong>上一次</strong>　{esc(ex.after(item))}</p>')
         rows = []

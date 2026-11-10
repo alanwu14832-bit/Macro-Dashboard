@@ -228,6 +228,14 @@ def story_block(story: dict | None, events: dict | None = None) -> str:
     if later:
         names = "、".join(dict.fromkeys(e["title"].split("　")[0] for e in later[:3]))
         note += f'<strong>寫在「{esc(names)}」公布之前，沒有提到它。</strong>'
+    # 公布之後、來源登出之前寫的（2026-11-10：CPI 21:30 公布、文章 22:06 寫、FRED 22:12 才登出）：
+    # 文章會說「本站資料尚未更新」，而數字接著就上站了——同一頁不能兩種說法並排而不講明。
+    arrived = [e for e in (events or {}).get("events") or []
+               if e not in later and e.get("posted") is not None and e["posted"] > written
+               and "已公布" in (e.get("tag") or "")]
+    if arrived:
+        names = "、".join(dict.fromkeys(e["title"].split("　")[0] for e in arrived[:3]))
+        note += f'<strong>寫的時候「{esc(names)}」的數字還沒到本站，文章沒有提到它。</strong>'
     body = "".join(f"<p>{esc(paragraph)}</p>" for paragraph in story["paragraphs"])
     return ('<article class="story">'
             f'<h2 class="story-k">{seal("摘")}今日導讀'

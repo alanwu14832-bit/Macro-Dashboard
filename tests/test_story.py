@@ -165,6 +165,21 @@ class Block(unittest.TestCase):
         html = front.story_block(story(), {"events": [decision]})
         self.assertIn("寫在「聯準會升息 1 碼」公布之前", html)
 
+    def test_data_that_reached_the_site_after_the_article_is_named(self):
+        """2026-11-10：CPI 21:30 公布、文章 22:06 寫（說「本站資料尚未更新」）、FRED 22:12 才登出。
+        數字上站之後，文章那一句就是錯的——要講明它寫的時候數字還沒到。"""
+        now = clock.today()
+        cpi = {**event("CPI", 21), "posted": datetime(now.year, now.month, now.day, 22, 12, tzinfo=TAIPEI)}
+        html = front.story_block(story(22, 6), {"events": [cpi]})
+        self.assertIn("寫的時候「CPI」的數字還沒到本站，文章沒有提到它", html)
+        self.assertNotIn("公布之前", html)
+        # 過了台北午夜（那件事變成昨天）文章還掛著，這一句也要還在
+        html = front.story_block(story(22, 6), {"events": [{**cpi, "today": False}]})
+        self.assertIn("數字還沒到本站", html)
+        # 文章寫在數字到站之後：不加
+        html = front.story_block(story(22, 30), {"events": [cpi]})
+        self.assertNotIn("還沒到本站", html)
+
     def test_earlier_or_still_pending_events_are_not_flagged(self):
         earlier = event("初領失業金", 2)
         pending = event("CPI", 20, tag="美國數據　今晚公布")
