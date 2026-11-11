@@ -1,0 +1,149 @@
+{
+ "date": "2026-11-11",
+ "written_at": "2026-11-11T10:13:19+08:00",
+ "model": "claude-opus-5-5",
+ "title": "美10月CPI月增0.4%，12月升息機率升高",
+ "lede": "美國10月CPI月增0.4%，聯準會理事華勒與達拉斯聯準銀行總裁羅根隨即表態支持再升息。輝達執行長風波加深科技股賣壓；台積電交出創紀錄的第3季財報並調高季配息。本站判定與上一份相同，仍是過熱、偏升息。",
+ "stories": [
+  {
+   "headline": "美國10月CPI月增0.4%，核心月增0.3%",
+   "paragraphs": [
+    "美國勞工統計局11月10日公布，10月CPI月增0.4%，9月為0.6%；核心CPI月增0.3%，與8、9月相同。住房指數月增0.3%，貢獻整體漲幅三成以上。因2025年10月政府關門沒有採價，這次沒有公布年增率。",
+    "CNBC指出，這份數據讓聯準會的抗通膨工作更複雜；Yahoo Finance引述嘉信理財的Kevin Gordon說，商品與服務的漲價範圍仍偏廣。"
+   ],
+   "sources": [
+    {
+     "title": "Consumer Price Index Summary - 2026 M10 Results",
+     "outlet": "美國勞工統計局",
+     "url": "https://www.bls.gov/news.release/cpi.nr0.htm"
+    },
+    {
+     "title": "CPI inflation report: October 2026",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/10/cpi-inflation-report-october-2026.html"
+    },
+    {
+     "title": "'Not great': October CPI inflation rises 0.4% as food and rent costs spike",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/economy/article/not-great-october-cpi-inflation-data-comes-in-hotter-than-expected-as-food-and-rent-costs-spike-142323507.html"
+    }
+   ]
+  },
+  {
+   "headline": "華勒、羅根接連放鷹，12月升息半碼被拿出來討論",
+   "paragraphs": [
+    "路透報導，聯準會理事華勒11月10日在倫敦表示將支持12月至少升息1碼，並說通膨持續的話應考慮升息50個基點。CNBC報導，羅根在CPI公布後表示還需要再升息兩次。",
+    "Yahoo Finance報導，CPI公布後美債殖利率走高，押注12月升息2碼的比率從零跳升。"
+   ],
+   "sources": [
+    {
+     "title": "Fed’s Waller plans to support at least a quarter-point rate hike in December By Reuters",
+     "outlet": "路透（Investing.com）",
+     "url": "https://www.investing.com/news/economy-news/feds-waller-plans-to-support-at-least-a-quarterpoint-rate-hike-in-december-5014429"
+    },
+    {
+     "title": "S&P 500 falls, dragged down by Nvidia sell-off and rate-hike fears after hot inflation data: Live updates",
+     "outlet": "CNBC",
+     "url": "https://cnbc.com/2026/11/09/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "Stock market today: Dow, S&P 500, Nasdaq slip as hot CPI fuels rate hike odds, Nvidia stock sinks",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/markets/article/stock-market-today-tuesday-november-10-dow-sp-500-nasdaq-inflation-data-cpi-090627830.html"
+    }
+   ]
+  },
+  {
+   "headline": "黃仁勳風波延燒，輝達連兩天重挫",
+   "paragraphs": [
+    "輝達董事會已對執行長黃仁勳展開獨立調查，起因是他與一名被指為中國間諜的女子的關係。Yahoo Finance引述The Information報導，這段關係據稱促成約75億美元的對中晶片銷售；這些指控仍待查證。",
+    "輝達11月10日收跌約5.5%。Yahoo Finance報導，晶片股市值跌幅逼近5兆美元，也拖累整體科技股。"
+   ],
+   "sources": [
+    {
+     "title": "Nvidia live updates: Nvidia stock drops as spy fiasco involving CEO Jensen Huang raises broader risk concerns",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/technology/live/nvidia-scandal-live-updates-nvidia-stock--board-investigates-ceo-jensen-huang-affair-alleged-chinese-spy-163130372.html"
+    },
+    {
+     "title": "Stock Market Today (Nov. 10, 2026): Nasdaq falls after key inflation report derails strong start to week - TheStreet",
+     "outlet": "TheStreet",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-nov-10-2026"
+    }
+   ]
+  },
+  {
+   "headline": "台積電第3季獲利創新高，季配息調高到9元",
+   "paragraphs": [
+    "經濟日報報導，台積電11月10日董事會核准第3季財報：營收約新台幣1兆4,942億元、稅後純益約7,630億元、每股盈餘29.43元，同創新高；季配息提高到9元，並通過認購OpenAI特別股。",
+    "同一天台股收漲1,050點、以42,711.92點作收，台積電收在當日最高的2,285元。經濟日報引述法人說，外資期貨淨空單仍超過10萬口。"
+   ],
+   "sources": [
+    {
+     "title": "驚喜！台積電董事會拍板五議案、季配息拉升至9元 認購OpenAI特別股",
+     "outlet": "經濟日報",
+     "url": "https://udn.com/news/story/7251/9870125"
+    },
+    {
+     "title": "快訊／台股收漲1050點 台積電漲50元至2285、收今日最高",
+     "outlet": "ETtoday",
+     "url": "https://finance.ettoday.net/news/3269566"
+    },
+    {
+     "title": "台股開高續彈逾千點重返5日線！台積電領軍 台達電、世芯跳空漲停",
+     "outlet": "經濟日報",
+     "url": "https://udn.com/news/story/7251/9868225"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "昨夜CPI公布後美股走低。標普500收7,521點，距一年高點-3.8%；那斯達克收25,253點；道瓊收52,232點。VIX為19.92。",
+    "10年期美債殖利率從4.86%上升到4.88%，10年實質殖利率從2.63%上升到2.66%，曲線呈熊平坦化。WTI原油99.64美元、布蘭特107.03美元，黃金4,145美元。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "美股權值股：輝達跌5.5%至168.89美元，微軟跌2.2%，蘋果跌0.6%；亞馬遜逆勢漲1.5%，Meta持平。",
+    "台股今早盤中加權指數暫報43,166點，漲454點；台積電暫報2,335元，漲50元。台達電跌35元，鴻海跌3元，聯發科跌10元。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美國與台灣都沒有重大數據或政策決議。下一期模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）：CPI年增3.94%、月增0.14%；核心PCE年增3.21%、月增0.27%。模型預估（亞特蘭大聯準銀行 GDPNow）：第4季年化季增3.5%。",
+    "FOMC 12/9期貨定價：升息65%、不變35%、降息0%。台灣央行理監事會在12/17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份相同：九宮格仍是過熱（就業強×通膨高），政策重心通膨優先，傾向偏升息。訊號共10條，偏升息5、偏降息1，沒有新增或消失。",
+    "關鍵讀數只有利率類變動：10年期從4.86%上升到4.88%，10減2從0.35收窄到0.32，衰退風險刻度從46.58降到46.30；核心PCE 3.12%、失業率4.10%沒有變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-10",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 51,
+  "sources": 11,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 2,
+  "input_tokens": 12,
+  "output_tokens": 9530,
+  "cache_creation_input_tokens": 41938,
+  "cache_read_input_tokens": 75820,
+  "web_search_requests": 4,
+  "attempts": 2,
+  "cost_usd": 0.4555
+ }
+}
