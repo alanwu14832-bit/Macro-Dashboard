@@ -1,0 +1,139 @@
+{
+ "date": "2026-11-12",
+ "written_at": "2026-11-12T11:22:44+08:00",
+ "model": "claude-opus-5-5",
+ "title": "AI 股反彈，12 月升息押注未退",
+ "lede": "CoreWeave 財報帶動 AI 與半導體股反彈，美股 11 日收高；但 10 月 CPI 偏熱後，交易員仍押注聯準會 12 月升息，華勒甚至提到升 2 碼的可能。輝達執行長傳出醜聞後盤後走弱，台股今早震盪。本站判定沒有變，仍在「過熱」格位。",
+ "stories": [
+  {
+   "headline": "CoreWeave 財報亮眼，那斯達克漲 1.6%",
+   "paragraphs": [
+    "CNBC 報導，美東時間 11 日標普 500 漲 1.31%，收 7,619.38 點；那斯達克漲 1.6%，收 25,466.19 點；道瓊收 52,486.49 點。CoreWeave 公布第三季營收並上修財測，股價大漲近 25%。當天是退伍軍人節，債市休市。",
+    "CNBC 引述 Baird 策略師指出，CoreWeave 財報與 Anthropic IPO 的認購熱度帶動 AI 族群情緒，市場在修正上週跌過頭的部分。"
+   ],
+   "sources": [
+    {
+     "title": "Stock market news for Nov. 11, 2026",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/10/stock-market-today-live-updates.html"
+    }
+   ]
+  },
+  {
+   "headline": "黃仁勳傳再爆婚外情、可能遭撤換，輝達盤後走弱",
+   "paragraphs": [
+    "Yahoo Finance 報導，輝達收盤後股價下滑，起因是執行長黃仁勳傳出第二段婚外情及可能遭撤換的報導。",
+    "新頭殼報導，輝達盤後重挫，美股期貨電子盤早盤承受賣壓；ETtoday 則報導已有多家機構調降輝達評價。"
+   ],
+   "sources": [
+    {
+     "title": "Stock market today: Nvidia slides following reports of CEO's second affair, possible removal",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-november-11-dow-sp-500-nasdaq-nvidia-treasurys-123445799.html"
+    },
+    {
+     "title": "輝達傳撤換黃仁勳！美股期貨回檔 台股逆勢強彈逾500點、櫃買漲2%",
+     "outlet": "新頭殼",
+     "url": "https://newtalk.tw/news/view/2026-11-12/1070652"
+    }
+   ]
+  },
+  {
+   "headline": "CPI 偏熱後，12 月升息押注升溫，華勒提升 2 碼",
+   "paragraphs": [
+    "Investing.com 引述 CME FedWatch 報導，10 日 CPI 公布後，12 月升息 1 碼的機率升到 88.8%，升 2 碼約 11.2%。華盛頓郵報報導，聯準會理事華勒表示，若通膨持續偏熱，12 月可能需要升息半個百分點。",
+    "路透調查中，101 位經濟學家全數預測聯準會 12 月升息 1 碼到 4.00%–4.25%。"
+   ],
+   "sources": [
+    {
+     "title": "Fed rate hike odds in December at 88% after hot CPI- CME Fedwatch",
+     "outlet": "Investing.com",
+     "url": "https://sg.finance.yahoo.com/news/fed-rate-hike-odds-december-035134676.html"
+    },
+    {
+     "title": "Trump-appointed Fed member signals big rate hike as inflation runs hot - The Washington Post",
+     "outlet": "華盛頓郵報",
+     "url": "https://www.washingtonpost.com/business/2026/11/10/trump-appointed-fed-member-signals-big-rate-hike-inflation-runs-hot/"
+    },
+    {
+     "title": "Fed to raise rates once more in December as inflation risks stay high: Reuters poll",
+     "outlet": "路透",
+     "url": "https://finance.yahoo.com/economy/policy/articles/fed-raise-rates-once-more-124512933.html"
+    }
+   ]
+  },
+  {
+   "headline": "台股 11 日大漲 1,545 點，今早開低震盪",
+   "paragraphs": [
+    "經濟日報整理，台股 11 日上漲 1,545 點重回 44,000 點，台積電漲 110 元收 2,395 元，三個交易日累計反彈 4,555 點。",
+    "中央社報導，12 日台股開盤跌 76.69 點，早盤高低震盪逾 500 點，櫃買指數逆勢走高。ETtoday 報導，MSCI 季調台灣成分股「3 進 4 出」，新增者都是 PCB 與載板族群。"
+   ],
+   "sources": [
+    {
+     "title": "11月12日 五件財經大事搶先看",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9873130"
+    },
+    {
+     "title": "台股早盤震盪逾500點 台積電跌40元",
+     "outlet": "中央社",
+     "url": "https://news.cts.com.tw/cna/money/202611/202611123100089.html"
+    },
+    {
+     "title": "MSCI季調台股3進4出！PCB三雄升級 元太、嘉澤降小型股",
+     "outlet": "ETtoday",
+     "url": "https://finance.ettoday.net/news/3270613"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "11/11 債市休市，10 年期殖利率停在 4.88%，10 年實質利率 2.66%，10 減 2 利差 0.32 個百分點。VIX 19.46，屬常態區間。",
+    "FRED 最新收盤：標普 500 為 7,520.93，近一月跌 3.7%；那斯達克 25,065.87，近一月跌 8.0%；道瓊 52,486.49，近一月漲 1.6%。廣體美元指數 121.88（2026-11-06）。本站商品資料：黃金 4,144.55 美元，近一月跌 9.3%；銅 14,473 美元。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "美股權值股：輝達漲 2.9%、蘋果漲 2.0%、Alphabet 漲 2.1%；微軟跌 2.3%、亞馬遜跌 1.7%、Meta 跌 2.0%。",
+    "台股盤中（11:20）：加權指數 44,190，跌 66.93 點；櫃買指數漲 1.5%。台積電 2,380 元，跌 15 元；聯發科 4,010 元，漲 20 元；廣達跌 4.7%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "美國今晚台北 21:30 公布初領失業金人數。台灣今天沒有重大數據；央行下次理監事會在 2026-12-17。",
+    "聯準會 12/9 會議期貨定價：升息 65%、不變 35%、降息 0%。CPI 模型預估（克里夫蘭聯準銀行 Inflation Nowcasting，2026-11-10 的估計）：年增 3.94%；核心 CPI 年增 2.87%、月增 0.21%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "跟上一份存檔相比沒有變。九宮格仍是「過熱」（就業強、通膨高），政策重心通膨優先，傾向偏升息（score 10）。訊號共 10 條，偏升息 5、偏降息 1、中性 4，無增減。",
+    "關鍵讀數也都沒變：核心 PCE 3.12%、核心 CPI 2.56%、失業率 4.10%、衰退風險刻度 46.30。台灣讀數同樣與上一份相同，國發會景氣燈號 41 分紅燈。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-11",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 64,
+  "sources": 9,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 2,
+  "input_tokens": 14,
+  "output_tokens": 10979,
+  "cache_creation_input_tokens": 48896,
+  "cache_read_input_tokens": 103304,
+  "web_search_requests": 4,
+  "attempts": 2,
+  "cost_usd": 0.5248
+ }
+}
