@@ -1,0 +1,149 @@
+{
+ "date": "2026-11-13",
+ "written_at": "2026-11-13T10:52:57+08:00",
+ "model": "claude-opus-5-5",
+ "title": "黃仁勳請辭 輝達重挫、台股反彈",
+ "lede": "輝達執行長黃仁勳請辭，輝達收跌逾 4%，美股小跌、美債殖利率走高；台股前一天重挫千點，今天早盤反彈。今晚美國公布 PPI。本站判定格位不變，新增一條偏降息訊號。",
+ "stories": [
+  {
+   "headline": "輝達執行長黃仁勳請辭，股價收跌逾 4%",
+   "paragraphs": [
+    "輝達 12 日（美東）開盤前宣布，黃仁勳即刻辭去執行長與董事職務。Yahoo 財經報導，董事會先前已就他與一名被指為中國間諜女性的關係展開調查。",
+    "StockTitan 報導，輝達開盤一度跌約 13%，終場收跌 4.34%。Yahoo 財經指出，對手博通與超微各漲近 6%，領漲標普 500。"
+   ],
+   "sources": [
+    {
+     "title": "Markets News, Nov. 12, 2026: Major Stock Indexes Fall as Investors Digest News of Nvidia CEO Jensen Huang’s Exit; AMD, Broadcom Soar",
+     "outlet": "Yahoo 財經",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nasdaq-p-131805045.html"
+    },
+    {
+     "title": "Stocks Closed Slightly Lower in the Stock Market Today, November 12, 2026, and Nvidia Said CEO Jensen Huang Resigned",
+     "outlet": "StockTitan",
+     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-12-2026"
+    }
+   ]
+  },
+  {
+   "headline": "美股收小跌，殖利率與油價走高",
+   "paragraphs": [
+    "CNBC 報導，美股 12 日標普 500 跌 0.35%、那斯達克跌 0.39%、道瓊跌 0.36%；華盛頓郵報指出，標普開盤一度跌近 1% 後幾乎收復。",
+    "VistaP Global 認為，殖利率上升、通膨疑慮與輝達人事變動一起壓抑氣氛，羅素 2000 跌 1.66%。"
+   ],
+   "sources": [
+    {
+     "title": "Nasdaq Composite slides as Nvidia shares tumble on Jensen Huang’s exit; oil prices jump",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/11/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "How major US stock indexes fared Thursday 11/12/2026",
+     "outlet": "華盛頓郵報",
+     "url": "https://www.washingtonpost.com/business/2026/11/12/wall-street-stocks-dow-nasdaq/8ee92692-dede-11f1-912c-4fbb80d73f7f_story.html"
+    },
+    {
+     "title": "Stock Market Today, November 12, 2026: Stocks Fall as Treasury Yields Hit 5.10%, Oil Rises and Nvidia Faces Leadership Reset",
+     "outlet": "VistaP Global",
+     "url": "https://vistapglobal.com/stock-market-today-november-12-2026-stocks-fall-as-treasury-yields-hit-5-10-oil-rises-and-nvidia-faces-leadership-reset-amd-crwv-eprx-googl-modd-msft-nvda-ser-spcx-ttek-ual/"
+    }
+   ]
+  },
+  {
+   "headline": "台股 12 日重挫 1,165 點，13 日開盤反彈",
+   "paragraphs": [
+    "台股 12 日受輝達風波衝擊，加權指數跌 1,165.28 點、跌幅 2.63%；CMoney 報導，台積電跌 55 元、收 2,340 元。",
+    "ETtoday 報導，13 日台股開盤漲 628 點，並引述台新投顧，認為純 AMD 與 ASIC 供應鏈可望受惠，部分輝達友好廠商面臨訂單調整風險。"
+   ],
+   "sources": [
+    {
+     "title": "【即時新聞】最新台股受輝達風波重挫，台積電股價下跌55元相對大盤展現韌性！",
+     "outlet": "CMoney",
+     "url": "https://www.cmoney.tw/notes/note-detail.aspx?nid=1292130"
+    },
+    {
+     "title": "【台股11/13日盤前分析】",
+     "outlet": "蕃新聞",
+     "url": "https://n.yam.com/Article/20261113881236"
+    },
+    {
+     "title": "快訊／台股衝了！ 開盤飆漲",
+     "outlet": "ETtoday",
+     "url": "https://finance.ettoday.net/news/3271374"
+    }
+   ]
+  },
+  {
+   "headline": "華勒傾向 12 月升息，升息押注升溫",
+   "paragraphs": [
+    "CNBC 報導，聯準會理事華勒 10 日表示傾向 12 月升息，若通膨數據偏熱，應考慮升息兩碼。",
+    "Investing.com 引述 CME FedWatch，10 月 CPI 公布後 12 月升息機率升到 88%；CNBC 指出升息兩碼機率為 11%，一週前是零。"
+   ],
+   "sources": [
+    {
+     "title": "Fed Governor Waller sees December hike likely, opens door to possible half-point increase",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/10/fed-governor-waller-sees-december-hike-likely.html"
+    },
+    {
+     "title": "Market spooked because now the Fed may need a supersized hike in December",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/10/market-spooked-because-now-the-fed-may-need-a-supersized-hike-in-december.html"
+    },
+    {
+     "title": "Fed rate hike odds in December at 88% after hot CPI- CME Fedwatch",
+     "outlet": "Investing.com",
+     "url": "https://sg.finance.yahoo.com/news/fed-rate-hike-odds-december-035134676.html"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "美股 11 月 12 日收小跌。標普 500 報 7,619，近一月跌 2.4%；那斯達克 25,466，近一月跌 6.4%；道瓊 52,297，近一月漲 1.3%。VIX 17.49。",
+    "10 年期殖利率 4.98%，比上一份存檔的 4.88% 上升；10 年實質 2.78%，30 年期 5.35%，曲線熊平坦化。WTI 89.62 美元/桶，黃金 4,144.55 美元/盎司，近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股 13 日盤中（台北 10:50）加權指數 44,073.97，漲 982.10 點、漲 2.3%；櫃買漲 3.2%。台積電 2,370 元，漲 30 元；台達電漲 20 元；鴻海跌 1 元；聯發科平盤。",
+    "美股權值股，輝達收 166.19 美元，跌 4.3%；Meta 跌 0.8%；Alphabet 漲 1.8%，微軟漲 0.4%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今晚台北 21:30 美國公布 PPI。台灣今天沒有重大數據，央行理監事會在 12/17。",
+    "模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）：下一次 CPI 年增 3.94%、核心 CPI 年增 2.87%。模型預估（亞特蘭大聯準銀行 GDPNow）Q4 年化季增 3.5%。期貨定價（聯邦基金利率期貨）：12/9 升息機率 65%、不變 35%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定跟上一份存檔比，格位沒有變：九宮格仍是過熱，政策重心通膨優先，傾向偏升息。",
+    "訊號由 10 條增為 11 條，新增偏降息一條：油價下行，WTI 近一月跌 8.2%。偏升息仍 5 條，偏降息由 1 增為 2。10 年期 4.98%（原 4.88）、10 減 2 為 0.25 pp（原 0.32）、衰退風險刻度 45.58（原 46.31）；核心 PCE 3.12% 不變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-12",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 59,
+  "sources": 11,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 18,
+  "output_tokens": 15265,
+  "cache_creation_input_tokens": 38888,
+  "cache_read_input_tokens": 178425,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.5755
+ }
+}
