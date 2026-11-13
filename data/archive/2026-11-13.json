@@ -1,6 +1,6 @@
 {
  "date": "2026-11-13",
- "generated_at": "2026-11-13T05:12:57+08:00",
+ "generated_at": "2026-11-13T10:10:16+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -31,8 +31,16 @@
    "headline": "實質利率高於實質成長，債務比會自動累積",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "r−g 為 +0.6 個百分點，債務佔 GDP 121%",
+   "evidence": "r−g 為 +0.7 個百分點，債務佔 GDP 121%",
    "module": "債務"
+  },
+  {
+   "key": "energy_downside",
+   "headline": "油價下行，未來一至兩月壓低總體 CPI",
+   "direction": "dovish",
+   "severity": "medium",
+   "evidence": "WTI 近一月 -8.2%",
+   "module": "物價"
   },
   {
    "key": "inflation_broad",
@@ -47,7 +55,7 @@
    "headline": "10年實質利率處於限制性水準",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "10年實質利率 2.66%",
+   "evidence": "10年實質利率 2.78%",
    "module": "利率"
   },
   {
@@ -84,11 +92,11 @@
   }
  ],
  "summary": {
-  "total": 10,
+  "total": 11,
   "hawkish": 5,
-  "dovish": 1,
+  "dovish": 2,
   "neutral": 4,
-  "score": 10,
+  "score": 8,
   "tilt": "偏升息"
  },
  "scenario": {
@@ -106,11 +114,11 @@
   "core_cpi": 2.5643583511686607,
   "core_pce": 3.1211596029620203,
   "supercore": 3.2293721989494317,
-  "ten_year": 4.88,
-  "real_ten_year": 2.66,
+  "ten_year": 4.98,
+  "real_ten_year": 2.78,
   "policy_upper": 4.0,
-  "curve_10_2": 0.3200000000000003,
-  "recession_gauge": 46.26746165252645,
+  "curve_10_2": 0.25,
+  "recession_gauge": 45.58390448376477,
   "composite_labor": -1.6726369654818263
  },
  "readings_tw": {
@@ -127,6 +135,6 @@
  "as_of": {
   "labor": "2026-10-01",
   "inflation": "2026-10-01",
-  "rates": "2026-11-09"
+  "rates": "2026-11-10"
  }
 }
