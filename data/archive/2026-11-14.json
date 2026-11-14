@@ -1,6 +1,6 @@
 {
  "date": "2026-11-14",
- "generated_at": "2026-11-14T02:09:41+08:00",
+ "generated_at": "2026-11-14T08:00:35+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -31,7 +31,7 @@
    "headline": "實質利率高於實質成長，債務比會自動累積",
    "direction": "hawkish",
    "severity": "medium",
-   "evidence": "r−g 為 +0.7 個百分點，債務佔 GDP 121%",
+   "evidence": "r−g 為 +0.8 個百分點，債務佔 GDP 121%",
    "module": "債務"
   },
   {
@@ -55,7 +55,7 @@
    "headline": "10年實質利率處於限制性水準",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "10年實質利率 2.78%",
+   "evidence": "10年實質利率 2.86%",
    "module": "利率"
   },
   {
@@ -81,21 +81,13 @@
    "severity": "medium",
    "evidence": "動向指數 48.7（50 為擴張與收縮分界）",
    "module": "台灣"
-  },
-  {
-   "key": "tw_m1b_below_m2",
-   "headline": "台灣 M1B 年增率低於 M2（死亡交叉），已 3 個月",
-   "direction": "neutral",
-   "severity": "medium",
-   "evidence": "M1B 年增 7.20%、M2 年增 7.24%（差 -0.04 個百分點）",
-   "module": "台灣"
   }
  ],
  "summary": {
-  "total": 11,
+  "total": 10,
   "hawkish": 5,
   "dovish": 2,
-  "neutral": 4,
+  "neutral": 3,
   "score": 8,
   "tilt": "偏升息"
  },
@@ -114,11 +106,11 @@
   "core_cpi": 2.5643583511686607,
   "core_pce": 3.1211596029620203,
   "supercore": 3.2293721989494317,
-  "ten_year": 4.98,
-  "real_ten_year": 2.78,
+  "ten_year": 5.1,
+  "real_ten_year": 2.86,
   "policy_upper": 4.0,
-  "curve_10_2": 0.25,
-  "recession_gauge": 45.58390448376477,
+  "curve_10_2": 0.23999999999999932,
+  "recession_gauge": 45.24500448398011,
   "composite_labor": -1.6726369654818263
  },
  "readings_tw": {
@@ -130,11 +122,11 @@
   "unemployment": 3.36,
   "policy": 2.0,
   "gdp": 12.93,
-  "m1b_m2": -0.04
+  "m1b_m2": 1.27
  },
  "as_of": {
   "labor": "2026-10-01",
   "inflation": "2026-10-01",
-  "rates": "2026-11-10"
+  "rates": "2026-11-12"
  }
 }
