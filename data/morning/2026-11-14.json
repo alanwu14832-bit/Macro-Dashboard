@@ -1,0 +1,144 @@
+{
+ "date": "2026-11-14",
+ "written_at": "2026-11-14T10:45:57+08:00",
+ "model": "claude-opus-5-5",
+ "title": "輝達遭降評晶片股重挫 台股週漲逾一成",
+ "lede": "黃仁勳請辭的餘波延續，匯豐調降輝達評等，AMD、博通領跌晶片股，標普500仍守住週線紅。美國10月PPI年增再攀高，美銀改估連三次會議升息。台股反彈，全週漲逾一成。本站判定維持過熱、偏升息。",
+ "stories": [
+  {
+   "headline": "輝達遭匯豐降評至「持有」，目標價砍到170美元",
+   "paragraphs": [
+    "Motley Fool（刊於Yahoo財經）報導，匯豐13日把輝達降評為持有，目標價由375美元砍到170美元，理由是黃仁勳請辭帶來的不確定性。",
+    "TheStreet統計，11月6日到12日輝達市值蒸發約4,930億美元，同期AMD與博通合計增加約5,610億美元；報導說投資人焦點轉向11月17日財報會議。"
+   ],
+   "sources": [
+    {
+     "title": "Stock Market Today, Nov. 13: Nvidia Slides After HSBC Downgrades Stock to Hold on CEO Uncertainty",
+     "outlet": "Yahoo 財經（Motley Fool）",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-13-222002466.html"
+    },
+    {
+     "title": "Stock Market Today: November 13, 2026",
+     "outlet": "TheStreet",
+     "url": "https://pro.thestreet.com/stock-market-today/2026-11-13#update-wp:30345"
+    }
+   ]
+  },
+  {
+   "headline": "AI晶片股獲利了結，AMD重挫近9%，標普仍收週線紅",
+   "paragraphs": [
+    "Motley Fool報導，AMD 13日早盤上漲後遭獲利了結賣壓反轉，終場跌8.75%；那斯達克跌0.91%，標普500跌0.40%。",
+    "TheStreet形容這是資金輪動的第一道裂縫。華盛頓郵報報導，標普500全週仍漲2.5%，是10月初以來首個上漲週。"
+   ],
+   "sources": [
+    {
+     "title": "Stock Market Today, Nov. 13: AMD Sinks 8.75% on Sector AI-Chip Sell-Off After Early Gains Reverse",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/coverage/stock-market-today/2026/11/13/stock-market-today-nov-13-amd-sinks-8-75-on-sector-ai-chip-sell-off-after-early-gains-reverse/"
+    },
+    {
+     "title": "How major US stock indexes fared Friday 11/13/2026",
+     "outlet": "華盛頓郵報",
+     "url": "https://www.washingtonpost.com/business/2026/11/13/wall-street-stocks-dow-nasdaq/f15a10e2-dfa7-11f1-912c-4fbb80d73f7f_story.html"
+    },
+    {
+     "title": "Stock Market Today: November 13, 2026",
+     "outlet": "TheStreet",
+     "url": "https://pro.thestreet.com/stock-market-today/2026-11-13#update-wp:30345"
+    }
+   ]
+  },
+  {
+   "headline": "美國10月PPI年增6.5%，美銀改估聯準會連三次會議升息",
+   "paragraphs": [
+    "美國勞工部13日公布10月生產者物價指數。Investing.com經濟日曆顯示PPI年增6.5%，前一期為6.3%。",
+    "TheStreet同日報導，美國銀行改為預估聯準會接下來三次會議都升息；12月8–9日會議前，還有11月25日的10月核心PCE與12月4日的就業報告。"
+   ],
+   "sources": [
+    {
+     "title": "United States Producer Price Index (PPI) YoY",
+     "outlet": "Investing.com",
+     "url": "https://www.investing.com/economic-calendar/ppi-734"
+    },
+    {
+     "title": "Stock Market Today: November 13, 2026",
+     "outlet": "TheStreet",
+     "url": "https://pro.thestreet.com/stock-market-today/2026-11-13#update-wp:30345"
+    }
+   ]
+  },
+  {
+   "headline": "台股反彈583點，全週漲逾一成、創2002年來最佳",
+   "paragraphs": [
+    "中央社報導，台股13日盤中震盪955.36點，終場漲583.25點，收43,675.12點，成交值9,162.55億元；台積電貢獻約79點，金融類股漲逾2%。",
+    "經濟日報指出，台股12日因黃仁勳請辭大跌千點，13日由台積電、聯發科帶頭反攻。優分析報導，台股全週漲逾10%，是2002年10月以來最大單週漲幅。"
+   ],
+   "sources": [
+    {
+     "title": "台股盤中震盪955點 收43675.12點上漲583.25點",
+     "outlet": "中央社",
+     "url": "https://www.cna.com.tw/news/afe/202611130135.aspx"
+    },
+    {
+     "title": "多頭力抗黑天鵝！台股漲583點收43,675點 聯發科領軍 ASIC 強攻",
+     "outlet": "經濟日報",
+     "url": "https://udn.com/news/story/7251/9876736"
+    },
+    {
+     "title": "台股週漲逾10%創24年最佳 AI晶片需求支撐跌深反彈",
+     "outlet": "優分析",
+     "url": "https://uanalyze.com.tw/articles/2480859438"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "昨夜標普500收7,562點，近一月跌2.4%；道瓊收52,348點，近一月漲0.3%。比特幣68,178美元，近一月跌15.9%。",
+    "10年期殖利率5.10%，較上一份存檔的4.98%上升；30年期5.43%，曲線熊平坦化。WTI原油89.62美元，近一月跌6.0%；黃金4,144.55美元，近一月跌9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股13日漲583點，收43,675點，漲1.4%；櫃買指數漲2.0%。台積電漲10元收2,350元；聯發科漲7.0%至4,120元；台達電平盤，廣達跌0.7%。",
+    "美股權值股，輝達跌2.0%，Alphabet跌1.0%；Meta漲2.9%，蘋果漲0.4%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美國與台灣都沒有重大數據或政策決議。聯準會12/9會議，期貨定價升息機率65%、不變35%；到2027/7累計升息36 bp。",
+    "下一份CPI，模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增3.94%，核心CPI年增2.87%；核心PCE年增3.21%。第四季GDP模型預估（亞特蘭大聯準銀行 GDPNow）年化季增3.5%。台灣央行理監事會在2026-12-17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔相同：九宮格「過熱」（就業強×通膨高），政策重心通膨優先，傾向偏升息（score 8）。",
+    "訊號由11條減為10條，偏升息5、偏降息2不變；拿掉的是台灣M1B年增率低於M2的死亡交叉訊號。10年期殖利率由4.98%上升到5.10%，衰退風險刻度由45.58降到45.25；核心PCE 3.12%、失業率4.10%沒有變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-13",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 52,
+  "sources": 10,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 28,
+  "output_tokens": 18424,
+  "cache_creation_input_tokens": 48772,
+  "cache_read_input_tokens": 362429,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.7249
+ }
+}
