@@ -1,0 +1,125 @@
+{
+ "date": "2026-11-15",
+ "written_at": "2026-11-15T10:10:39+08:00",
+ "model": "claude-opus-5-5",
+ "title": "輝達換帥風波下的台美股",
+ "lede": "輝達執行長黃仁勳請辭，晶片股成為本週焦點：美股 11 月 13 日科技股收低，但週線仍收紅；台股同日反彈，IC 設計股被視為受惠。本站判定維持「過熱」、偏升息，與上一份存檔相比沒有變。",
+ "stories": [
+  {
+   "headline": "黃仁勳辭任輝達執行長，晶片股本週承壓",
+   "paragraphs": [
+    "TheStreet 報導，輝達執行長黃仁勳在一連串爭議中請辭。StockTitan 整理，自 11 月 6 日以來董事會先展開調查、執行長隨後請辭，輝達 13 日收盤比 6 日低約 13%。",
+    "TheStreet 指出，13 日輝達開盤一度反彈後再走弱，科技、工業等類股收低；CNBC 也把當天那斯達克下跌歸因於輝達賣壓。"
+   ],
+   "sources": [
+    {
+     "title": "Stock Market Today (Nov. 13, 2026): Nasdaq, S&P 500 end lower as Nvidia drama continues to roil tech - TheStreet",
+     "outlet": "TheStreet",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-nov-13-2026"
+    },
+    {
+     "title": "Stocks Close Lower in the Stock Market Today, November 13, 2026, After a Higher Open",
+     "outlet": "StockTitan",
+     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-13-2026"
+    }
+   ]
+  },
+  {
+   "headline": "美股週五收低，三大指數仍繳出八月以來最佳一週",
+   "paragraphs": [
+    "CNBC 報導，美東 11 月 13 日那斯達克跌 0.91%，標普 500 跌 0.4%，道瓊小漲 50.46 點。週線則是標普漲 2.5%、那斯達克漲 2.3%、道瓊漲 2.1%，都是八月初以來最佳一週。",
+    "TheStreet 說盤前批發物價讀數偏溫和，帶動開盤走高；Motley Fool 盤中報導指出，公債殖利率觸及 5%，與輝達的不確定性一起加重科技股賣壓。"
+   ],
+   "sources": [
+    {
+     "title": "Nasdaq falls on Friday as Nvidia sells off, but index notches best week since August: Live updates",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/12/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "How major US stock indexes fared Friday 11/13/2026 - The Washington Post",
+     "outlet": "華盛頓郵報",
+     "url": "https://www.washingtonpost.com/business/2026/11/13/wall-street-stocks-dow-nasdaq/f15a10e2-dfa7-11f1-912c-4fbb80d73f7f_story.html"
+    },
+    {
+     "title": "Stock Market Midday, Nov. 13: Nasdaq Plunges as Nvidia Turmoil Deepens and Treasury Yields Hit 5%",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/coverage/stock-market-today/2026/11/13/stock-market-midday-nov-13-nasdaq-plunges-as-nvidia-turmoil-deepens-and-treasury-yields-hit-5/"
+    }
+   ]
+  },
+  {
+   "headline": "台股 13 日反彈 583 點，IC 設計股被視為黃仁勳事件受惠者",
+   "paragraphs": [
+    "中央社報導，台股 11 月 13 日開高走高，收盤漲 583.25 點、為 43,675.12 點，成交金額 9,162.55 億元。",
+    "工商時報指出，台股把黃仁勳離開輝達視為利空出盡，開盤一度大漲近 1,400 點後收斂；IC 設計被視為受惠族群，聯發科、創意、世芯-KY 分別漲 7.01%、9.54%、9.39%。"
+   ],
+   "sources": [
+    {
+     "title": "台股漲583.25點 - 財經 - 華視新聞網",
+     "outlet": "中央社（華視新聞網）",
+     "url": "https://news.cts.com.tw/cna/money/202611/202611133100702.html"
+    },
+    {
+     "title": "台股漲583.25點",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9876741"
+    },
+    {
+     "title": "老黃斷尾 壓力釋放！台股漲583點 44K得而復失 IC設計、資服強強滾 - 證券 - 工商時報",
+     "outlet": "工商時報",
+     "url": "https://www.ctee.com.tw/news/20261113701077-430201"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "最近一個交易日的美國市場（11/13 週五）",
+   "paragraphs": [
+    "美股 11 月 14 日休市，最近收盤為 11 月 13 日。標普 500 收 7,561.67 點，近一月跌 2.4%；那斯達克 25,136.27 點，近一月跌 5.9%；道瓊 52,347.55 點，近一月漲 0.3%。VIX 為 18.70。",
+    "10 年期殖利率 5.10%，近一月下降 0.11 個百分點；10 減 2 年利差 0.24 pp，曲線呈熊平坦化。WTI 原油 89.62 美元、近一月跌 6.0%；黃金 4,144.55 美元、近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股 11 月 13 日收 43,675.12 點，漲 583.25 點；台積電收 2,350 元、漲 10 元，聯發科 4,120 元、漲 270 元，台達電 1,240 元平盤，廣達跌 2 元。",
+    "美股權值股同日分歧：輝達收 162.85 美元、跌 2.0%，Alphabet 跌 1.0%；Meta 漲 2.9%，蘋果、微軟小漲。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美國與台灣都沒有重大數據或決議。12/9 FOMC 期貨定價升息 65%、不變 35%，到 2027/7 累計升息 36 bp。",
+    "模型預估（克里夫蘭聯準銀行 Inflation Nowcasting，2026-11-13 的估計）下一次 CPI 年增 3.94%、核心 CPI 年增 2.87%；模型預估（亞特蘭大聯準銀行 GDPNow）2026 年 Q4 年化季增 3.5%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與 2026-11-14 的上一份存檔相同，沒有變：九宮格「過熱」（就業強 × 通膨高），政策傾向偏升息（score 8），訊號 10 條、偏升息 5、偏降息 2，沒有新增或消失的訊號。",
+    "關鍵讀數持平：核心 PCE 3.12%、核心 CPI 2.56%、失業率 4.10%、10 年期 5.10%。台灣讀數也與上一份相同；國發會景氣燈號為紅燈 41 分，本站不替台灣下判定。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-13",
+  "overnight": false
+ },
+ "checks": {
+  "numbers": 60,
+  "sources": 8,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 20,
+  "output_tokens": 12622,
+  "cache_creation_input_tokens": 42648,
+  "cache_read_input_tokens": 204915,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.5467
+ }
+}
