@@ -1,6 +1,6 @@
 {
  "date": "2026-11-16",
- "generated_at": "2026-11-16T07:16:59+08:00",
+ "generated_at": "2026-11-16T10:26:45+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -81,13 +81,21 @@
    "severity": "medium",
    "evidence": "動向指數 48.7（50 為擴張與收縮分界）",
    "module": "台灣"
+  },
+  {
+   "key": "tw_m1b_below_m2",
+   "headline": "台灣 M1B 年增率低於 M2（死亡交叉），已 3 個月",
+   "direction": "neutral",
+   "severity": "medium",
+   "evidence": "M1B 年增 7.20%、M2 年增 7.24%（差 -0.04 個百分點）",
+   "module": "台灣"
   }
  ],
  "summary": {
-  "total": 10,
+  "total": 11,
   "hawkish": 5,
   "dovish": 2,
-  "neutral": 3,
+  "neutral": 4,
   "score": 8,
   "tilt": "偏升息"
  },
@@ -122,7 +130,7 @@
   "unemployment": 3.36,
   "policy": 2.0,
   "gdp": 12.93,
-  "m1b_m2": 1.27
+  "m1b_m2": -0.04
  },
  "as_of": {
   "labor": "2026-10-01",

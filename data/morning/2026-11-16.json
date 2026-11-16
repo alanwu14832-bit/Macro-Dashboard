@@ -1,0 +1,149 @@
+{
+ "date": "2026-11-16",
+ "written_at": "2026-11-16T10:29:03+08:00",
+ "model": "claude-opus-5-5",
+ "title": "台股重挫逾千點 輝達換帥風波未平",
+ "lede": "週一台股賣壓擴大，加權指數盤中跌破四萬三千點，台達電、聯發科領跌。外電報導黃仁勳考慮回鍋輝達執行長，美股11月13日（週五）科技股收黑，聯準會12月升息押注持續牽動亞股。本站判定維持「過熱」，多了一條台灣訊號。",
+ "stories": [
+  {
+   "headline": "金融時報：黃仁勳考慮回任輝達執行長",
+   "paragraphs": [
+    "CNBC引述金融時報報導，上週因私人醜聞辭去輝達執行長的黃仁勳，已和親近人士討論回任的可能，矽谷支持者正遊說董事會。首爾經濟日報指出，黃仁勳12日請辭，目前由財務長克芮絲暫代執行長。",
+    "Investing.com報導，遊說行動獲黃仁勳本人支持。輝達股價13日再跌2%，領導層不確定性仍壓著AI供應鏈。"
+   ],
+   "sources": [
+    {
+     "title": "Tech world's calls for Jensen Huang to return to Nvidia are growing",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/16/nvidia-jensen-huang-return-tech.html"
+    },
+    {
+     "title": "Jensen Huang may return as Nvidia chief executive - report",
+     "outlet": "Investing.com",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/jensen-huang-may-return-nvidia-210940404.html"
+    },
+    {
+     "title": "Jensen Huang Moves to Return as Nvidia CEO Four Days After Exit",
+     "outlet": "首爾經濟日報",
+     "url": "https://en.sedaily.com/world/2026/11/16/jensen-huang-moves-to-return-as-nvidia-ceo-four-days-after"
+    }
+   ]
+  },
+  {
+   "headline": "美股週五科技股回落，三大指數仍收週線上漲",
+   "paragraphs": [
+    "CNBC報導，美股13日（週五）那斯達克跌0.91%至25,136.27點，標普500跌0.4%；Kiplinger指出道瓊小漲0.1%。整週標普500漲2.5%，為8月以來最佳單週。",
+    "Investing.com指出，週五賣壓由輝達領頭；環球郵報則說，當天的通膨數據沒有改變交易員押注聯準會續升息的看法。"
+   ],
+   "sources": [
+    {
+     "title": "Nasdaq falls on Friday as Nvidia sells off, but index notches best week since August: Live updates",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/12/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "Nasdaq Drops Friday on Nvidia Fallout But Ends the Week Up: Stock Market Today",
+     "outlet": "Kiplinger",
+     "url": "https://www.kiplinger.com/investing/stocks/nasdaq-drops-friday-on-nvidia-fallout-but-ends-the-week-up-stock-market-today"
+    },
+    {
+     "title": "TSX and S&P 500 close lower as Nvidia uncertainty weighs; airline stocks fall on U.S. flight mayhem - The Globe and Mail",
+     "outlet": "環球郵報",
+     "url": "https://theglobeandmail.com/investing/markets/inside-the-market/market-news/article-premarket-world-shares-log-modest-losses-as-investors-assess-impact-on"
+    }
+   ]
+  },
+  {
+   "headline": "台股週一開低走低，盤中跌破43,000點",
+   "paragraphs": [
+    "中央社報導，台股16日開盤跌162.7點、報43,512.42點；ETtoday隨後報導指數一度重挫1,300點、失守43,000點，台達電一度跌7%。",
+    "ETtoday把賣壓歸因於聯準會12月升息押注升高，以及上週五費半、那斯達克收黑。經濟日報指出，台股上週五才漲583.25點，國安基金護盤、外資終結連11賣是支撐，但指數反彈到月線附近即遇壓。"
+   ],
+   "sources": [
+    {
+     "title": "台股開盤跌162.7點",
+     "outlet": "中央社",
+     "url": "https://www.cna.com.tw/news/afe/202611160020.aspx"
+    },
+    {
+     "title": "快訊／台積電跌15元至2335 台股跌545點來到43131點",
+     "outlet": "ETtoday",
+     "url": "https://finance.ettoday.net/news/3272786"
+    },
+    {
+     "title": "11月16日盤前／台股四利多對抗 AI 變局 本周聚焦輝達財報與 Anthropic IPO",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9880852"
+    }
+   ]
+  },
+  {
+   "headline": "央行理事張建一：12月不排除預防性升息",
+   "paragraphs": [
+    "Yahoo奇摩新聞報導，央行12月召開第4季理監事會，央行理事張建一表示政策方向維持中性略緊，不排除預防性升息，但幅度可能有限。經濟日報行事曆顯示，央行今天赴立法院備詢。",
+    "報導指出，美國利率走勢、外資流向與油電價格都是央行評估的變數；學者羅瑋認為，若聯準會12月升息使台美利差擴大，央行可能須重新權衡。"
+   ],
+   "sources": [
+    {
+     "title": "央行12月不排除預防性升息 緊盯美利率、油電價格等變數",
+     "outlet": "Yahoo奇摩新聞",
+     "url": "https://tw.news.yahoo.com/%E5%A4%AE%E8%A1%8C12%E6%9C%88%E4%B8%8D%E6%8E%92%E9%99%A4%E9%A0%90%E9%98%B2%E6%80%A7%E5%8D%87%E6%81%AF-%E7%B7%8A%E7%9B%AF%E7%BE%8E%E5%88%A9%E7%8E%87-%E6%B2%B9%E9%9B%BB%E5%83%B9%E6%A0%BC%E7%AD%89%E8%AE%8A%E6%95%B8-223642749.html"
+    },
+    {
+     "title": "11月16日重要財經行事曆",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9880782"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "最近一個交易日的美國市場（11/13 週五）",
+   "paragraphs": [
+    "11月13日（週五）收盤，標普500報7,561.67點，近一月跌2.4%；那斯達克報25,136.27點，近一月跌5.9%；道瓊報52,347.55點，近一月漲0.3%。VIX為18.70。",
+    "10年期公債殖利率5.10%，近一月下降0.11個百分點；10年實質利率2.86%，10年減2年利差0.24個百分點，曲線呈熊平坦化。WTI原油89.62美元、近一月跌6.0%，黃金4,144.55美元、近一月跌9.3%，比特幣近一月跌18.9%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "截至10:26，加權指數42,316點，跌1,358.97點（跌3.1%），櫃買指數跌4.8%。台積電2,300元、跌2.1%；台達電跌8.9%、鴻海跌4.8%、聯發科跌4.0%，中華電漲0.9%。",
+    "美股權值股11月13日分歧：輝達收162.85美元、跌2.0%，Alphabet跌1.0%；Meta漲2.9%，蘋果漲0.4%、微軟漲0.2%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美國與台灣都沒有重大數據或政策決議；外電焦點在輝達董事會如何回應黃仁勳回任聲浪，以及本週輝達財報。",
+    "聯準會12/9會議，期貨定價升息機率65%、不變35%；到2027/7累計升息36 bp。下一次CPI模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增3.94%、月增0.14%，核心CPI年增2.87%。台灣央行理監事會在2026-12-17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔相比沒有變：九宮格仍是「過熱」（就業強 × 通膨高），政策重心通膨優先，傾向偏升息（score 8）。",
+    "訊號由10條增為11條，偏升息5條、偏降息2條不變；新增一條中性的台灣規則：M1B年增7.20%低於M2的7.24%，已3個月。關鍵讀數全數持平：核心PCE 3.12%、核心CPI 2.56%、失業率4.10%、10年期5.10%。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-13",
+  "overnight": false
+ },
+ "checks": {
+  "numbers": 66,
+  "sources": 11,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 16,
+  "output_tokens": 13146,
+  "cache_creation_input_tokens": 37774,
+  "cache_read_input_tokens": 130956,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.518
+ }
+}
