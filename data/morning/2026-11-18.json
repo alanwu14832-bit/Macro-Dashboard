@@ -1,0 +1,160 @@
+{
+ "date": "2026-11-18",
+ "written_at": "2026-11-18T11:55:30+08:00",
+ "model": "claude-opus-5-5",
+ "title": "美股四連跌後輝達財報出爐，台股開高收斂",
+ "lede": "昨夜美股在輝達財報前連跌第四天，道瓊單日重挫，標普來到五個月低點；盤後輝達公布財報、黃仁勳表態願意回任，台股今早一度大漲後收斂。美國10月零售銷售小幅成長，紐約聯準銀行總裁釋出再升息訊號。今晚看美國新屋開工。",
+ "stories": [
+  {
+   "headline": "美國10月零售銷售增0.2%，汽車等大件商品轉弱",
+   "paragraphs": [
+    "美國商務部11月17日公布，10月零售銷售月增0.2%，前一個月因油價推升而成長0.8%，是三個月來最小增幅。路透報導，家庭在物價偏高下減少購買汽車等大件商品，汽車經銷商營收減少1.6%，無店面零售則增加1.2%。",
+    "雅虎財經引述經濟學家說法，整體放緩底下仍可見消費者韌性，民眾可能正為年底購物季做準備。"
+   ],
+   "sources": [
+    {
+     "title": "US retail sales increase moderately in October",
+     "outlet": "路透（經 AOL 轉載）",
+     "url": "https://www.aol.com/articles/us-retail-sales-increase-moderately-134127000.html"
+    },
+    {
+     "title": "American shoppers are taking a breather ahead of the holiday season",
+     "outlet": "雅虎財經",
+     "url": "https://finance.yahoo.com/economy/articles/american-shoppers-showing-signs-strain-135435131.html"
+    }
+   ]
+  },
+  {
+   "headline": "AI與軟體股領跌，標普500連跌四天到五個月低點",
+   "paragraphs": [
+    "美聯社報導，美股11月17日再度震盪，標普500指數盤中一度跌1.7%，收盤跌1%；道瓊工業指數跌1.6%，那斯達克綜合指數跌0.7%。輝達等AI股帶動廣泛賣壓。",
+    "Motley Fool指出，標普500收在7,341點，連續第四天下跌，科技類股走弱拖累那斯達克，Salesforce重挫9%，軟體股是主要跌幅來源。"
+   ],
+   "sources": [
+    {
+     "title": "How major US stock indexes fared Tuesday 11/17/2026",
+     "outlet": "華盛頓郵報（美聯社）",
+     "url": "https://www.washingtonpost.com/business/2026/11/17/wall-street-stocks-dow-nasdaq/9f975f00-e2cf-11f1-a99e-b3e3805c6b8b_story.html"
+    },
+    {
+     "title": "Stock Market Today, Nov. 17: Stocks Slide on AI Chip and Tech Pressures, Salesforce Plummets 9%",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/coverage/stock-market-today/2026/11/17/stock-market-today-nov-17-stocks-slide-on-ai-chip-and-tech-pressures-salesforce-plummets-9/"
+    }
+   ]
+  },
+  {
+   "headline": "輝達公布黃仁勳離職後首份財報，黃仁勳表態願回任",
+   "paragraphs": [
+    "輝達於美東11月17日盤後公布財報，這是黃仁勳辭去執行長後的第一份財報；StockTitan報導，輝達股價在盤後上漲。經濟日報引述華爾街日報刊出的聲明，黃仁勳表示若董事會同意，他願意重返執行長職位。",
+    "經濟日報報導，在財報與代理執行長消息帶動下，台股今早開盤大漲627.98點，早盤一度漲逾800點，之後漲幅收斂。"
+   ],
+   "sources": [
+    {
+     "title": "Stock Market Today, November 17, 2026: Nvidia Rises After Hours on the Evening It Reports Results",
+     "outlet": "StockTitan",
+     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-17-2026"
+    },
+    {
+     "title": "11月18日 五件財經大事搶先看",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9885377"
+    },
+    {
+     "title": "台股開盤漲627.98點",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9885617"
+    }
+   ]
+  },
+  {
+   "headline": "台股兩天重挫逾3,500點，外資今年賣超逼近3.1兆元",
+   "paragraphs": [
+    "經濟日報報導，台股17日收跌947.97點、收在40,092.11點，台積電收2,170元、跌2.03%。理財周刊統計，截至17日外資今年累計賣超台股近新台幣3.1兆元，除台積電、鴻海、聯發科等權值股外，連元大台灣50也被賣超。",
+    "理財周刊指出，11月18日是台指期結算日，外資近10萬口空單可能提前平倉或轉倉，近月合約未平倉量可能明顯變化。"
+   ],
+   "sources": [
+    {
+     "title": "外資狂倒3.1兆元！連0050都不放過 台積電遭砍近28萬張、9.8萬口空單壓境",
+     "outlet": "理財周刊",
+     "url": "https://www.moneyweekly.com.tw/ArticleData/Info/Article/262916"
+    },
+    {
+     "title": "11月18日 五件財經大事搶先看",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9885377"
+    }
+   ]
+  },
+  {
+   "headline": "紐約聯準銀行總裁威廉斯釋出進一步升息訊號",
+   "paragraphs": [
+    "BigGo Finance報導，紐約聯準銀行總裁威廉斯11月17日表示，通膨仍高且具黏性，聯準會可能進一步升息。聯準會9月升息、10月維持利率在3.75%至4.00%，下次會議在12月8日至9日。",
+    "Motley Fool報導，聯準會理事華勒先前已不排除一次升息兩碼的可能。"
+   ],
+   "sources": [
+    {
+     "title": "New York Fed President Signals Further Rate Hike as Inflation Stays Elevated; December FOMC Speculation Intensifies — BigGo Finance",
+     "outlet": "BigGo Finance",
+     "url": "https://finance.biggo.com/news/27cd66e2-3d47-4c65-9386-132720bda5b9"
+    },
+    {
+     "title": "There's Now a 100% Chance of a Fed Rate Hike in December -- but That's Not the Worst News for Wall Street",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/investing/2026/11/16/theres-now-100-chance-fed-rate-hike-in-december-thats-not-worst-news-for-wall-street/"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "昨夜道瓊工業指數收在50,759點，三大指數同步走低。VIX為22.91，風險胃納指標18.2，落在恐慌區。",
+    "10年期公債殖利率5.12%，較上一份的5.15%下降；10年實質利率2.92%，較2.91%小幅上升；30年期殖利率5.46%。10年減2年利差0.29個百分點，較0.27擴大，曲線形狀為熊平坦化。美元指數（廣體）122.65（2026-11-13）。",
+    "商品方面，WTI原油89.62美元、近一月跌6.0%，布蘭特原油92.14美元；黃金4,144.55美元，近一月跌9.3%；銅14,473美元，處十年高檔。比特幣64,605美元，近一月跌20.0%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股加權指數近午盤中報40,106點，比昨收40,092點漲14.30點，開高後大幅收斂；櫃買指數304.95點，跌1.66點。權值股中台積電2,185元，漲15元；聯發科3,920元，漲80元、漲2.1%；廣達258.5元，跌4元、跌1.5%；鴻海、台達電、中華電平盤。",
+    "美股權值股昨夜多數下跌：微軟跌2.3%收506.24美元，Alphabet與Meta各跌1.2%，蘋果跌0.2%，亞馬遜漲0.1%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今晚台北21:30美國公布新屋開工。本週稍早已公布零售銷售與工業生產。",
+    "聯準會12/9會議的期貨定價：升息65%、不動35%、降息0%；期貨定價到2027/7累計升息36 bp。下一次CPI的模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）為年增3.86%、月增0.07%，核心CPI年增2.87%、月增0.21%。模型預估（亞特蘭大聯準銀行 GDPNow）2026年Q4年化季增3.4%。",
+    "台灣方面今天沒有重大數據；央行下次理監事會在2026-12-17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份相同，沒有變：九宮格仍在「過熱」（就業強 × 通膨高），政策重心通膨優先，政策傾向偏升息（score 8）。訊號共11條，偏升息5、偏降息2、中性4，沒有新增或消失的訊號。",
+    "關鍵讀數中，核心PCE 3.12%、核心CPI 2.56%、核心服務除住房3.23%、失業率4.10%都沒變。變動的是長端：10年期殖利率5.12%（原5.15），10年實質利率2.92%（原2.91），10減2利差0.29 pp（原0.27），衰退風險刻度45.64（原45.58）。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-17",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 82,
+  "sources": 11,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 10,
+  "output_tokens": 6788,
+  "cache_creation_input_tokens": 25564,
+  "cache_read_input_tokens": 45645,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.3127
+ }
+}
