@@ -1,6 +1,6 @@
 {
  "date": "2026-11-19",
- "generated_at": "2026-11-19T20:17:54+08:00",
+ "generated_at": "2026-11-19T21:46:22+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -118,8 +118,8 @@
   "real_ten_year": 2.89,
   "policy_upper": 4.0,
   "curve_10_2": 0.2999999999999998,
-  "recession_gauge": 49.284980902357326,
-  "composite_labor": -1.6726369654818263
+  "recession_gauge": 49.318482597138875,
+  "composite_labor": -1.7069634477685454
  },
  "readings_tw": {
   "score": 41.0,
