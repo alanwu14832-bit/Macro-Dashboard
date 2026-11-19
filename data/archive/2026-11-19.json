@@ -1,6 +1,6 @@
 {
  "date": "2026-11-19",
- "generated_at": "2026-11-19T05:43:37+08:00",
+ "generated_at": "2026-11-19T10:56:25+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -63,7 +63,7 @@
    "headline": "股債同向，債券對股票的對沖效果變差",
    "direction": "neutral",
    "severity": "medium",
-   "evidence": "標普報酬與10年殖利率變動相關 -0.26（近一年）",
+   "evidence": "標普報酬與10年殖利率變動相關 -0.27（近一年）",
    "module": "市場"
   },
   {
@@ -118,7 +118,7 @@
   "real_ten_year": 2.89,
   "policy_upper": 4.0,
   "curve_10_2": 0.2999999999999998,
-  "recession_gauge": 49.01487450874884,
+  "recession_gauge": 49.284980902357326,
   "composite_labor": -1.6726369654818263
  },
  "readings_tw": {
