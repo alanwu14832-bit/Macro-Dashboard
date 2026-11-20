@@ -1,0 +1,144 @@
+{
+ "date": "2026-11-20",
+ "written_at": "2026-11-20T11:48:54+08:00",
+ "model": "claude-opus-5-5",
+ "title": "台股盤中重挫逾2千點 限空令擋不住賣壓",
+ "lede": "美股週四全面下跌，標普 500 連六黑；台股今早在擴大限空令首日仍重挫逾兩千點，權值股全面走弱。聯準會會議紀錄釋出 12 月升息訊號，今天下午有台灣 10 月外銷訂單公布。",
+ "stories": [
+  {
+   "headline": "台股早盤跌逾2千點，回探七個月低檔",
+   "paragraphs": [
+    "經濟日報報導，台股20日早盤恐慌性賣壓湧現，加權指數重挫逾2,000點，失守37,000點，回到逾七個月低檔；中央社指出盤中最多跌逾2,200點，為史上第5大盤中跌點。",
+    "經濟日報歸因於AI投資獲利疑慮升溫與聯準會鷹派訊號，美股昨夜重挫；台積電早盤回測2,000元關卡後有買盤低接。"
+   ],
+   "sources": [
+    {
+     "title": "台股崩跌逾2,000點探七個月低檔 半導體三雄全面重挫",
+     "outlet": "經濟日報",
+     "url": "https://udn.com/news/story/7251/9890614"
+    },
+    {
+     "title": "台積電陷2,000元關卡保衛戰 台股血崩盤中重挫逾2,000點",
+     "outlet": "經濟日報",
+     "url": "https://udn.com/news/story/7251/9890690"
+    },
+    {
+     "title": "限空令難擋賣壓 台股重挫逾2200點史上第5大盤中跌點",
+     "outlet": "中央社",
+     "url": "https://www.cna.com.tw/news/afe/202611200056.aspx"
+    }
+   ]
+  },
+  {
+   "headline": "美股週四全面下挫，標普500連六跌",
+   "paragraphs": [
+    "美聯社報導，11月19日標普500跌2%，連六跌，是2024年以來最長連跌；道瓊跌2.2%、那斯達克跌2.3%，超過九成標普成分股下跌。",
+    "報導指AI類股續跌，市場擔心熱潮已過；The Motley Fool則指賣壓已擴散到科技股以外。"
+   ],
+   "sources": [
+    {
+     "title": "How major US stock indexes fared Thursday 11/19/2026",
+     "outlet": "華盛頓郵報（美聯社）",
+     "url": "https://www.washingtonpost.com/business/2026/11/19/wall-street-stocks-dow-nasdaq/6aaf39d0-e463-11f1-a99e-b3e3805c6b8b_story.html"
+    },
+    {
+     "title": "Stock Market Today, Nov. 19: Dow Plunges 1,100 Points as the S&P 500 Suffers Its 6th Straight Day of Losses",
+     "outlet": "The Motley Fool",
+     "url": "https://www.fool.com/coverage/stock-market-today/2026/11/19/stock-market-today-nov-19-dow-plunges-1-100-points-as-the-s-and-p-500-suffers-its-6th-straight-day-of-losses/"
+    }
+   ]
+  },
+  {
+   "headline": "聯準會紀錄：幾乎所有官員看12月升息",
+   "paragraphs": [
+    "美聯社報導，10月會議紀錄顯示幾乎所有聯準會官員都預料12月升息一碼，另有兩人提出升息兩碼的可能。",
+    "美聯社指出，紀錄將鞏固12月升息的看法；經濟日報把聯準會鷹派訊號列為本週股市賣壓來源之一。"
+   ],
+   "sources": [
+    {
+     "title": "Fed minutes: Higher interest rates needed in December as inflation worries mount",
+     "outlet": "ABC News（美聯社）",
+     "url": "https://abcnews.com/US/wireStory/fed-minutes-higher-interest-rates-needed-december-inflation-138258781"
+    },
+    {
+     "title": "Fed minutes: Higher interest rates needed in December as inflation worries mount",
+     "outlet": "華盛頓郵報（美聯社）",
+     "url": "https://www.washingtonpost.com/business/2026/11/18/federal-reserve-inflation-rates/a9391062-e383-11f1-a99e-b3e3805c6b8b_story.html"
+    }
+   ]
+  },
+  {
+   "headline": "金管會擴大限空，1028檔股票今天禁平盤下放空",
+   "paragraphs": [
+    "中央社報導，金管會19日擴大限空：收盤跌幅達3.5%以上的個股，隔日禁止平盤下放空，20日適用1028檔；理由包括台股波動大、跌幅比國際股市深，並稱與選舉無關。",
+    "經濟日報引述證期局，借券賣出委託上限再由3%降到1%，一限價、一限量。民視報導，19日台股已重挫1,768點；但今早盤勢顯示，上路首日仍未止住賣壓。"
+   ],
+   "sources": [
+    {
+     "title": "金管會提3理由擴大限空 1028檔股票11/20禁平盤下放空",
+     "outlet": "中央社（華視轉載）",
+     "url": "https://news.cts.com.tw/cna/money/202611/202611193103120.html"
+    },
+    {
+     "title": "再下重手！金管會救市 擴大限空令 借券規定更嚴格",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5613/9890133"
+    },
+    {
+     "title": "金管會擴大限空令！弱勢股隔天不能平盤下放空 盤中借券賣出量再降至1％",
+     "outlet": "民視",
+     "url": "https://finance.ftvnews.com.tw/news/detail/2026B19W0461"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "道瓊昨夜收 49,097，標普 500 收 7,323.63，那斯達克收 24,429.88，近一月分別跌 7.1%、5.0%、7.5%。VIX 為 24.56，本站風險胃納 15.3，屬恐慌。",
+    "10 年期殖利率 5.07%，較上一份的 5.10% 下降；10 年減 2 年利差 0.27 pp，曲線熊平坦化。廣體美元指數 122.65（11/13）。WTI 原油 89.53 美元，近一月跌 18.6%；黃金 4,144.55 美元，近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "截至 11:46，加權指數 36,362.62，跌 2,064.27 點、跌 5.4%；櫃買跌 7.2%。台積電 2,010 元跌 4.3%，聯發科跌 8.3%，台達電跌 10.0%，鴻海跌 4.3%。",
+    "美股權值股昨夜全收黑：輝達跌 3.3%、亞馬遜跌 3.9%、微軟跌 2.0%、蘋果跌 0.9%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "台灣今天 16:00 公布 10 月外銷訂單；前一期年增 62.4%，動向指數 48.7，低於 50。央行理監事會在 12/17。",
+    "美國今天沒有重大數據。聯準會 12/9 會議期貨定價：升息 65%、不變 35%。下一次 CPI 模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增 3.86%，核心 CPI 年增 2.87%；模型預估（亞特蘭大聯準銀行 GDPNow）Q4 年化季增 3.2%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔相同：九宮格「過熱」（就業強 × 通膨高），政策重心通膨優先，傾向偏升息（score 8）；訊號 11 條，偏升息 5、偏降息 2、中性 4，無增減。",
+    "關鍵讀數：10 年期 5.07%（原 5.10）、10 年實質 2.88%（原 2.89）、10 減 2 利差 0.27 pp（原 0.30），衰退風險刻度 49.52（原 49.32）上升；核心 PCE 3.12% 等其餘不變。台灣紅燈 41 分是國發會燈號，不是本站判定。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-19",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 68,
+  "sources": 10,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 18,
+  "output_tokens": 14892,
+  "cache_creation_input_tokens": 40430,
+  "cache_read_input_tokens": 174319,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.5749
+ }
+}
