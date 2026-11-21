@@ -1,0 +1,144 @@
+{
+ "date": "2026-11-21",
+ "written_at": "2026-11-21T11:30:10+08:00",
+ "model": "claude-opus-5-5",
+ "title": "輝達遭SEC調查重挫，台股美股同步失血",
+ "lede": "輝達傳出遭美國證交會調查會計處理，週五重挫14%，AI股賣壓擴散，標普500單日跌3.7%，美債則因避險買盤走強。台股週五先重挫逾6%，夜盤台指期續跌。本站判定維持「過熱」與偏升息。",
+ "stories": [
+  {
+   "headline": "傳SEC調查會計，輝達重挫14.01%",
+   "paragraphs": [
+    "中時新聞網引述路透報導，美國證交會執法部門正審查輝達潛在的會計疑慮與資訊揭露；消息拖累輝達週五（20日）收盤重挫14.01%、收125.53美元，週線連7黑，是2008年以來最長連跌。",
+    "聯合新聞網報導，輝達單日市值蒸發約4,900億美元，市值排名退居第4；報導指出，投資人對AI基礎建設熱潮能延續多久的疑慮，在期中選舉後加深。"
+   ],
+   "sources": [
+    {
+     "title": "沒了黃仁勳！輝達又遭美盯上「會計問題」 股價狂崩創2008最慘紀錄",
+     "outlet": "中時新聞網",
+     "url": "https://www.chinatimes.com/realtimenews/20261121001140-260410"
+    },
+    {
+     "title": "輝達股價重挫14%連7週收黑 創金融危機後最長紀錄",
+     "outlet": "聯合新聞網",
+     "url": "https://udn.com/news/story/6811/9892640"
+    }
+   ]
+  },
+  {
+   "headline": "AI股賣壓擴散，標普500跌3.7%",
+   "paragraphs": [
+    "美聯社報導，標普500週五跌3.7%、收6,910.39點，寫下逾18個月來最大單週跌幅；道瓊收48,147.33點，那斯達克收22,617.73點，今年以來轉為下跌。",
+    "investingLive指出，標普500已連跌7個交易日並進入修正區間，比特幣跌破6萬美元。"
+   ],
+   "sources": [
+    {
+     "title": "S&P 500 sinks 3.7%, Nasdaq composite goes negative for the year",
+     "outlet": "NBC Connecticut（美聯社）",
+     "url": "https://www.nbcconnecticut.com/news/national-international/november-20-stock-market-updates/3798357/"
+    },
+    {
+     "title": "investingLive Americas FX news wrap 20 Nov: Stocks get hammered as Nasdaq plunges 5.28%",
+     "outlet": "investingLive",
+     "url": "https://investinglive.com/news/investinglive-americas-fx-news-wrap-20-nov-stocks-get-hammered-as-nasdaq-plunges-5-28/"
+    }
+   ]
+  },
+  {
+   "headline": "避險買盤湧入，10年期美債殖利率跌破5%",
+   "paragraphs": [
+    "美聯社報導，股市賣壓促使資金轉向避險，10年期美債殖利率從週四尾盤的5.04%降至4.93%。",
+    "investingLive指出，短端領軍，2年期殖利率下降13個基點，曲線變陡；聯準會理事庫克當天主張政策應更緊縮，買盤仍未退。"
+   ],
+   "sources": [
+    {
+     "title": "S&P 500 sinks 3.7%, Nasdaq composite goes negative for the year",
+     "outlet": "NBC Connecticut（美聯社）",
+     "url": "https://www.nbcconnecticut.com/news/national-international/november-20-stock-market-updates/3798357/"
+    },
+    {
+     "title": "investingLive Americas FX news wrap 20 Nov: Stocks get hammered as Nasdaq plunges 5.28%",
+     "outlet": "investingLive",
+     "url": "https://investinglive.com/news/investinglive-americas-fx-news-wrap-20-nov-stocks-get-hammered-as-nasdaq-plunges-5-28/"
+    },
+    {
+     "title": "Treasury yields are sharply lower as investors flee to safe havens",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/amp/2026/11/20/treasury-yields-bonds-inflation.html"
+    }
+   ]
+  },
+  {
+   "headline": "台股重挫、台積電失守2,000元，夜盤續跌",
+   "paragraphs": [
+    "工商時報報導，台股20日盤中重挫2,467點，台積電一度失守2,000元，上市櫃超過300家跌停；ETtoday報導，台股一週跌掉逾7,000點，金管會加碼限空令仍難擋賣壓。",
+    "ETtoday報導，美股週五收盤後台積電ADR跌9.48%，台指期夜盤大跌1,881點、收33,919點。"
+   ],
+   "sources": [
+    {
+     "title": "別都推給黃仁勳！傳奇交易員揭台股暴跌「致命原因」 硬拉台積電也解決不了問題",
+     "outlet": "工商時報",
+     "url": "https://www.ctee.com.tw/news/20261120700944-430201"
+    },
+    {
+     "title": "美股大屠殺！輝達血崩14.01% 台指期夜盤大跌1881點",
+     "outlet": "ETtoday",
+     "url": "https://www.ettoday.net/news/20261121/3275832.htm"
+    },
+    {
+     "title": "快訊／台股血洗！一開盤崩了",
+     "outlet": "ETtoday",
+     "url": "https://finance.ettoday.net/news/3275314"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "週五（20日）道瓊收 48,147 點，近一月跌 8.9%。本站的標普500與那斯達克讀數還停在前一個交易日，週五收盤見要聞。VIX 為 28.44，風險胃納指標 12.6，屬「恐慌」。",
+    "10年期殖利率讀數 5.04%（週四收盤），較上一份存檔的 5.07% 下降，週五再明顯下降。廣體美元指數 122.65（11月13日）。WTI 原油 89.53 美元，近一月跌 18.6%；黃金近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股加權指數20日收 36,033 點，跌 2,393.60 點、6.2%；櫃買指數跌 7.7%。台積電收 2,000 元，跌 4.8%；聯發科跌 9.9%，台達電跌 10.0%，鴻海跌 4.8%。",
+    "美股權值股全面收黑：輝達收 125.53 美元，跌 14.0%；Meta 跌 5.9%，亞馬遜跌 4.1%，微軟跌 2.8%，Alphabet 跌 2.7%，蘋果跌 1.9%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天週六，美台都沒有重大數據或政策決議。12/9 FOMC 的期貨定價升息機率 65%、不變 35%；期貨定價到 2027/7 累計升息 36 bp。",
+    "模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）下一次 CPI 年增 3.86%、核心 CPI 年增 2.87%、核心 PCE 年增 3.21%；模型預估（亞特蘭大聯準銀行 GDPNow）2026 年 Q4 年化季增 3.2%。台灣央行理監事會在 12月17日。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔相比沒有變：九宮格「過熱」（就業強、通膨高），通膨優先，偏升息（score 8）。訊號 11 條，偏升息 5、偏降息 2、中性 4，沒有增減。",
+    "關鍵讀數三項變動：10年期殖利率由 5.07% 降至 5.04%；10年減2年利差由 0.27 升至 0.28 個百分點；衰退風險刻度由 49.52 升至 50.21。其餘讀數不變。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-20",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 57,
+  "sources": 10,
+  "searches": 3
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 22,
+  "output_tokens": 12488,
+  "cache_creation_input_tokens": 39134,
+  "cache_read_input_tokens": 232751,
+  "web_search_requests": 3,
+  "attempts": 1,
+  "cost_usd": 0.5221
+ }
+}
