@@ -1,0 +1,130 @@
+{
+ "date": "2026-11-22",
+ "written_at": "2026-11-22T10:39:23+08:00",
+ "model": "claude-opus-5-5",
+ "title": "輝達遭調查重挫，台美股齊陷修正",
+ "lede": "路透報導美國證交會調查輝達會計，輝達 11 月 20 日重挫 14%，標普與道瓊進入修正；同日台股暴跌 2,393 點，單週跌點創紀錄。本站判定與上一份相同，仍是過熱、偏升息。",
+ "stories": [
+  {
+   "headline": "路透：美國證交會調查輝達會計，股價單日重挫 14%",
+   "paragraphs": [
+    "11 月 20 日週五，輝達收 125.53 美元，單日跌 14.01%。Motley Fool 指出，導火線是路透報導美國證交會正在檢視輝達的會計處理。",
+    "Axios 報導，輝達市值自 10 月 6 日高點已蒸發逾 2.5 兆美元，強勁財報也沒能止跌。"
+   ],
+   "sources": [
+    {
+     "title": "Nvidia Stock Plunge Wipes Out Nearly $500 Billion in One Day as SEC Reportedly Probes Its Accounting",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/investing/2026/11/20/nvidia-stock-plunge-wipes-out-nearly-usd500-billion-in-one-day-as-sec-reportedly-probes-its-accounting/"
+    },
+    {
+     "title": "Nvidia shares plunge as Anthropic can't stop the AI selloff",
+     "outlet": "Axios",
+     "url": "https://www.axios.com/2026/11/20/anthropic-ipo-nvidia-ai-tech-selloff"
+    }
+   ]
+  },
+  {
+   "headline": "標普、道瓊進入修正，那斯達克今年漲幅歸零",
+   "paragraphs": [
+    "CNBC 報導，11 月 20 日標普 500 跌 3.7% 收 6,910.39 點，那斯達克跌 5.28% 收 22,617.73 點，道瓊跌 949.73 點收 48,147.33 點；標普與道瓊進入修正，那斯達克今年轉為下跌。",
+    "CNBC 指出，Anthropic 上市沒能帶動 AI 行情，反而引來獲利了結；道瓊單週跌 8%，是 2020 年 3 月以來最差的一週。"
+   ],
+   "sources": [
+    {
+     "title": "S&P 500 and Dow close in correction; Nasdaq erases 2026 gain as AI rout picks up steam",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/19/stock-market-today-live-updates.html"
+    }
+   ]
+  },
+  {
+   "headline": "台股單週狂瀉 7,641 點，跌點改寫歷史紀錄",
+   "paragraphs": [
+    "壹蘋新聞網引述證交所統計，加權指數 11 月 20 日收 36,033.29 點，跌 2,393.60 點、6.23%，為史上第 3 大收盤跌點；全週跌 7,641.83 點、17.50%。",
+    "Yahoo 奇摩報導，指數自 10 月初 49,968 點高點下探，波段跌幅逾 28%；三大法人連 5 日賣超，八大行庫連 5 日買超。"
+   ],
+   "sources": [
+    {
+     "title": "台股一週重挫7641點 上市市值蒸發近25兆元",
+     "outlet": "壹蘋新聞網",
+     "url": "https://news.nextapple.com/finance/20261121/ACD20D356AA66E47B558957BADEA98B4"
+    },
+    {
+     "title": "一個月暴跌1.4萬點！台股重挫28% 外資公股同買這16檔",
+     "outlet": "Yahoo 奇摩新聞",
+     "url": "https://tw.news.yahoo.com/%E5%80%8B%E6%9C%88%E6%9A%B4%E8%B7%8C1-4%E8%90%AC%E9%BB%9E-%E5%8F%B0%E8%82%A1%E9%87%8D%E6%8C%AB28-%E5%A4%96%E8%B3%87%E5%85%AC%E8%82%A1%E5%90%8C%E8%B2%B7%E9%80%9916%E6%AA%94-122157969.html"
+    }
+   ]
+  },
+  {
+   "headline": "行政院緊急召集財經首長，融資追繳戶數創新高",
+   "paragraphs": [
+    "看中國引述中央社報導，行政院長卓榮泰 11 月 20 日下午緊急召集財經首長聽取股市與國際金融情勢簡報；金管會先前已祭出限空措施。",
+    "TVBS 報導，投資達人股魚統計 20 日融資追繳達 6,462 戶，創紀錄，並提醒下週三可能出現斷頭賣壓。"
+   ],
+   "sources": [
+    {
+     "title": "台股遭遇重挫 行政院緊急出手",
+     "outlet": "看中國",
+     "url": "https://www.secretchina.com/news/b5/2026/11/21/1107752.html"
+    },
+    {
+     "title": "回到原點還變負！股民賠千萬 台達電11個月總市值蒸發2467億",
+     "outlet": "TVBS",
+     "url": "https://news.tvbs.com.tw/money/4054161"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "最近一個交易日的美國市場（11/20 週五）",
+   "paragraphs": [
+    "最近一個交易日是 11 月 20 日（週五），21 日休市。道瓊收 48,147 點，距一年高點跌 11.4%；標普、那斯達克收盤見要聞。",
+    "10 年期殖利率 5.04%，近三月上升 0.39 個百分點；10 年實質利率 2.88%，10 減 2 利差 0.28 個百分點，曲線熊平坦化。廣體美元指數 122.65（11 月 13 日）。",
+    "WTI 原油 89.53 美元、近一月跌 18.6%；黃金 4,144.55 美元、近一月跌 9.3%；比特幣 60,071 美元、近一月跌 22.4%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股 11 月 20 日收 36,033 點，跌 6.2%；櫃買跌 7.7%。台積電收 2,000 元、跌 4.8%，聯發科跌 9.9%，台達電跌 10.0%，鴻海跌 4.8%。",
+    "美股權值股：輝達跌 14.0% 收 125.53 美元，Meta 跌 5.9%，亞馬遜跌 4.1%，微軟跌 2.8%，蘋果跌 1.9%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天美國與台灣都沒有重大數據或政策決議。12/9 FOMC 期貨定價：升息 65%、不變 35%、降息 0%；到 2027/7 累計升息 36 bp。",
+    "模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）：下一次 CPI 年增 3.86%，核心 CPI 年增 2.87%，核心 PCE 年增 3.21%。模型預估（亞特蘭大聯準銀行 GDPNow）2026 年 Q4 年化季增 3.2%。台灣央行理監事會在 12/17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份（2026-11-21）相同，沒有變：九宮格「過熱」（就業強 × 通膨高），通膨優先，偏升息（score 8）；訊號 11 條，偏升息 5、偏降息 2、中性 4，沒有增減。",
+    "關鍵讀數持平：核心 PCE 3.12%、核心 CPI 2.56%、失業率 4.10%、10 年期 5.04%。台灣讀數也與上一份相同。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-20",
+  "overnight": false
+ },
+ "checks": {
+  "numbers": 64,
+  "sources": 7,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 24,
+  "output_tokens": 16234,
+  "cache_creation_input_tokens": 45934,
+  "cache_read_input_tokens": 277096,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.6499
+ }
+}
