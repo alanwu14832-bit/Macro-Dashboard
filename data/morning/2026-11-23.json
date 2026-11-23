@@ -1,0 +1,124 @@
+{
+ "date": "2026-11-23",
+ "written_at": "2026-11-23T11:05:54+08:00",
+ "model": "claude-opus-5-5",
+ "title": "輝達遭傳調查重挫，美股陷修正",
+ "lede": "美股 11 月 20 日收在慘烈一週的尾聲：路透報導證管會調查輝達會計，輝達單日跌 14%，標普與道瓊進入修正。台股週一早盤一度反彈，聯準會官員持續為 12 月大幅升息留門。本站判定與上一份相同。",
+ "stories": [
+  {
+   "headline": "傳證管會查帳，輝達單日重挫 14%",
+   "paragraphs": [
+    "Motley Fool 引述路透報導，美國證管會（SEC）正檢視輝達的會計處理，輝達 11 月 20 日重挫 14.01%，收 125.53 美元，單日市值蒸發近 5,000 億美元。SEC 不予置評。",
+    "Motley Fool 指出，輝達距 10 月收盤紀錄已跌約 48%，調查方向明朗前股價恐持續震盪。"
+   ],
+   "sources": [
+    {
+     "title": "Nvidia Stock Plunge Wipes Out Nearly $500 Billion in One Day as SEC Reportedly Probes Its Accounting",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/investing/2026/11/20/nvidia-stock-plunge-wipes-out-nearly-usd500-billion-in-one-day-as-sec-reportedly-probes-its-accounting/"
+    },
+    {
+     "title": "Nvidia shares plunge as Anthropic can't stop the AI selloff",
+     "outlet": "Axios",
+     "url": "https://www.axios.com/2026/11/20/anthropic-ipo-nvidia-ai-tech-selloff"
+    }
+   ]
+  },
+  {
+   "headline": "標普、道瓊進入修正，那斯達克今年轉跌",
+   "paragraphs": [
+    "CNBC 報導，11 月 20 日標普 500 跌 3.7%、收 6,910.39 點，那斯達克跌 5.28%、收 22,617.73 點，道瓊跌 1.93%、收 48,147.33 點。標普與道瓊進入修正，那斯達克今年轉為下跌。",
+    "CNBC 指出，道瓊整週跌 8%，為 2020 年 3 月以來最差，Anthropic 上市反讓資金了結 AI 股；NBC 報導，超微、美光、博通當天皆跌逾 12%。"
+   ],
+   "sources": [
+    {
+     "title": "S&P 500 and Dow close in correction; Nasdaq erases 2026 gain as AI rout picks up steam",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/19/stock-market-today-live-updates.html"
+    },
+    {
+     "title": "S&P 500 sinks 3.7%, Nasdaq composite goes negative for the year",
+     "outlet": "NBC Bay Area",
+     "url": "https://www.nbcbayarea.com/news/national-international/november-20-stock-market-updates/4179477/"
+    }
+   ]
+  },
+  {
+   "headline": "台股週五重挫後，週一早盤一度反彈",
+   "paragraphs": [
+    "FourWeekMBA 報導，台股加權指數前一交易日跌 6.2% 後，11 月 23 日早盤一度漲 1.2%，9 點 46 分報 36,469.10 點，台積電持平。",
+    "該報導計算，加權指數仍較 10 月 6 日今年高點低約 26.8%。"
+   ],
+   "sources": [
+    {
+     "title": "Taiex Up 1.2% by 01:46Z After 6.2% Drop; TSMC Flat at 2,000",
+     "outlet": "FourWeekMBA",
+     "url": "https://fourweekmba.com/ai-taiex-up-1-2-by-0146z-after-6-2-drop-tsmc-flat-at-2000/"
+    }
+   ]
+  },
+  {
+   "headline": "古爾斯比不排除 12 月大幅升息",
+   "paragraphs": [
+    "Quartz 引述彭博報導，芝加哥聯準銀行總裁古爾斯比不排除 12 月更大幅升息，表示升息路徑多陡取決於通膨走向。",
+    "理事華勒週三也再度表示，12 月可能需考慮升息半個百分點。聯準會 10 月維持利率在 3.75% 至 4%。"
+   ],
+   "sources": [
+    {
+     "title": "Chicago Fed president won't rule out a larger rate hike for December",
+     "outlet": "Quartz",
+     "url": "https://qz.com/goolsbee-chicago-fed-larger-rate-hike-december-112026"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "最近一個交易日的美國市場（11/20 週五）",
+   "paragraphs": [
+    "11 月 20 日道瓊收 48,147 點，近一月跌 8.9%；VIX 28.44，風險胃納 12.6，屬「恐慌」。10 年期美債殖利率 5.04%，近一月下降 0.08 個百分點、近三月上升 0.39 個百分點；10 年減 2 年利差 0.28 個百分點，曲線熊平坦化。",
+    "廣體美元指數 122.65（11 月 13 日），近一月漲 0.5%。WTI 原油 89.53 美元，近一月跌 18.6%；黃金 4,144.55 美元，近一月跌 9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "美股權值股 11 月 20 日全面收黑：輝達跌 14.0%、收 125.53 美元，Meta 跌 5.9%，微軟跌 2.8%，蘋果跌 1.9%。",
+    "台股今天上午 11 點盤中，加權指數 35,952 點，跌 81 點；櫃買指數跌 1.0%。台積電 1,995 元，跌 5 元；鴻海跌 1.7%；聯發科漲 5.5%、台達電漲 4.1%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "台灣：主計總處今天 16:00 公布 10 月失業率，9 月為 3.36%。美國今天沒有重大數據。",
+    "聯準會 12/9 會議期貨定價：升息 65%、不變 35%。模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）下一次 CPI 年增 3.86%、核心 CPI 年增 2.87%、核心 PCE 年增 3.21%；模型預估（亞特蘭大聯準銀行 GDPNow）第四季年化季增 3.2%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔沒有變：九宮格仍為「過熱」（就業強、通膨高），政策重心通膨優先，傾向偏升息（score 8）；訊號 11 條，偏升息 5、偏降息 2、中性 4，無增減。",
+    "關鍵讀數皆持平：核心 PCE 3.12%、核心 CPI 2.56%、失業率 4.10%、10 年期 5.04%、衰退風險刻度 50.21。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-20",
+  "overnight": false
+ },
+ "checks": {
+  "numbers": 59,
+  "sources": 6,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 22,
+  "output_tokens": 13484,
+  "cache_creation_input_tokens": 39963,
+  "cache_read_input_tokens": 239990,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.5576
+ }
+}
