@@ -579,7 +579,7 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 :is(.fp,.pg) .dateline .trust time { font-weight: 400; color: inherit; font-family: inherit; }
 :is(.fp,.pg) .dateline .trust-dot { align-self: center; }
 :is(.fp,.pg) .dateline .trust-go { display: none; }
-:is(.fp,.pg) .dateline .trust.stale { color: var(--critical); }
+:is(.fp,.pg) .dateline .trust.stale { color: var(--critical-ink); }
 
 /* ---- 頭條 ----------------------------------------------------------------- */
 .fp .hero h1 a { display: block; }
@@ -587,7 +587,7 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
   margin-top: .32em; font: var(--wnum) clamp(26px, 3.7vw, 56px)/1.12 var(--latin), serif;
   letter-spacing: -.012em; color: var(--ink);
 }
-.fp .lede-gap .eyebrow b { color: var(--critical); }
+.fp .lede-gap .eyebrow b { color: var(--critical-ink); }
 .fp .lead-note:has(.gist:nth-child(3)) { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; }
 .fp .gist a, .fp .call-s a, .fp .fig-src a, .fp .fine a, .fp .more a, .fp .bf-m a, .fp .mc-foot-note a {
   text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
@@ -614,11 +614,11 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
   font: 700 13px/1.4 var(--ming); letter-spacing: .3em; color: var(--ink-2);
 }
 .fp .seal.s-mkt { border-radius: 50%; }
-.fp .seal.s-gap { border-color: var(--critical); color: var(--critical); }
+.fp .seal.s-gap { border-color: var(--critical-ink); color: var(--critical-ink); }
 .fp .sh h2 { display: flex; align-items: center; }
 .fp .sh h2 .seal { flex: none; vertical-align: 0; }
 .fp .quiet { font-size: 14px; line-height: 1.75; color: var(--ink-2); max-width: 46em; padding: 6px 0; }
-.fp .gapnote { font-size: 14px; line-height: 1.7; color: var(--critical); padding: 8px 0; }
+.fp .gapnote { font-size: 14px; line-height: 1.7; color: var(--critical-ink); padding: 8px 0; }
 .fp .gapnote .seal { font-size: 11px; margin-right: .7em; vertical-align: .1em; }
 .fp .na { color: var(--ink-2); }
 
@@ -662,7 +662,7 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .more { margin-top: 1em; font: 700 15px/1.5 var(--ming); }
 
 /* ---- 今天：更新的序列跟價格同一種列 --------------------------------------- */
-.fp .sv-gap { color: var(--critical); }
+.fp .sv-gap { color: var(--critical-ink); }
 .fp .nx h3 a, .fp .sig-btn { background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1.5px; transition: background-size .3s var(--fx); padding-bottom: 2px; }
 .fp .new-badge { margin-left: .6em; vertical-align: .15em; }
 
@@ -1116,7 +1116,7 @@ html.js[data-ed="tw"] .nav-sub a[href^="/#"]:not([href^="/#tw-"]):not([href="/#c
 .fp .story > p { font-size: 16px; line-height: 1.9; color: var(--fp-text); text-wrap: pretty; }
 .fp .story > p + p { margin-top: .75em; }
 .fp .story > .story-n { margin-top: 1em; font-size: 12.5px; line-height: 1.6; color: var(--ink-2); }
-.fp .story-n strong { font-weight: 600; color: var(--critical); margin-left: .4em; }
+.fp .story-n strong { font-weight: 600; color: var(--critical-ink); margin-left: .4em; }
 /* 摘＝語言模型寫的摘要：只有上下兩條線、沒有框。四枚有框的印（機構、本站、市場、報導）
    各自為一句話負責；這一枚只是轉述它們，所以不圍起來 */
 .fp .seal.s-sum, .pg .seal.s-sum { border-width: 1.5px 0; width: auto; padding: 0 .12em; }

@@ -52,6 +52,14 @@
   --serious:  #ec835a;
   --critical: #d03b3b;
   --delta-up: #006300;
+  /* 狀態色當「文字」用時的專用色。上面四個是給圓點、色條、邊框用的，直接拿來當字
+     在紙色上不到 4.5:1（good 3.0、warning 1.7、serious 2.4、critical 4.35）。
+     當字用一律取這一組；括號是在 page／surface／surface-sunken 上的對比。 */
+  --good-ink:     #077a07;   /* 5.0／5.3／4.6 */
+  --warning-ink:  #875900;   /* 5.5／5.8／5.1 */
+  --serious-ink:  #a8431b;   /* 5.5／5.8／5.0 */
+  --critical-ink: #bf2f2f;   /* 5.2／5.5／4.8 */
+  --on-good:      #11151a;   /* 壓在 good 綠底上的字：5.5（白字只有 3.35） */
 
   /* 字階凍結成 7 階，每階綁死 (字級, 行高)。原本 11–15.8px 之間就有 21 種字級、
      相鄰常只差 0.3px——眼睛分不出來，但每個新元件都得重新決定一次。
@@ -122,6 +130,10 @@
     --neutral:      #898781;
     --neutral-wash: rgba(137, 135, 129, 0.16);
     --delta-up:     #0ca30c;
+    --good-ink:     #1fae1f;   /* 6.1／5.6／6.6 */
+    --warning-ink:  #fab219;   /* 9.8／9.0／10.5 */
+    --serious-ink:  #ec835a;   /* 6.8／6.3／7.3 */
+    --critical-ink: #ee7373;   /* 6.3／5.8／6.8——夜報沿用日報的紅只有 3.7 */
   }
 }
 
@@ -156,6 +168,10 @@
   --neutral:      #898781;
   --neutral-wash: rgba(137, 135, 129, 0.16);
   --delta-up:     #0ca30c;
+  --good-ink:     #1fae1f;   /* 6.1／5.6／6.6 */
+  --warning-ink:  #fab219;   /* 9.8／9.0／10.5 */
+  --serious-ink:  #ec835a;   /* 6.8／6.3／7.3 */
+  --critical-ink: #ee7373;   /* 6.3／5.8／6.8——夜報沿用日報的紅只有 3.7 */
 }
 
 
@@ -542,12 +558,12 @@ section:not(.sub-section) > .section-head h2::before {
 .new-badge {
   display: inline-block; margin-left: 6px; padding: 0 5px;
   border-radius: 4px; font-size: var(--t-12); line-height: var(--lh-12); font-weight: 620; line-height: 1.7;
-  color: #fff; background: var(--good); vertical-align: 1px;
+  color: var(--on-good); background: var(--good); vertical-align: 1px;
   letter-spacing: 0.05em; cursor: help;
 }
 
 /* 推播開關開啟時給個明確的「on」狀態 */
-#push-toggle.on { color: var(--good); border-color: var(--good); }
+#push-toggle.on { color: var(--good-ink); border-color: var(--good-ink); }
 
 /* ================================================ 按壓回饋與手勢細節 ==== */
 /* 回饋要發生在 pointerdown，不是放開才亮——:active 在指標按下當帧就成立。
@@ -607,8 +623,8 @@ details.acc > summary:focus-visible,
 }
 .signal:last-child { border-bottom: 0; }
 .signal .sev { font-size: var(--t-15); line-height: var(--lh-15); line-height: 1.5; text-align: center; }
-.signal .sev.high     { color: var(--critical); }
-.signal .sev.medium   { color: var(--serious); }
+.signal .sev.high     { color: var(--critical-ink); }
+.signal .sev.medium   { color: var(--serious-ink); }
 .signal .sev.low      { color: var(--ink-muted); }
 .signal .headline { font-weight: 600; }
 .signal .why { color: var(--ink-2); font-size: var(--t-14); line-height: var(--lh-14); margin-top: 2px; }
@@ -624,9 +640,9 @@ details.acc > summary:focus-visible,
   background: var(--surface);
 }
 .check .glyph { font-size: var(--t-14); line-height: var(--lh-14); text-align: center; }
-.check.alert  .glyph { color: var(--critical); }
-.check.watch  .glyph { color: var(--warning); }
-.check.normal .glyph { color: var(--good); }
+.check.alert  .glyph { color: var(--critical-ink); }
+.check.watch  .glyph { color: var(--warning-ink); }
+.check.normal .glyph { color: var(--good-ink); }
 .check .name { font-size: var(--t-14); line-height: var(--lh-14); }
 .check .state { font-size: var(--t-13); line-height: var(--lh-13); color: var(--ink-muted); }
 .check .reading { font-size: var(--t-14); line-height: var(--lh-14); font-variant-numeric: tabular-nums; font-weight: 600; }
@@ -649,7 +665,7 @@ td.num, th.num { font-variant-numeric: tabular-nums; }
 /* 表尾的說明是一整句話：不換行的話，它會把整張表撐得比手機螢幕寬，欄位明明放得下也得橫向捲 */
 tfoot td { color: var(--ink-muted); font-size: var(--t-13); line-height: var(--lh-13); border-bottom: 0; white-space: normal; }
 .pos { color: var(--delta-up); }
-.neg { color: var(--critical); }
+.neg { color: var(--critical-ink); }
 
 .bar-cell .fill {
   position: absolute; top: 50%; transform: translateY(-50%); height: 60%;
@@ -877,6 +893,9 @@ details.acc.terms > summary { color: var(--ink-muted); font-weight: 500; font-si
 }
 .ht-code { font-size: var(--t-12); line-height: var(--lh-12); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
 .ht-chg { font-size: var(--t-14); line-height: var(--lh-14); font-variant-numeric: tabular-nums; }
+/* 格子的底色已經是漲跌色了：代號與漲跌幅再用灰字、紅字、綠字，壓在最深的底上只有
+   2.5:1。格子裡的字一律用墨色（最深的底上 8:1），方向由底色與正負號表示。 */
+.heat-tile :is(.ht-code, .ht-chg, .ht-chg *) { color: var(--ink); }
 
 /* ========================================================= 側欄子選單 == */
 /* 每個大標是一個 <details>：summary 裡是原本的 nav-item（點了就換頁）
@@ -983,7 +1002,7 @@ details.acc.terms > summary { color: var(--ink-muted); font-weight: 500; font-si
   background: var(--ink); color: var(--page);
   border: none; border-radius: var(--radius-sm);
 }
-.wl-msg { font-size: var(--t-13); line-height: var(--lh-13); color: var(--critical); }
+.wl-msg { font-size: var(--t-13); line-height: var(--lh-13); color: var(--critical-ink); }
 .wl-name { color: var(--ink-2); }
 .wl-remove {
   width: 24px; height: 24px; border: none; background: none; cursor: pointer;
@@ -1135,7 +1154,7 @@ details.acc.terms > summary { color: var(--ink-muted); font-weight: 500; font-si
   margin-left: 8px; font-size: var(--t-12); line-height: var(--lh-12); padding: 0 5px; white-space: nowrap;
   border: 1px solid var(--border-strong); border-radius: 4px; color: var(--ink-muted);
 }
-.dd-flag-bad { color: var(--critical); border-color: var(--critical); }
+.dd-flag-bad { color: var(--critical-ink); border-color: var(--critical-ink); }
 .dd-date { font-size: var(--t-13); line-height: var(--lh-13); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
 .dd-len { font-size: var(--t-12); line-height: var(--lh-12); color: var(--ink-muted); }
 .dd-targets { margin: 0; font-size: var(--t-13); line-height: var(--lh-13); color: var(--ink-muted); line-height: 1.7; }
@@ -1285,7 +1304,7 @@ section { scroll-margin-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 1
    「這一眼跟上一眼之間變了什麼」。看不到答案，這一頁就只是昨天再看一次。
    ========================================================================== */
 /* 形狀是主要通道、顏色只是補強——色盲與灰階列印都還讀得出輕重 */
-.chg-sev.sev-high   { color: var(--critical); }
+.chg-sev.sev-high   { color: var(--critical-ink); }
 .chg-sev.sev-low    { color: var(--ink-muted); }
 .chg-scope {
   margin: 10px 0 0; font-size: var(--t-13); line-height: var(--lh-13); color: var(--ink-muted); line-height: 1.6;
@@ -1529,7 +1548,7 @@ section { scroll-margin-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 1
   .bf-h a:hover { text-decoration: underline; }
   .digest-text a:hover { text-decoration: underline; }
   .wl-add:hover { opacity: 0.85; }
-  .wl-remove:hover { background: var(--surface-sunken); color: var(--critical); }
+  .wl-remove:hover { background: var(--surface-sunken); color: var(--critical-ink); }
   .topbar-guide:hover { color: var(--ink); background: var(--surface-sunken); }
   .dd-hero-title a:hover { text-decoration: underline; }
   .dd-item:hover { background: var(--surface-sunken); }
@@ -1781,6 +1800,8 @@ th, td { border-bottom-color: var(--border); }
 .range-group button[aria-pressed="true"] { background: none; border-bottom-color: var(--ink); }
 .chart-svg text { font-family: var(--serif); font-variant-numeric: lining-nums tabular-nums; }
 .chart-svg .tick { font-size: 11.5px; fill: var(--ink-2); }
+/* 右軸的刻度由 chart.js 壓到 0.75 透明度；ink-2 再打七五折在紙色上只有 4.3:1 */
+.chart-svg .tick[opacity] { fill: var(--ink); }
 .chart-svg .end-label { font-size: 12.5px; fill: var(--ink); }
 .chart-svg .axis-line { stroke: var(--ink-2); }
 .chart-svg .band { fill: var(--ink); opacity: 0.06; }
@@ -1827,7 +1848,7 @@ th, td { border-bottom-color: var(--border); }
   font-variant-numeric: lining-nums;
 }
 .sig-sev { padding-top: 14px; letter-spacing: 0.08em; }
-.sig-card.sev-high .sig-sev { color: var(--critical); }
+.sig-card.sev-high .sig-sev { color: var(--critical-ink); }
 .sig-card.sev-medium .sig-sev { color: var(--ink-2); }
 .sig-open { color: var(--ink-muted); letter-spacing: 0; }
 .sig-card:focus-visible, .bf-d > summary.bf-h:focus-visible, .to-top:focus-visible { outline-color: var(--focus); }
@@ -1978,7 +1999,7 @@ html.still .enter { opacity: 1; transform: none; transition: none; }   /* ?still
 .pg .mb-meta .seal { font-size: var(--t-12); margin-right: 0; vertical-align: 0; }
 .pg .mb-date { color: var(--ink); font-variant-numeric: tabular-nums; }
 .pg .mb-stale { margin: 0 0 var(--s4); padding: var(--s3) 0 var(--s3) var(--s3); border-left: 2px solid var(--critical); font-size: var(--t-15); line-height: var(--lh-15); color: var(--ink-2); }
-.pg .mb-stale strong { display: block; color: var(--critical); font-weight: 700; }
+.pg .mb-stale strong { display: block; color: var(--critical-ink); font-weight: 700; }
 .pg .mb-title { margin: 0 0 var(--s3); font-family: var(--ming); font-size: var(--t-30); line-height: var(--lh-30); font-weight: 700; text-wrap: balance; }
 .pg .mb-lede { margin: 0; font-size: var(--t-18); line-height: 1.8; color: var(--ink); }
 .pg .mb-story + .mb-story { margin-top: var(--s8); padding-top: var(--s6); border-top: 1px solid var(--hair); }
