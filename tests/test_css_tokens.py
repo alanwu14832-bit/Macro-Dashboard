@@ -128,8 +128,45 @@ class TestInnerPagesUseTokens(unittest.TestCase):
         self.assertEqual(sizes, [12, 13, 14, 15, 16, 18, 22, 30])
         spaces = sorted(int(x) for x in re.findall(r"--(?:s\d+|m\d+):\s*(\d+)px", light))
         self.assertEqual(spaces, [2, 4, 6, 8, 10, 12, 14, 16, 24, 32, 48, 64])
-        self.assertEqual(len(re.findall(r"--lead-[a-z]+:", light)), 6)
+        self.assertEqual(len(re.findall(r"--lead-[a-z]+:", light)), 7)
         self.assertEqual(len(re.findall(r"--w-[a-z]+:", light)), 4)
+
+
+class TestSkeletonUsesTokens(unittest.TestCase):
+    """頭版與內頁骨架（margin.css）：18px 以下的固定字級、行高、字重取 token。
+
+    19px 以上的固定字級與 clamp() 是展示字級，跟著視窗寬度那一套走，不在此限；間距還沒收斂。
+    會靜默出錯的地方跟內頁一樣：多寫一個 13.5px 不會壞任何東西，只是又多一種字級
+    （2026-11-26 收斂前，這份檔案 10.5 到 17.5px 之間有 15 種，半像素一階）。
+    """
+
+    def setUp(self):
+        self.rows = list(declarations(read("margin.css")))
+
+    def test_fixed_sizes_up_to_18px(self):
+        bad = []
+        for sel, prop, value in self.rows:
+            if prop == "font-size":
+                found = re.fullmatch(r"([\d.]+)px", value)
+            elif prop == "font":
+                found = re.search(r"(?:^|\s)([\d.]+)px/", value)
+            else:
+                continue
+            if found and float(found.group(1)) <= 18:
+                bad.append((sel, prop, value))
+        self.assertEqual(bad, [], "18px 以下的固定字級要用 --t-*")
+
+    def test_line_heights_and_weights(self):
+        bad = [(sel, prop, value) for sel, prop, value in self.rows
+               if (prop == "line-height" and not re.fullmatch(r"var\(--(lh-\d+|lead-[a-z]+)\)|inherit|normal", value))
+               or (prop == "font-weight" and not re.fullmatch(r"var\(--[\w-]+\)|inherit|normal", value))]
+        self.assertEqual(bad, [], "行高用 --lead-*／--lh-*，字重用 --w-*")
+
+    def test_tokens_come_from_style_css(self):
+        # margin.css 不另立一套：它用到的字級、行高、字重 token 都定義在 style.css
+        defined = set(re.findall(r"(--(?:t-\d+|lead-[a-z]+|w-[a-z]+)):", read("style.css")))
+        used = set(re.findall(r"var\((--(?:t-\d+|lead-[a-z]+|w-[a-z]+))\)", read("margin.css")))
+        self.assertEqual(used - defined, set())
 
 
 if __name__ == "__main__":
