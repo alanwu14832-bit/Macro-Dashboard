@@ -169,5 +169,66 @@ class TestSkeletonUsesTokens(unittest.TestCase):
         self.assertEqual(used - defined, set())
 
 
+class TestExpenseApp(unittest.TestCase):
+    """記帳頁（expense-app.css）是另一套設計系統，但同樣不准寫死。
+
+    它只載入自己這一份樣式，所以 token 定義在自己檔案裡；字級用 rem（跟著使用者的字體
+    設定縮放）。會靜默出錯的地方：次要文字太淡——頁面沒壞，只是每一列的小字讀起來吃力
+    （2026-11-26 實測 --ink-muted 在紙色上 3.2:1）。
+    """
+
+    def setUp(self):
+        self.css = read("expense-app.css")
+        self.rows = list(declarations(self.css))
+
+    def test_font_sizes(self):
+        allowed = {"16px",     # 輸入框：16px 以下 iOS 會自動放大
+                   "34px",     # 金額輸入的大數字
+                   "9px"}      # 甜甜圈圖裡的 SVG 字，單位是 viewBox 的
+        bad = []
+        for sel, prop, value in self.rows:
+            if prop != "font-size" or value in allowed:
+                continue
+            rem = re.fullmatch(r"([\d.]+)rem", value)
+            if rem and float(rem.group(1)) >= 1.5:          # 展示字級
+                continue
+            if not re.fullmatch(r"var\(--t-\d+\)|inherit|[\d.]+em", value):
+                bad.append((sel, value))
+        self.assertEqual(bad, [])
+
+    def test_line_heights_weights_and_spacing(self):
+        bad = []
+        for sel, prop, value in self.rows:
+            if prop == "line-height" and not re.fullmatch(r"var\(--lead-[a-z]+\)|inherit|normal", value):
+                bad.append((sel, prop, value))
+            if prop == "font-weight" and not re.fullmatch(r"var\(--w-[a-z]+\)|inherit|normal", value):
+                bad.append((sel, prop, value))
+            if SPACING.match(prop):
+                plain = re.sub(r"\b(?:calc|max|min|clamp|env)\((?:[^()]|\([^()]*\))*\)", "", value)
+                if any(float(px) not in (0.0, 1.0) and float(px) <= 64
+                       for px in re.findall(r"(?<![\w.])-?(\d+(?:\.\d+)?)px", plain)):
+                    bad.append((sel, prop, value))
+        self.assertEqual(bad, [])
+
+    def test_every_token_it_uses_is_defined_in_this_file(self):
+        used = set(re.findall(r"var\((--[\w-]+)", self.css))
+        defined = set(re.findall(r"(--[\w-]+)\s*:", self.css))
+        self.assertEqual(used - defined, set(), "記帳頁不載入 style.css，token 要自己定義")
+
+    def test_muted_ink_passes_on_every_surface(self):
+        blocks = theme_blocks(self.css)
+        light = blocks["日報"]
+        for theme, block in blocks.items():
+            ink = token(block, "ink-muted")
+            for name in ("page", "surface", "sunken"):
+                surface = token(block, name) or token(light, name)
+                self.assertGreaterEqual(contrast(ink, surface), 4.5, f"{theme} --ink-muted 在 {name} 上")
+
+    def test_dimmed_text_is_gone(self):
+        # 備註那一行原本是 muted 再打八折，日報 2.6:1；要淡就換 token，不要疊透明度
+        body = self.css[self.css.index(".row-note"):]
+        self.assertNotIn("opacity", body[:body.index("}")])
+
+
 if __name__ == "__main__":
     unittest.main()
