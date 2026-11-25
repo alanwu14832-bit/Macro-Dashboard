@@ -32,6 +32,17 @@
     return cssVar(SERIES_VARS[index % SERIES_VARS.length]);
   }
 
+  /** 同一個序列「當文字用」的顏色。線的顏色直接拿來當字，日報的橘、青綠、紅在紙色上只有
+   *  2.6–3.6:1；style.css 另外替每個序列色定義了一支 -ink（同色相，日報較深、夜報較亮）。
+   *  回傳的是 var(...)，不是算好的色碼——切換日夜報時標籤跟著換，不用重畫。
+   *  沒有定義 -ink 的（hawkish、dovish 本身就夠深）退回線的顏色。 */
+  function seriesInk(token, index) {
+    const name = token && !token.startsWith("#") && cssVar("--" + token)
+      ? "--" + token : SERIES_VARS[index % SERIES_VARS.length];
+    if (token && token.startsWith("#")) return token;
+    return cssVar(name + "-ink") ? `var(${name}-ink)` : seriesColor(token, index);
+  }
+
   const el = (tag, attrs = {}, parent = null) => {
     const node = document.createElementNS(NS, tag);
     for (const [k, v] of Object.entries(attrs)) {
@@ -421,7 +432,8 @@
           stroke: cssVar("--surface"), "stroke-width": 2, "data-fade": "",
         }, svg);
         if (spec.endLabels !== false) {
-          endLabels.push({ x: X(ld) + 9, y: Yv(lv) + 4, text: fmtVal(lv, spec), color });
+          endLabels.push({ x: X(ld) + 9, y: Yv(lv) + 4, text: fmtVal(lv, spec), color,
+                           ink: seriesInk(s.color, si) });
         }
       }
     });
@@ -441,9 +453,9 @@
       }
     }
     for (const label of endLabels) {
-      // 多條線時標籤跟著線的顏色走，才認得出哪個數字是哪條線
+      // 多條線時標籤跟著線的顏色走，才認得出哪個數字是哪條線——用的是那個顏色的文字色
       el("text", { class: "end-label", x: label.x, y: label.y, "data-fade": "",
-                   style: endLabels.length > 1 ? `fill:${label.color}` : null }, svg)
+                   style: endLabels.length > 1 ? `fill:${label.ink}` : null }, svg)
         .textContent = label.text;
     }
 

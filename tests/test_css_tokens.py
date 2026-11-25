@@ -230,5 +230,33 @@ class TestExpenseApp(unittest.TestCase):
         self.assertNotIn("opacity", body[:body.index("}")])
 
 
+class TestChartLabelInk(unittest.TestCase):
+    """圖表線尾的數字標籤跟著線的顏色走，但用的是那個顏色的文字色（--series-N-ink）。
+
+    會靜默出錯的地方：線的顏色直接當字，圖表照樣畫得出來，只是日報的橘、青綠、紅在紙色上
+    2.6–3.6:1（2026-11-25 實測 14 處）。新增序列色卻忘了加 -ink，chart.js 會退回線的顏色。
+    """
+
+    def test_every_series_colour_has_a_passing_ink_in_every_theme(self):
+        blocks = theme_blocks(read("style.css"))
+        light = blocks["日報"]
+        slots = sorted(set(re.findall(r"--series-(\d):", light)) - {"1"})        # 1 是墨色
+        self.assertEqual(slots, [str(n) for n in range(2, 9)])
+        for theme, block in blocks.items():
+            surfaces = [token(block, name) or token(light, name) for name in ("page", "surface")]
+            for name in [f"series-{n}-ink" for n in slots] + ["neutral-ink"]:
+                ink = token(block, name)
+                self.assertIsNotNone(ink, f"{theme} 沒有定義 --{name}")
+                for surface in surfaces:
+                    self.assertGreaterEqual(contrast(ink, surface), 4.5, f"{theme} --{name} {ink} 在 {surface} 上")
+
+    def test_chart_js_labels_use_the_ink(self):
+        with open(os.path.join(STATIC, "chart.js"), encoding="utf-8") as handle:
+            js = handle.read()
+        self.assertIn("fill:${label.ink}", js)
+        self.assertNotIn("fill:${label.color}", js)
+        self.assertIn('cssVar(name + "-ink")', js)
+
+
 if __name__ == "__main__":
     unittest.main()
