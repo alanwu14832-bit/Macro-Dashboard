@@ -1,6 +1,6 @@
 {
  "date": "2026-11-26",
- "generated_at": "2026-11-26T02:32:35+08:00",
+ "generated_at": "2026-11-26T04:19:19+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -31,7 +31,7 @@
    "headline": "油價下行，未來一至兩月壓低總體 CPI",
    "direction": "dovish",
    "severity": "medium",
-   "evidence": "WTI 近一月 -9.2%",
+   "evidence": "WTI 近一月 -11.4%",
    "module": "物價"
   },
   {
