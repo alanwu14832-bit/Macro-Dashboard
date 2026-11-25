@@ -1,6 +1,6 @@
 {
  "date": "2026-11-25",
- "generated_at": "2026-11-25T21:54:01+08:00",
+ "generated_at": "2026-11-25T22:03:57+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -25,14 +25,6 @@
    "severity": "high",
    "evidence": "綜合分數 41 分（紅燈 38–45、藍燈 9–16）",
    "module": "台灣"
-  },
-  {
-   "key": "debt_dynamics_adverse",
-   "headline": "實質利率高於實質成長，債務比會自動累積",
-   "direction": "hawkish",
-   "severity": "medium",
-   "evidence": "r−g 為 +0.7 個百分點，債務佔 GDP 121%",
-   "module": "債務"
   },
   {
    "key": "energy_downside",
@@ -84,11 +76,11 @@
   }
  ],
  "summary": {
-  "total": 10,
-  "hawkish": 5,
+  "total": 9,
+  "hawkish": 4,
   "dovish": 2,
   "neutral": 3,
-  "score": 8,
+  "score": 6,
   "tilt": "偏升息"
  },
  "scenario": {
