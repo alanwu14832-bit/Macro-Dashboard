@@ -37,6 +37,13 @@
   --series-6: #008300;  /* green   */
   --series-7: #4a3aa7;  /* violet  */
   --series-8: #e34948;  /* red     */
+  /* 同一組顏色當「文字」用（圖表線尾的數字標籤）。上面那組是畫線的，直接當字在紙色上
+     只有 2.0–3.6:1；這組同色相、較深，在 page 與 surface 上都過 4.6:1。chart.js 的
+     seriesInk() 取用。加新的序列色時要一起加它的 -ink。 */
+  --series-1-ink: var(--ink);
+  --series-2-ink: #b34f28;  --series-3-ink: #137c57;  --series-4-ink: #936400;
+  --series-5-ink: #a25673;  --series-6-ink: #008000;  --series-7-ink: #4a3aa7;
+  --series-8-ink: #c33f3e;
 
   /* diverging pair — policy direction is a polarity, not a status */
   --hawkish:      #c9302f;   /* 利升息；當文字用時在紙色上 4.8:1 */
@@ -44,6 +51,7 @@
   --dovish:       #1f64bd;   /* 利降息；5.3:1 */
   --dovish-wash:  rgba(31, 100, 189, 0.10);
   --neutral:      #898781;   /* 中性 / 方向不明 */
+  --neutral-ink:  #6f6d68;   /* 當文字用：4.7:1（neutral 本身 3.3:1） */
   --neutral-wash: rgba(137, 135, 129, 0.12);
 
   /* status — reserved, always shipped with an icon + label */
@@ -140,6 +148,10 @@
     --series-1: var(--ink);  --series-2: #d95926;  --series-3: #199e70;
     --series-4: #c98500;  --series-5: #d55181;  --series-6: #008300;
     --series-7: #9085e9;  --series-8: #e66767;
+    --series-1-ink: var(--ink);
+    --series-2-ink: #db6333;  --series-3-ink: #199e70;  --series-4-ink: #c98500;   /* 夜報多數序列色本身就夠亮； */
+    --series-5-ink: #d85d8a;  --series-6-ink: #339c33;  --series-7-ink: #9085e9;   /* 2、5、6 在 surface 上不到 4.5，各調亮一點 */
+    --series-8-ink: #e66767;  --neutral-ink: #898781;
 
     --hawkish:      #f07a79;
     --hawkish-wash: rgba(240, 122, 121, 0.14);
@@ -178,6 +190,10 @@
   --series-1: var(--ink);  --series-2: #d95926;  --series-3: #199e70;
   --series-4: #c98500;  --series-5: #d55181;  --series-6: #008300;
   --series-7: #9085e9;  --series-8: #e66767;
+  --series-1-ink: var(--ink);
+  --series-2-ink: #db6333;  --series-3-ink: #199e70;  --series-4-ink: #c98500;   /* 夜報多數序列色本身就夠亮； */
+  --series-5-ink: #d85d8a;  --series-6-ink: #339c33;  --series-7-ink: #9085e9;   /* 2、5、6 在 surface 上不到 4.5，各調亮一點 */
+  --series-8-ink: #e66767;  --neutral-ink: #898781;
 
   --hawkish:      #f07a79;
   --hawkish-wash: rgba(240, 122, 121, 0.14);
