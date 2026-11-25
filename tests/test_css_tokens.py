@@ -70,5 +70,67 @@ class TestStatusColoursAsText(unittest.TestCase):
         self.assertGreaterEqual(contrast(token(light, "on-good"), token(light, "good")), 4.5)
 
 
+def declarations(css: str):
+    """(選擇器, 屬性, 值)，不含 token 定義（-- 開頭的自訂屬性）。"""
+    for selector, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+        if selector.strip().startswith("@font-face"):      # 字型檔的字重範圍（200 800）不是樣式
+            continue
+        for item in body.split(";"):
+            prop, sep, value = item.partition(":")
+            prop, value = prop.strip().lower(), " ".join(value.split())
+            if sep and prop and not prop.startswith("--"):
+                yield " ".join(selector.split())[-60:], prop, value.replace(" !important", "")
+
+
+SPACING = re.compile(r"^(margin|padding)(-(top|right|bottom|left|block|inline)(-(start|end))?)?$|^(row-|column-)?gap$")
+
+
+class TestInnerPagesUseTokens(unittest.TestCase):
+    """內頁（style.css）的字級、行高、字重、間距只能取 token。
+
+    會靜默出錯的地方：寫死一個 13.5px 或 7px 不會壞任何東西，只是每多一個，全站就多一種
+    字級或間距。2026-11-26 收斂前這份檔案有 16 種行高、8 種字重、39 種間距。
+    """
+
+    def setUp(self):
+        self.rows = list(declarations(read("style.css")))
+
+    def test_font_sizes(self):
+        bad = [(sel, value) for sel, prop, value in self.rows if prop == "font-size"
+               and not re.fullmatch(r"var\(--(t-\d+|d-\d)\)|inherit|[\d.]+em|clamp\(.+\)", value)
+               and not (sel == "body" and value == "0.9375rem")]      # 根字級：跟著使用者的字體設定走
+        self.assertEqual(bad, [], "字級要用 --t-*（em 的相對大小與 clamp() 的流動字級例外）")
+
+    def test_line_heights(self):
+        bad = [(sel, value) for sel, prop, value in self.rows if prop == "line-height"
+               and not re.fullmatch(r"var\(--(lh-\d+|lead-[a-z]+)\)|inherit|normal", value)]
+        self.assertEqual(bad, [], "行高要用 --lh-*（單行）或 --lead-*（會折行的段落）")
+
+    def test_font_weights(self):
+        bad = [(sel, value) for sel, prop, value in self.rows if prop == "font-weight"
+               and not re.fullmatch(r"var\(--w-[a-z]+\)|inherit|normal", value)]
+        self.assertEqual(bad, [], "字重只有 --w-regular／medium／semibold／bold 四類")
+
+    def test_spacing(self):
+        bad = []
+        for sel, prop, value in self.rows:
+            if not SPACING.match(prop):
+                continue
+            plain = re.sub(r"\b(?:calc|max|min|clamp|env)\((?:[^()]|\([^()]*\))*\)", "", value)
+            for px in re.findall(r"(?<![\w.-])(\d+(?:\.\d+)?)px", plain):       # 負值是光學修正，不算
+                if float(px) not in (0.0, 1.0) and float(px) <= 64:
+                    bad.append((sel, prop, value))
+        self.assertEqual(bad, [], "間距要用 --s*／--m*（0、1px、負值、calc()／max() 裡的例外）")
+
+    def test_scales_are_what_the_docs_say(self):
+        light = theme_blocks(read("style.css"))["日報"]
+        sizes = sorted(int(x) for x in re.findall(r"--t-(\d+):", light))
+        self.assertEqual(sizes, [12, 13, 14, 15, 16, 18, 22, 30])
+        spaces = sorted(int(x) for x in re.findall(r"--(?:s\d+|m\d+):\s*(\d+)px", light))
+        self.assertEqual(spaces, [2, 4, 6, 8, 10, 12, 14, 16, 24, 32, 48, 64])
+        self.assertEqual(len(re.findall(r"--lead-[a-z]+:", light)), 6)
+        self.assertEqual(len(re.findall(r"--w-[a-z]+:", light)), 4)
+
+
 if __name__ == "__main__":
     unittest.main()
