@@ -135,7 +135,8 @@ class TestInnerPagesUseTokens(unittest.TestCase):
 class TestSkeletonUsesTokens(unittest.TestCase):
     """頭版與內頁骨架（margin.css）：18px 以下的固定字級、行高、字重取 token。
 
-    19px 以上的固定字級與 clamp() 是展示字級，跟著視窗寬度那一套走，不在此限；間距還沒收斂。
+    19px 以上的固定字級與 clamp() 是展示字級，跟著視窗寬度那一套走，不在此限。間距也取 token，
+    比內頁多 20 與 28 兩階。
     會靜默出錯的地方跟內頁一樣：多寫一個 13.5px 不會壞任何東西，只是又多一種字級
     （2026-11-26 收斂前，這份檔案 10.5 到 17.5px 之間有 15 種，半像素一階）。
     """
@@ -161,6 +162,22 @@ class TestSkeletonUsesTokens(unittest.TestCase):
                if (prop == "line-height" and not re.fullmatch(r"var\(--(lh-\d+|lead-[a-z]+)\)|inherit|normal", value))
                or (prop == "font-weight" and not re.fullmatch(r"var\(--[\w-]+\)|inherit|normal", value))]
         self.assertEqual(bad, [], "行高用 --lead-*／--lh-*，字重用 --w-*")
+
+    def test_spacing(self):
+        bad = []
+        for sel, prop, value in self.rows:
+            if not SPACING.match(prop):
+                continue
+            # 函式裡的算式（最多兩層括號，例如 calc((1.45*var(--wh) - 11px)/2)）不算
+            plain = re.sub(r"\b(?:calc|max|min|clamp|env|var)\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)", "", value)
+            for px in re.findall(r"(?<![\w.-])(\d+(?:\.\d+)?)px", plain):       # 負值是光學修正，不算
+                if float(px) not in (0.0, 1.0):
+                    bad.append((sel, prop, value))
+        self.assertEqual(bad, [], "間距用 --s*／--m*（em 與 clamp() 的流動間距不在此限）")
+
+    def test_skeleton_adds_only_two_spacing_steps(self):
+        own = dict(re.findall(r"(--s\d+|--m\d+):\s*(\d+)px", read("margin.css")))
+        self.assertEqual(own, {"--s5": "20", "--s7": "28"})
 
     def test_tokens_come_from_style_css(self):
         # margin.css 不另立一套：它用到的字級、行高、字重 token 都定義在 style.css

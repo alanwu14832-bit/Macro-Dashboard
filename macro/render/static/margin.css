@@ -13,6 +13,10 @@
      斜線底   本站規則的輸出（判定框、圖上高於門檻的區域）。
    ========================================================================== */
 :root {
+  /* 間距：取 style.css 的 12 階，另外多兩階只給骨架用（內頁刻意跳過 20 與 28，
+     頭版的區塊內距與目錄間距卻常用——併到 16／24／32 會差 4px）。2026-11-26 收斂前
+     這份檔案寫死了 28 種 px 間距；em 與 clamp() 的流動間距不在此限。 */
+  --s5: 20px;  --s7: 28px;
   --hair: rgba(17, 21, 26, 0.17);
   --hatch: rgba(17, 21, 26, 0.06);
   --band: var(--mark);  --band-ink: #11151a;  --band-ink-2: #4a4322;
@@ -85,7 +89,7 @@
 
 .mg .topbar {
   position: fixed; inset: 0 0 auto 0; z-index: 50; height: var(--mast-h);
-  padding: 0 var(--padr) 0 var(--edge); gap: 6px; justify-content: flex-end;
+  padding: 0 var(--padr) 0 var(--edge); gap: var(--s15); justify-content: flex-end;
   pointer-events: none;
   transition: height .3s var(--fx), background-color .25s ease, border-color .25s ease;
 }
@@ -108,10 +112,10 @@
 :root.masthead-gone .mg .nameplate { opacity: 1; transform: none; pointer-events: auto; }
 .mg .topbar .icon-btn {
   border-color: transparent; background: none; color: var(--ink);
-  min-width: 40px; min-height: 40px; display: grid; place-items: center; padding: 0 8px;
+  min-width: 40px; min-height: 40px; display: grid; place-items: center; padding: 0 var(--s2);
 }
 .mg .topbar #theme-toggle {
-  border: 1.5px solid var(--ink); border-radius: 0; min-height: 30px; padding: 0 8px 0 11px;
+  border: 1.5px solid var(--ink); border-radius: 0; min-height: 30px; padding: 0 var(--s2) 0 var(--s25);
   font: var(--w-bold) var(--t-13)/var(--lead-solid) var(--ming); letter-spacing: .28em;
 }
 .mg .drawer-btn { display: grid; order: 9; }
@@ -129,8 +133,8 @@
   /* 抽屜永遠是展開樣式，其他頁記住的「收合」不該滲進來 */
   :root.rail-collapsed .mg .nav-label,
   :root.rail-collapsed .mg .nav-group span { opacity: 1; }
-  :root.rail-collapsed .mg .nav-group { height: auto; padding: 16px 10px 6px; }
-  :root.rail-collapsed .mg .nav-item { justify-content: flex-start; padding-left: 10px; padding-right: 10px; }
+  :root.rail-collapsed .mg .nav-group { height: auto; padding: var(--s4) var(--s25) var(--s15); }
+  :root.rail-collapsed .mg .nav-item { justify-content: flex-start; padding-left: var(--s25); padding-right: var(--s25); }
   .mg .nav-tip { display: none !important; }
 }
 
@@ -172,7 +176,7 @@ html[data-ed="tw"] .fp:not(.tw-chg) { --band: transparent; --band-ink: var(--ink
 .fp .mn .k{--kx:0em;display:inline-block;position:relative;font:var(--w-bold) var(--nz)/var(--lead-solid) var(--ming);color:var(--ink);
   padding:.4em var(--kx) .32em;margin-right:calc(-1*var(--kx));white-space:nowrap}
 .fp .mn .k i{font:italic var(--w-medium) var(--nn)/.8 var(--latin),serif;letter-spacing:-.012em}
-.fp .mn small{display:block;margin-top:8px;font-size:var(--t-13);line-height:var(--lead-snug);color:var(--ink-2)}
+.fp .mn small{display:block;margin-top:var(--s2);font-size:var(--t-13);line-height:var(--lead-snug);color:var(--ink-2)}
 .fp .mn .k::after{content:"";position:absolute;right:calc(var(--kx) - var(--mpad) - var(--tick)/2);top:50%;
   width:var(--tick);height:1px;background:var(--mrule);transform-origin:right center;transition:width .35s var(--fx)}
 .fp .mn.chg .k{--kx:.44em;background:var(--hl-bg);color:var(--hl-ink)}
@@ -187,7 +191,7 @@ html[data-ed="tw"] .fp:not(.tw-chg) { --band: transparent; --band-ink: var(--ink
 .fp .top>*{position:relative;z-index:1}
 :is(.fp,.pg) .mast{padding-top:clamp(16px,2.1vw,30px);padding-bottom:clamp(10px,1.2vw,18px)}
 :is(.fp,.pg) .mast>.m{padding-right:var(--wgap)}
-:is(.fp,.pg) .mast>.b{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px clamp(12px,1.5vw,22px);padding-left:var(--wgap);max-width:none}
+:is(.fp,.pg) .mast>.b{display:flex;align-items:baseline;flex-wrap:wrap;gap:var(--s1) clamp(12px,1.5vw,22px);padding-left:var(--wgap);max-width:none}
 :is(.fp,.pg) .wm-c{font:var(--w-bold) var(--wm)/var(--lead-solid) "Songti TC","Noto Serif TC","Source Han Serif TC","PMingLiU",serif;display:inline-block}
 :is(.fp,.pg) .mast>.m .wm-c{color:var(--band-ink)}
 .fp .wm-en{font:italic var(--w-regular) clamp(15px,1.75vw,25px)/var(--lead-solid) var(--latin),serif;white-space:nowrap;letter-spacing:.005em}
@@ -222,15 +226,15 @@ html[data-ed="tw"] .fp:not(.tw-chg) { --band: transparent; --band-ink: var(--ink
 .fp .since .d{display:block;position:relative;font:italic var(--w-medium) clamp(44px,5.05vw,76px)/.92 var(--latin),serif;letter-spacing:-.022em;color:var(--delta)}
 .fp .since .d::after{content:"";position:absolute;right:calc(-1*var(--mpad) - var(--tick)/2);top:47%;width:var(--tick);height:1px;background:var(--mrule);transform-origin:right center;transition:width .35s var(--fx)}
 @media (hover:hover) and (pointer:fine){.fp .since li:hover .d::after{width:calc(var(--tick) + var(--mpad) - 8px)}}
-.fp .since .w{display:block;margin-top:9px;font-size:var(--t-14);line-height:var(--lead-ui);color:var(--band-ink-2)}
+.fp .since .w{display:block;margin-top:var(--s2);font-size:var(--t-14);line-height:var(--lead-ui);color:var(--band-ink-2)}
 .fp .since .w b{font:var(--w-bold) var(--t-15)/var(--lead-ui) var(--ming);color:var(--band-ink);margin-right:.7em}
 .fp .since .ft{white-space:nowrap}
 .fp .since .ft em{font-style:normal;font-weight:var(--w-semibold);color:var(--band-ink)}
 .fp .scan{margin-top:auto;align-self:flex-end;font:var(--w-bold) var(--t-13)/var(--lead-tight) var(--ming);letter-spacing:.08em;color:var(--band-ink);background:none;
-  border:1.5px solid currentColor;padding:8px 11px 7px;cursor:pointer;display:inline-flex;align-items:center;gap:.7em;transition:background-color .25s,color .25s}
+  border:1.5px solid currentColor;padding:var(--s2) var(--s25) var(--s15);cursor:pointer;display:inline-flex;align-items:center;gap:.7em;transition:background-color .25s,color .25s}
 .fp .scan::before{content:"";width:9px;height:9px;border:1.5px solid currentColor;transition:background-color .2s}
 .fp .scan[aria-pressed="true"]::before{background:currentColor}
-.fp .scan kbd{font:var(--w-regular) var(--t-12)/var(--lead-solid) var(--latin),serif;border:1px solid currentColor;padding:2px 4px 1px;opacity:.7}
+.fp .scan kbd{font:var(--w-regular) var(--t-12)/var(--lead-solid) var(--latin),serif;border:1px solid currentColor;padding:var(--s05) var(--s1) 1px;opacity:.7}
 @media (hover:hover) and (pointer:fine){.fp .scan:hover{background:var(--band-ink);color:var(--band)}}
 .fp .hero-m .scan{margin-top:clamp(22px,3vw,44px)}
 .fp .hero-m .since{margin-bottom:auto}
@@ -279,11 +283,11 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
 .fp .yl::after{content:"";position:absolute;right:calc(-1*var(--mpad) - var(--tick)/2);top:50%;width:var(--tick);height:1px;background:var(--mrule)}
 .fp .yl.key{font:var(--w-bold) var(--t-13)/var(--lead-solid) var(--ming);color:var(--ink)}
 .fp .yl.key i{color:inherit;font-size:19px}
-.fp .fig-src{margin-top:10px;font-size:var(--t-13);line-height:var(--lead-ui);color:var(--ink-2);max-width:46em}
+.fp .fig-src{margin-top:var(--s25);font-size:var(--t-13);line-height:var(--lead-ui);color:var(--ink-2);max-width:46em}
 /* ───────── 四個數字 ───────── */
 .fp .fact>.b{display:grid;grid-template-columns:var(--c1) var(--c2) minmax(0,1fr);column-gap:var(--gap);align-items:baseline;padding-top:clamp(16px,1.9vw,24px);padding-bottom:clamp(16px,1.9vw,24px)}
 .fp .fact h3{font:var(--w-bold) clamp(17px,1.5vw,21px)/var(--lead-head) var(--ming)}
-.fp .fact h3 a,.fp .px h3 a{background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/0 1.5px;transition:background-size .3s var(--fx);padding-bottom:2px}
+.fp .fact h3 a,.fp .px h3 a{background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/0 1.5px;transition:background-size .3s var(--fx);padding-bottom:var(--s05)}
 @media (hover:hover) and (pointer:fine){.fp .fact h3 a:hover,.fp .px h3 a:hover{background-size:100% 1.5px}}
 .fp .val{font:var(--wnum) clamp(42px,4.5vw,66px)/var(--lead-solid) var(--latin),serif;color:var(--ink);letter-spacing:-.018em;white-space:nowrap}
 .fp .val .u{font-size:.5em;letter-spacing:0;margin-left:.05em}
@@ -298,12 +302,12 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
 .fp .big{font:var(--w-bold) clamp(26px,3.3vw,46px)/var(--lead-tight) var(--ming);letter-spacing:.02em}
 .fp .split{display:flex;flex-wrap:wrap;gap:.1em 1.1em;font:var(--w-bold) clamp(19px,2vw,27px)/var(--lead-head) var(--ming)}
 .fp .split i{font:italic var(--w-medium) 1.5em/var(--lead-solid) var(--latin),serif;margin-right:.12em}
-.fp .tally{display:flex;align-items:center;gap:6px;height:26px;margin-top:14px}
+.fp .tally{display:flex;align-items:center;gap:var(--s15);height:26px;margin-top:var(--s35)}
 .fp .tally i{display:block;flex:0 1 19px;min-width:0;height:3px;background:var(--ink-muted)}
 .fp .tally .dv{background:var(--dovish);transform:rotate(34deg)}
 .fp .tally .hk{background:var(--hawkish);transform:rotate(-34deg)}
-.fp .tally .gp{flex:none;width:1px;height:16px;background:var(--hair);margin:0 5px}
-.fp .tkey{display:flex;flex-wrap:wrap;gap:.2em 1.4em;margin-top:8px;font-size:var(--t-13);color:var(--ink-2)}
+.fp .tally .gp{flex:none;width:1px;height:16px;background:var(--hair);margin:0 var(--s1)}
+.fp .tkey{display:flex;flex-wrap:wrap;gap:.2em 1.4em;margin-top:var(--s2);font-size:var(--t-13);color:var(--ink-2)}
 /* 方向：小斜線＝利率的走向。紅藍只在這裡出現。 */
 .fp .dir{white-space:nowrap}
 .fp .dir::before{content:"";display:inline-block;width:13px;height:2.5px;vertical-align:.3em;margin-right:.5em;background:var(--ink-muted)}
@@ -319,7 +323,7 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
 .fp .sv-3::before{border-radius:50%;background:var(--ink-muted)}
 /* ───────── 訊號 ───────── */
 .fp .sig>.b{display:grid;grid-template-columns:var(--c1) minmax(0,1fr);column-gap:var(--gap);align-items:baseline;padding-top:clamp(18px,2.2vw,28px);padding-bottom:clamp(18px,2.2vw,28px)}
-.fp .tags{display:flex;flex-direction:column;gap:5px;font-size:var(--t-14);line-height:var(--lead-ui);color:var(--ink-2)}
+.fp .tags{display:flex;flex-direction:column;gap:var(--s1);font-size:var(--t-14);line-height:var(--lead-ui);color:var(--ink-2)}
 .fp .tags .sv{font:var(--w-bold) var(--t-16)/var(--lead-ui) var(--ming);letter-spacing:.14em}
 .fp .tags .sv-1{color:var(--ink)}
 .fp .tags .meta{display:flex;flex-wrap:wrap;gap:0 1.1em}
@@ -334,18 +338,18 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
 /* 日期：直線是今天，離直線多遠就是還有幾天 */
 .fp .axis{margin-top:clamp(10px,1.4vw,18px)}
 .fp .axis>.b{padding-left:0;display:flex;gap:0;font-size:var(--t-12);line-height:var(--lead-head);letter-spacing:.08em;color:var(--ink-2)}
-.fp .axis>.b span:first-child{padding:0 9px 0 8px;flex:none}
-.fp .axis>.b span:last-child{padding-left:9px;border-left:1px solid var(--ink-muted)}
+.fp .axis>.b span:first-child{padding:0 var(--s2) 0 var(--s2);flex:none}
+.fp .axis>.b span:last-child{padding-left:var(--s2);border-left:1px solid var(--ink-muted)}
 .fp .when>.b{padding-left:0;padding-top:clamp(9px,1.15vw,14px);padding-bottom:clamp(9px,1.15vw,14px);max-width:none}
 .fp .run{display:flex;align-items:baseline}
 .fp .bar{flex:none;align-self:flex-start;margin-top:calc((1.45*var(--wh) - 11px)/2);position:relative;width:max(2px,calc(var(--days)*var(--u)));height:11px;transform-origin:left center;translate:0 var(--bar-dy,0px);
   background:linear-gradient(var(--mrule),var(--mrule)) no-repeat 0 50%/100% 1px,
     repeating-linear-gradient(90deg,transparent 0 calc(var(--u) - 1px),var(--ink-muted) calc(var(--u) - 1px) var(--u)) no-repeat 0 50%/100% 7px}
 .fp .bar::after{content:"";position:absolute;right:-5px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--ink)}
-.fp .txt{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .9em;padding-left:20px;min-width:0}
+.fp .txt{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .9em;padding-left:var(--s5);min-width:0}
 .fp .when h3{font:var(--w-bold) var(--wh)/var(--lead-snug) var(--ming)}
 /* ───────── 價格 ───────── */
-.fp .px>.b{display:grid;grid-template-columns:var(--c1) var(--c2) minmax(0,1fr);column-gap:var(--gap);align-items:baseline;padding-top:11px;padding-bottom:11px}
+.fp .px>.b{display:grid;grid-template-columns:var(--c1) var(--c2) minmax(0,1fr);column-gap:var(--gap);align-items:baseline;padding-top:var(--s25);padding-bottom:var(--s25)}
 .fp .px h3{font:var(--w-bold) var(--t-16)/var(--lead-snug) var(--ming)}
 .fp .px .lv{font:var(--wnum) clamp(22px,2.1vw,28px)/1.1 var(--latin),serif;color:var(--ink);letter-spacing:-.008em;white-space:nowrap}
 .fp .px .lv .u{font-size:.62em;margin-left:.12em}
@@ -359,7 +363,7 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
 .fp .toc h3{font:var(--w-regular) var(--t-13)/var(--lead-snug) var(--hei);letter-spacing:.1em;color:var(--ink-2);padding-bottom:.75em;border-bottom:1.5px solid var(--ink);margin-bottom:.5em}
 .fp .toc a{display:flex;align-items:baseline;gap:.7em;font:var(--w-bold) clamp(16px,1.45vw,19px)/var(--lead-snug) var(--ming);padding:.42em 0}
 .fp .toc a i{font:italic var(--w-regular) var(--t-13)/var(--lead-solid) var(--latin),serif;color:var(--ink-2);width:1.5em;flex:none}
-.fp .toc a span{background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/0 1.5px;transition:background-size .3s var(--fx);padding-bottom:2px}
+.fp .toc a span{background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/0 1.5px;transition:background-size .3s var(--fx);padding-bottom:var(--s05)}
 .fp .toc a::after{content:"→";font-family:"PingFang TC","Noto Sans TC",sans-serif;font-weight:var(--w-regular);opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .25s var(--fx);color:var(--ink-2)}
 .fp .toc a:focus-visible span{background-size:100% 1.5px}
 @media (hover:hover) and (pointer:fine){.fp .toc a:hover span{background-size:100% 1.5px}}
@@ -378,7 +382,7 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
 :is(.fp,.pg) .colo::before{content:"";position:absolute;top:0;bottom:0;left:-50vw;width:calc(50vw + var(--m));background:var(--surface-sunken)}
 :is(.fp,.pg) .colo>*{position:relative;z-index:1}
 :is(.fp,.pg) .colo>.m{padding:clamp(22px,2.8vw,40px) var(--wgap) clamp(26px,3vw,44px) 0}
-:is(.fp,.pg) .colo>.b{padding-top:clamp(22px,2.8vw,40px);padding-bottom:clamp(26px,3vw,44px);padding-left:var(--wgap);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px clamp(14px,2vw,30px);max-width:none}
+:is(.fp,.pg) .colo>.b{padding-top:clamp(22px,2.8vw,40px);padding-bottom:clamp(26px,3vw,44px);padding-left:var(--wgap);display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s15) clamp(14px,2vw,30px);max-width:none}
 :is(.fp,.pg) .colo .m .wm-c{color:var(--ink)}
 :is(.fp,.pg) .colo .fine{font-size:var(--t-14);line-height:var(--lead-body);color:var(--ink-2);max-width:34em;margin-left:auto}
 :is(.fp,.pg) .colo .fine strong{color:var(--ink);font-weight:var(--w-semibold)}
@@ -392,7 +396,7 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
   .fp .px>.b{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n v" "c c"}
   .fp .px h3{grid-area:n}
   .fp .px .lv{grid-area:v;text-align:right}
-  .fp .px .cap{grid-area:c;margin-top:2px}
+  .fp .px .cap{grid-area:c;margin-top:var(--s05)}
   .fp .px .cap:empty{display:none}
   .fp .sig>.b,.fp .nx>.b{grid-template-columns:1fr}
   .fp .tags{flex-direction:row;flex-wrap:wrap;gap:0 1.1em;align-items:baseline;margin-bottom:.5em}
@@ -403,28 +407,28 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
 }
 /* ───────── 手機：頁邊縮成貼在左緣的一條細欄，但不消失 ───────── */
 @media (max-width:699px){
-  :is(.fp,.pg) .mast{padding-top:14px;padding-bottom:12px}
-  :is(.fp,.pg) .mast>.b{gap:6px 9px;padding-right:var(--padr)}
+  :is(.fp,.pg) .mast{padding-top:var(--s35);padding-bottom:var(--s3)}
+  :is(.fp,.pg) .mast>.b{gap:var(--s15) var(--s2);padding-right:var(--padr)}
   .fp .wm-en{font-size:var(--t-15)}
   :is(.fp,.pg) .ed{left:var(--edge);bottom:auto;top:.15em;font-size:var(--t-12);letter-spacing:.12em;writing-mode:vertical-rl}
   :is(.fp,.pg) .ed em{display:none}
   :is(.fp,.pg) .dateline{font-size:var(--t-12);gap:0 .9em;padding-left:calc(var(--pad) - var(--wgap))}
   .fp .hero{grid-template-rows:auto auto auto}
   .fp .hero-m{display:contents}
-  .fp .lead-head{padding-top:22px;padding-bottom:26px}
-  .fp .eyebrow{font-size:var(--t-13);gap:.2em 1em;margin-bottom:14px}
+  .fp .lead-head{padding-top:var(--s5);padding-bottom:var(--s6)}
+  .fp .eyebrow{font-size:var(--t-13);gap:.2em 1em;margin-bottom:var(--s35)}
   .fp .eyebrow b{font-size:var(--t-14);letter-spacing:.24em}
   .fp .hero h1{line-height:var(--lead-tight)}
   .fp .hero h1 .l{display:block}
-  .fp .sub{font-size:var(--t-18);line-height:var(--lead-ui);margin-top:14px}
-  .fp .tagline{grid-column:1;grid-row:1;writing-mode:vertical-rl;justify-self:center;align-self:start;margin-top:24px;
+  .fp .sub{font-size:var(--t-18);line-height:var(--lead-ui);margin-top:var(--s35)}
+  .fp .tagline{grid-column:1;grid-row:1;writing-mode:vertical-rl;justify-self:center;align-self:start;margin-top:var(--s6);
     font-size:var(--t-15);line-height:var(--lead-solid);letter-spacing:.22em;color:var(--band-ink);text-align:left}
   .fp .tagline .cl{display:inline}
-  .fp .since{grid-column:1/3;grid-row:2;padding-bottom:20px;text-align:left}
+  .fp .since{grid-column:1/3;grid-row:2;padding-bottom:var(--s5);text-align:left}
   .fp .hero-m .since{margin-bottom:0}
-  .fp .since h2{margin:0 0 6px;padding-left:calc(var(--m) + var(--pad));color:var(--ink-2);font-size:var(--t-13)}
+  .fp .since h2{margin:0 0 var(--s15);padding-left:calc(var(--m) + var(--pad));color:var(--ink-2);font-size:var(--t-13)}
   .fp .since ol{margin-top:0;gap:0}
-  .fp .since li{display:grid;grid-template-columns:var(--m) minmax(0,1fr);align-items:baseline;padding:9px 0}
+  .fp .since li{display:grid;grid-template-columns:var(--m) minmax(0,1fr);align-items:baseline;padding:var(--s2) 0}
   .fp .since .d{grid-column:1;text-align:right;padding-right:var(--mpad);font-size:26px;font-weight:var(--w-semibold);letter-spacing:-.03em;line-height:var(--lead-solid)}
   .fp .since .d::after{right:calc(var(--tick)/-2)}
   @media (hover:hover) and (pointer:fine){.fp .since li:hover .d::after{width:var(--tick)}}
@@ -432,25 +436,25 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
   .fp .since .w b{font-size:var(--t-16);color:var(--ink);margin:0}
   .fp .since .ft{font-size:var(--t-15)}
   .fp .since .ft em{color:var(--ink)}
-  .fp .hero-m .scan{grid-column:2;grid-row:2;justify-self:end;align-self:start;margin:-5px var(--padr) 0 0;z-index:2;padding:5px 8px 4px;font-size:var(--t-12);color:var(--ink)}
+  .fp .hero-m .scan{grid-column:2;grid-row:2;justify-self:end;align-self:start;margin:-5px var(--padr) 0 0;z-index:2;padding:var(--s1) var(--s2) var(--s1);font-size:var(--t-12);color:var(--ink)}
   .fp .scan kbd{display:none}
   @media (hover:hover) and (pointer:fine){.fp .scan:hover{background:var(--ink);color:var(--page)}}
-  .fp .lead-note{grid-column:1/3;grid-row:3;background:var(--page);padding:24px var(--padr) 6px calc(var(--m) + var(--pad))}
+  .fp .lead-note{grid-column:1/3;grid-row:3;background:var(--page);padding:var(--s6) var(--padr) var(--s15) calc(var(--m) + var(--pad))}
   .fp .gist p{font-size:var(--t-15);line-height:var(--lead-prose)}
   .fp .sh h2{font-size:var(--t-22)}
   .fp .sh p{font-size:var(--t-13)}
-  .fp .mn small{font-size:var(--t-12);margin-top:5px;line-height:var(--lead-head)}
+  .fp .mn small{font-size:var(--t-12);margin-top:var(--s1);line-height:var(--lead-head)}
   .fp .mn.chg .k{--kx:.4em}
   @media (hover:hover) and (pointer:fine){:is(.fp,.pg) .row:hover>.m .mn .k::after{width:var(--tick)}}
-  .fp .fact>.b{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n v" "r r";column-gap:.9em;padding-top:15px;padding-bottom:17px;align-items:end}
+  .fp .fact>.b{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n v" "r r";column-gap:.9em;padding-top:var(--s35);padding-bottom:var(--s4);align-items:end}
   .fp .fact h3{font-size:var(--t-16)}
   .fp .fact .val{font-size:44px;margin:0}
   .fp .calls{grid-template-columns:1fr}
-  .fp .call{padding:17px 15px 18px}
+  .fp .call{padding:var(--s4) var(--s35) var(--s4)}
   .fp .call+.call{border-left:0;border-top:1.5px solid var(--ink)}
-  .fp .tally{gap:4px}
+  .fp .tally{gap:var(--s1)}
   .fp .tally i{flex-basis:11px;height:2.5px}
-  .fp .tally .gp{margin:0 2px}
+  .fp .tally .gp{margin:0 var(--s05)}
   .fp .sig h3{font-size:19.5px}
   .fp .sig .det{font-size:var(--t-14)}
   .fp .tags .sv{font-size:var(--t-14)}
@@ -458,20 +462,20 @@ html.scanning :is(.fp,.pg) .mast>.b{opacity:1}
   .fp .kind b{font-size:var(--t-14)}
   .fp .nx h3{font-size:var(--t-16)}
   .fp .nx .det{font-size:var(--t-13)}
-  .fp .px>.b{padding-top:10px;padding-bottom:10px}
+  .fp .px>.b{padding-top:var(--s25);padding-bottom:var(--s25)}
   .fp .px h3{font-size:var(--t-16)}
   .fp .px .lv{font-size:21px}
   .fp .px .cap{font-size:var(--t-12)}
   .fp .axis>.b span:first-child{padding-left:var(--pad)}
   .fp .run{flex-direction:column;align-items:flex-start}
   .fp .bar{margin-top:0}
-  .fp .txt{padding:8px 0 0 var(--pad)}
-  .fp .when>.b{padding-top:12px;padding-bottom:10px}
-  .fp .toc{gap:26px 16px}
+  .fp .txt{padding:var(--s2) 0 0 var(--pad)}
+  .fp .when>.b{padding-top:var(--s3);padding-bottom:var(--s25)}
+  .fp .toc{gap:var(--s6) var(--s4)}
   .fp .toc a{font-size:var(--t-16);gap:.5em}
   .fp .toc a::after{display:none}
   .fp .howto{grid-template-columns:1fr;font-size:var(--t-13)}
-  :is(.fp,.pg) .colo .fine{margin:10px 0 0;font-size:var(--t-13);padding-left:calc(var(--pad) - var(--wgap));width:100%}
+  :is(.fp,.pg) .colo .fine{margin:var(--s25) 0 0;font-size:var(--t-13);padding-left:calc(var(--pad) - var(--wgap));width:100%}
   .fp .yl{font-size:var(--t-12)}
   .fp .yl i{font-size:var(--t-14)}
   .fp .yl.key{font-size:var(--t-12)}
@@ -604,7 +608,7 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 }
 .fp .since .d-t { font: var(--w-bold) clamp(26px, 3vw, 44px)/var(--lead-tight) var(--ming); letter-spacing: .02em; }
 .fp .since .ft { white-space: normal; }
-.fp .since .ft-t { display: block; margin-top: 2px; text-wrap: balance; }
+.fp .since .ft-t { display: block; margin-top: var(--s05); text-wrap: balance; }
 .fp .eyebrow { font-weight: var(--w-regular); letter-spacing: 0; }
 .fp .mn small .wide { display: inline; }
 
@@ -617,8 +621,8 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .seal.s-gap { border-color: var(--critical-ink); color: var(--critical-ink); }
 .fp .sh h2 { display: flex; align-items: center; }
 .fp .sh h2 .seal { flex: none; vertical-align: 0; }
-.fp .quiet { font-size: var(--t-14); line-height: var(--lead-body); color: var(--ink-2); max-width: 46em; padding: 6px 0; }
-.fp .gapnote { font-size: var(--t-14); line-height: var(--lead-body); color: var(--critical-ink); padding: 8px 0; }
+.fp .quiet { font-size: var(--t-14); line-height: var(--lead-body); color: var(--ink-2); max-width: 46em; padding: var(--s15) 0; }
+.fp .gapnote { font-size: var(--t-14); line-height: var(--lead-body); color: var(--critical-ink); padding: var(--s2) 0; }
 .fp .gapnote .seal { font-size: var(--t-12); margin-right: .7em; vertical-align: .1em; }
 .fp .na { color: var(--ink-2); }
 
@@ -626,7 +630,7 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .fact > .b { align-items: center; }
 .fp .read { min-width: 0; }
 .fp .read .rd { font: var(--w-bold) var(--t-15)/var(--lead-ui) var(--ming); color: var(--ink); margin-right: .9em; white-space: nowrap; }
-.fp .ruler { padding: 34px 0 30px; }
+.fp .ruler { padding: var(--s8) 0 var(--s7); }
 .fp .ruler-track::before { opacity: .9; }
 .fp .rr { background: var(--page); }
 .fp .ruler i, .fp .gridmap i, .fp .tally i { font-style: normal; }
@@ -637,14 +641,14 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .big { font-size: clamp(26px, 2.9vw, 42px); white-space: nowrap; }
 .fp .call-s { margin-top: .8em; font-size: var(--t-14); line-height: var(--lead-body); color: var(--ink-2); }
 .fp .gridmap {
-  flex: none; display: grid; grid-template-columns: auto auto; gap: 5px 7px;
+  flex: none; display: grid; grid-template-columns: auto auto; gap: var(--s1) var(--s15);
   font: var(--w-regular) var(--t-12)/var(--lead-solid) var(--hei); color: var(--ink-2); --cell: clamp(20px, 2vw, 28px);
 }
-.fp .gx { grid-column: 2; display: grid; grid-template-columns: repeat(3, var(--cell)); gap: 2px; text-align: center; }
-.fp .gx b { grid-column: 1 / -1; font-weight: var(--w-regular); letter-spacing: .3em; text-indent: .3em; padding-bottom: 4px; }
-.fp .gy { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: auto auto; grid-template-rows: repeat(3, var(--cell)); gap: 2px 5px; align-items: center; }
+.fp .gx { grid-column: 2; display: grid; grid-template-columns: repeat(3, var(--cell)); gap: var(--s05); text-align: center; }
+.fp .gx b { grid-column: 1 / -1; font-weight: var(--w-regular); letter-spacing: .3em; text-indent: .3em; padding-bottom: var(--s1); }
+.fp .gy { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: auto auto; grid-template-rows: repeat(3, var(--cell)); gap: var(--s05) var(--s1); align-items: center; }
 .fp .gy b { grid-row: 1 / -1; font-weight: var(--w-regular); writing-mode: vertical-rl; letter-spacing: .3em; }
-.fp .gcells { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: repeat(3, var(--cell)); grid-auto-rows: var(--cell); gap: 2px; }
+.fp .gcells { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: repeat(3, var(--cell)); grid-auto-rows: var(--cell); gap: var(--s05); }
 .fp .gc { display: block; border: 1px solid var(--ink-muted); background: var(--page); }
 .fp .gc.on { background: var(--ink); border-color: var(--ink); }
 
@@ -658,12 +662,12 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
   font-size: var(--t-14); line-height: var(--lead-body); color: var(--ink);
 }
 .fp .acc { margin-top: clamp(14px, 2vw, 24px); border-top: 1px solid var(--hair); }
-.fp .acc > summary { padding: 14px 0; font: var(--w-bold) var(--t-15)/var(--lead-snug) var(--ming); letter-spacing: .1em; cursor: pointer; }
+.fp .acc > summary { padding: var(--s35) 0; font: var(--w-bold) var(--t-15)/var(--lead-snug) var(--ming); letter-spacing: .1em; cursor: pointer; }
 .fp .more { margin-top: 1em; font: var(--w-bold) var(--t-15)/var(--lead-ui) var(--ming); }
 
 /* ---- 今天：更新的序列跟價格同一種列 --------------------------------------- */
 .fp .sv-gap { color: var(--critical-ink); }
-.fp .nx h3 a, .fp .sig-btn { background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1.5px; transition: background-size .3s var(--fx); padding-bottom: 2px; }
+.fp .nx h3 a, .fp .sig-btn { background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1.5px; transition: background-size .3s var(--fx); padding-bottom: var(--s05); }
 .fp .new-badge { margin-left: .6em; vertical-align: .15em; }
 
 /* ---- 接下來：一格一天，單位寬度跟著這一段的天數走 ------------------------- */
@@ -684,7 +688,7 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .said-b .bf-k { font: var(--w-bold) var(--t-13)/var(--lead-snug) var(--ming); letter-spacing: .3em; color: var(--ink-2); border-bottom: 1px dashed var(--ink-muted); padding-bottom: .6em; margin: 0; }
 .fp .said-b .bf-list li, .fp .said-b .bf-list li:last-child { border-bottom: 1px dashed var(--hair); }
 .fp .said-b .bf-h { font: var(--w-semibold) var(--t-16)/var(--lead-ui) var(--ming); color: var(--ink); }
-.fp .said-b .bf-d > summary.bf-h { padding: 12px 28px 12px 0; }
+.fp .said-b .bf-d > summary.bf-h { padding: var(--s3) var(--s7) var(--s3) 0; }
 .fp .said-b .bf-detail { font-size: var(--t-14); line-height: var(--lead-body); }
 .fp .said-b .bf-syn, .fp .said-b .mc-foot-note, .fp .said-b > .b > p, .fp .said-b .digest { grid-column: 1 / -1; }
 .fp .said-b .bf-syn { margin-top: 0; font-size: var(--t-15); line-height: var(--lead-prose); max-width: 46em; color: var(--fp-text); }
@@ -712,17 +716,17 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 }
 @media (max-width: 699px) {
   /* 手機：第一行只有刊名與工具列，英文刊名與日期各自往下排 */
-  :is(.fp,.pg) .mast > .b { padding-right: var(--padr); row-gap: 3px; }
+  :is(.fp,.pg) .mast > .b { padding-right: var(--padr); row-gap: var(--s05); }
   :is(.fp,.pg) .dateline { padding-right: 0; flex-direction: column; gap: 0; }
   :is(.fp,.pg) .dateline .trust { white-space: nowrap; }
   .fp .mn small .wide { display: none; }
-  .fp .since-none { margin: 0; padding: 0 var(--padr) 4px calc(var(--m) + var(--pad)); font-size: var(--t-14); color: var(--ink-2); text-align: left; }
-  .fp .since-more { margin: 4px 0 0 calc(var(--m) + var(--pad)); color: var(--ink); }
+  .fp .since-none { margin: 0; padding: 0 var(--padr) var(--s1) calc(var(--m) + var(--pad)); font-size: var(--t-14); color: var(--ink-2); text-align: left; }
+  .fp .since-more { margin: var(--s1) 0 0 calc(var(--m) + var(--pad)); color: var(--ink); }
   .fp .since .d-t { font-size: var(--t-16); }
   .fp .lede-fig { font-size: clamp(22px, 6.6vw, 30px); }
   .fp .fact .read { grid-area: r; }
   .fp .fact h3 { align-self: end; }
-  .fp .ruler { padding: 32px 0 28px; }
+  .fp .ruler { padding: var(--s8) 0 var(--s7); }
   .fp .read .rd { display: block; margin: 0 0 .1em; }
   .fp .read p { font-size: var(--t-13); }
   .fp .sig .evi { font-size: var(--t-13); }
@@ -769,10 +773,10 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .since h2 { font-size: var(--t-13); }
 .fp .since ol { margin-top: clamp(12px, 1.4vw, 20px); gap: clamp(8px, 1vw, 14px); }
 .fp .since .d { font-size: clamp(34px, 3.5vw, 52px); }
-.fp .since .w { margin-top: 5px; font-size: var(--t-13); line-height: var(--lead-snug); }
+.fp .since .w { margin-top: var(--s1); font-size: var(--t-13); line-height: var(--lead-snug); }
 .fp .since .w b { font-size: var(--t-14); margin-right: .6em; }
 .fp .since-none { margin-top: clamp(10px, 1.2vw, 16px); font-size: var(--t-14); line-height: var(--lead-body); text-wrap: balance; }
-.fp .hero-m .scan { margin-top: clamp(14px, 1.6vw, 22px); padding: 6px 9px 5px; font-size: var(--t-12); }
+.fp .hero-m .scan { margin-top: clamp(14px, 1.6vw, 22px); padding: var(--s15) var(--s2) var(--s1); font-size: var(--t-12); }
 
 /* 段落標題 */
 .fp .sh { margin-bottom: clamp(6px, .8vw, 12px); }
@@ -781,11 +785,11 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .sh h2 { font-size: clamp(20px, 1.8vw, 26px); }
 .fp .sh p { margin-top: .3em; font-size: var(--t-14); line-height: var(--lead-ui); max-width: 48em; }
 .fp .sub-h { padding-top: clamp(12px, 1.5vw, 20px); padding-bottom: .35em; font-size: var(--t-13); }
-.fp .mn small { margin-top: 5px; font-size: var(--t-12); }
+.fp .mn small { margin-top: var(--s1); font-size: var(--t-12); }
 
 /* 圖 */
-.fp .gchart { margin-top: 4px; }
-.fp .fig-src { margin-top: 6px; }
+.fp .gchart { margin-top: var(--s1); }
+.fp .fig-src { margin-top: var(--s15); }
 .fp .yl { font-size: var(--t-12); }
 .fp .yl i { font-size: var(--t-15); }
 .fp .yl.key { font-size: var(--t-12); }
@@ -796,7 +800,7 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .fact > .b { padding-top: clamp(6px, .7vw, 10px); padding-bottom: clamp(6px, .7vw, 10px); }
 .fp .fact h3 { font-size: clamp(16px, 1.3vw, 19px); }
 .fp .val { font-size: clamp(36px, 3.3vw, 50px); }
-.fp .ruler { padding: 27px 0 33px; }
+.fp .ruler { padding: var(--s7) 0 var(--s8); }
 .fp .read p { font-size: var(--t-14); line-height: var(--lead-ui); }
 .fp .read .rd { font-size: var(--t-14); }
 
@@ -805,17 +809,17 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .call h3 { margin-bottom: .55em; font-size: var(--t-13); }
 .fp .big { font-size: clamp(24px, 2.3vw, 34px); }
 .fp .split { font-size: clamp(16px, 1.5vw, 21px); }
-.fp .tally { height: 20px; margin-top: 8px; }
-.fp .tkey { margin-top: 5px; }
+.fp .tally { height: 20px; margin-top: var(--s2); }
+.fp .tkey { margin-top: var(--s1); }
 .fp .call-s { margin-top: .5em; font-size: var(--t-13); }
 .fp .sig > .b { padding-top: clamp(11px, 1.2vw, 16px); padding-bottom: clamp(11px, 1.2vw, 16px); }
 .fp .sig h3 { font-size: clamp(18px, 1.55vw, 22px); line-height: var(--lead-head); }
 .fp .sig .det { margin-top: .3em; font-size: var(--t-14); line-height: var(--lead-ui); }
 .fp .sig .evi { margin-top: .45em; font-size: var(--t-14); line-height: var(--lead-ui); }
-.fp .tags { font-size: var(--t-13); gap: 3px; }
+.fp .tags { font-size: var(--t-13); gap: var(--s05); }
 .fp .tags .sv { font-size: var(--t-15); }
 .fp .acc { margin-top: clamp(10px, 1.2vw, 16px); }
-.fp .acc > summary { padding: 10px 0; font-size: var(--t-14); }
+.fp .acc > summary { padding: var(--s25) 0; font-size: var(--t-14); }
 .fp .more { margin-top: .6em; font-size: var(--t-14); }
 
 /* 今天／接下來／價格：一列一行，不撐高 */
@@ -826,17 +830,17 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 .fp .kind b { font-size: var(--t-14); }
 .fp .axis { margin-top: clamp(8px, 1vw, 12px); }
 .fp .when > .b { padding-top: clamp(5px, .55vw, 8px); padding-bottom: clamp(5px, .55vw, 8px); }
-.fp .px > .b { padding-top: 6px; padding-bottom: 6px; }
+.fp .px > .b { padding-top: var(--s15); padding-bottom: var(--s15); }
 .fp .px h3 { font-size: var(--t-15); }
 .fp .px .lv { font-size: clamp(19px, 1.6vw, 23px); }
 .fp .px .cap { font-size: var(--t-13); }
 .fp .also { margin-top: clamp(14px, 1.6vw, 22px); gap: .7em var(--gap); font-size: var(--t-14); line-height: var(--lead-ui); }
-.fp .quiet { font-size: var(--t-14); padding: 4px 0; }
+.fp .quiet { font-size: var(--t-14); padding: var(--s1) 0; }
 
 /* 別人怎麼說／目錄／頁尾 */
 .fp .said-b .bf-group { margin-bottom: clamp(10px, 1.2vw, 16px); }
 .fp .said-b .bf-h { font-size: var(--t-16); line-height: var(--lead-ui); }
-.fp .said-b .bf-d > summary.bf-h { padding: 8px 26px 8px 0; }
+.fp .said-b .bf-d > summary.bf-h { padding: var(--s2) var(--s6) var(--s2) 0; }
 .fp .said-b .bf-d > summary.bf-h::after { top: 9px; }
 .fp .said-b .bf-syn { font-size: var(--t-14); line-height: var(--lead-body); }
 .fp .toc { gap: clamp(16px, 2vw, 28px) var(--gap); }
@@ -850,39 +854,39 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 :is(.fp,.pg) .colo .fine { font-size: var(--t-13); line-height: var(--lead-body); }
 
 @media (max-width: 699px) {
-  :is(.fp,.pg) .mast { padding-top: 11px; padding-bottom: 8px; }
-  :is(.fp,.pg) .mast > .b { row-gap: 2px; }
+  :is(.fp,.pg) .mast { padding-top: var(--s25); padding-bottom: var(--s2); }
+  :is(.fp,.pg) .mast > .b { row-gap: var(--s05); }
   :is(.fp,.pg) .ed { display: none; }                 /* 手機的頁邊放不下；右上角的按鈕已經寫著日報／夜報 */
   :is(.fp,.pg) .dateline { font-size: var(--t-12); }
-  .fp .lead-head { padding-top: 16px; padding-bottom: 18px; }
-  .fp .eyebrow { margin-bottom: 9px; font-size: var(--t-12); }
+  .fp .lead-head { padding-top: var(--s4); padding-bottom: var(--s4); }
+  .fp .eyebrow { margin-bottom: var(--s2); font-size: var(--t-12); }
   .fp .eyebrow b { font-size: var(--t-13); }
-  .fp .sub { font-size: var(--t-16); line-height: var(--lead-ui); margin-top: 10px; }
-  .fp .tagline { margin-top: 18px; font-size: var(--t-14); }
-  .fp .since { padding-bottom: 14px; }
-  .fp .since li { padding: 6px 0; }
+  .fp .sub { font-size: var(--t-16); line-height: var(--lead-ui); margin-top: var(--s25); }
+  .fp .tagline { margin-top: var(--s4); font-size: var(--t-14); }
+  .fp .since { padding-bottom: var(--s35); }
+  .fp .since li { padding: var(--s15) 0; }
   .fp .since .d { font-size: var(--t-22); }
   .fp .since .w b { font-size: var(--t-15); }
   .fp .since .ft { font-size: var(--t-14); }
-  .fp .lead-note { padding-top: 16px; padding-bottom: 4px; gap: 1em; }
+  .fp .lead-note { padding-top: var(--s4); padding-bottom: var(--s1); gap: 1em; }
   .fp .gist p { font-size: var(--t-14); line-height: var(--lead-body); }
   .fp .sh h2 { font-size: 20px; }
   .fp .sh p { font-size: var(--t-13); }
-  .fp .fact > .b { padding-top: 10px; padding-bottom: 10px; }
+  .fp .fact > .b { padding-top: var(--s25); padding-bottom: var(--s25); }
   .fp .fact h3 { font-size: var(--t-15); }
   .fp .fact .val { font-size: 38px; }
-  .fp .ruler { padding: 26px 0 32px; }
-  .fp .call { padding: 13px 13px 14px; }
+  .fp .ruler { padding: var(--s6) 0 var(--s8); }
+  .fp .call { padding: var(--s3) var(--s3) var(--s35); }
   .fp .sig h3 { font-size: var(--t-18); }
   .fp .sig .det { font-size: var(--t-13); }
   .fp .nx h3 { font-size: var(--t-15); }
-  .fp .px > .b { padding-top: 7px; padding-bottom: 7px; }
+  .fp .px > .b { padding-top: var(--s15); padding-bottom: var(--s15); }
   .fp .px h3 { font-size: var(--t-15); }
   .fp .px .lv { font-size: 19px; }
-  .fp .when > .b { padding-top: 8px; padding-bottom: 7px; }
-  .fp .txt { padding-top: 5px; }
+  .fp .when > .b { padding-top: var(--s2); padding-bottom: var(--s15); }
+  .fp .txt { padding-top: var(--s1); }
   .fp .said-b .bf-h { font-size: var(--t-15); }
-  .fp .mn small { font-size: var(--t-12); margin-top: 3px; }
+  .fp .mn small { font-size: var(--t-12); margin-top: var(--s05); }
   .fp .plot .endv { font-size: 19px; }
 }
 
@@ -905,21 +909,21 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
   position: sticky; top: calc(var(--topbar-h) + 14px);
   max-height: calc(100vh - var(--topbar-h) - 28px); overflow-y: auto; scrollbar-width: none;
   display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
-  padding: clamp(18px, 2.2vw, 34px) var(--mpad) 20px var(--edge); text-align: right;
+  padding: clamp(18px, 2.2vw, 34px) var(--mpad) var(--s5) var(--edge); text-align: right;
 }
 .pg-toc::-webkit-scrollbar { display: none; }
 .pg-kicker {
-  margin: 0 0 clamp(10px, 1.2vw, 16px); display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  margin: 0 0 clamp(10px, 1.2vw, 16px); display: flex; flex-direction: column; align-items: flex-end; gap: var(--s1);
   font: var(--w-bold) var(--t-13)/var(--lead-snug) var(--ming); letter-spacing: .24em; color: var(--ink-2);
 }
 .pg-kicker i { font: italic var(--w-medium) clamp(34px, 3.5vw, 52px)/.9 var(--latin), serif; letter-spacing: -.02em; color: var(--ink); }
 .pg-kicker a { color: inherit; text-decoration: none; letter-spacing: .08em; }
 .pg-toc > a {
-  position: relative; padding: 3px 0; max-width: 100%;
+  position: relative; padding: var(--s05) 0; max-width: 100%;
   font: var(--w-regular) var(--t-13)/var(--lead-snug) var(--hei); color: var(--ink-2); text-decoration: none;
   transition: color .2s ease;
 }
-.pg-toc > a.sub2 { font-size: var(--t-12); color: var(--ink-muted); padding: 2px 0; }
+.pg-toc > a.sub2 { font-size: var(--t-12); color: var(--ink-muted); padding: var(--s05) 0; }
 .pg-toc > a::after {
   content: ""; position: absolute; right: calc(-1 * var(--mpad) - var(--tick) / 2); top: 50%;
   width: var(--tick); height: 1px; background: var(--mrule);
@@ -953,16 +957,16 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
 }
 .pg-b .section-head .note { font-size: var(--t-13); line-height: var(--lead-ui); color: var(--ink-2); }
 .pg-b section.sub-section { padding-top: clamp(16px, 1.8vw, 26px); }
-.pg-b section.sub-section > .section-head { padding-top: 0; margin-bottom: 8px; }
+.pg-b section.sub-section > .section-head { padding-top: 0; margin-bottom: var(--s2); }
 .pg-b section.sub-section > .section-head h2 { font-size: clamp(16px, 1.3vw, 19px); }
 .pg > .colo { margin-top: var(--sec); }
 
 /* 頂列：刊頭還在時只有工具；捲走後是「刊名｜頁名」 */
 .is-page .topbar-title {
-  display: block; margin-right: auto; padding-left: 12px; font: var(--w-bold) var(--t-15)/var(--lead-solid) var(--ming); letter-spacing: .06em;
+  display: block; margin-right: auto; padding-left: var(--s3); font: var(--w-bold) var(--t-15)/var(--lead-solid) var(--ming); letter-spacing: .06em;
   opacity: 0; transition: opacity .25s ease;
 }
-.is-page .nameplate { margin-right: 0; padding-right: 12px; border-right: 1px solid var(--border-strong); }
+.is-page .nameplate { margin-right: 0; padding-right: var(--s3); border-right: 1px solid var(--border-strong); }
 :root.masthead-gone .is-page .topbar-title { opacity: 1; }
 
 @media (max-width: 959px) {
@@ -981,8 +985,8 @@ html.theming .fp *,html.theming .fp *::before,html.theming .fp *::after{transiti
   .is-page .topbar-title { font-size: var(--t-14); }
 }
 @media (max-width: 699px) {
-  .pg-b { padding: 0 16px; }
-  .pg-b .page-head { padding-top: 16px; }
+  .pg-b { padding: 0 var(--s4); }
+  .pg-b .page-head { padding-top: var(--s4); }
   .pg-b .page-head h1 { font-size: var(--t-30); }
   .pg-b .page-head .lede { font-size: var(--t-15); }
   .is-page .topbar-title { display: none; }
@@ -1009,7 +1013,7 @@ html.js[data-ed="tw"] .fp .edn[data-ed="us"] { display: none; }
 .fp .edsw { display: flex; gap: clamp(20px, 2.2vw, 32px); }
 .fp .edt {
   position: relative; display: inline-flex; align-items: baseline; min-height: 44px;
-  padding: 15px 0 12px; font: var(--w-bold) clamp(16px, 1.35vw, 19px)/var(--lead-solid) var(--ming); letter-spacing: .14em;
+  padding: var(--s35) 0 var(--s3); font: var(--w-bold) clamp(16px, 1.35vw, 19px)/var(--lead-solid) var(--ming); letter-spacing: .14em;
   color: var(--ink-2); transition: color .2s ease;
 }
 .fp .edt span { margin-left: .12em; font-weight: var(--w-regular); font-size: .74em; letter-spacing: .1em; }
@@ -1027,7 +1031,7 @@ html.scanning .fp .edrow > .b { opacity: 1; }
 /* 晨報的入口：版別底下一行，兩版共用。不是區塊，不上螢光筆（它不是「跟上一期不一樣」）。 */
 .fp .mbrow > .b { padding-top: 0; padding-bottom: 0; }
 .fp .mbrow a {
-  display: flex; align-items: baseline; gap: .7em; min-height: 44px; padding: 12px 0;
+  display: flex; align-items: baseline; gap: .7em; min-height: 44px; padding: var(--s3) 0;
   font: var(--w-regular) var(--t-15)/var(--lead-ui) var(--hei); color: var(--ink); border-bottom: 1px solid var(--hair);
 }
 .fp .mbrow .seal { font-size: var(--t-12); margin-right: 0; vertical-align: 0; align-self: center; }
@@ -1039,7 +1043,7 @@ html.scanning .fp .edrow > .b { opacity: 1; }
 
 /* 刊頭捲走之後，頂列裡留一份小的：捲到哪一段都能換版 */
 .mg .edsw-bar {
-  display: flex; gap: 2px; margin-right: auto; margin-left: 14px; padding-left: 14px;
+  display: flex; gap: var(--s05); margin-right: auto; margin-left: var(--s35); padding-left: var(--s35);
   border-left: 1px solid var(--border-strong);
   opacity: 0; transform: translateY(6px); pointer-events: none;
   transition: opacity .25s ease, transform .3s var(--fx);
@@ -1047,7 +1051,7 @@ html.scanning .fp .edrow > .b { opacity: 1; }
 :root.masthead-gone .mg .edsw-bar { opacity: 1; transform: none; pointer-events: auto; }
 .mg .topbar .nameplate:has(+ .edsw-bar) { margin-right: 0; }
 .mg .edsw-bar .edt {
-  display: inline-flex; align-items: center; min-height: 34px; padding: 0 9px;
+  display: inline-flex; align-items: center; min-height: 34px; padding: 0 var(--s2);
   font: var(--w-bold) var(--t-14)/var(--lead-solid) var(--ming); letter-spacing: .12em; text-decoration: none;
   color: var(--ink-2); border-bottom: 2px solid transparent; transition: color .2s ease, border-color .2s ease;
 }
@@ -1060,7 +1064,7 @@ html[data-ed="us"] .mg .edsw-bar .edt[data-ed-set="us"], html[data-ed="tw"] .mg 
   /* 窄螢幕的頂列放不下刊名＋版別＋工具：頭版的頂列讓版別當標題，刊名收起來 */
   .mg.is-front .topbar .nameplate { display: none; }
   .mg .edsw-bar { margin-left: 0; padding-left: 0; border-left: 0; }
-  .mg .edsw-bar .edt { min-height: 40px; padding: 0 10px; font-size: var(--t-15); }
+  .mg .edsw-bar .edt { min-height: 40px; padding: 0 var(--s25); font-size: var(--t-15); }
 }
 
 /* 抽屜裡頭版的小標只列現在這一版的（另一版的段落在畫面上不存在） */
