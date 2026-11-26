@@ -1,0 +1,125 @@
+{
+ "date": "2026-11-26",
+ "written_at": "2026-11-26T12:25:48+08:00",
+ "model": "claude-opus-5-5",
+ "title": "美通膨升溫、AI股再殺，台股反彈",
+ "lede": "美國10月PCE年增升到3.8%，第三季GDP上修到4.3%，昨夜美股在AI賣壓中震盪，輝達再跌近4%。台股前一天重挫1,926點後，今天盤中強彈。本站判定維持「過熱、偏升息」，與上一份相同。",
+ "stories": [
+  {
+   "headline": "美國10月PCE年增3.8%，第三季GDP上修至4.3%",
+   "paragraphs": [
+    "美國經濟分析局11月25日公布，10月PCE物價年增3.8%，核心PCE年增3.3%，整體與核心月增都是0.3%；第三季GDP年化成長率由3.4%上修到4.3%。",
+    "Kitco報導，PCE年增由9月的3.6%升高，GDP上修主要來自投資與消費支出；數據公布後金價再跌約1%。"
+   ],
+   "sources": [
+    {
+     "title": "PCE Inflation Hits 3.8% as Expected, 3Q GDP Growth Revised Up to 4.3%",
+     "outlet": "Benzinga",
+     "url": "https://www.benzinga.com/markets/economic-data/26/11/63619838/pce-inflation-october-gdp-second-estimate"
+    },
+    {
+     "title": "Gold prices drop another 1% as US Q3 GDP revised to 4.3% with contained PCE inflation",
+     "outlet": "Kitco",
+     "url": "https://www.kitco.com/news/article/2026-11-25/gold-prices-drop-another-1-us-q3-gdp-revised-43-contained-pce-inflation"
+    }
+   ]
+  },
+  {
+   "headline": "AI股賣壓未歇，輝達收跌3.9%，美股收盤漲跌互見",
+   "paragraphs": [
+    "CNN報導，美股25日早盤重挫後收斂，標普500終場跌0.25%，資金轉向非科技類股，輝達跌3.9%，VIX盤中一度到35。Yahoo財經報導，那斯達克跌約0.6%，道瓊翻紅，避險資金流向公債。",
+    "CNN指出，AI支出能否延續的疑慮與輝達執行長風波持續壓抑科技股，升息也會墊高AI業者的資金成本。Motley Fool則把輝達的跌勢歸於偏熱的PCE數據與新的關稅提案。"
+   ],
+   "sources": [
+    {
+     "title": "Tech stocks are volatile as AI fears overshadow Huang’s Nvidia return",
+     "outlet": "CNN",
+     "url": "https://www.cnn.com/2026/11/25/business/ai-sell-off-despite-huang-nvidia-return"
+    },
+    {
+     "title": "Stock market today: Dow erases losses to end positive, S&P 500 and Nasdaq recover ground amid AI sell-off",
+     "outlet": "Yahoo財經",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-november-25-dow-sp-500-nasdaq-pce-inflation-data-091428237.html"
+    },
+    {
+     "title": "Stock Market Today, Nov. 25: Nvidia Slides 3.9% as the Market Considers Hot PCE Inflation Data and New Tariff Proposals",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/coverage/stock-market-today/2026/11/25/stock-market-today-nov-25-nvidia-slides-3-9-as-the-market-considers-hot-pce-inflation-data-and-new-tariff-proposals/"
+    }
+   ]
+  },
+  {
+   "headline": "台股25日暴跌1,926點跌破年線，外資賣超1,236億元",
+   "paragraphs": [
+    "台股11月25日終場跌1,926.92點，收38,195.43點，為史上第6大跌點，台積電跌3.58%。經濟日報報導，外資賣超1,236億元、為史上第7大，投信買超535億元；金管會同日研商放寬注意股認定標準，最快年底前上路。",
+    "統一證券晨訊把跌勢歸因於輝達行情只維持一天、加上川普再掀關稅戰，並提到美國新一輪301調查下台灣稅率維持15%不疊加、不涵蓋半導體。中央社報導，台股今天開盤漲240.56點。"
+   ],
+   "sources": [
+    {
+     "title": "11月26日 五件財經大事搶先看",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9902487"
+    },
+    {
+     "title": "【統一證券晨訊】短線震盪測底",
+     "outlet": "Yahoo奇摩股市",
+     "url": "https://tw.stock.yahoo.com/news/%E7%B5%B1-%E8%AD%89%E5%88%B8%E6%99%A8%E8%A8%8A-%E7%9F%AD%E7%B7%9A%E9%9C%87%E7%9B%AA%E6%B8%AC%E5%BA%95-001210600.html"
+    },
+    {
+     "title": "【台股開盤】漲240.56點",
+     "outlet": "中央社",
+     "url": "https://tw.stock.yahoo.com/news/%E5%8F%B0%E8%82%A1%E9%96%8B%E7%9B%A4-%E6%BC%B2240-56%E9%BB%9E-010415553.html"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "昨夜美股收盤：標普500收7,201點，那斯達克23,734點，道瓊50,183點，距一年高點分別低7.9%、14.0%、7.7%。VIX收26.36，風險胃納指標12.4，屬恐慌。",
+    "10年期殖利率4.91%，較上一份的4.92%下降；10年實質利率2.79%，10年減2年利差0.28個百分點，曲線熊平坦化。WTI原油82.24美元，近一月跌21.9%；黃金4,144.55美元，近一月跌9.3%；廣體美元指數123.60（11/20）。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股盤中強彈，加權指數39,271點，漲1,075點（2.8%），櫃買漲4.6%。台積電2,155元，只漲5元；廣達漲8.0%、台達電漲6.2%、鴻海漲5.3%、聯發科漲3.6%。",
+    "美股權值股多數收黑：輝達收149.30美元、跌3.9%，亞馬遜跌3.1%，Alphabet跌2.1%，微軟跌1.2%；Meta漲3.4%，蘋果漲0.4%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "美國今天沒有重大數據。聯準會12/9會議的期貨定價：升息65%、不變35%；到2027/7累計升息36 bp。模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）下一次CPI年增3.79%、核心CPI年增2.87%；模型預估（亞特蘭大聯準銀行 GDPNow）第四季年化季增2.9%。",
+    "台灣今天沒有重大數據；央行理監事會在12/17。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份相同：九宮格「過熱」（就業強×通膨高），政策重心通膨優先，傾向偏升息（score 6）；訊號9條，偏升息4、偏降息2、中性3，沒有增減。",
+    "關鍵讀數三項變動：10年期殖利率4.91%（原4.92%）、10年減2年利差0.28（原0.29）、衰退風險刻度52.02（原50.52）。核心PCE 3.26%、失業率4.10%不變。國發會景氣燈號41分紅燈，台灣讀數與上一份相同。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-25",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 67,
+  "sources": 8,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 28,
+  "output_tokens": 13825,
+  "cache_creation_input_tokens": 44454,
+  "cache_read_input_tokens": 332277,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.6053
+ }
+}
