@@ -1,6 +1,6 @@
 {
  "date": "2026-11-26",
- "generated_at": "2026-11-26T04:19:19+08:00",
+ "generated_at": "2026-11-26T09:08:05+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -98,11 +98,11 @@
   "core_cpi": 2.5643583511686607,
   "core_pce": 3.26111744583808,
   "supercore": 3.2293721989494317,
-  "ten_year": 4.92,
+  "ten_year": 4.91,
   "real_ten_year": 2.79,
   "policy_upper": 4.0,
-  "curve_10_2": 0.29000000000000004,
-  "recession_gauge": 51.74902115290629,
+  "curve_10_2": 0.28000000000000025,
+  "recession_gauge": 52.02373427054361,
   "composite_labor": -1.6853691262209334
  },
  "readings_tw": {
@@ -119,6 +119,6 @@
  "as_of": {
   "labor": "2026-10-01",
   "inflation": "2026-10-01",
-  "rates": "2026-11-23"
+  "rates": "2026-11-24"
  }
 }
