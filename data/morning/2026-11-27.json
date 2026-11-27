@@ -1,0 +1,134 @@
+{
+ "date": "2026-11-27",
+ "written_at": "2026-11-27T12:34:47+08:00",
+ "model": "claude-opus-5-5",
+ "title": "升息押注升溫，美股休市台股看外資",
+ "lede": "美股因感恩節休市，最近收盤停在11月25日。美國PCE偏熱、GDP上修，12月升息押注升溫；黃仁勳復職後輝達股價大起大落。外資連日賣超台積電，今天下午主計總處與國發會公布GDP與景氣燈號。",
+ "stories": [
+  {
+   "headline": "美股11月25日盤中重挫後收斂，感恩節休市一天",
+   "paragraphs": [
+    "CNBC報導，美股11月25日盤中一度重挫，標普500盤中跌3.2%，收盤僅跌0.25%；道瓊漲0.33%，那斯達克跌0.62%。美股26日休市，27日提前收盤。",
+    "CNBC指出，黃仁勳離職前市場對AI交易已偏悲觀，擔心舉債融資與資本支出放緩；報導也提到美元回落、白銀大漲5%，但引述分析師提醒假期交投清淡，不宜過度解讀。"
+   ],
+   "sources": [
+    {
+     "title": "Stock market news for Nov. 25, 2026",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/24/stock-market-today-live-updates-.html"
+    },
+    {
+     "title": "Stock futures tick higher as Wall Street gets set to wrap up a volatile holiday week: Live updates",
+     "outlet": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/26/stock-market-today-live-updates.html"
+    }
+   ]
+  },
+  {
+   "headline": "美國PCE偏熱、GDP上修，12月升息押注升溫",
+   "paragraphs": [
+    "Yahoo Finance報導，美國11月25日公布的第三季GDP上修至年化4.3%，PCE年增3.8%；川普政府隨後提出對14個主要貿易夥伴的新關稅方案。",
+    "報導引述CME FedWatch，期貨交易人認為12月FOMC升息1碼的機率約97%至98%；Truist經濟學家Mike Skordeles表示數據讓他們更確定12月會升息。"
+   ],
+   "sources": [
+    {
+     "title": "Fed rate-hike bets deliver fresh blow to your holiday budget",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/economy/policy/articles/fed-rate-hike-bets-deliver-174700533.html"
+    },
+    {
+     "title": "Rates fall this week, but hot inflation locks in Fed hike",
+     "outlet": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/real-estate/articles/rates-fall-week-hot-inflation-183453675.html"
+    }
+   ]
+  },
+  {
+   "headline": "黃仁勳復職輝達執行長，股價大起大落",
+   "paragraphs": [
+    "The Motley Fool報導，11月12日因婚外情爭議請辭的黃仁勳，本週被輝達董事會請回執行長一職。",
+    "報導指出，他離職期間輝達股價累計跌24%，回任首個交易日大漲31%，後續相關消息仍可能牽動股價。"
+   ],
+   "sources": [
+    {
+     "title": "Will Nvidia Stock Continue to Soar Now That Jensen Huang Is Back? Here Are the Bull and Bear Cases.",
+     "outlet": "The Motley Fool",
+     "url": "https://www.fool.com/investing/2026/11/25/will-nvidia-stock-continue-to-soar-now-that-jensen-huang-is-back-here-are-the-bull-and-bear-cases/"
+    }
+   ]
+  },
+  {
+   "headline": "台股大漲956點，外資仍持續賣超台積電",
+   "paragraphs": [
+    "台股26日大漲956點收39,151.81點，台積電卻跌5元。ETtoday報導，外資當天賣超491.81億元，連續10個交易日賣超台積電累計12萬1884張。",
+    "理財周刊認為，外資賣壓是否告一段落與新台幣走勢是焦點。壹蘋新聞網報導，美國公布對台301調查結果，工總提醒業界檢視供應鏈與營運風險。"
+   ],
+   "sources": [
+    {
+     "title": "外資連10砍台積電12萬張！今提款台股491億 進出前10大曝光",
+     "outlet": "ETtoday",
+     "url": "https://finance.ettoday.net/news/3279044"
+    },
+    {
+     "title": "台積電遭外資連11賣！匯率失守。台灣央行軟弱 唯一解法提前放鷹",
+     "outlet": "理財周刊",
+     "url": "https://www.lifetoutiao.news/365043/"
+    },
+    {
+     "title": "台股開盤漲逾230點 台積電2145元平盤開出",
+     "outlet": "壹蘋新聞網",
+     "url": "https://news.nextapple.com/finance/20261127/3F7B6487899C5075434923B057193CBD"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "最近一個交易日的美國市場（11/25 週三）",
+   "paragraphs": [
+    "美股最近收盤（11月25日）：標普500收7,201點，近一月跌6.2%；那斯達克23,586點，近一月跌10.9%；道瓊50,183點，近一月跌4.2%。VIX 26.36，風險胃納12.4，屬恐慌。",
+    "10年期殖利率4.91%，近一月下降0.09個百分點；10減2利差0.28個百分點，曲線熊平坦化。廣義美元指數（11月20日）123.60。WTI 82.24美元，近一月跌21.9%；黃金4,145美元，近一月跌9.3%。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股盤中（12:32）加權指數39,319點，漲167點；櫃買指數跌1.1%。台積電2,170元漲1.2%，鴻海漲1.6%，聯發科跌0.9%。",
+    "美股權值股11月25日：輝達跌3.9%，亞馬遜跌3.1%，Alphabet跌2.1%，微軟跌1.2%；Meta漲3.4%，蘋果漲0.4%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "台灣16:00有主計總處GDP與經濟成長率、國發會10月景氣對策信號；上期41分紅燈，已連續10個月。",
+    "美國今天沒有重大數據。12月9日FOMC期貨定價：升息65%、不變35%。下一次核心CPI模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）年增2.87%，核心PCE年增3.38%；第4季模型預估（亞特蘭大聯準銀行 GDPNow）2.9%。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份（11月26日）相同，沒有變：九宮格過熱（就業強、通膨高），政策重心通膨優先，傾向偏升息（score 6）；訊號9條，偏升息4、偏降息2、中性3，無增減。",
+    "關鍵讀數持平：核心PCE 3.26%、核心CPI 2.56%、失業率4.10%、10年實質2.79%、衰退風險刻度52.02。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-25",
+  "overnight": false
+ },
+ "checks": {
+  "numbers": 65,
+  "sources": 8,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 1,
+  "input_tokens": 24,
+  "output_tokens": 12296,
+  "cache_creation_input_tokens": 39941,
+  "cache_read_input_tokens": 237359,
+  "web_search_requests": 4,
+  "attempts": 1,
+  "cost_usd": 0.5332
+ }
+}
