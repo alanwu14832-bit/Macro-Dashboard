@@ -1,0 +1,132 @@
+{
+ "date": "2026-11-28",
+ "written_at": "2026-11-28T12:14:10+08:00",
+ "model": "claude-opus-5-5",
+ "title": "美股創逾一年最佳週 OPEC+週日開會",
+ "lede": "感恩節後的縮短交易日，美股昨夜收高，標普 500 寫下 2025 年 4 月以來最大單週漲幅；台股週五在選前量縮中靠台積電尾盤翻紅。油價本月大幅回落，OPEC+ 週日要訂 2027 年配額。本站判定與上一份存檔相同，只有長端殖利率回落。",
+ "stories": [
+  {
+   "headline": "美股週五全面收高，標普 500 創逾一年最佳單週",
+   "paragraphs": [
+    "美股 11 月 27 日（週五）在感恩節後的縮短交易日收高。美聯社報導，標普 500 漲 1.6% 至 7,297.49 點，道瓊漲 591.99 點、約 1.2%，那斯達克漲 2.3% 至 24,129.50 點；標普本週累計漲 5.6%，是 2025 年 4 月以來最大週漲幅。",
+    "美聯社指出，科技股再度領漲，但漲勢擴散到大盤，大約每 5 檔有 4 檔上漲；本週走勢起伏很大。Motley Fool 把這波漲勢形容為先前重挫的 AI 類股回補。"
+   ],
+   "sources": [
+    {
+     "title": "Stocks jump to end an erratic week that was Wall Street's best in over a year",
+     "outlet": "美聯社（Spectrum News 轉載）",
+     "url": "https://spectrumlocalnews.com/us/snplus/business/2026/11/27/stocks-rally-wall-street-best-week-in-over-a-year"
+    },
+    {
+     "title": "How major US stock indexes fared Friday 11/27/2026",
+     "outlet": "華盛頓郵報",
+     "url": "https://www.washingtonpost.com/business/2026/11/27/wall-street-stocks-dow-nasdaq/d71517d6-ea92-11f1-8db0-6f1e3c389e7c_story.html"
+    },
+    {
+     "title": "Stock Market Today, Nov. 27: S&P 500 Posts Best Week in 19 Months as AI Stocks Rebound",
+     "outlet": "Motley Fool",
+     "url": "https://www.fool.com/coverage/stock-market-today/2026/11/27/stock-market-today-nov-27-s-and-p-500-posts-best-week-in-19-months-as-ai-stocks-rebound/"
+    }
+   ]
+  },
+  {
+   "headline": "台股選前量縮收漲 156 點，台積電尾盤拉抬",
+   "paragraphs": [
+    "台股 11 月 27 日（週五）收漲 156.27 點，收 39,308.08 點，成交值縮至新台幣 6,660.69 億元。中央社報導，上漲 447 家、下跌 561 家，漲少跌多。",
+    "經濟日報指出，美股感恩節休市加上選前觀望，台股交易清淡，盤中漲逾 300 點後在年線附近遇壓，最後靠台積電尾盤拉抬收紅。中央社另報導，三大法人合計賣超 213.04 億元，只有投信買超。"
+   ],
+   "sources": [
+    {
+     "title": "台積電拉尾盤 台股選前量縮收漲156點",
+     "outlet": "經濟日報",
+     "url": "https://money.udn.com/money/story/5607/9905817"
+    },
+    {
+     "title": "台股漲156.27點",
+     "outlet": "中央社",
+     "url": "https://www.cna.com.tw/news/afe/202611270102.aspx"
+    },
+    {
+     "title": "三大法人賣超台股213.04億元",
+     "outlet": "中央社（聯合新聞網轉載）",
+     "url": "https://udn.com/news/story/7251/9905969"
+    }
+   ]
+  },
+  {
+   "headline": "OPEC+ 週日開會訂 2027 年配額，油價本月明顯回落",
+   "paragraphs": [
+    "OPEC+ 部長級會議訂在 11 月 29 日（週日），要決定 2027 年產量政策。ICIS 報導，布蘭特油價本月比 10 月均價跌超過 30 美元，因供給回到市場、需求轉弱，市場從短缺轉向預估的供給過剩；成員立場分歧，配額可能不易談攏。",
+    "中東風險仍在。有報導指出，布蘭特 26 日因荷莫茲海峽油輪觸雷、沙烏地煉油廠遭攻擊而漲 2.07%，並引述 IEA 估計第四季每日供給過剩 170 萬桶。The Rio Times 報導，USO 基金週五在會議前跌 1.52%。"
+   ],
+   "sources": [
+    {
+     "title": "Oil falls on supply glut concerns; eyes on 29 Nov OPEC+ meeting",
+     "outlet": "ICIS",
+     "url": "https://www.icis.com/explore/resources/news/2026/11/25/11243387/oil-falls-on-supply-glut-concerns-eyes-on-29-nov-opec-meeting/"
+    },
+    {
+     "title": "OPEC+ Meets on 29 November to Set 2027 Oil Quotas Today",
+     "outlet": "Bloggoto",
+     "url": "https://www.bloggoto.com/2026/11/28/opec-plus-november-29-meeting-2027-oil-quotas/"
+    },
+    {
+     "title": "Oil Slips 1.52% Before OPEC+ Meeting as Petrobras Gains",
+     "outlet": "The Rio Times",
+     "url": "https://www.riotimesonline.com/oil-markets-latam-friday-november-27-2026/"
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "us": {
+   "heading": "昨夜美國市場",
+   "paragraphs": [
+    "道瓊工業指數昨夜收 50,775 點；標普 500 與那斯達克在本站序列的最新一筆仍是前一交易日收盤，週五表現見第一則要聞。VIX 在 26.80，已連續 5 個交易日在 25 以上，風險胃納指標 11.9，落在「恐慌」區。",
+    "10 年期公債殖利率 4.85%，比上一份存檔的 4.91% 下降；10 年實質利率 2.73%；30 年期 5.24%。10 年減 2 年利差 0.24 個百分點，曲線呈熊平坦化。廣體美元指數最新一筆 123.60。",
+    "WTI 原油每桶 82.24 美元，近一月跌 21.9%；布蘭特 91.80 美元，近一月跌 28.3%。黃金每盎司 4,145 美元，近一月跌 9.3%；銅每噸 14,473 美元，處在十年百分位 100。"
+   ]
+  },
+  "markets": {
+   "heading": "台股美股",
+   "paragraphs": [
+    "台股加權指數週五收 39,308 點，漲 156 點、0.4%；櫃買指數跌 1.4%，收 285.77 點。台積電收 2,180 元，漲 35 元、1.6%；鴻海收 219 元，漲 2.5 元；聯發科收 3,680 元，跌 25 元；廣達收 278 元，跌 3 元。",
+    "美股權值股昨夜全數收紅：亞馬遜漲 4.0%，收 254.12 美元；Meta 漲 3.1%，收 628.96 美元；輝達、蘋果都漲 0.8%；Alphabet 漲 0.7%；微軟漲 0.6%。"
+   ]
+  },
+  "watch": {
+   "heading": "今天要看什麼",
+   "paragraphs": [
+    "今天是週六，美國與台灣都沒有重大數據或政策決議；明天（週日）有 OPEC+ 部長級會議。",
+    "聯準會 12/9 的決議，期貨定價升息 65%、不變 35%、降息 0%；到 2027/7 期貨定價累計升息 36 bp。下一次 CPI 的模型預估（克里夫蘭聯準銀行 Inflation Nowcasting）是年增 3.79%，核心 CPI 年增 2.87%、月增 0.21%；核心 PCE 年增 3.38%。第四季 GDP 的模型預估（亞特蘭大聯準銀行 GDPNow）是年化季增 2.9%。",
+    "台灣央行下次理監事會在 12 月 17 日，重貼現率 2.000%，已 32 個月沒有調整。"
+   ]
+  },
+  "verdict": {
+   "heading": "本站判定",
+   "paragraphs": [
+    "本站判定與上一份存檔相同，沒有變。九宮格仍在「過熱」（就業強 × 通膨高），政策重心是通膨優先，傾向偏升息（score 6）。訊號共 9 條，偏升息 4、偏降息 2、中性 3，沒有新增或消失。",
+    "核心 PCE 3.26%、核心 CPI 2.56%、失業率 4.10% 都沒動。變動都在利率端：10 年期殖利率從 4.91% 降到 4.85%，10 年實質利率從 2.79% 降到 2.73%，10 年減 2 年利差從 0.28 縮到 0.24 個百分點，衰退風險刻度從 52.02 降到 51.47。"
+   ]
+  }
+ },
+ "session": {
+  "us_date": "2026-11-27",
+  "overnight": true
+ },
+ "checks": {
+  "numbers": 79,
+  "sources": 9,
+  "searches": 4
+ },
+ "usage": {
+  "requests": 2,
+  "input_tokens": 16,
+  "output_tokens": 10855,
+  "cache_creation_input_tokens": 37879,
+  "cache_read_input_tokens": 112587,
+  "web_search_requests": 4,
+  "attempts": 2,
+  "cost_usd": 0.4691
+ }
+}
