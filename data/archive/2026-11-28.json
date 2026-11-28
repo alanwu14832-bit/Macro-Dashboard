@@ -1,6 +1,6 @@
 {
  "date": "2026-11-28",
- "generated_at": "2026-11-28T12:12:14+08:00",
+ "generated_at": "2026-11-28T13:05:46+08:00",
  "signals": [
   {
    "key": "core_pce_above_target",
@@ -20,10 +20,10 @@
   },
   {
    "key": "tw_signal_light_extreme",
-   "headline": "台灣景氣對策信號亮紅燈，熱絡區間已 10 個月",
+   "headline": "台灣景氣對策信號亮紅燈，熱絡區間已 11 個月",
    "direction": "neutral",
    "severity": "high",
-   "evidence": "綜合分數 41 分（紅燈 38–45、藍燈 9–16）",
+   "evidence": "綜合分數 40 分（紅燈 38–45、藍燈 9–16）",
    "module": "台灣"
   },
   {
@@ -71,7 +71,7 @@
    "headline": "台灣外銷訂單動向指數低於 50，看減家數多於看增",
    "direction": "neutral",
    "severity": "medium",
-   "evidence": "動向指數 48.7（50 為擴張與收縮分界）",
+   "evidence": "動向指數 49.0（50 為擴張與收縮分界）",
    "module": "台灣"
   }
  ],
@@ -106,14 +106,14 @@
   "composite_labor": -1.6853691262209334
  },
  "readings_tw": {
-  "score": 41.0,
+  "score": 40.0,
   "light": "紅",
   "exports_yoy": 58.9,
   "orders_yoy": 78.3,
   "cpi": 2.33,
-  "unemployment": 3.36,
+  "unemployment": 3.35,
   "policy": 2.0,
-  "gdp": 12.93,
+  "gdp": 14.39,
   "m1b_m2": null
  },
  "as_of": {
